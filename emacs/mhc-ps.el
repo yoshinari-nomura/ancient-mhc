@@ -3,7 +3,7 @@
 ;; Author:  TSUCHIYA Masatoshi <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 ;;          Hideyuki SHIRAI <shirai@quickhack.net>
 ;; Created: 2000/06/18
-;; Revised: $Date: 2000/08/07 02:16:21 $
+;; Revised: $Date: 2000/10/03 14:44:23 $
 
 
 ;;; Commentary:
@@ -874,7 +874,7 @@ showpage
   lst)
 
 
-(defun mhc-ps/make-contents (file year month &optional category category-is-invert)
+(defun mhc-ps/make-contents (file year month &optional category-predicate)
   (let ((weeks (mhc-ps/weeks (mhc-date-new year month 1)))
 	(last-yymm (mhc-date-mm-- (mhc-date-new year month 1)))
 	(next-yymm (mhc-date-mm++ (mhc-date-new year month 1)))
@@ -886,10 +886,7 @@ showpage
       (while dayinfo-list
 	(let ((schedules (mhc-day-schedules (car dayinfo-list))))
 	  (while schedules
-	    (when (or (null category)
-		      (if category-is-invert
-			  (not (mhc-schedule-in-category-p (car schedules) category))
-			(mhc-schedule-in-category-p (car schedules) category)))
+	    (when (funcall category-predicate (car schedules))
 	      (if (mhc-schedule-in-category-p (car schedules) "holiday")
 		  (setq holidays-buffer
 			(cons (mhc-ps/schedule-to-string
@@ -906,10 +903,7 @@ showpage
       (while dayinfo-list
 	(let ((schedules (mhc-day-schedules (car dayinfo-list))))
 	  (while schedules
-	    (when (or (null category)
-		      (if category-is-invert
-			  (not (mhc-schedule-in-category-p (car schedules) category))
-			(mhc-schedule-in-category-p (car schedules) category)))
+	    (when (funcall category-predicate (car schedules))
 	      (if (mhc-schedule-in-category-p (car schedules) "holiday")
 		  (setq last-holidays-buffer
 			(cons (number-to-string
@@ -925,10 +919,7 @@ showpage
       (while dayinfo-list
 	(let ((schedules (mhc-day-schedules (car dayinfo-list))))
 	  (while schedules
-	    (when (or (null category)
-		      (if category-is-invert
-			  (not (mhc-schedule-in-category-p (car schedules) category))
-			(mhc-schedule-in-category-p (car schedules) category)))
+	    (when (funcall category-predicate (car schedules))
 	      (if (mhc-schedule-in-category-p (car schedules) "holiday")
 		  (setq next-holidays-buffer
 			(cons (number-to-string
@@ -978,11 +969,11 @@ showpage
 (defvar mhc-ps/process-file-alist '())
 
 (defun mhc-ps/process (command arguments file buffer year month
-			       category category-is-invert)
+			       category-predicate)
   (mhc-setup)
   (message "PostScript creating ...")
   (let ((contents
-	 (mhc-ps/make-contents file year month category category-is-invert)))
+	 (mhc-ps/make-contents file year month category-predicate)))
     (if (null contents)
 	(message "No PostScript create.")
       (cond
@@ -1029,53 +1020,47 @@ showpage
 
 
 ;;;###autoload
-(defun mhc-ps-preview (year month &optional category category-is-invert)
+(defun mhc-ps-preview (year month &optional category-predicate)
   "*Preview PostScript calendar."
   (interactive
    (let* ((cdate (or (mhc-current-date) (mhc-calendar-get-date)))
-	  (date (mhc-input-month "Month: " cdate))
-	  (category (mhc-category-convert mhc-default-category)))
+	  (date (mhc-input-month "Month: " cdate)))
      (list
       (mhc-date-yy date)
       (mhc-date-mm date)
-      (cdr category)
-      (car category))))
+      mhc-default-category-predicate-sexp)))
   (mhc-ps/process mhc-ps-preview-command mhc-ps-preview-command-arguments
 		  (expand-file-name
 		   (format "mhc%04d%02d.ps" year month)
 		   (mhc-summary-folder-to-path mhc-base-folder))
 		  nil
 		  year month
-		  category category-is-invert))
-
+		  category-predicate))
 
 ;;;###autoload
-(defun mhc-ps-print (year month &optional category category-is-invert)
+(defun mhc-ps-print (year month &optional category-predicate)
   "*Print PostScript calendar."
   (interactive
    (let* ((cdate (or (mhc-current-date) (mhc-calendar-get-date)))
-	  (date (mhc-input-month "Month: " cdate))
-	  (category (mhc-category-convert mhc-default-category)))
+	  (date (mhc-input-month "Month: " cdate)))
      (list
       (mhc-date-yy date)
       (mhc-date-mm date)
-      (cdr category)
-      (car category))))
+      mhc-default-category-predicate-sexp)))
   (mhc-ps/process mhc-ps-print-command mhc-ps-print-command-arguments
 		  (expand-file-name
 		   (format "mhc%04d%02d.ps" year month)
 		   (mhc-summary-folder-to-path mhc-base-folder))
 		  nil
 		  year month
-		  category category-is-invert))
+		  category-predicate))
 
 ;;;###autoload
-(defun mhc-ps-save (year month file &optional category category-is-invert)
+(defun mhc-ps-save (year month file &optional category-predicate)
   "*Save PostScript calendar."
   (interactive
    (let* ((cdate (or (mhc-current-date) (mhc-calendar-get-date)))
 	  (date (mhc-input-month "Month: " cdate))
-	  (category (mhc-category-convert mhc-default-category))
 	  (default (expand-file-name
 		    (mhc-date-format date "mhc%04d%02d.ps" yy mm)
 		    (mhc-summary-folder-to-path mhc-base-folder)))
@@ -1084,33 +1069,29 @@ showpage
       (mhc-date-yy date)
       (mhc-date-mm date)
       file
-      (cdr category)
-      (car category))))
+      mhc-default-category-predicate-sexp)))
   (mhc-ps/process 'save nil
 		  file nil
 		  year month
-		  category category-is-invert))
-
+		  category-predicate))
 
 ;;;###autoload
-(defun mhc-ps-insert-buffer (year month buffer &optional category category-is-invert)
+(defun mhc-ps-insert-buffer (year month buffer &optional category-predicate)
   "*Insert PostScript calendar."
   (interactive
    (let* ((cdate (or (mhc-current-date) (mhc-calendar-get-date)))
 	  (date (mhc-input-month "Month: " cdate))
-	  (category (mhc-category-convert mhc-default-category))
 	  (buffer (read-buffer "Insert buffer: "
 			       "*mhc-postscript*")))
      (list
       (mhc-date-yy date)
       (mhc-date-mm date)
       buffer
-      (cdr category)
-      (car category))))
+      mhc-default-category-predicate-sexp)))
   (mhc-ps/process 'buffer nil
 		  nil buffer
 		  year month
-		  category category-is-invert))
+		  category-predicate))
 
 
 (provide 'mhc-ps)
