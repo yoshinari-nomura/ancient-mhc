@@ -1,12 +1,20 @@
+2000-07-19  Yoshinari Nomura  <nom@quickhack.net>
+
+	* emacs/mhc-cmail.el:
+	override some cmail's functions to make cmail-read-contents
+	available. 
+
 2000-07-19  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* emacs/mhc-face.el (mhc-face/make-face-bold):
 	New macro, fill the gap which Emacs and XEmacs.
 	(mhc-face/mhc-face-italic): Ditto.
 	(mhc-face/mhc-face-bold-italic): Ditto.
-	(mhc-face-get-effect): Use above macros. Make face name as mhc-effect-*-*.
+	(mhc-face-get-effect): Use above macros. Make face name as
+	mhc-effect-*-*. 
 
-	* emacs/mhc-ps.el (mhc-ps-preview-command-arguments): Change default value.
+	* emacs/mhc-ps.el (mhc-ps-preview-command-arguments): Change
+	  default value. 
 	(mhc-ps-paper-fill-print): New variable.
 	(mhc-ps/replace-table): Use mhc-ps-paper-fill-print.
 	(mhc-ps/process): Use expand-file-name()
@@ -273,9 +281,11 @@
 
 2000-06-30  Hideyuki SHIRAI  <shirai@quickhack.net>
 
-	* emacs/mhc.el (mhc-current-date): Get dayinfo property safe. (thanks to Teranishi-san)
+	* emacs/mhc.el (mhc-current-date): Get dayinfo property
+	  safe. (thanks to Teranishi-san)
 
-	* emacs/mhc-calendar.el (mhc-calendar/in-date-p): Renamed 'mhc-calendar/in-day-p'.
+	* emacs/mhc-calendar.el (mhc-calendar/in-date-p): Renamed
+	  'mhc-calendar/in-day-p'. 
 
 2000-06-28  MIYOSHI Masanori  <miyoshi@ask.ne.jp>
 
@@ -303,11 +313,13 @@
 
 2000-06-28  Hideyuki SHIRAI  <shirai@quickhack.net>
 
-	* emacs/mhc-summary.el (mhc-summary-insert-contents): If mailer eq 'direct,
+	* emacs/mhc-summary.el (mhc-summary-insert-contents): If mailer eq
+	  'direct, 
 	disable icon and insert \n.
 	(mhc-summary-line-insert): Set background color, if today.
 
-	* emacs/mhc-calendar.el (mhc-calendar-insert-summary-contents): Follow up new method.
+	* emacs/mhc-calendar.el (mhc-calendar-insert-summary-contents):
+	  Follow up new method. 
 
 	* emacs/mhc-ps.el (mhc-ps/substring): Use mhc-string-to-char-list
 	instead of string-to-list.
