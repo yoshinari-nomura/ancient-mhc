@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1994/07/04
-;; Revised: $Date: 2000/07/03 07:04:37 $
+;; Revised: $Date: 2000/07/18 04:29:00 $
 
 ;;;
 ;;; Commentay:
@@ -212,7 +212,8 @@ If HIDE-PRIVATE, private schedules are suppressed."
 
 (defun mhc-goto-next-month (&optional arg)
   (interactive "p")
-  (mhc-goto-month (mhc-date-mm+ (or (mhc-current-date-month) (mhc-date-now)) arg)
+  (mhc-goto-month (mhc-date-mm+ 
+		   (or (mhc-current-date-month) (mhc-date-now)) arg)
 		  mhc-default-hide-private-schedules))
 
 (defun mhc-goto-prev-month (&optional arg)
@@ -225,17 +226,19 @@ Unless NO-DISPLAY, display it."
   (interactive "P")
   (let ((now (mhc-date-now))
 	(buf-date (mhc-current-date-month)))
-    (goto-char (point-min))
-    (mhc-date-let now
-      (and 
-       (= yy (mhc-date-yy buf-date))
-       (= mm (mhc-date-mm buf-date))
-       (when (mhc-summary-search-date now)
-	 (forward-line 0)
-	 (or (pos-visible-in-window-p (point))
-	     (recenter))
-	 (or no-display
-	     (mhc-summary-display-article)))))))
+    (if buf-date
+	(progn
+	  (goto-char (point-min))
+	  (mhc-date-let now
+	    (and 
+	     (= yy (mhc-date-yy buf-date))
+	     (= mm (mhc-date-mm buf-date))
+	     (when (mhc-summary-search-date now)
+	       (forward-line 0)
+	       (or (pos-visible-in-window-p (point))
+		   (recenter))
+	       (or no-display
+		   (mhc-summary-display-article)))))))))
 
 (defun mhc-rescan-month (&optional hide-private)
   "*Rescan schedules of this buffer.
@@ -265,6 +268,10 @@ If HIDE-PRIVATE, private schedules are suppressed."
 (defvar mhc-use-week-separator 6
   "*if number 0 .. 6, insert separator in summary buffer.")
 
+(defvar mhc-summary-buffer-current-date-month nil
+  "Indicate summary buffer's month. It is also used by mhc-summary-buffer-p")
+(make-variable-buffer-local 'mhc-summary-buffer-current-date)
+
 (defun mhc-scan-month (date mailer cat inv-cat secret)
   (let ((from  (mhc-date-mm-first date))
 	(to    (mhc-date-mm-last date))
@@ -276,18 +283,21 @@ If HIDE-PRIVATE, private schedules are suppressed."
     (or (eq 'direct mailer)
 	(progn
 	  (if mhc-insert-todo-list
-	      (mhc-summary-make-todo-list (if (and (>= today from) (<= today to))
-					      today
-					    from)
-					  mailer cat inv-cat secret))
+	      (mhc-summary-make-todo-list
+	       (if (and (>= today from) (<= today to))
+		   today
+		 from)
+	       mailer cat inv-cat secret))
 	  (if mhc-insert-calendar
 	      (mhc-cal-insert-rectangle-at date (- (window-width) 24))) ;; xxx
-	  (mhc-goto-today t)
 	  (mhc-summary-mode-setup date mailer)
 	  (mhc-mode 1)
 	  (setq inhibit-read-only nil)
 	  (setq buffer-read-only t)
-	  (set-buffer-modified-p nil)))
+	  (set-buffer-modified-p nil)
+	  (setq mhc-summary-buffer-current-date-month
+		(mhc-date-mm-first date))
+	  (mhc-goto-today t)))
     (message (mhc-date-format date "Scanning %04d/%02d ... done." yy mm))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -627,13 +637,18 @@ C-c ?    mhc-draft-insert-calendar
 (defconst mhc-summary-buf-regex   
   (concat mhc-base-folder "/\\([0-9]+\\)/\\([0-9]+\\)"))
 
+;(defun mhc-summary-buffer-p (&optional buffer)
+;  (string-match mhc-summary-buf-regex 
+;		(buffer-name 
+;		 (or buffer (current-buffer)))))
+
 (defun mhc-summary-buffer-p (&optional buffer)
-  (string-match mhc-summary-buf-regex 
-		(buffer-name 
-		 (or buffer (current-buffer)))))
+  (if buffer
+      (set-buffer buffer))
+  mhc-summary-buffer-current-date-month)
 
 (defun mhc-current-date ()
-  (when (string-match mhc-summary-buf-regex (buffer-name))
+  (when (mhc-summary-buffer-p)
     (let ((dayinfo (get-text-property (point) 'mhc-dayinfo)))
       (or (and dayinfo (mhc-day-date dayinfo))
 	  (save-excursion
@@ -644,13 +659,16 @@ C-c ?    mhc-draft-insert-calendar
 		  (forward-char -1)))
 	    (and dayinfo (mhc-day-date dayinfo)))))))
 
+; (defun mhc-current-date-month ()
+;   (let ((buf (buffer-name)) yy mm dd)
+;     (if (not (string-match mhc-summary-buf-regex buf))
+; 	nil
+;       (mhc-date-new (string-to-number (match-string 1 buf))
+; 		    (string-to-number (match-string 2 buf))
+; 		    1))))
+
 (defun mhc-current-date-month ()
-  (let ((buf (buffer-name)) yy mm dd)
-    (if (not (string-match mhc-summary-buf-regex buf))
-	nil
-      (mhc-date-new (string-to-number (match-string 1 buf))
-		    (string-to-number (match-string 2 buf))
-		    1))))
+  mhc-summary-buffer-current-date-month)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; make rectangle like calendar.el
