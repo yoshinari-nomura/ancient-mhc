@@ -1,5 +1,6 @@
 2000-06-20  Yoshinari Nomura  <nom@quickhack.net>
 
+	* emacs/mhc-date.el (mhc-date-yy+): Fix dd's overrun.
 	* today: Change Author's mail address.
 	* emacs/mhc.el:	Change interfaces to guess functions. 
 	       Change indent fitting to 80 columns. 
