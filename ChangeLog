@@ -1,3 +1,8 @@
+2004-05-01  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+
+	* emacs/mhc-gnus.el: Rewritten to support both original Gnus and
+	T-gnus.
+
 2004-04-01  Mimpei MORISHITA <mimpei@cac.co.jp> / Yoshinari Nomura
 
 	* emacs/mhc-guess.el: brush up English date recognition.
