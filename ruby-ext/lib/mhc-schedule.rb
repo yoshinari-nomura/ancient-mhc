@@ -3,7 +3,7 @@
 ## Author:  Yoshinari Nomura <nom@quickhack.net>
 ##
 ## Created: 1999/07/16
-## Revised: $Date: 2000/06/21 06:38:47 $
+## Revised: $Date: 2000/06/26 04:14:33 $
 ##
 
 ################################################################
@@ -434,15 +434,38 @@ class MhcScheduleItem
     return self
   end
 
-  def dump
-    return dump_header + non_xsc_header .to_s + "\n" + 
-      description .to_s .chomp + "\n"
+  def dump_without_xsc_header
+    hdrs = non_xsc_header .to_s .sub(/\n+$/np, '')
+    hdrs += "\n" if hdrs != ''
+
+    desc = description .to_s
+    desc += "\n" if desc != '' and desc !~ /\n$/np
+
+    return hdrs + (desc != '' ? "\n" : '') + desc
   end
 
+  def dump
+    hdrs = non_xsc_header .to_s .sub(/\n+$/np, '')
+    hdrs += "\n" if hdrs != ''
+
+    desc = description .to_s
+    desc += "\n" if desc != '' and desc !~ /\n$/np
+
+    return dump_header + hdrs + "\n" + desc
+  end
+
+  ## non_xsc_header
   def non_xsc_header
     return @non_xsc_header
   end
 
+  def set_non_xsc_header(txt)
+    @non_xsc_header = txt
+    set_modified(true, 'set_description')
+    return self
+  end
+
+  ## description
   def description
     if @description
       return @description
@@ -454,7 +477,13 @@ class MhcScheduleItem
     end
     return @description
   end
-    
+
+  def set_description(txt)
+    @description = txt
+    set_modified(true, 'set_description')
+    return self
+  end
+
 #    ## description
 #    def description(all = false)
 #      if @description
@@ -482,12 +511,6 @@ class MhcScheduleItem
 #      @description = (hdr << val .to_s)
 #      return @description
 #    end
-
-  def set_description(txt)
-    @description = txt
-    set_modified(true, 'set_description')
-    return self
-  end
 
   ## pilot_flag
   def pilot_flag
@@ -796,15 +819,19 @@ class MhcScheduleItem
     pi_rec = PilotApptRecord .new
     pi_rec .set_alarm(alarm)
     pi_rec .set_time(time_b, time_e)
+
     exception .each{|date|
       pi_rec .add_exception(date)
     }
-    pi_rec .set_note(
-		     if non_xsc_header .to_s != '' or description .to_s != ''
-		       non_xsc_header .to_s + "\n" + description .to_s
-		     else
-		       ''
-		     end)
+
+    category .each{|cat|
+      datebk3_icon = cat if cat =~ /^\#\#@@@.@@@$/
+    }
+    contents = dump_without_xsc_header
+    contents = '' if contents =~ /^\s+$/np   ## \s includes \n
+    contents += datebk3_icon + "\n" if datebk3_icon
+    pi_rec .set_note(contents)
+
     pi_rec .set_description(subject)
     return pi_rec
   end
