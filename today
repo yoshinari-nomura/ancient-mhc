@@ -5,7 +5,7 @@
 ## Author:  Yoshinari Nomura <nom@quickhack.net>
 ##
 ## Created: 1999/11/11
-## Revised: $Date: 2000/06/28 13:58:40 $
+## Revised: $Date: 2000/07/07 06:27:22 $
 ##
 ## today was originally written in perl.
 ## This  is a ruby version of it. Original authors were
@@ -117,7 +117,14 @@ formatter_normal = Proc .new{|date, items|
   first = true
   items .each{|sch|
     heading = heading .gsub(/./, ' ') if !first
-    ret += heading + format("%-11s %s\n", sch .time_as_string, sch .subject)
+    ret += heading + format("%-11s %s%s\n",
+			    sch .time_as_string,
+			    sch .subject,
+			    if sch .location and sch .location != ''
+			      ' [' + sch .location + ']'
+			    else
+			      ''
+			    end)
     first = false
   }
   MhcKconv::todisp(ret)
