@@ -1,3 +1,13 @@
+2000-09-25  Yoshinari Nomura  <nom@quickhack.net>
+
+	* today.in: assume duration is whole month in case --format=ps.
+
+	* mhc-sync.in: more neat unconsistency check.
+
+	* 00readme, 00readme.jis, 00usage.jis: Catch up current status.
+
+	* emacs/00usage.jis: fix documents about X-SC-Category.
+
 2000-09-21  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* emacs/mhc-mew.el (mhc-mew/schedule-foldermsg): Support Mew 1.95b58
