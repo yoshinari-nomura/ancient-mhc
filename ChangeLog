@@ -1,3 +1,7 @@
+2001-06-25  Yoshinari Nomura  <nom@quickhack.net>
+
+	* emacs/mhc-guess.el: clever mhc-guess-time-regexp.
+
 2001-06-20  Yuuichi Teranishi  <teranisi@quickhack.net>
 
 	* emacs/mhc-wl.el (mhc-wl-highlight-message): Follow the changes
