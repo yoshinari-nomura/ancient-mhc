@@ -136,26 +136,30 @@
   (mhc-record-set-id record (mhc-parse/continuous-lines))
   schedule)
 
+;; FIXME: top level とそれ以外の場所で許される header が異なるので、
+;; multi pass parser に組み替えるべきかも知れない。
 (defun mhc-parse/internal-parser (record &optional schedule)
   "Internal parseser of schedule headers in this narrowed buffer."
   (let (func)
     (while (not (eobp))
-      (setq func (if (looking-at "\\([^ \t:]+\\):")
-		     (mhc-header-parse-function (match-string 1))
-		   (error "Parse ERROR !!!")))
-      (mhc-header-goto-end)
-      (if (fboundp func)
-	  (save-restriction
-	    (narrow-to-region (match-beginning 0) (point))
-	    (goto-char (match-end 0))
-	    (setq schedule
-		  (funcall func
-			   record
-			   (or schedule
-			       (if (memq func '(mhc-parse/schedule mhc-parse/next))
-				   nil
-				 (mhc-parse/next record nil)))))
-	    (goto-char (point-max))))))
+      (if (looking-at "\\([^ \t:]+\\):")
+	  (progn
+	    (setq func (mhc-header-parse-function (match-string 1)))
+	    (mhc-header-goto-end)
+	    (if (fboundp func)
+		(save-restriction
+		  (narrow-to-region (match-beginning 0) (point))
+		  (goto-char (match-end 0))
+		  (setq schedule
+			(funcall func
+				 record
+				 (or schedule
+				     (if (memq func '(mhc-parse/schedule mhc-parse/next))
+					 nil
+				       (mhc-parse/next record nil)))))
+		  (goto-char (point-max)))))
+	;; Always skip non-header lines.
+	(forward-line 1))))
   schedule)
 
 (defun mhc-parse-buffer (&optional record)

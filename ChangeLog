@@ -1,3 +1,8 @@
+2000-06-14  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+
+	* emacs/mhc-parse.el (mhc-parse/internal-parser): Always skip
+	non-header lines.
+
 2000-06-14  Hideyuki SHIRAI  <shirai@rdmg.mgcs.mei.co.jp>
 
 	* emacs/mhc.el (mhc-edit): Enwrap regexp-opt in parenthesis .
