@@ -5,7 +5,7 @@
 ## Author:  Yoshinari Nomura <nom@quickhack.net>
 ##
 ## Created: 1999/10/08
-## Revised: $Date: 2000/05/29 14:59:24 $
+## Revised: $Date: 2000/06/17 15:27:13 $
 ##
 
 $DEBUG = false
@@ -114,6 +114,8 @@ pdb .each_record{|rec|
 	  else
 	    print "Ignored.\n"
 	  end
+	else
+	  mdb .add_sch(x)
 	end
       end
     end
