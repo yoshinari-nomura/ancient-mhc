@@ -1,3 +1,16 @@
+2000-08-04  Yuuichi Teranishi  <teranisi@quickhack.net>
+
+	* emacs/mhc-summary.el (mhc-icon-setup-hook): New hook.
+
+	* emacs/mhc-xmas.el (mhc-icon-setup): Run `mhc-icon-setup-hook'
+
+	* emacs/mhc-bm.el (mhc-icon-setup): Ditto.
+
+	* emacs/mhc.el (mhc-setup): Revival `mhc-icon-setup'.
+
+	* emacs/mhc-summary.el (mhc-summary-line-inserter-setup):
+	Call `mhc-icon-setup' only when it is called interactively.
+
 2000-08-04  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* emacs/mhc.el (mhc-setup): Fix, called mhc-icon-setup() twice.

@@ -100,6 +100,11 @@
   :group 'mhc
   :type 'directory)
 
+(defcustom mhc-icon-setup-hook nil
+  "*A hook called after icon setup."
+  :group 'mhc
+  :type 'hook)
+
 (defcustom mhc-summary-display-todo t
   "*Display TODO in summary."
   :group 'mhc
@@ -638,7 +643,9 @@ If optional argument FOR-DRAFT is non-nil, Hilight message as draft message."
 (defun mhc-summary-line-inserter-setup ()
   "Setup MHC summary and todo line inserter."
   (interactive)
-  (if (mhc-use-icon-p) (call-interactively 'mhc-icon-setup))
+  (if (and (interactive-p)
+	   (mhc-use-icon-p))
+      (call-interactively 'mhc-icon-setup))
   (mhc-line-inserter-setup
    mhc-summary/line-inserter
    mhc-summary-line-format

@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1994/07/04
-;; Revised: $Date: 2000/08/04 10:31:50 $
+;; Revised: $Date: 2000/08/04 11:01:24 $
 
 ;;;
 ;;; Commentay:
@@ -741,6 +741,7 @@ Returns t if the importation was succeeded."
     (mhc-face-setup)
     (mhc-calendar-setup)
     (mhc-file-setup)
+    (and (mhc-use-icon-p) (mhc-icon-setup))
     (and mhc-calendar-link-hnf (mhc-calendar-hnf-face-setup))
     (mhc-summary-line-inserter-setup)
     (autoload 'mhc-ps-preview "mhc-ps" "*Preview PostScript calendar." t)

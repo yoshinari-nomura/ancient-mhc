@@ -3,7 +3,7 @@
 ;; Author:  Yuuichi Teranishi <teranisi@gohome.org>
 ;;
 ;; Created: 2000/05/27
-;; Revised: $Date: 2000/08/04 03:18:39 $
+;; Revised: $Date: 2000/08/04 11:01:23 $
 
 (require 'bitmap)
 (require 'mhc-face)
@@ -122,6 +122,7 @@ icon line."
       (progn
 	(message "Initializing MHC icons...")
 	(mhc-bm/setup-icons)
+	(run-hooks 'mhc-icon-setup-hook)
 	(message "Initializing MHC icons...done."))))
 
 (defun mhc-use-icon-p ()
