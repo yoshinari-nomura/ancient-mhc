@@ -1,3 +1,7 @@
+2005-03-23  Yoshiaki Kasahara <kasahara@nc.kyushu-u.ac.jp>
+
+	* ruby-ext/lib/mhc-gtk.rb.in: Use explicit regexp
+
 2005-03-16  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* emacs/mhc-guess.el (mhc-guess-date-regexp-list): Support new

@@ -5,7 +5,7 @@
 ## Author:  Yoshinari Nomura <nom@quickhack.net>
 ##
 ## Created: 1999/07/16
-## Revised: $Date: 2000/08/03 07:48:20 $
+## Revised: $Date: 2005/03/22 16:18:45 $
 ##
 
 #$DEBUG = true
@@ -41,7 +41,7 @@ XPM_PATH = '@@MHC_XPM_PATH@@'
 TIPS = Gtk::Tooltips .new
 TIPS .set_delay(500)
 
-if RUBY_PLATFORM =~ 'cygwin'
+if RUBY_PLATFORM =~ /cygwin/
   ## for windows
   FONTSET = "-unknown-ms ui gothic-normal-r-normal-*-*-100-*-*-p-*-windows-shiftjis"
   FONTSET2 = "-unknown-ms ui gothic-bold-r-normal-*-*-100-*-*-p-*-windows-shiftjis"
