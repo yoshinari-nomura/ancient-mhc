@@ -3,7 +3,7 @@
 ################################################################
 
 Created: 1999/04/07
-Revised: $Date: 2000/07/03 16:13:54 $
+Revised: $Date: 2000/09/25 02:15:43 $
 
 mhc の使いかた
 
@@ -250,7 +250,7 @@ mhc の使いかた
 
 	Private や Leisure というカテゴリを設定している人は、
 
-	(setq mhc-default-category "!private leasure")
+        (setq mhc-default-category '("!private" "leasure"))
 
 	と書いておくと、普段は private と leasure についての表示を 
         Summary に出しません。仕事に生きる人は、
