@@ -3,7 +3,7 @@
 ;; Author:  TSUCHIYA Masatoshi <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 ;;          Hideyuki SHIRAI <shirai@quickhack.net>
 ;; Created: 2000/06/18
-;; Revised: $Date: 2000/10/03 14:44:23 $
+;; Revised: $Date: 2000/12/20 12:06:09 $
 
 
 ;;; Commentary:
@@ -325,12 +325,12 @@ def
 } def
 
 /startday {             % starting day-of-week for this month
-    /off year 2000 sub def      % offset from start of \"epoch\"
+    /off year 2032 sub def      % offset from start of \"epoch\"
     off
     off 4 idiv add          % number of leap years
     off 100 idiv sub        % number of centuries
     off 1000 idiv add       % number of millenia
-    6 add weekday days_week add     % offset from Jan 1 2000
+    4 add weekday days_week add     % offset from Jan 1 2032
     /off exch def
     1 1 month 1 sub {
         /idx exch def
