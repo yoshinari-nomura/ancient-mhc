@@ -1,3 +1,8 @@
+2001-05-22  Yoshinari Nomura  <nom@quickhack.net>
+
+	* ruby-ext/lib/mhc-schedule.rb (File#utime2):
+	update mtime surely in case FreeBSD.
+
 2001-05-10  Yoshinari Nomura <nom@quickhack.net>
 
 	* configure.rb: xpm path is now configurable.
