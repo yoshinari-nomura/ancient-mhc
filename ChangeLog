@@ -1,3 +1,8 @@
+2000-07-28  Yoshinari Nomura  <nom@quickhack.net>
+
+	* emacs/mhc-logic.el (mhc-logic/day-of-month-regexp):
+	In X-SC-Cond, day of month allows preceding zeros.
+
 2000-07-28  Yoshiaki Kasahara  <kasahara@nc.kyushu-u.ac.jp>
 
 	* emacs/mhc-date.el (mhc-date-digit-to-oo-string): Fix a typo.
