@@ -5,7 +5,7 @@
 ;;          MIYOSHI Masanori <miyoshi@quickhack.net>
 ;;
 ;; Created: 05/12/2000
-;; Reviesd: $Date: 2002/11/11 05:27:14 $
+;; Reviesd: $Date: 2002/12/01 03:55:06 $
 
 ;;; Configration Variables:
 
@@ -615,7 +615,8 @@ The keys that are defined for mhc-calendar-mode are:
 	(mhc-use-week-separator nil))
     (goto-char (point-max))
     (insert "\n")
-    (mhc-summary/insert-separator)
+    (mhc-summary/insert-separator nil nil
+				  (* mhc-calendar-next-offset 3))
     (mhc-summary-make-contents date date 'mhc-calendar)
     (delete-char -1)
     (set-buffer-modified-p nil)))

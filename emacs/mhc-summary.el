@@ -543,25 +543,28 @@ If optional argument FOR-DRAFT is non-nil, Hilight message as draft message."
 (defsubst mhc-summary/make-string (count character)
   (make-string (max 4 count) character))	;; xxxx 4 ?
 
-(defun mhc-summary/insert-separator (&optional wide str)
-  (let (hr)
+(defun mhc-summary/insert-separator (&optional wide str fixwidth)
+  (let ((width (mhc-misc-get-width))
+	hr)
     (if wide
 	(progn
 	  (setq hr (mhc-summary/make-string
-		    (- (frame-width) 2) mhc-summary-month-separator))
+		    (- width 2) mhc-summary-month-separator))
 	  (mhc-face-put hr 'mhc-summary-face-month-separator))
       (if (stringp str)
-	  (let ((hr1 (make-string 4 mhc-summary-separator))
+	  (let ((hr1 (make-string 4 mhc-summary-separator))	;; xxxx 4 ?
 		hr2)
 	    (mhc-face-put hr1 'mhc-summary-face-separator)
 	    (mhc-face-put str 'mhc-summary-face-cw)
-	    (setq hr2 (mhc-summary/make-string (- (frame-width) mhc-calendar-width
+	    (setq hr2 (mhc-summary/make-string (- width mhc-calendar-width
 						  (length hr1) (length str))
 					       mhc-summary-separator))
 	    (mhc-face-put hr2 'mhc-summary-face-separator)
 	    (setq hr (concat hr1 str hr2)))
-	(setq hr (mhc-summary/make-string (- (frame-width) mhc-calendar-width)
-					  mhc-summary-separator))
+	(if fixwidth
+	    (setq hr (mhc-summary/make-string fixwidth mhc-summary-separator))
+	  (setq hr (mhc-summary/make-string (- width mhc-calendar-width)
+					    mhc-summary-separator)))
 	(mhc-face-put hr 'mhc-summary-face-separator)))
     (insert hr "\n")))
 

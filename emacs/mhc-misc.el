@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1997/10/12
-;; Revised: $Date: 2000/06/18 09:59:33 $
+;; Revised: $Date: 2002/12/01 03:55:06 $
 
 ;;;
 ;;; Commentay:
@@ -93,9 +93,6 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; rectangle
-
-(get-char-property (point) 'invisible)
-
 ;;
 ;; Does (current-column) count visible character only?
 ;;   emacs  19.34, 20.4, 20.5 -- yes
@@ -145,6 +142,17 @@
 	  (delete-region (point) (match-end 0)))
       (insert (car lines))
       (setq lines (cdr lines)))))
+
+(defun mhc-misc-get-width ()
+  (let ((dw (* mhc-calendar-width 2))
+	(ww (window-width))
+	(fw (frame-width)))
+    (cond
+     ((> ww dw) ww)
+     ((and (< (* ww 2) fw)
+	   (> (* ww 2) dw)) (* ww 2))
+     ((> fw dw) fw)
+     (t dw))))
 
 ;; read-passwd
 
