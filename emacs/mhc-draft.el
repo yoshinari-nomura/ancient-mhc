@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>,
 ;;          Yuuichi Teranishi <teranisi@quickhack.net>
 ;; Created: 2000/07/25
-;; Revised: $Date: 2004/05/01 12:55:23 $
+;; Revised: $Date: 2004/05/01 17:14:28 $
 
 ;;; Commentary:
 
@@ -44,10 +44,11 @@
 
 (defcustom mhc-draft-unuse-hdr-list
   '(">From " "From " "Delivered-To:" "Delivery-date:" "Envelope-to:"
-    "Errors-To:" "Lines:" "Posted:" "Precedence:" "Received:" "Replied:"
-    "Return-Path:" "Sender:" "User-Agent:" "X-Bogosity:" "X-Dispatcher:"
-    "X-Filter:" "X-Gnus-Mail-Source:" "X-Mailer:" "X-Received:" "X-Sender:"
-    "X-Seqno:" "X-Spam-Flag:" "X-Spam-Probability:" "X-UIDL:" "Xref:")
+    "Errors-To:" "Gnus-Warning:" "Lines:" "Posted:" "Precedence:" "Received:"
+    "Replied:" "Return-Path:" "Sender:" "User-Agent:" "X-Bogosity:"
+    "X-Dispatcher:" "X-Filter:" "X-Gnus-Mail-Source:" "X-Mailer:" "X-Received:"
+    "X-Sender:" "X-Seqno:" "X-Spam-Flag:" "X-Spam-Probability:" "X-UIDL:"
+    "Xref:")
   "*These headers are removed when article is imported."
   :group 'mhc
   :type '(repeat string))

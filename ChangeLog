@@ -1,3 +1,10 @@
+2004-05-02  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+
+	* emacs/MHC-MK (make-mhc/module-alist): Check that mime-edit.el is
+	available when before byte-compiling mhc-mime.el for Gnus.
+
+	* emacs/mhc-draft.el (mhc-draft-unuse-hdr-list): Add Gnus-Warning.
+
 2004-05-01  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 
 	* emacs/mhc.el (mhc-edit): Call `mhc-draft-mode' before calling
@@ -36,7 +43,7 @@
 	* emacs/mhc-mew.el (mhc-mew/header-string): Support the new format
 	of summary for Mew 4.
 	(mhc-mew/header-string-review): Ditto.
-	
+
 2003-12-19  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* emacs/mhc.el (mhc-edit): Ask Alarm when direct input.
@@ -69,7 +76,7 @@
 
 	* mhc2ol.in (Period::get_duration): Use `nil?' for ruby-1.8.
 	(Exporter::setup_ol_appointments): Don't use `$=' for ruby-1.8.
-	(Exporter::export):  Don't use `=~' for ruby-1.8.
+	(Exporter::export): Don't use `=~' for ruby-1.8.
 	($flag_category_regexp): Initialize with a Regexp object.
 
 2003-10-14  Hiroya Murata <lapis-lazuli@pop06.odn.ne.jp> / nom
