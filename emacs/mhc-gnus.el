@@ -67,13 +67,12 @@
   (gnus-copy-article-buffer))
 
 
-(defsubst mhc-gnus/ddate-to-group-name (ddate)
-  (format "%s/%02d/%02d"
-	  mhc-base-folder (ddate-yy ddate) (ddate-mm ddate)))
+(defsubst mhc-gnus/date-to-group-name (date)
+  (mhc-date-format date "%s/%02d/%02d" mhc-base-folder yy mm))
 
 
-(defun mhc-gnus-generate-summary-buffer (ddate)
-  (let* ((group (mhc-gnus/ddate-to-group-name ddate))
+(defun mhc-gnus-generate-summary-buffer (date)
+  (let* ((group (mhc-gnus/date-to-group-name date))
 	 (method `(nnmhc ,group))
 	 (vgroup (gnus-group-prefixed-name group method)))
     ;; initialize ephemeral nnmhc group.
@@ -107,7 +106,7 @@
 	(mhc-put-icon icon (+ pos mhc-summary-icon-position)))))
 
 
-(defun mhc-gnus-summary-mode-setup (ddate)
+(defun mhc-gnus-summary-mode-setup (date)
   (setq gnus-newsgroup-data (nreverse gnus-newsgroup-data)
 	nnmhc-article-list (nreverse nnmhc-article-list))
   (save-excursion
@@ -118,7 +117,7 @@
       (forward-line 1)))
   (let ((gnus-newsgroup-data))
     (gnus-summary-mode (gnus-group-prefixed-name
-			(mhc-gnus/ddate-to-group-name ddate)
+			(mhc-gnus/date-to-group-name date)
 			'(nnmhc))))
   (when (fboundp 'gnus-summary-setup-default-charset)
     (gnus-summary-setup-default-charset)) ; for Nana7

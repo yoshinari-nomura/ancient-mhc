@@ -82,27 +82,29 @@
 	(mhc-put-icon icon (+ pos mhc-summary-icon-position)))))
 
 
-(defsubst mhc-wl/ddate-to-folder (ddate)
-  (concat "*" 
-	  mhc-base-folder "/intersect"
-	  ","
-	  mhc-base-folder "/" (ddate-yymm-s1 ddate "/")))
+(defsubst mhc-wl/date-to-folder (date)
+  (mhc-date-format date
+		   "*%s/intersect,%s/%04d/%02"
+		   mhc-base-folder
+		   mhc-base-folder
+		   yy
+		   dd))
 
 
-(defun mhc-wl-summary-mode-setup (ddate)
+(defun mhc-wl-summary-mode-setup (date)
   (wl-summary-mode)
-  (wl-summary-buffer-set-folder (mhc-wl/ddate-to-folder ddate))
+  (wl-summary-buffer-set-folder (mhc-wl/date-to-folder date))
   (make-local-variable 'wl-summary-highlight)
   (setq wl-summary-highlight nil)
   (setq wl-summary-buffer-number-regexp "[0-9]+")
   (setq wl-summary-buffer-msgdb '(nil)))
 
 
-(defun mhc-wl-generate-summary-buffer (ddate)
+(defun mhc-wl-generate-summary-buffer (date)
   (switch-to-buffer
    (set-buffer
     (mhc-get-buffer-create
-     (concat mhc-base-folder "/" (ddate-yymm-s1 ddate "/")))))
+     (mhc-date-format date "%s/%02d/%02d" mhc-base-folder yy mm))))
   (setq inhibit-read-only t
 	buffer-read-only nil
 	selective-display t

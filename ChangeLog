@@ -1,11 +1,27 @@
+2000-06-18  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+
+	* emacs/mhc.el: Follow reconstruction of mhc-date.el.
+	* emacs/mhc-db.el: Ditto.
+	* emacs/mhc-gnus.el: Ditto.
+	* emacs/mhc-guess.el: Ditto.
+	* emacs/mhc-logic.el: Ditto.
+	* emacs/mhc-mew.el: Ditto.
+	* emacs/mhc-minibuf.el: Ditto.
+	* emacs/mhc-record.el: Ditto.
+	* emacs/mhc-wl.el: Ditto.
+	* emacs/mhc-date.el: Some bug fixes.
+	* emacs/mhc-calendar.el: Quick hack to follow reconstruction of mhc-date.el.
+	* emacs/ddate.el: Ditto.
+	* emacs/Makefile: Add suffix rule.
+	
+2000-06-18  Yoshinari Nomura  <nom@quickhack.net>
+
+	* emacs/mhc-date.el: Rewrite all codes.
+
 2000-06-17  Yoshinari Nomura  <nom@quickhack.net>,
             MIYOSHI Masanori  <miyoshi@ask.ne.jp>
 
 	* palm2mhc: call ad_sch() in non interactive mode.
-
-2000-06-17  Yoshinari Nomura  <nom@quickhack.net>
-
-	* emacs/mhc-date2.el: Temporary file.
 
 2000-06-17  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 

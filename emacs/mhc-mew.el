@@ -66,14 +66,14 @@
 	(current-buffer))))
 
 
-(defun mhc-mew/ddate-to-buffer (ddate)
-  (concat mhc-base-folder "/" (ddate-yymm-s1 ddate "/")))
+(defun mhc-mew/date-to-buffer (date)
+  (mhc-date-format date "%s/%02d/%02d" mhc-base-folder yy mm))
 
 
-(defun mhc-mew-generate-summary-buffer (ddate)
+(defun mhc-mew-generate-summary-buffer (date)
   (switch-to-buffer
    (set-buffer
-    (mhc-get-buffer-create (mhc-mew/ddate-to-buffer ddate))))
+    (mhc-get-buffer-create (mhc-mew/date-to-buffer date))))
   (setq inhibit-read-only t
 	buffer-read-only nil
 	selective-display t
@@ -110,7 +110,7 @@
 	(mhc-put-icon icon (+ pos mhc-summary-icon-position)))))
 
 
-(defun mhc-mew-summary-mode-setup (ddate)
+(defun mhc-mew-summary-mode-setup (date)
   (make-local-variable 'mew-use-cursor-mark)
   (make-local-variable 'mew-use-highlight-cursor-line)
   (setq mew-use-cursor-mark nil)

@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1994/07/04
-;; Revised: $Date: 2000/06/17 12:50:28 $
+;; Revised: $Date: 2000/06/18 06:57:51 $
 
 ;;;
 ;;; Commentay:
@@ -171,14 +171,17 @@
 (defvar mhc-month-hist nil)
 
 (defun mhc-input-month (prompt)
-  (let ((ret nil) (month-str (ddate-yymm-s1 (ddate-now) "/")))
+  (let ((ret nil)
+	(month-str (mhc-date-format (mhc-date-now) "%04d/%02d" yy dd)))
     (while (null ret)
       (setq month-str 
 	    (read-from-minibuffer
 	     (concat prompt "(yyyy/mm) : ") month-str nil nil 'mhc-month-hist))
       (if (string-match "\\([0-9]+\\)/\\([0-9]+\\)" month-str)
-	  (setq ret (ddate-new (ddate-substring-to-int month-str 1)
-			       (ddate-substring-to-int month-str 2) 1 t))))
+	  (setq ret (mhc-date-new
+		     (string-to-number (match-string 1 month-str))
+		     (string-to-number (match-string 2 month-str))
+		     1 t))))
     ret))
 
 (defun mhc-goto-month (&optional date hide-private)
@@ -205,12 +208,11 @@ If HIDE-PRIVATE, private schedules are suppressed."
     (if mhc-default-hide-private-schedules
 	(not current-prefix-arg)
       current-prefix-arg)))
-  (mhc-goto-month (ddate-now) hide-private))
+  (mhc-goto-month (mhc-date-now) hide-private))
 
 (defun mhc-goto-next-month (&optional arg)
   (interactive "p")
-  (mhc-goto-month (ddate-mm-inc (or (mhc-current-ddate-month)
-				    (ddate-now)) arg)
+  (mhc-goto-month (mhc-date-mm+ (or (mhc-current-date-month) (mhc-date-now)) arg)
 		  mhc-default-hide-private-schedules))
 
 (defun mhc-goto-prev-month (&optional arg)
@@ -221,18 +223,21 @@ If HIDE-PRIVATE, private schedules are suppressed."
   "*Go to the line of today's schedule.
 Unless NO-DISPLAY, display it."
   (interactive "P")
-  (let ((now (ddate-now)) (buf-date (mhc-current-ddate-month)))
+  (let ((now (mhc-date-now))
+	(buf-date (mhc-current-date-month)))
     (goto-char (point-min))
-    (and (= (ddate-yy now) (ddate-yy buf-date))
-	 (= (ddate-mm now) (ddate-mm buf-date))
-	 (re-search-forward
-	  (format "^\\([0-9]+ | \\)?%s" (ddate-mmdd-s1 (ddate-now) "/")) nil t)
-	 (progn 
-	   (forward-line 0)
-	   (or (pos-visible-in-window-p (point))
-	       (recenter))
-	   (or no-display
-	       (mhc-summary-display-article))))))
+    (mhc-date-let now
+      (and 
+       (= yy (mhc-date-yy buf-date))
+       (= mm (mhc-date-mm buf-date))
+       (re-search-forward
+	(format "^\\([0-9]+ | \\)?%04d/%02d" yy mm) nil t)
+       (progn 
+	 (forward-line 0)
+	 (or (pos-visible-in-window-p (point))
+	     (recenter))
+	 (or no-display
+	     (mhc-summary-display-article)))))))
 
 (defun mhc-rescan-month (&optional hide-private)
   "*Rescan schedules of this buffer.
@@ -245,7 +250,7 @@ If HIDE-PRIVATE, private schedules are suppressed."
   (let ((category (mhc-category-convert mhc-default-category))
 	(line (+ (count-lines (point-min) (point))
 		 (if (= (current-column) 0) 1 0))))
-    (mhc-scan-month (mhc-current-ddate-month)
+    (mhc-scan-month (mhc-current-date-month)
 		    (mhc-summary-mailer-type)
 		    (cdr category)
 		    (car category)
@@ -262,13 +267,13 @@ If HIDE-PRIVATE, private schedules are suppressed."
 (defvar mhc-use-week-separator 6
   "*if number 0 .. 6, insert separator in summary buffer.")
 
-(defun mhc-scan-month (ddate mailer cat inv-cat secret)
-  (let ((from  (ddate-days (ddate-mm-first-day ddate)))
-	(to    (ddate-days (ddate-mm-last-day ddate)))
-	(today (ddate-days (ddate-now))))
+(defun mhc-scan-month (date mailer cat inv-cat secret)
+  (let ((from  (mhc-date-mm-first date))
+	(to    (mhc-date-mm-last date))
+	(today (mhc-date-now)))
     (or (eq 'direct mailer)
-	(mhc-summary-generate-buffer ddate mailer))
-    (message "Scanning %s ..." (ddate-yymm-s1 ddate "/"))
+	(mhc-summary-generate-buffer date mailer))
+    (message (mhc-date-format date "Scanning %04d/%02d ..." yy mm))
     (mhc-summary-make-contents from to mailer cat inv-cat secret)
     (or (eq 'direct mailer)
 	(progn
@@ -278,13 +283,13 @@ If HIDE-PRIVATE, private schedules are suppressed."
 					    from)
 					  mailer cat inv-cat secret))
 	  (if mhc-insert-calendar
-	      (mhc-cal-insert-rectangle-at ddate (- (window-width) 24))) ;; xxx
+	      (mhc-cal-insert-rectangle-at date (- (window-width) 24))) ;; xxx
 	  (mhc-goto-today t)
-	  (mhc-summary-mode-setup ddate mailer)
+	  (mhc-summary-mode-setup date mailer)
 	  (mhc-mode 1)
 	  (setq inhibit-read-only nil)
 	  (setq buffer-read-only t)))
-    (message "Scanning %s ... done." (ddate-yymm-s1 ddate "/"))))
+    (message (mhc-date-format date "Scanning %04d/%02d ... done." yy mm))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; import, edit, delete, modify
@@ -298,7 +303,7 @@ Returns t if the importation was succeeded."
        (list (get-buffer (read-buffer "Import buffer: "
 				      (current-buffer))))))
   (let ((draft-buffer (generate-new-buffer mhc-draft-buffer-name))
-	(current-date (if calendar (mhc-calendar-get-ddate) (mhc-current-ddate)))
+	(current-date (if calendar (mhc-calendar-get-ddate) (mhc-current-date)))
 	(succeed t)
 	date time subject location category)
     (and (interactive-p)
@@ -379,12 +384,15 @@ Returns t if the importation was succeeded."
 	  (goto-char (point-min))
 	  (insert "X-SC-Subject: " subject
 		  "\nX-SC-Location: " location
-		  "\nX-SC-Day: " (mapconcat (function ddate-to-s) date " ")
+		  "\nX-SC-Day: " (mapconcat
+				  (lambda (day)
+				    (mhc-date-format day "%04d%02d%02d" yy mm dd))
+				  date " ")
 		  "\nX-SC-Time: " (if time
 				      (let ((begin (car time))
 					    (end (nth 1 time)))
-					(concat (if begin (dtime-to-s begin) "")
-						(if end (concat "-" (dtime-to-s end)) "")))
+					(concat (if begin (mhc-time-to-string begin) "")
+						(if end (concat "-" (mhc-time-to-string end)) "")))
 				    "")
 		  "\nX-SC-Category: " (mapconcat (function capitalize) category " ")
 		  "\nX-SC-Cond: "
@@ -419,10 +427,9 @@ Returns t if the importation was succeeded."
 	   (not (y-or-n-p (format
 			   "%s has multiple occurrences. Delete all(=y) or one(=n) ?"
 			   (mhc-record-subject-as-string record)))))
-	  (mhc-db-add-exception-rule record (ddate-days
-					     (or (mhc-current-ddate)
-						 (and (eq major-mode 'mhc-calendar-mode)
-						      mhc-calendar-view-ddate))))
+	  (mhc-db-add-exception-rule record (or (mhc-current-date)
+						(and (eq major-mode 'mhc-calendar-mode)
+						     mhc-calendar-view-ddate)))
 	(mhc-db-delete-file record))
       (or (and (mhc-summary-buffer-p)
 	       (mhc-rescan-month mhc-default-hide-private-schedules))
@@ -610,29 +617,29 @@ C-c ?    mhc-draft-insert-calendar
 		(buffer-name 
 		 (or buffer (current-buffer)))))
 
-(defun mhc-current-ddate ()
+(defun mhc-current-date ()
   (let ((buf (buffer-name)) yy mm dd)
     (if (not (string-match mhc-summary-buf-regex buf))
 	nil
-      (setq yy (ddate-substring-to-int buf 1)
-	    mm (ddate-substring-to-int buf 2))
+      (setq yy (string-to-number (match-string 1 buf))
+	    mm (string-to-number (match-string 2 buf)))
       (save-excursion
 	(forward-line 0)
 	(while (if (looking-at mhc-summary-day-regex)
 		   (progn
-		     (setq dd (ddate-substring-to-int t 2))
+		     (setq dd (string-to-number (match-string 2)))
 		     nil) ;; exit loop.
 		 (not (bobp)))
 	  (forward-line -1))
-	(if dd (ddate-new yy mm dd) nil)))))
+	(if dd (mhc-date-new yy mm dd) nil)))))
 
-(defun mhc-current-ddate-month ()
+(defun mhc-current-date-month ()
   (let ((buf (buffer-name)) yy mm dd)
     (if (not (string-match mhc-summary-buf-regex buf))
 	nil
-      (ddate-new (ddate-substring-to-int buf 1)
-		 (ddate-substring-to-int buf 2)
-		 1))))
+      (mhc-date-new (string-to-number (match-string 1 buf))
+		    (string-to-number (match-string 2 buf))
+		    1))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; make rectangle like calendar.el
@@ -645,24 +652,27 @@ C-c ?    mhc-draft-insert-calendar
 
 (defconst mhc-cal-week-header "| Su Mo Tu We Th Fr Sa")
 
-(defun mhc-cal-insert-rectangle-at (ddate col)
+(defun mhc-cal-insert-rectangle-at (date col)
   (save-excursion
     (put-text-property (point-min) (point-max) 'rear-nonsticky t)
     (goto-char (point-min))
     (mhc-misc-move-to-column col)
     (mhc-misc-insert-rectangle
-     (nconc (mhc-cal-make-rectangle (ddate-mm-dec ddate))
+     (nconc (mhc-cal-make-rectangle (mhc-date-mm-- date))
 	    (list "| ")
-	    (mhc-cal-make-rectangle ddate)
+	    (mhc-cal-make-rectangle date)
 	    (list "| ")
-	    (mhc-cal-make-rectangle (ddate-mm-inc ddate))))))
+	    (mhc-cal-make-rectangle (mhc-date-mm++ date))))))
 
-(defun mhc-cal-make-rectangle (&optional ddate)
+(defun mhc-cal-make-rectangle (&optional date)
   (interactive)
-  (let* ((today (ddate-now))
-	 (days (mhc-db-scan-month (ddate-yy (or ddate today)) (ddate-mm (or ddate today)) t))
+  (let* ((today (mhc-date-now))
+	 (days (mhc-db-scan-month (mhc-date-yy (or date today)) (mhc-date-mm (or date today)) t))
 	 (month (list mhc-cal-week-header
-		      (format "|    %s" (ddate-yymm-sj (or ddate today)))))
+		      (mhc-date-format (or date today)
+				       "|    %s %04d"
+				       (mhc-date-digit-to-mm-string mm t)
+				       yy)))
 	 (i (mhc-day-day-of-week (car days)))
 	 week color)
     (while (> i 0)
@@ -675,9 +685,9 @@ C-c ?    mhc-draft-insert-calendar
 	     ((mhc-day-holiday (car days)) (mhc-face-category-to-face "Holiday"))
 	     ((= 6 (mhc-day-day-of-week (car days))) 'mhc-calendar-face-saturday)
 	     (t 'default)))
-      (and (= (ddate-dd today) (mhc-day-day-of-month (car days)))
-	   (= (ddate-mm today) (mhc-day-month (car days)))
-	   (= (ddate-yy today) (mhc-day-year (car days)))
+      (and (= (mhc-date-dd today) (mhc-day-day-of-month (car days)))
+	   (= (mhc-date-mm today) (mhc-day-month (car days)))
+	   (= (mhc-date-yy today) (mhc-day-year (car days)))
 	   (setq color (mhc-face-get-gray-face color)))
       (if (mhc-day-busy-p (car days))
 	  (setq color (mhc-face-get-underline-face color)))
@@ -724,21 +734,21 @@ C-c ?    mhc-draft-insert-calendar
 
 (defun mhc-input-date (&optional prompt default)
   (interactive)
-  (let* ((ddate (or default (ddate-now)))
+  (let* ((date (or default (mhc-date-now)))
 	 yy mm in dlst tlst tstr dstr ret err)
-    ;; input ddate string.
+    ;; input date string.
     (setq in (read-from-minibuffer
 	      (concat (or prompt "") " (yyyy/mm/dd) : ")
-	      (ddate-to-s1 ddate "/")
+	      (mhc-date-format date "%04d/%02d/%02d" yy mm dd)
 	      nil nil 'mhc-date-hist))
     ;; check format
     (if (not (string-match
 	      "\\([0-9]+\\)/\\([0-9]+\\)/\\([0-9]+\\)"
 	      in))
 	nil
-      (ddate-new (ddate-substring-to-int in 1)
-		 (ddate-substring-to-int in 2)
-		 (ddate-substring-to-int in 3)))))
+      (mhc-date-new (string-to-number (match-string 1 in))
+		    (string-to-number (match-string 2 in))
+		    (string-to-number (match-string 3 in))))))
 
 (defun mhc-view-file ()
   "View the schedule on the current line in View mode in another window."

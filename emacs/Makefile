@@ -29,3 +29,12 @@ install-package:
 
 clean:
 	-rm -f *.elc auto-autoloads.el custom-load.el
+
+### Suffix rules
+.SUFFIXES: .elc .el
+
+.el.elc:
+	-rm -f $@
+	$(EMACS) -batch -q -no-site-file \
+		-eval '(setq load-path (cons default-directory load-path))' \
+		-l mhc.el -f batch-byte-compile $<

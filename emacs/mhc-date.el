@@ -1,481 +1,476 @@
 ;;; mhc-date.el -- Digit style Date Calculation Lib.
 
-;; Author:  Yoshinari Nomura <nom@quickhack.net>
+;; Author:  Yoshinari Nomura <nom@quickhack.net>,
+;;          TSUCHIYA Masatoshi <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 ;;
-;; Created: 1999/04/07
-;; Revised: $Date: 2000/06/07 01:03:24 $
+;; Created: 2000/06/14
+;; Revised: $Date: 2000/06/18 06:57:51 $
 
 ;;;
 ;;; Commentary:
 ;;;
 
 ;; 
-;; ddate is very simple. It expresses a date by a list of integer.
+;; mhc-date format is simple. It expresses a date by
+;; days from 1970/1/1
+;;
 ;; for example:
 ;;
-;; 1999-04-30 corresponds to  (1999 4 30)
+;; (mhc-date-new 1970 1  1) -> 0
+;; (mhc-date-new 2000 6 14) -> 11122
 ;;
-;; ddate is also simple. It expresses a time by a list of integer.
-;; for example:
-;;
-;; 12:30 (12 30)
+;; mhc-time is also simple. It expresses a time by minits from midnight.
 
 ;;;
 ;;; Code:
 ;;;
 
-(defconst ddate-regex
-  "^\\([0-9][0-9][0-9][0-9]\\)\\([0-9][0-9]\\)\\([0-9][0-9]\\)$")
-
-(defconst dtime-regex
-  "^\\([0-9][0-9]\\):\\([0-9][0-9]\\)$")
-
-(defconst ddate-max-const '(2037 12 31))
-(defconst ddate-min-const '(1971  1  1))
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; dtime
+;;; mhc-time
 
-(defun dtime-now (&optional need-sec time)
-  (let ((now (current-time-string time)) (match (match-data))
-	hour min sec)
-    ;; current-time-string is "Thu Jun 30 01:58:16 1994"
-    (string-match "\\([0-9]+\\):\\([0-9]+\\):\\([0-9]+\\)" now)
-    (setq 
-     hour (string-to-int (substring now (match-beginning 1) (match-end 1)))
-     min  (string-to-int (substring now (match-beginning 2) (match-end 2)))
-     sec  (string-to-int (substring now (match-beginning 3) (match-end 3))))
-    (store-match-data match)
-    (if need-sec
-	(list  hour min sec)
-      (list  hour min))))
+(defsubst mhc-time/check (HH MM)
+  (and (integerp HH) (>= HH 0) (<= HH 99)
+       (integerp MM) (>= MM 0) (<= MM 59)))
 
-(defun dtime-new (HH &optional MM noerror)
-  (if (stringp HH)
-      (dtime-new-from-string HH noerror)
-    (dtime-new-from-digit HH MM noerror)))
+(defmacro mhc-time-HH (time)
+  `(/ ,time 60))
 
-(defun dtime-new-from-string (str &optional noerror regex)
-  (let (HH MM (match (match-data)))
-    (if (string-match (or regex dtime-regex) str)
-	(setq HH (ddate-substring-to-int str 1)
-	      MM (ddate-substring-to-int str 2)))
-    (store-match-data match)
-    (if HH
-	(dtime-new-from-digit HH MM noerror)
-      (if noerror nil (error "Time format error (%s)" str)))))
+(defmacro mhc-time-MM (time)
+  `(% ,time 60))
 
-(defun dtime-new-from-digit (HH MM &optional noerror)
-  (let ((dtime (list HH MM)))
-    (if (dtime-parse dtime)
-	dtime
-      (if noerror nil (error "Time format error (%s %s)" HH MM)))))
+;; All constructors emit error signal if args are illegal.
+;; In case called with noerror is t, return nil quietly.
 
-(defun dtime-parse (dtime)
-  (let (HH MM)
-    (if (not (and dtime (listp dtime)))
+(defsubst mhc-time-new (HH MM &optional noerror)
+  (if (mhc-time/check HH MM)
+      (+ (* HH 60) MM)
+    (if noerror
 	nil
-      (setq HH (dtime-HH dtime) MM (dtime-MM dtime))
-      (and (integerp HH) (>= HH 0) (<= HH 99)
-	   (integerp MM) (>= MM 0) (<= MM 59)
-	   (format "%02d:%02d" HH MM)))))
+      (error "mhc-time-new: arg error (%s,%s)" HH MM))))
 
-(defun dtime-HH (dtime)
-  (nth 0 dtime))
-
-(defun dtime-MM (dtime)
-  (nth 1 dtime))
-
-(defun dtime-max (t1 t2)
-  (if (dtime< t1 t2) t2 t1))
-
-(defun dtime-min (t1 t2)
-  (if (dtime< t1 t2) t1 t2))
-
-(defun dtime< (t1 t2)
-  (string<
-   (apply 'format "%02d%02d" (or t1 '(-1 -1)))
-   (apply 'format "%02d%02d" (or t2 '(-1 -1)))))
-
-(fset 'dtime= (symbol-function 'equal))
-
-(defun dtime<= (t1 t2)
-  (or
-   (dtime< t1 t2)
-   (dtime= t1 t2)))
-
-(defun dtime-to-s (dtime &optional need-sec)
-  (if need-sec
-      (apply 'format "%02d:%02d:%02d" dtime)
-    (apply 'format "%02d:%02d" dtime)))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; ddate
-
-;;
-;; create new object, access method to each element.
-;;
-(defun ddate-new (yy &optional mm dd noerror)
-  (if (stringp yy)
-      (ddate-new-from-string yy noerror)
-    (ddate-new-from-digit yy mm dd noerror)))
-
-(defun ddate-new-from-string (str &optional noerror regex)
-  (let (yy mm dd (match (match-data)))
-    (if (string-match (or regex ddate-regex) str)
-	(setq yy (ddate-substring-to-int str 1)
-	      mm (ddate-substring-to-int str 2)
-	      dd (ddate-substring-to-int str 3)))
+(defsubst mhc-time-new-from-string (str &optional noerror regexp)
+  (let (ret (match (match-data)))
+    (if (string-match (or regexp "^\\([0-9][0-9]\\):\\([0-9][0-9]\\)$") str)
+	(setq ret (mhc-time-new (mhc-date/substring-to-int str 1)
+				(mhc-date/substring-to-int str 2)
+				t)))
     (store-match-data match)
-    (if yy
-	(ddate-new-from-digit yy mm dd noerror)
-      (if  noerror nil (error "Date format error (%s)" str)))))
+    (if (or noerror ret)
+	ret
+      (error "mhc-time-new-from-string: format error (%s)" str))))
 
-(defun ddate-new-from-string2 (str &optional base-date noerror)
-  (let* ((now (or base-date (ddate-now)))
-	 (yy (ddate-yy now)) (mm (ddate-mm now)) ret)
-    (setq ret
-	  (cond
-	   ((string-match "^\\([0-9]+\\)/\\([0-9]+\\)/\\([0-9]+\\)$" str)
-	    (ddate-new (ddate-substring-to-int str 1)
-		       (ddate-substring-to-int str 2)
-		       (ddate-substring-to-int str 3) noerror))
-	   ((string-match "^\\([0-9]+\\)/\\([0-9]+\\)$" str)
-	    (ddate-new yy
-		       (ddate-substring-to-int str 1)
-		       (ddate-substring-to-int str 2) noerror))
-	   ((string-match "^\\([0-9]+\\)$" str)
-	    (ddate-new yy
-		       mm
-		       (ddate-substring-to-int str 1) noerror))))
-    ;; if ret is past, assume the next year.
-    ;; (if (and ret (ddate< ret now))
-    ;; (ddate-yy-inc ret)
-    ret))
-  
-(defun ddate-new-from-digit (yy mm dd &optional noerror)
-  (let ((ddate (list yy mm dd)))
-    (if (ddate-parse ddate)
-	ddate
-      (if noerror
-	  nil
-	(error "Date format error (%s %s %s)" yy mm dd)))))
+(defsubst mhc-time-now ()
+  (let* ((now (decode-time (current-time)))
+	 (HH (nth 2 now))
+	 (MM (nth 1 now)))
+    (mhc-time-new HH MM)))
 
+(defalias 'mhc-time-max 'max)
+(defalias 'mhc-time-min 'min)
+(defalias 'mhc-time<    '<)
+(defalias 'mhc-time=    '=)
+(defalias 'mhc-time<=   '<=)
+(defalias 'mhc-time>    '>)
+(defalias 'mhc-time>=   '>=)
 
-;; emacs 19.2x doesn't have format-time-string
-;;
-;;(defun ddate-now ()
-;;  (let (yy mm dd HH MM (now (current-time)))
-;;    (setq 
-;;     yy (string-to-int (format-time-string "%Y" now))
-;;     mm (string-to-int (format-time-string "%m" now))
-;;     dd (string-to-int (format-time-string "%d" now))
-;;     HH (string-to-int (format-time-string "%H" now))
-;;     MM (string-to-int (format-time-string "%M" now)))
-;;    (list yy mm dd HH MM )))
-;;
+(defun mhc-time-sort (time-list)
+  (sort time-list (function mhc-time<)))
 
-(defun ddate-now (&optional date)
-  (let ((now (current-time-string date)) (match (match-data))
-	week mon day hour min year)
-    ;; current-time-string is "Thu Jun 30 01:58:16 1994"
-    (string-match (concat 
-		   "^\\([^ ]+\\) +\\([^ ]+\\) +\\([^ ]+\\) +"
-		   "\\([^: ]+\\):\\([^: ]+\\):[^ ]+ +"
-		   "\\([^ ]+\\)$")
-		  (current-time-string))
-    (setq 
-     week (substring now (match-beginning 1) (match-end 1))
-     mon  (substring now (match-beginning 2) (match-end 2))
-     day  (substring now (match-beginning 3) (match-end 3))
-     hour (substring now (match-beginning 4) (match-end 4))
-     min  (substring now (match-beginning 5) (match-end 5))
-     year (substring now (match-beginning 6) (match-end 6))
-     week (/ (string-match week "SunMonTueWedThuFriSat") 3)
-     mon  (/ (string-match mon "   JanFebMarAprMayJunJulAugSepOctNovDec") 3)
-     year (string-to-int year))
-    (store-match-data match)
-    (list  year mon (string-to-int day))))
+(defmacro mhc-time-let (time &rest form)
+  (let ((tempvar (make-symbol "tempvar")))
+    `(let* ((,tempvar ,time)
+ 	    (hh (mhc-time-HH ,tempvar))
+ 	    (mm (mhc-time-MM ,tempvar)))
+       ,@form)))
+(put 'mhc-time-let 'lisp-indent-function 1)
+(put 'mhc-time-let 'edebug-form-spec '(form body))
 
-(defun ddate-yy (ddate) (nth 0 ddate))
-(defun ddate-mm (ddate) (nth 1 ddate))
-(defun ddate-dd (ddate) (nth 2 ddate))
-(defun ddate-ww (ddate)
-  ;;  (0:Sun, 2:Mon, ... , 6:Sat)
-  (let ((xx (1- (ddate-yy ddate))))
-    (% (+ (ddate-day-of-yy ddate)
-	  (* xx  365)
-	  (/ xx    4)
-	  (/ xx -100)
-	  (/ xx  400))
-       7)))
+(defmacro mhc-time-to-string (time)
+  `(mhc-time-let ,time (format "%02d:%02d" hh mm)))
 
-(defun ddate-oo (ddate)
-  (/ (1- (ddate-dd ddate)) 7))
+(defsubst mhc-time-to-list (time)
+  (list (mhc-time-HH time)
+	(mhc-time-MM time)))
 
-
-;;
-;; to-string
-;;
-
-;; for X-SC-*
-
-(defun ddate-to-s (ddate)
-  (apply 'format "%04d%02d%02d" ddate))
-
-(defun ddate-yymm-s (ddate)
-  (apply 'format "%04d%02d" ddate))
-
-
-(defun ddate-yy-s (date)
-  (format "%04d" (ddate-yy date)))
-
-(defun ddate-mm-s (date)
-  (let ((from (* 3 (1- (ddate-mm date)))))
-    (substring "JanFebMarAprMayJunJulAugSepOctNovDec"
-	       from (+ 3 from))))
-
-(defun ddate-dd-s (date)
-  (format "%02d" (ddate-dd date)))
-
-(defun ddate-ww-s (date)
-  (let ((from (* 3 (ddate-ww date))))
-    (substring "SunMonTueWedThuFriSat"
-	       from (+ 3 from))))
-
-(defun ddate-oo-s (date)
-  (let ((from (* 3 (ddate-oo date))))
-    (substring "1st2nd3rd4th5th"
-	       from (+ 3 from))))
-
-;;
-;; expression using digits and separators
-;; ex. 1999-10-12, 1999/10/12
-;;
-
-(defun ddate-to-s1 (ddate &optional d)
-  (format "%04d%s%02d%s%02d"
-	  (ddate-yy ddate)
-	  (or d "")
-	  (ddate-mm ddate)
-	  (or d "")
-	  (ddate-dd ddate)))
-
-(fset 'ddate-yy-s1 (symbol-function 'ddate-yy-s))
-
-(defun ddate-mm-s1 (ddate)
-  (format "%02d" (ddate-mm ddate)))
-
-(defun ddate-dd-s1 (ddate)
-  (format "%02d" (ddate-dd ddate)))
-
-(defun ddate-yymm-s1 (ddate &optional d)
-  (format "%04d%s%02d"
-	  (ddate-yy ddate) (or d "") (ddate-mm ddate)))
-
-(defun ddate-mmdd-s1 (ddate &optional d)
-  (format "%02d%s%02d" (ddate-mm ddate) (or d "") (ddate-dd ddate)))
-
-
-;;
-;; expression using digits and separators
-;; ex. April 1999
-;;
-
-(defun ddate-yymm-sj (ddate)
-  (format "%s %04d" (ddate-mm-sj ddate) (ddate-yy ddate)))
-
-(defun ddate-mm-sj (ddate)
-  (aref 
-   '["January" "February" "March"     "April"   "May"      "June"
-     "July"    "August"   "September" "October" "November" "December"]
-   (1- (ddate-mm ddate))))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; compare, increment, decrement
-
-(defun ddate-sort (dlist)
-  (sort dlist (function ddate<)))
-
-(defun ddate-max (d1 d2)
-  (if (ddate< d1 d2) d2 d1))
-
-(defun ddate-min (d1 d2)
-  (if (ddate< d1 d2) d1 d2))
-
-(fset 'ddate= (symbol-function 'equal))
-
-(defun ddate< (d1 d2)
-  (string<
-   (apply 'format "%04d%02d%02d" d1)
-   (apply 'format "%04d%02d%02d" d2)))
-
-(defun ddate<= (d1 d2)
-  (or
-   (string<
-    (apply 'format "%04d%02d%02d" d1)
-    (apply 'format "%04d%02d%02d" d2))
-   (string=
-    (apply 'format "%04d%02d%02d" d1)
-    (apply 'format "%04d%02d%02d" d2))))
-
-(defun ddate-yy< (d1 d2)
-  (< (ddate-yy d1) (ddate-yy d2)))
-
-(defun ddate-yymm< (d1 d2)
-  (string<
-   (apply 'format "%04d%02d" d1)
-   (apply 'format "%04d%02d" d2)))
+;;; mhc-date
 
 ;;
-;; succ and dec.
+;; special form.
 ;;
 
-(defun ddate-yy-inc (ddate &optional c)
-  (let ((new-yy (+ (or c 1) (ddate-yy ddate)))
-	(mm (ddate-mm ddate))
-	(dd (ddate-dd ddate)))
-    (if (and (not (ddate-leap-year-p new-yy))
-	     (= mm 2)
-	     (= dd 29))
-	(ddate-new new-yy 3 1)
-      (ddate-new new-yy mm dd))))
+(defmacro mhc-date-let (date &rest form) "\
+ This special form converts DATE, as the number of days since
+ 1970/01/01, to following local variables, and evaluates FORM.
 
-(defun ddate-yy-dec (ddate &optional c)
-  (ddate-yy-inc ddate (if c (- c) -1)))
-
-(defun ddate-mm-inc (ddate &optional c)
-  (let ((yy (ddate-yy ddate)) (mm (ddate-mm ddate)) (c (or c 1)) xx pp)
-    (setq xx (+ mm c))
-    (setq pp (if (< 0 xx ) (/ (- xx  1) 12) (/ (- xx 12) 12)))
-    (setq yy (+ yy pp) mm (- xx (* 12 pp)))
-    (if (ddate-parse (list yy mm (nth 2 ddate)))
-	(list yy mm (nth 2 ddate))
-      (list yy mm (ddate-days-of-mm (list yy mm 1))))))
-
-(defun ddate-mm-dec (ddate &optional c)
-  (ddate-mm-inc ddate (if c (- c) -1)))
-
-(defun ddate-inc (date)
-  (let ((yy (ddate-yy date)) (mm (ddate-mm date)) (dd (ddate-dd date)))
-    (if (= dd (ddate-days-of-mm date))
-	(if (= mm 12) (setq yy (1+ yy) mm 1 dd 1)
-	  (setq mm (1+ mm) dd 1))
-      (setq dd (1+ dd)))
-    (ddate-new yy mm dd)))
-
-(defun ddate-dec (date)
-  (let ((yy (ddate-yy date)) (mm (ddate-mm date)) (dd (ddate-dd date)))
-    (if (= dd 1)
-	(if (= mm 1)
-	    (setq yy (1- yy) mm 12 dd 31)
-	  (setq mm (1- mm))
-	  (setq dd (ddate-days-of-mm (ddate-new yy mm dd))))
-      (setq dd (1- dd)))
-    (ddate-new yy mm dd)))
-
-(defun ddate-mm-first-day (date)
-  (ddate-new (ddate-yy date) (ddate-mm date) 1))
-
-(defun ddate-mm-last-day (date)
-  (ddate-new (ddate-yy date) (ddate-mm date) (ddate-days-of-mm date)))
+      yy  The year, an integer typically greater than 1900.
+      mm  The month of the year, as an integer between 1 and 12.
+      dd  The day of the month, as an integer between 1 and 31.
+      ww  The day of week, as an integer between 0 and 6, where 0
+          stands for Sunday.
+ "
+  (let ((tempvar (make-symbol "tempvar")))
+    `(let* ((,tempvar (mhc-date-to-list ,date))
+ 	    (yy (nth 0 ,tempvar))
+ 	    (mm (nth 1 ,tempvar))
+ 	    (dd (nth 2 ,tempvar))
+ 	    (ww (nth 3 ,tempvar)))
+       ,@form)))
+(put 'mhc-date-let 'lisp-indent-function 1)
+(put 'mhc-date-let 'edebug-form-spec '(form body))
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; date calculation
+(defmacro mhc-date-let-for-month (date &rest form) "\
+ This special form converts DATE, as the number of days since
+ 1970/01/01, to following local variables, and evaluates FORM.
 
-;;
-;; days between d1 to d2
-;;
-(defun ddate- (d1 d2)
-  (- (ddate-days d1) (ddate-days d2)))
-
-  
-;;
-;; days of the month.
-;;
-(defun ddate-days-of-mm (ddate)
-  (let ((yy (ddate-yy ddate)) (mm (ddate-mm ddate)))
-    (if (and (= mm 2) (ddate-leap-year-p yy))
-	29
-      (aref [31 28 31 30 31 30 31 31 30 31 30 31] (1- mm)))))
-  
-;;
-;; returns t if the the year is leapyear.
-;;
-(defun ddate-leap-year-p (ddate-or-yy)
-  (let ((yy (if (listp ddate-or-yy) (ddate-yy ddate-or-yy) ddate-or-yy)))
-    (or (= (% yy 400) 0)
-	(and (= (% yy 4) 0)
-	     (not (= (% yy 100) 0))))))
-
-;;
-;; nth day of the year.
-;;
-;; example: 
-;;   (1994 7 1 xx xx xx) -> 182 
-;;      ; 1994-7-1 is the 182nd day of the year.
-;;
-(defun ddate-day-of-yy (ddate)
-  (let (yy mm dd xx)
-    (setq yy (ddate-yy ddate) mm (ddate-mm ddate) dd (ddate-dd ddate)
-	  xx (if (and (ddate-leap-year-p yy) (> mm 2)) 1 0))
-    (- (+ dd (* (1- mm) 31) xx)
-       (nth (1- mm) '(0 0 3 3 4 4 5 5 5 6 6 7)))))
+      yy  The year, an integer typically greater than 1900.
+      mm  The month of the year, as an integer between 1 and 12.
+      dd  The day of the month, as an integer between 1 and 31.
+      ww  The day of week, as an integer between 0 and 6, where 0
+          stands for Sunday.
+      oo  The order of week, as an integer between 0 and 4.
+  last-p  Predicate to check if the dd is in the last week.
+ "
+  (let ((tempvar (make-symbol "tempvar")))
+    `(let* ((,tempvar (mhc-date-to-list ,date))
+ 	    (yy (nth 0 ,tempvar))
+ 	    (mm (nth 1 ,tempvar))
+ 	    (dd 1)
+ 	    (ww (nth 3 ,tempvar))
+	    (end (mhc-date/last-day-of-month yy mm))
+	    (days ,date)
+	    (last-p nil))
+       (while (<= dd end)
+	 ,@form
+	 (setq days   (mhc-date++ days)
+	       dd     (1+ dd)
+	       oo     (/ (1- dd) 7)
+	       ww     (% (1+ ww) 7)
+	       last-p (< (- end 7) dd))))))
+(put 'mhc-date-let-for-month 'lisp-indent-function 1)
+(put 'mhc-date-let-for-month 'edebug-form-spec '(form body))
 
 
 ;;
-;; days from 1970-01-01
+;; private
 ;;
-(defun ddate-days (ddate)
-  (let ((xx (1- (ddate-yy ddate))))
-    (- (+ (ddate-day-of-yy ddate)
-	  (* xx  365)
-	  (/ xx    4)
-	  (/ xx -100)
-	  (/ xx  400))
-       719163)))
+
+(defsubst mhc-date/leap-year-p (yy)
+  (and (zerop (% yy 4))
+       (or (not (zerop (% yy 100)))
+           (zerop (% yy 400)))))
+
+(defsubst mhc-date/last-day-of-month (yy mm)
+  (if (and (= mm 2) (mhc-date/leap-year-p yy))
+      29
+    (aref '[0 31 28 31 30 31 30 31 31 30 31 30 31] mm)))
+
+(defsubst mhc-date/check (yy mm dd)
+  (and (integerp yy) (>= yy 1000)
+       (integerp mm) (>= mm 1) (<= mm 12)
+       (integerp dd) (>= dd 1) (<= dd (mhc-date/last-day-of-month yy mm))
+       t))
+
+(defmacro mhc-date/day-number (yy mm dd)
+  `(if (mhc-date/leap-year-p ,yy)
+      (+ (aref '[0 0 31 60 91 121 152 182 213 244 274 305 335] ,mm) ,dd)
+    (+ (aref '[0 0 31 59 90 120 151 181 212 243 273 304 334] ,mm) ,dd)))
+
+(defsubst mhc-date/absolute-from-epoch (yy mm dd)
+  (let ((xx (1- yy)))
+    (+ (mhc-date/day-number yy mm dd)
+       (* xx  365)
+       (/ xx    4)
+       (/ xx -100)
+       (/ xx  400)
+       -719163)))
+
+(defmacro mhc-date/substring-to-int (str pos)
+  `(string-to-int
+    (substring ,str (match-beginning ,pos) (match-end ,pos))))
 
 ;;
-;; check if date is the last week of the month.
+;; conversion.
 ;;
-(defun ddate-oo-last-p (date)
-  (< (- (ddate-days-of-mm date) 7) (ddate-dd date)))
+
+(defsubst mhc-date-to-second (date)
+  ;; It has workaround in case of 28 bit integer.
+  (let (high low)
+    (setq low  (* (+ date (if (< (nth 0 (current-time-zone)) 0) 1 0)) 240)
+	  high (/ low 65536)
+	  low  (* (% low 65536) 360)
+	  high (+ (* high 360) (/ low 65536))
+	  low  (% low 65536))
+    (list high low 0)))
+
+
+(defsubst mhc-date/to-list1 (date)
+  (let ((lst (decode-time (mhc-date-to-second date))))
+    (list (nth 5 lst)
+	  (nth 4 lst)
+	  (nth 3 lst)
+	  (nth 6 lst))))
+
+(defsubst mhc-date/to-list2 (date)
+  (let (x b c d e w dom)
+    (setq w  (% (+ date 4) 7)
+	  date (+ date 2440588)
+	  x (floor (/ (- date 1867216.25) 36524.25))
+	  b (- (+ date 1525 x) (floor (/ x 4.0)))
+	  c (floor (/ (- b 122.1) 365.25))
+	  d (floor (* 365.25 c))
+	  e (floor (/ (- b d) 30.6001))
+	  dom (- b d (floor (* 30.6001 e))))
+    (if (<= e 13)
+	(list (- c 4716) (1- e) dom w)
+      (list (- c 4715) (- e 13) dom w))))
+
+(defsubst mhc-date-to-list (date)
+  (if (and (<= 0 date) (<= date 24837))
+      (mhc-date/to-list1 date)
+    (mhc-date/to-list2 date)))
 
 ;;
-;; check ddate validity (both syntax and semantics.)
+;; constructor.
 ;;
-;; returns "YYYYMMDD" if ddate is valid else nil.
-;;
-(defun ddate-parse (ddate)
-  (let (yy mm dd)
-    (if (not (and ddate (listp ddate)))
+
+;; All constructors emit error signal if args are illegal.
+;; In case called with noerror is t, return nil quietly.
+
+;; new from 3 digits.
+(defsubst mhc-date-new (yy mm dd &optional noerror)
+  (if (mhc-date/check yy mm dd)
+      (mhc-date/absolute-from-epoch yy mm dd)
+    (if noerror
 	nil
-      (setq yy (ddate-yy ddate) mm (ddate-mm ddate) dd (ddate-dd ddate))
-      (and (integerp yy) (>= yy 1000)
-	   (integerp mm) (>= mm 1) (<= mm 12)
-	   (integerp dd) (>= dd 1) (<= dd (ddate-days-of-mm ddate))
-	   (format "%04d%02d%02d" yy mm dd)))))
+      (error "mhc-date-new: arg error (%s,%s,%s)" yy mm dd))))
 
-(fset 'ddate-p (symbol-function 'ddate-parse))
+
+;; new from emacs style time such as (14654 3252 689999).
+(defsubst mhc-date-new-from-second (&optional second)
+  (let ((now (decode-time (or second (current-time)))))
+    (mhc-date/absolute-from-epoch
+     (nth 5 now)
+     (nth 4 now)
+     (nth 3 now))))
+
+;; new from current time.
+(defalias 'mhc-date-now 'mhc-date-new-from-second)
+
+;; new from string. 19990101
+(defsubst mhc-date-new-from-string (str &optional noerror)
+  (let (ret (match (match-data)))
+    (if (string-match 
+	 "^\\([0-9][0-9][0-9][0-9]\\)\\([0-9][0-9]\\)\\([0-9][0-9]\\)$" str)
+	(setq ret (mhc-date-new (mhc-date/substring-to-int str 1)
+				(mhc-date/substring-to-int str 2)
+				(mhc-date/substring-to-int str 3)
+				t)))
+    (store-match-data match)
+    (if (or noerror ret)
+	ret
+      (error "mhc-date-new-from-string: format error (%s)" str))))
+    
+;; new from string. [[yyyy/]mm]/dd 
+(defsubst mhc-date-new-from-string2 (str &optional base-date noerror)
+  (mhc-date-let (or base-date (mhc-date-now))
+    (let ((match (match-data)) fail ret)
+      (cond
+       ((string-match 
+	 "^\\([0-9][0-9][0-9][0-9]\\)\\([0-9][0-9]\\)\\([0-9][0-9]\\)$" str)
+	(setq yy (mhc-date/substring-to-int str 1)
+	      mm (mhc-date/substring-to-int str 2)
+	      dd (mhc-date/substring-to-int str 3)))
+       ((string-match "^\\([0-9]+\\)/\\([0-9]+\\)/\\([0-9]+\\)$" str)
+	(setq yy (mhc-date/substring-to-int str 1)
+	      mm (mhc-date/substring-to-int str 2)
+	      dd (mhc-date/substring-to-int str 3)))
+       ((string-match "^\\([0-9]+\\)/\\([0-9]+\\)$" str)
+	(setq mm (mhc-date/substring-to-int str 1)
+	      dd (mhc-date/substring-to-int str 2)))
+       ((string-match "^\\([0-9]+\\)$" str)
+	(setq dd (mhc-date/substring-to-int str 1)))
+       (t
+	(setq fail t)))
+      (store-match-data match)
+      (if (not fail) (setq ret (mhc-date-new yy mm dd t)))
+      (if (or noerror ret)
+	  ret
+	(error "mhc-date-new-from-string2: format error (%s)" str)))))
 
 ;;
-;; misc
+;; manipulate yy, mm, dd.
 ;;
 
-(defun ddate-substring-to-int (str pos)
-  (cond
-   ((stringp str)
-    (string-to-int
-     (substring str (match-beginning pos) (match-end pos))))
-   (t
-    (string-to-int
-     (buffer-substring (match-beginning pos) (match-end pos))))))
+(defmacro mhc-date-yy (date)
+  `(nth 0 (mhc-date-to-list ,date)))
 
+(defmacro mhc-date-mm (date)
+  `(nth 1 (mhc-date-to-list ,date)))
+
+(defmacro mhc-date-dd (date)
+  `(nth 2 (mhc-date-to-list ,date)))
+
+(defmacro mhc-date-ww (date)
+  `(nth 3 (mhc-date-to-list ,date)))
+
+(defmacro mhc-date-oo (date)
+  `(/ (1- (mhc-date-dd ,date)) 7))
+
+
+;;
+;; compare.
+;;
+
+(defalias 'mhc-date=    '=  )
+(defalias 'mhc-date<    '<  )
+(defalias 'mhc-date<=   '<= )
+(defalias 'mhc-date>    '>  )
+(defalias 'mhc-date>=   '>= )
+
+(defalias 'mhc-date-max 'max)
+(defalias 'mhc-date-min 'min)
+(defmacro mhc-date-sort    (date-list)
+  `(sort ,date-list (function mhc-date<)))
+
+(defsubst mhc-date-yy=  (d1 d2) (=  (mhc-date-yy d1) (mhc-date-yy d2)))
+(defsubst mhc-date-yy<  (d1 d2) (<  (mhc-date-yy d1) (mhc-date-yy d2)))
+(defsubst mhc-date-yy<= (d1 d2) (<= (mhc-date-yy d1) (mhc-date-yy d2)))
+(defsubst mhc-date-yy>  (d1 d2) (mhc-date-yy<  d2 d1))
+(defsubst mhc-date-yy>= (d1 d2) (mhc-date-yy<= d2 d1))
+
+(defsubst mhc-date-yymm=  (d1 d2)
+  (and (mhc-date-yy= d1 d2)
+       (= (mhc-date-mm d1) (mhc-date-mm d1))))
+
+(defsubst mhc-date-yymm<  (d1 d2)
+  (or (mhc-date-yy< d1 d2)
+      (and (mhc-date-yy= d1 d2)
+	   (< (mhc-date-mm d1) (mhc-date-mm d1)))))
+
+(defmacro mhc-date-yymm>  (d1 d2)      `(mhc-date-yymm<  ,d2 ,d1))
+(defmacro mhc-date-yymm<= (d1 d2) `(not (mhc-date-yymm>  ,d1 ,d2)))
+(defmacro mhc-date-yymm>= (d1 d2)      `(mhc-date-yymm<= ,d2 ,d1))
+
+;;
+;; increment, decrement.
+;;
+
+(defalias 'mhc-date+  '+ )
+(defalias 'mhc-date-  '- )
+(defalias 'mhc-date++ '1+)
+(defalias 'mhc-date-- '1-)
+
+(defsubst mhc-date-mm+  (date c)
+  (mhc-date-let date
+    (let (xx pp)
+      (setq xx (+ mm c))
+      (setq pp (if (< 0 xx ) (/ (- xx  1) 12) (/ (- xx 12) 12)))
+      (setq yy (+ yy pp) mm (- xx (* 12 pp)))
+      (if (mhc-date/check yy mm dd)
+	  (mhc-date-new yy mm dd)
+	(mhc-date-new yy mm 1 t)))))
+
+(defmacro mhc-date-mm-  (date c) `(mhc-date-mm+ ,date (- ,c)))
+(defmacro mhc-date-mm++ (date)   `(mhc-date-mm+ ,date 1))
+(defmacro mhc-date-mm-- (date)   `(mhc-date-mm- ,date 1))
+
+;;
+;; get meaninful date.
+;;
+(defmacro mhc-date-mm-first (date)
+  "Return the number of days since 1970/01/01 to the first day of month, DATE."
+  `(mhc-date-let ,date
+     (mhc-date-new yy mm 1 t)))
+
+(defmacro mhc-date-mm-last (date)
+  "Return the number of days since 1970/01/01 to the last day of month, DATE."
+  `(mhc-date-let ,date
+     (mhc-date-new yy mm (mhc-date/last-day-of-month yy mm) t)))
+
+;;
+;; predicate
+;;
+
+;; check if the date is in the last week of a month.
+(defsubst mhc-date-oo-last-p (date)
+  (< (- (mhc-date/last-day-of-month 
+	 (mhc-date-yy date)
+	 (mhc-date-mm date)) 7) (mhc-date-dd date)))
+
+;;
+;; to string.
+;;
+
+;; (mhc-date-format date "%04d%02d%02d" yy mm dd)
+(defmacro mhc-date-format (date format &rest vars)
+  `(mhc-date-let ,date
+     (format ,format ,@vars)))
+
+(defun mhc-date-digit-to-mm-string (mm &optional long)
+  (if long
+      (aref 
+       '[nil "January" "February" "March"     "April"   "May"      "June"
+	     "July"    "August"   "September" "October" "November" "December"]
+       mm)
+    (aref 
+     [nil "Jan" "Feb" "Mar" "Apr" "May" "Jun"
+	  "Jul" "Aug" "Sep" "Oct" "Nov" "Dec"]
+     mm)))
+
+(defun mhc-date-digit-to-ww-string (ww &optional long)
+  (if long
+      (aref ["Sunday" "Monday" "Tuesday" "Wednesday"
+	     "Thursday" "Friday" "Sataday"] ww)
+    (aref ["Sun" "Mon" "Tue" "Wed" "Thu" "Fri" "Sat"] ww)))
+
+(defun mhc-date-digit-to-oo-string (oo &optinal long)
+  (aref  ["1st" "2nd" "3rd" "4th" "5th"] oo))
+
+;; format-time-string subset (but has enough spec)
+(defun mhc-date-format-time-string (format date)
+  (mhc-date-let date
+    (let (head match (ret "") char)
+      (while (string-match "%." format)
+	(setq head   (substring format 0 (match-beginning 0))
+	      match  (match-string 0 format)
+	      format (substring format (match-end 0))
+	      char   (aref match 1))
+	(cond
+	 ((eq char ?Y) ;; 100年単位の年
+	  (setq match (format "%d" yy)))
+
+	 ((eq char ?y)  ;; 年の下2桁 (00-99)
+	  (setq match (format "%02d"  (% yy 100))))
+
+	 ((or (eq char ?b) (eq char ?h)) ;; 月   略称
+	  (setq match (mhc-date-digit-to-mm-string mm)))
+
+	 ((eq char ?B) ;; 月   名称
+	  (setq match (mhc-date-digit-to-mm-string mm t)))
+
+	 ((eq char ?m) ;; 月 (01-12)
+	  (setq match (format "%02d" mm)))
+
+	 ((eq char ?d) ;; 日 (ゼロ padding)
+	  (setq match (format "%02d" dd)))
+
+	 ((eq char ?e) ;; 日 (空白 padding)
+	  (setq match (format "%2d" dd)))
+
+	 ((eq char ?a) ;; 曜日 略称
+	  (setq match (mhc-date-digit-to-ww-string ww)))
+
+	 ((eq char ?A) ;; 曜日 名称
+	  (setq match (mhc-date-digit-to-ww-string ww t))))
+
+	(setq ret (concat ret head match)))
+      (concat ret format))))
 
 (provide 'mhc-date)
-
 
 ;;; Copyright Notice:
 
@@ -508,4 +503,4 @@
 ;; ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 ;; OF THE POSSIBILITY OF SUCH DAMAGE.
 
-;;; mhc-date.el ends here
+;;; mhc-date2.el ends here.

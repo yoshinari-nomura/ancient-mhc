@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1999/12/10
-;; Revised: $Date: 2000/05/30 15:04:57 $
+;; Revised: $Date: 2000/06/18 06:57:51 $
 
 ;;;
 ;;; Commentay:
@@ -187,7 +187,7 @@
 ;;
 
 (defun mhc-minibuf-date-to-s (obj)
-  (ddate-to-s1 obj "/"))
+  (mhc-date-format obj "%04d/%02d/%02d"))
 
 (defun mhc-input-day (&optional prompt default candidate)
   (interactive)
@@ -195,17 +195,18 @@
     (while error
       (setq str (mhc-minibuf-read (concat (or prompt "") "(yyyy/mm/dd): ")
 				  (if default
-				      (cond
-				       ((ddate-p default)
-					(ddate-to-s1 default "/"))
-				       ((stringp default)
-					default)
-				       (t
-					(mapconcat 
-					 '(lambda (ddate)
-					    (ddate-to-s1 ddate "/"))
-					 default
-					 " "))))
+				      (let ((default-date (mhc-date-new-from-string default t)))
+					(cond
+					 (default-date
+					   (mhc-date-format default-date "%04d/%02d/%02d" yy mm dd))
+					 ((stringp default)
+					  default)
+					 ((listp default)
+					  (mapconcat 
+					   (lambda (date)
+					     (mhc-date-format default-date "%04d/%02d/%02d" yy mm dd))
+					   default
+					   " ")))))
 				  (current-buffer)
 				  candidate
 				  0
@@ -217,21 +218,20 @@
 	(cond
 	 ((= 2 (length (mhc-misc-split (car str-list) "-")))
 	  (let* ((duration (mhc-misc-split (car str-list) "-"))
-		 (b (ddate-new-from-string2 (nth 0  duration) nil t))
-		 (e (ddate-new-from-string2 (nth 1  duration) b   t)))
-	    (if (and b e (ddate< b e))
+		 (b (mhc-date-new-from-string2 (nth 0 duration) nil t))
+		 (e (mhc-date-new-from-string2 (nth 1 duration) b t)))
+	    (if (and b e (mhc-date< b e))
 		(progn
 		  (setq date b)
-		  (while (ddate<= date e)
+		  (while (mhc-date<= date e)
 		    (if (not (member date ret))
 			(setq ret (cons date ret))
 		      (setq error t))
-		    (setq date (ddate-inc date))))
+		    (setq date (mhc-date++ date))))
 	      (setq error t))))
 	 ((string= (car str-list) "")
 	  ())
-	 ((setq date (ddate-new-from-string2
-		      (car str-list) date t))
+	 ((setq date (mhc-date-new-from-string2 (car str-list) date t))
 	  (if (not (member date ret))
 	      (setq ret (cons date ret))
 	    (setq error t)))
@@ -243,7 +243,7 @@
       (if error (beep)))
     (setq mhc-calendar-separator nil)
     (setq mhc-calendar-call-buffer nil)
-    (ddate-sort ret)))
+    (mhc-date-sort ret)))
 
 (defun mhc-input-time (&optional prompt default candidate)
   (interactive)
@@ -256,23 +256,23 @@
 		       nil
 		     (if default
 			 (if (stringp default) default
-			   (dtime-to-s default) "")))
+			   (mhc-time-to-string default) "")))
 		   (current-buffer)
 		   candidate
 		   0
-		   'dtime-to-s))
+		   'mhc-time-to-string))
 	(cond 
 	 ((and (string-match
 		"^\\([0-9]+:[0-9]+\\)\\(-\\([0-9]+:[0-9]+\\)\\)?$" str)
-	       (setq time-b (dtime-new-from-string
+	       (setq time-b (mhc-time-new-from-string
 			     (substring str (match-beginning 1) (match-end 1))
 			     t mhc-input-time-regex)))
 	  (if (not (match-beginning 3)) (throw 'ok (list time-b nil)))
 	  (if (and (setq time-e
-			 (dtime-new-from-string
+			 (mhc-time-new-from-string
 			  (substring str (match-beginning 3) (match-end 3))
 			  t mhc-input-time-regex))
-		   (dtime<= time-b time-e))
+		   (mhc-time<= time-b time-e))
 	      (throw 'ok (list time-b time-e))))
 	 ((string= "" str)
 	  (throw 'ok (list nil nil))))

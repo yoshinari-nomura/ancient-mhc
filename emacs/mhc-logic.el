@@ -99,8 +99,11 @@
 (defun mhc-logic-eval-for-date (sexp-list day &optional todo)
   "指定された日のスケジュールを探索"
   (mhc-day-let day
-    (let ((week-of-month (/ (+ day-of-month (ddate-ww (list year month 1)) -8) 7))
-	  (last-week (> 7 (- (ddate-days-of-mm (list year month 1))
+    (let ((week-of-month (/ (+ day-of-month
+			       (mhc-date-ww (mhc-date-mm-first day))
+			       -8)
+			    7))
+	  (last-week (> 7 (- (mhc-date/last-day-of-month year month)
 			     day-of-month)))
 	  (new (mhc-day-new year month day-of-month day-of-week)))
       (mhc-day-set-schedules new (delq nil (mapcar (lambda (sexp) (funcall sexp)) sexp-list)))
@@ -191,10 +194,9 @@
     (while (not (eobp))
       (or (mhc-logic/looking-at mhc-logic/not-regexp mhc-logic/day-regexp)
 	  (error "Parse ERROR !!!"))
-      (setq d (ddate-days
-	       (list (string-to-number (match-string 2))
-		     (string-to-number (match-string 3))
-		     (string-to-number (match-string 4))))
+      (setq d (mhc-date-new (string-to-number (match-string 2))
+			    (string-to-number (match-string 3))
+			    (string-to-number (match-string 4)))
 	    days (cons (if (match-string 1) (cons d nil) d) days))
       (goto-char (match-end 0)))
     (mhc-logic/set-day logicinfo days)))
@@ -211,15 +213,13 @@
 	(let ((year (string-to-number (match-string 3))))
 	  (mhc-logic/set-day 
 	   logicinfo
-	   (cons (ddate-days
-		  (list
-		   (cond ((< year 69)
-			  (+ year 2000))
-			 ((< year 1000)
-			  (+ year 1900))
-			 (t year))
-		   month
-		   (string-to-number (match-string 1))))
+	   (cons (mhc-date-new (cond ((< year 69)
+				      (+ year 2000))
+				     ((< year 1000)
+				      (+ year 1900))
+				     (t year))
+			       month
+			       (string-to-number (match-string 1)))
 		 (mhc-logic/day logicinfo)))
 	  (goto-char (match-end 0)))
       (error "Parse ERROR !!!"))))
@@ -285,26 +285,22 @@
 	    (cons (cond
 		   ((mhc-logic/looking-at mhc-logic/day-regexp "-" mhc-logic/day-regexp)
 		    (list 'mhc-logic/condition-duration
-			  (ddate-days (list
-				       (string-to-number (match-string 1))
-				       (string-to-number (match-string 2))
-				       (string-to-number (match-string 3))))
-			  (ddate-days (list
-				       (string-to-number (match-string 4))
-				       (string-to-number (match-string 5))
-				       (string-to-number (match-string 6))))))
+			  (mhc-date-new (string-to-number (match-string 1))
+					(string-to-number (match-string 2))
+					(string-to-number (match-string 3)))
+			  (mhc-date-new (string-to-number (match-string 4))
+					(string-to-number (match-string 5))
+					(string-to-number (match-string 6)))))
 		   ((mhc-logic/looking-at mhc-logic/day-regexp "-")
 		    (list 'mhc-logic/condition-duration-begin
-			  (ddate-days (list
-				       (string-to-number (match-string 1))
-				       (string-to-number (match-string 2))
-				       (string-to-number (match-string 3))))))
+			  (mhc-date-new (string-to-number (match-string 1))
+					(string-to-number (match-string 2))
+					(string-to-number (match-string 3)))))
 		   ((mhc-logic/looking-at "-" mhc-logic/day-regexp)
 		    (list 'mhc-logic/condition-duration-end
-			  (ddate-days (list
-				       (string-to-number (match-string 1))
-				       (string-to-number (match-string 2))
-				       (string-to-number (match-string 3))))))
+			  (mhc-date-new (string-to-number (match-string 1))
+					(string-to-number (match-string 2))
+					(string-to-number (match-string 3)))))
 		   (t ; それ以外の場合
 		    (error "Parse ERROR !!!")))
 		  sexp))

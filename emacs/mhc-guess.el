@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1999/04/13
-;; Revised: $Date: 2000/05/30 15:04:57 $
+;; Revised: $Date: 2000/06/18 06:57:51 $
 ;;
 
 ;;;
@@ -128,28 +128,6 @@
 		     hint1)))
     (sort score-list (function (lambda (a b) (< (car b) (car a)))))))
 
-; (defun gdate-guess-date ()
-;   (let* ((score -1000)
-; 	 (now   (ddate-now))
-; 	 (ddate now)
-; 	 (ptr   0)
-; 	 (score-list
-; 	  (gdate-score (gdate-gather-date-list gdate-date-regex-list)
-; 		       gdate-keyword-score-alist))
-; 	 entry-score entry-ptr entry-date entry)
-;     (while score-list
-;       (setq entry       (car score-list)
-; 	    entry-score (car entry)
-; 	    entry-ptr   (car (cdr entry))
-;             entry-date  (cdr (cdr entry)))
-;       (if (and (< score entry-score) (ddate<= now entry-date))
-; 	  (setq score  entry-score
-; 		ddate  entry-date
-; 		ptr    entry-ptr))
-;       (setq score-list (cdr score-list)))
-;     (cons ptr ddate)))
-
-
 ;; returns nil or list of (score (ptr-begin . ptr-end) HH MM)
 ;;
 
@@ -160,31 +138,11 @@
 		     hint1)))
     (sort score-list (function (lambda (a b) (< (car b) (car a)))))))
 
-; (defun gdate-guess-time ()
-;   (let* ((score -1000)
-; 	 (dtime nil)
-; 	 (ptr   0)
-; 	 (score-list
-; 	  (gdate-score (gdate-gather-time-list gdate-time-regex-list)
-; 		       gdate-keyword-score-alist))
-; 	 entry-score entry-ptr entry-time entry)
-;     (while score-list
-;       (setq entry       (car score-list)
-; 	    entry-score (car entry)
-; 	    entry-ptr   (car (cdr entry))
-;             entry-time  (cdr (cdr entry)))
-;       (if (< score entry-score)
-; 	  (setq score  entry-score
-; 		dtime  entry-time
-; 		ptr    entry-ptr))
-;       (setq score-list (cdr score-list)))
-;     (if dtime (cons ptr dtime) nil)))
-
 ;;
 ;; gather time
 ;;
 
-;; returns (((ptr-begin . ptr-end) . dtime) ...)
+;; returns (((ptr-begin . ptr-end) . time) ...)
 ;;
 (defun gdate-gather-time-list (regexp-lst)
   (let ((ret nil))
@@ -194,10 +152,10 @@
     ret))
 
 
-;; returns (((ptr-begin . ptr-end) . dtime) ...)
+;; returns (((ptr-begin . ptr-end) . time) ...)
 ;;
 (defun gdate-gather-time-list2 (regexp)
-  (let* (lst xHH xMM dtime)
+  (let* (lst xHH xMM time)
     (save-excursion
       ;; skip Header
       (goto-char (point-min))
@@ -216,16 +174,16 @@
 	       (t
 		(gdate-string-to-int
 		 (buffer-substring (match-beginning 2) (match-end 2))))))
-	(if (setq dtime (dtime-new xHH xMM t)) ;; noerror is t
+	(if (setq time (mhc-time-new xHH xMM t)) ;; noerror is t
 	    (setq lst (cons (cons (cons (match-beginning 0) (match-end 0))
-				  dtime) lst))))
+				  time) lst))))
       (nreverse lst))))
 
 ;;
 ;; gather date
 ;;
 
-;; returns (((ptr-begin . ptr-end) . ddate) ...)
+;; returns (((ptr-begin . ptr-end) . date) ...)
 ;;
 (defun gdate-gather-date-list (regexp-lst)
   (let ((ret nil))
@@ -234,53 +192,52 @@
       (setq regexp-lst (cdr regexp-lst)))
     ret))
 
-;; returns (((ptr-begin . ptr-end) . ddate) ...)
+;; returns (((ptr-begin . ptr-end) . date) ...)
 ;;
 (defun gdate-gather-date-list2 (regexp)
-  (let* ((now (ddate-now))
-	 (yy (ddate-yy now)) (mm (ddate-mm now)) (dd (ddate-dd now))
-	 (year-offset 0)
-	 lst xmm xdd ddate)
-    (save-excursion
-      ;; skip Header
-      (goto-char (point-min))
-      (re-search-forward "^-*$" nil t)
-      ;; search candities.
-      (while (re-search-forward regexp nil t)
-	(setq xmm (gdate-string-to-int
-		   (buffer-substring (match-beginning 1) (match-end 1)))
-	      xdd (gdate-string-to-int
-		   (buffer-substring (match-beginning 2) (match-end 2))))
-	(if (= xmm 0) (setq xmm mm))
-	(if (not (setq ddate (ddate-new yy xmm xdd t))) ;; noerror is t
-	    ()
-	  ;; if ddate is past, assume the next year.
-	  ;; But, don't ddate-yy-inc immediately
-	  ;; to do well in case 2/29.
-	  (if (ddate< ddate (ddate-now))
-	      (setq year-offset (1+ year-offset)))
-	  ;; if ddate is far future, assume the last year.
-	  (if (< 300 (+ (ddate- ddate (ddate-now)) (* year-offset 365)))
-	      (setq year-offset (1- year-offset)))
-	  (setq ddate (ddate-yy-inc ddate year-offset))
-	  (setq lst (cons (cons 
-			   (cons (match-beginning 0) (match-end 0))
-			   ddate) lst))))
-      (nreverse lst))))
+  (let ((now (mhc-date-now))
+	(year-offset 0)
+	lst xmm xdd date)
+    (mhc-date-let now
+      (save-excursion
+	;; skip Header
+	(goto-char (point-min))
+	(re-search-forward "^-*$" nil t)
+	;; search candities.
+	(while (re-search-forward regexp nil t)
+	  (setq xmm (gdate-string-to-int
+		     (buffer-substring (match-beginning 1) (match-end 1)))
+		xdd (gdate-string-to-int
+		     (buffer-substring (match-beginning 2) (match-end 2))))
+	  (if (= xmm 0) (setq xmm mm))
+	  (when (setq date (mhc-date-new yy xmm xdd t)) ;; noerror is t
+	    ;; if date is past, assume the next year.
+	    ;; But, don't mhc-date++ immediately
+	    ;; to do well in case 2/29.
+	    (if (mhc-date< date (mhc-date-now))
+		(setq year-offset (1+ year-offset)))
+	    ;; if date is far future, assume the last year.
+	    (if (< 300 (+ (mhc-date- date (mhc-date-now)) (* year-offset 365)))
+		(setq year-offset (1- year-offset)))
+	    (setq date (mhc-date-let date (mhc-date-new (+ yy year-offset) mm dd))
+		  lst (cons (cons 
+			     (cons (match-beginning 0) (match-end 0))
+			     date) lst))))
+	(nreverse lst)))))
 
 ;;
 ;; scoring
 ;;
 
-;; returns ((score ptr . ddate-or-dtime) ...)
+;; returns ((score ptr . date-or-time) ...)
 
 (defun gdate-score (candidate-lst score-alist &optional hint1)
-  (let ((ret nil) s-alist score ptr ddate regex boundary sameline s)
+  (let ((ret nil) s-alist score ptr date regex boundary sameline s)
     (while candidate-lst
       (setq s-alist score-alist
 	    score   0
 	    ptr     (car (car candidate-lst))
-	    ddate   (cdr (car candidate-lst)))
+	    date    (cdr (car candidate-lst)))
       (while s-alist
 	(setq regex    (nth 0 (car s-alist))
 	      boundary (nth 1 (car s-alist))
@@ -293,7 +250,7 @@
 		 (<  (- (car ptr) hint1) 40))
 	    (setq score (+ score 10)))
 	(setq s-alist (cdr s-alist)))
-      (setq ret (cons (cons score (cons ptr ddate)) ret))
+      (setq ret (cons (cons score (cons ptr date)) ret))
       (setq candidate-lst (cdr candidate-lst)))
     (nreverse ret)))
 

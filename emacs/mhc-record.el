@@ -140,9 +140,7 @@
 			   ((eq status 'delete) ?D)
 			   ((eq status 'modify) ?M)
 			   (t ??))
-			  (let ((now (current-time)))
-			    (concat (ddate-to-s1 (ddate-now now) "-") " "
-				    (dtime-to-s (dtime-now t now) t)))
+			  (format-time-string "%Y-%m-%d %H:%M")
 			  (mhc-record-id record)
 			  (mhc-record-name record)
 			  (mhc-record-subject-as-string record)))

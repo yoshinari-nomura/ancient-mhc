@@ -7,6 +7,7 @@
 ;; Created: 05/12/2000
 ;; Revised: 06/14/2000
 
+(require 'ddate)
 (condition-case nil
     (require 'hnf-mode)
   (error))
@@ -196,7 +197,7 @@ The keys that are defined for mhc-calendar-mode are:
   "MHC 3-month mini calender."
   (interactive)
   (or mhc-setup-p (mhc-setup))
-  (mhc-calendar-goto-day (or ddate (mhc-current-ddate) (ddate-now))))
+  (mhc-calendar-goto-day (or ddate (mhc-current-date) (ddate-now))))
 
 (defun mhc-calendar-goto-day (ddate)
   (let ((mhc-calendar-view-summary nil)
