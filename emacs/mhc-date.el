@@ -4,7 +4,7 @@
 ;;          TSUCHIYA Masatoshi <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 ;;
 ;; Created: 2000/06/14
-;; Revised: $Date: 2000/06/18 09:54:31 $
+;; Revised: $Date: 2000/06/18 15:58:36 $
 
 ;;;
 ;;; Commentary:
@@ -503,4 +503,4 @@
 ;; ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 ;; OF THE POSSIBILITY OF SUCH DAMAGE.
 
-;;; mhc-date2.el ends here.
+;;; mhc-date.el ends here.

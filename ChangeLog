@@ -1,3 +1,12 @@
+2000-06-19  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+
+	* emacs/MHC-MK: Add mhc-ps.el.
+
+	* emacs/mhc-ps.el: Fix coding system trouble, clean up codes, and
+	add new customize variables.
+
+	* emacs/mhc-date.el: Fix typo.
+
 2000-06-18  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 
 	* emacs/mhc-ps.el: New file.

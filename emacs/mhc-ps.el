@@ -2,13 +2,19 @@
 
 ;; Author:  TSUCHIYA Masatoshi <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 ;; Created: 2000/06/18
-;; Revised: $Date: 2000/06/18 10:36:25 $
+;; Revised: $Date: 2000/06/18 15:58:36 $
 
 
 ;;; Commentary:
 
 ;; This file is a part of MHC and includes functions to make
 ;; PoscScrpit calendar.
+
+
+;;; History:
+
+;; FIXME: 元々の PoscScrpit プログラムの著作者の変遷と、それを sh
+;; script に直した人の記述を追加すること。
 
 
 ;;; Customize variables:
@@ -49,25 +55,24 @@
   :group 'mhc
   :type '(repeat string))
 
+(defcustom mhc-ps-print-command "lp"
+  "*Command to print PoscScript calendar."
+  :group 'mhc
+  :type 'string)
+
+(defcustom mhc-ps-print-command-arguments nil
+  "*Argument of print command."
+  :group 'mhc
+  :type '(repeat string))
+
+(defcustom mhc-ps-coding-system
+  (if (boundp 'MULE) '*euc-japan*unix 'euc-japan-unix)
+  "*Coding system of PostScript data."
+  :group 'mhc
+  :type 'symbol)
+
 
 ;;; Internal Variables:
-
-(defconst mhc-ps/replace-table
-  '(("@MONTH@"     . (format "%d" month))
-    ("@YEAR@"      . (format "%d" year))
-    ("@TFONT@"     . mhc-ps-title-font)
-    ("@DFONT@"     . mhc-ps-day-font)
-    ("@EFONT@"     . mhc-ps-event-font)
-    ("@JFONT@"     . mhc-ps-japanese-font)
-    ("@HOLIDAYS@"  . holidays-buffer)
-    ("@SCHEDULES@" . schedules-buffer)
-    ("@BANNER@"    . "")
-    ("@LFOOT@"     . "")
-    ("@RFOOT@"     . "")
-    ("@CFOOT@"     . "")
-    ("@SCALE@"     . (if mhc-ps-paper-type "1.0 1.0" "0.75 0.75"))
-    ("@ROTATE@"    . (if mhc-ps-paper-type "90" "0"))
-    ("@TRANSLATE@" . (if mhc-ps-paper-type "50 -120" "50 900"))))
 
 (defconst mhc-ps/string "\
 %!
@@ -643,10 +648,27 @@ showpage
 
 ")
 
+(defconst mhc-ps/replace-table
+  '(("@MONTH@"     . (format "%d" month))
+    ("@YEAR@"      . (format "%d" year))
+    ("@TFONT@"     . mhc-ps-title-font)
+    ("@DFONT@"     . mhc-ps-day-font)
+    ("@EFONT@"     . mhc-ps-event-font)
+    ("@JFONT@"     . mhc-ps-japanese-font)
+    ("@HOLIDAYS@"  . holidays-buffer)
+    ("@SCHEDULES@" . schedules-buffer)
+    ("@BANNER@"    . "")
+    ("@LFOOT@"     . "")
+    ("@RFOOT@"     . "")
+    ("@CFOOT@"     . "")
+    ("@SCALE@"     . (if mhc-ps-paper-type "1.0 1.0" "0.75 0.75"))
+    ("@ROTATE@"    . (if mhc-ps-paper-type "90" "0"))
+    ("@TRANSLATE@" . (if mhc-ps-paper-type "50 -120" "50 900"))))
+
 
 ;;; Code:
 
-(defsubst mhc-ps/schedule-to-postscript (dayinfo schedule)
+(defsubst mhc-ps/schedule-to-string (dayinfo schedule)
   (let ((begin (mhc-schedule-time-begin schedule))
 	(end (mhc-schedule-time-end schedule)))
     (if (or begin end)
@@ -674,10 +696,10 @@ showpage
 			(mhc-schedule-in-category-p (car schedules) category)))
 	      (if (mhc-schedule-in-category-p (car schedules) "holiday")
 		  (setq holidays-buffer
-			(cons (mhc-ps/schedule-to-postscript (car dayinfo-list) (car schedules))
+			(cons (mhc-ps/schedule-to-string (car dayinfo-list) (car schedules))
 			      holidays-buffer))
 		(setq schedules-buffer
-		      (cons (mhc-ps/schedule-to-postscript (car dayinfo-list) (car schedules))
+		      (cons (mhc-ps/schedule-to-string (car dayinfo-list) (car schedules))
 			    schedules-buffer))))
 	    (setq schedules (cdr schedules))))
 	(setq dayinfo-list (cdr dayinfo-list))))
@@ -701,15 +723,16 @@ showpage
       (buffer-substring (point-min) (point-max)))))
 
 
-(defun mhc-ps-view-calendar (year month &optional category category-is-invert)
+(defun mhc-ps-preview (year month &optional category category-is-invert)
+  "*Preview PostScript calendar."
   (interactive
    (let ((date (mhc-input-month "Month: "))
 	 (category (mhc-category-convert mhc-default-category)))
      (list
       (mhc-date-yy date)
       (mhc-date-mm date)
-      (car category)
-      (cdr category))))
+      (cdr category)
+      (car category))))
   (let ((contents
 	 (mhc-ps/make-contents year month category category-is-invert)))
     (if contents
@@ -718,8 +741,38 @@ showpage
 		      "mhc-ps-preview"
 		      (mhc-get-buffer-create " *mhc-ps-preview*")
 		      mhc-ps-preview-command
-		      mhc-ps-preview-command-arguments))
-	      (coding-system-for-write 'euc-japan-unix))
+		      mhc-ps-preview-command-arguments)))
+	  (if (fboundp 'set-process-coding-system)
+	      (set-process-coding-system process mhc-ps-coding-system mhc-ps-coding-system)
+	    (set-process-input-coding-system process mhc-ps-coding-system)
+	    (set-process-output-coding-system process mhc-ps-coding-system))
+	  (process-send-string process contents)
+	  (process-send-eof process)))))
+
+
+(defun mhc-ps-print (year month &optional category category-is-invert)
+  "*Print PostScript calendar."
+  (interactive
+   (let ((date (mhc-input-month "Month: "))
+	 (category (mhc-category-convert mhc-default-category)))
+     (list
+      (mhc-date-yy date)
+      (mhc-date-mm date)
+      (cdr category)
+      (car category))))
+  (let ((contents
+	 (mhc-ps/make-contents year month category category-is-invert)))
+    (if contents
+	(let ((process
+	       (apply (function start-process)
+		      "mhc-ps-print"
+		      (mhc-get-buffer-create " *mhc-ps-print*")
+		      mhc-ps-print-command
+		      mhc-ps-print-command-arguments)))
+	  (if (fboundp 'set-process-coding-system)
+	      (set-process-coding-system process mhc-ps-coding-system mhc-ps-coding-system)
+	    (set-process-input-coding-system process mhc-ps-coding-system)
+	    (set-process-output-coding-system process mhc-ps-coding-system))
 	  (process-send-string process contents)
 	  (process-send-eof process)))))
 
