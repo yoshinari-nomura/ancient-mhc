@@ -50,7 +50,8 @@
   `(save-excursion
      (save-restriction
        (goto-char (point-min))
-       (re-search-forward "^-*$" nil t)
+       (re-search-forward
+	(concat "^" (regexp-quote mail-header-separator) "$\\|^$" nil t))
        (narrow-to-region (point-min) (match-beginning 0))
        (goto-char (point-min))
        ,@form)))
