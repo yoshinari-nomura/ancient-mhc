@@ -1,3 +1,9 @@
+2000-06-05  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+
+	* emacs/mhc.el (mhc-eword-encode-string): New function.
+	(mhc-sch-scan1): Replace eword-encode-string with
+	mhc-eword-encode-string.
+
 2000-06-02  Hideyuki SHIRAI  <shirai@rdmg.mgcs.mei.co.jp>
 
 	* emacs/mhc-calendar.el (mhc-calendar-hnf-summary-insert): hnf's 'CAT' support.
