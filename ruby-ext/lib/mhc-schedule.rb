@@ -3,7 +3,7 @@
 ## Author:  Yoshinari Nomura <nom@quickhack.net>
 ##
 ## Created: 1999/07/16
-## Revised: $Date: 2000/07/18 12:22:54 $
+## Revised: $Date: 2000/07/28 04:42:57 $
 ##
 
 ################################################################
@@ -885,14 +885,25 @@ class MhcScheduleItem
     hash .each_pair{|key,val|
       case key
       when 'day:'
-	val .split .each{|d|
-	  case d
-	  when /^!(\d+)$/
-	    @exception << MhcDate .new($1)
-	  when /^(\d+)$/
-	    @day << MhcDate .new($1)
+	while (val != '')
+	  case val
+	  when /^!/
+	    is_exception = true
+	  when /^\d+/
+	    if is_exception
+	      @exception << MhcDate .new($&)
+	      is_exception = false
+	    else
+	      @day << MhcDate .new($&)
+	    end
+	  when /^[^!\d]+/
+	    # discard the word.
+	  else
+	    # never occured.
 	  end
-	}
+	  val = $'
+	end
+
       when 'date:' ## backward compatibility
         if (val =~ /(\d+)\s+([A-Z][a-z][a-z])\s+(\d+)\s+(\d\d:\d\d)/)
 	  dd, mm, yy, hhmm = $1 .to_i, $2, $3 .to_i  + 1900 , $4
