@@ -1,3 +1,11 @@
+2000-07-26  Hideyuki SHIRAI  <shirai@quickhack.net>
+
+	* emacs/mhc-ps.el (mhc-ps-save): Add default option with read-file-name().
+	(mhc-ps/make-contents): Support (last|next)-(holiday|schedule).
+	(mhc-ps/replace-table): Ditto.
+	(mhc-ps/string): Ditto. Fix indent for PostScript.
+	(mhc-ps/uniq-list): New function.
+	
 2000-07-24  Yoshinari Nomura  <nom@quickhack.net>
 
 	* emacs/mhc-cmail.el (mhc-cmail-get-import-buffer):
