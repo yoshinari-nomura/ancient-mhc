@@ -1,3 +1,28 @@
+2000-08-07  Hideyuki SHIRAI  <shirai@quickhack.net>
+
+	* emacs/mhc.el (mhc-mode-menu-spec): 'Sync' enable safer.
+
+	* emacs/mhc-sync (toplevel): Add $Date: 2000/08/07 02:16:20 $.
+
+	* emacs/mhc-calendar.el (mhc-calendar-input-exit): New function.
+	(mhc-calendar-date-noduration): New variable.
+	(mhc-draft-insert-calendar): mhc-calendar-date-noduration set t, if
+	called in area of X-SC-Day:.
+	(mhc-calendar/get-day-region): If mhc-calendar-date-noduration is t,
+	insert days as break down.
+	(mhc-calendar): Not autoload.
+	(mhc-calendar-insert-summary-contents): Don't bind mhc-mailer-type.
+	(mhc-calendar-eword-decode-string): Remove.
+
+	* emacs/mhc-minibuf.el (mhc-input-day): Call mhc-calendar-input-exit()
+	when exit.
+
+	* emacs/mhc-draft.el (mhc-draft-kill): Ditto.
+	(mhc-draft-finish): Ditto.
+
+	* emacs/mhc-ps.el (mhc-ps/schedule-to-string): Always set
+	mhc-ps-left-margin when mhc-ps/compose-subject call.
+
 2000-08-07  Yoshinari NOMURA  <nom@quickhack.net>
 
 	* emacs/mhc-cmail.el (mhc-cmail-setup):

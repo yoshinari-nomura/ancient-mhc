@@ -3,8 +3,8 @@
 ;;
 ;; Author:  Hideyuki SHIRAI <shirai@quickhack.net>
 ;;
-;; Created: 06/12/2000
-;; Revised: 06/12/2000
+;; Created: 2000/06/12
+;; Revised: $Date: 2000/08/07 02:16:21 $
 
 ;;; Commentary:
 

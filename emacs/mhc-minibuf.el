@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1999/12/10
-;; Revised: $Date: 2000/08/05 19:56:12 $
+;; Revised: $Date: 2000/08/07 02:16:21 $
 
 ;;;
 ;;; Commentay:
@@ -271,8 +271,7 @@
 	  (setq error t)))
 	(setq str-list (cdr str-list)))
       (if error (beep)))
-    (setq mhc-calendar-date-separator nil)
-    (setq mhc-calendar-call-buffer nil)
+    (mhc-calendar-input-exit)
     (mhc-date-sort ret)))
 
 (defun mhc-input-time (&optional prompt default candidate)

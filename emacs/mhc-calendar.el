@@ -5,7 +5,7 @@
 ;;          MIYOSHI Masanori <miyoshi@ask.ne.jp>
 ;;
 ;; Created: 05/12/2000
-;; Reviesd: $Date: 2000/08/02 05:30:12 $
+;; Reviesd: $Date: 2000/08/07 02:16:21 $
 
 ;;; Configration Variables:
 
@@ -79,6 +79,7 @@ and must return string like \"   December 2000\"."
 (defvar mhc-calendar-view-date nil)
 (defvar mhc-calendar-call-buffer nil)
 (defvar mhc-calendar-date-separator nil)
+(defvar mhc-calendar-date-noduration nil)
 (defvar mhc-calendar-mode-map nil)
 (defvar mhc-calendar-mode-menu-spec nil)
 
@@ -200,7 +201,7 @@ and must return string like \"   December 2000\"."
 	   ["Next year" mhc-calendar-next-year t]
 	   ["Prev year" mhc-calendar-prev-year t])
 	  ["Rescan" mhc-calendar-rescan t]
-	  ["MHC summary scan" mhc-calendar-scan (mhc-calendar/mua-ready-p)]
+	  ["MHC summary scan" mhc-calendar-scan t]
 	  "----"
 	  ("Insert/Get"
 	   ["Insert" mhc-calendar-get-day-insert t]
@@ -387,11 +388,9 @@ The keys that are defined for mhc-calendar-mode are:
   (if (featurep 'xemacs) (easy-menu-add mhc-calendar-mode-menu))
   (run-hooks 'mhc-calendar-mode-hook))
 
-;;;###autoload
 (defun mhc-calendar (&optional date)
   "Display 3-month mini calender."
   (interactive)
-  (or mhc-setup-p (mhc-setup))
   (setq date (or date (mhc-current-date) (mhc-calendar-get-date)))
   (when (and (get-buffer mhc-calendar/buffer) (set-buffer mhc-calendar/buffer))
     (setq date (or date mhc-calendar-view-date))
@@ -610,6 +609,7 @@ The keys that are defined for mhc-calendar-mode are:
     ;; in mhc-clendar-call-buffer
     (set-buffer (get-buffer callbuf))
     (pop-to-buffer callbuf)
+    (mhc-calendar-input-exit)
     (cond
      ((window-minibuffer-p)
       (insert str) t)
@@ -642,16 +642,42 @@ The keys that are defined for mhc-calendar-mode are:
 
 (defun mhc-calendar/get-day-region (beg end &optional separator)
   (let ((cat (if (string= separator "\\") "〜" "-"))
-	str-beg str-end)
-    (setq str-beg (save-excursion
-		    (goto-char beg)
-		    (mhc-calendar/get-day separator)))
-    (setq str-end (save-excursion
-		    (goto-char end)
-		    (mhc-calendar/get-day separator)))
-    (if (string< str-beg str-end)
-	(concat str-beg cat str-end)
-      (concat str-end cat str-beg))))
+	datebeg dateend datetmp)
+    (if (and (string= separator "") mhc-calendar-date-noduration)
+	;; 20000101 200000102 200000103
+	(progn
+	  (setq datebeg (save-excursion
+			  (goto-char beg)
+			  (mhc-calendar-get-date)))
+	  (setq dateend (save-excursion
+			  (goto-char end)
+			  (mhc-calendar-get-date)))
+	  (when (mhc-date> datebeg dateend)
+	    (setq datetmp datebeg)
+	    (setq datebeg dateend)
+	    (setq dateend datetmp)
+	    (setq datetmp nil))
+	  (while (mhc-date<= datebeg dateend)
+	    (setq datetmp (cons datebeg datetmp))
+	    (setq datebeg (mhc-date++ datebeg)))
+	  (setq datetmp (nreverse datetmp))
+	  (mapconcat (lambda (x)
+		       (mhc-date-format x "%04d%02d%02d" yy mm dd))
+		     datetmp
+		     " "))
+      ;; 20000101-200000103
+      (setq datebeg (save-excursion
+		      (goto-char beg)
+		      (mhc-calendar/get-day separator)))
+      (setq dateend (save-excursion
+		      (goto-char end)
+		      (mhc-calendar/get-day separator)))
+      (cond
+       ((string= datebeg dateend)
+	datebeg)
+       ((string< datebeg dateend)
+	(concat datebeg cat dateend))
+       (t (concat dateend cat datebeg))))))
 
 (defun mhc-calendar-get-day-with-character (separator &optional arg)
   (interactive "cInput separator(n=null, \\=japanese, others=itself): \nP")
@@ -674,24 +700,20 @@ The keys that are defined for mhc-calendar-mode are:
 
 (defun mhc-calendar-scan (&optional hide-private)
   (interactive "P")
-  (if (mhc-calendar/mua-ready-p)
-      (let ((date (mhc-calendar-get-date)))
-	(mhc-calendar-quit)
-	(mhc-goto-month date hide-private)
-	(goto-char (point-min))
-	(if (mhc-summary-search-date date)
-	    (progn
-	      (beginning-of-line)
-	      (if (not (pos-visible-in-window-p (point)))
-		  (recenter)))))
-    (message "MUA is not ready.")))
+  (let ((date (mhc-calendar-get-date)))
+    (mhc-calendar-quit)
+    (mhc-goto-month date hide-private)
+    (goto-char (point-min))
+    (if (mhc-summary-search-date date)
+	(progn
+	  (beginning-of-line)
+	  (if (not (pos-visible-in-window-p (point)))
+	      (recenter))))))
 
 (defun mhc-calendar-quit ()
   (interactive)
   (let ((win (get-buffer-window mhc-calendar/buffer))
 	(buf (get-buffer mhc-calendar/buffer)))
-    (setq mhc-calendar-date-separator nil)
-    (setq mhc-calendar-call-buffer nil)
     (if (null win)
 	()
       (bury-buffer buf)
@@ -699,6 +721,11 @@ The keys that are defined for mhc-calendar-mode are:
 	  (delete-windows-on buf)
 	(set-window-buffer win (other-buffer))
 	(select-window (next-window))))))
+
+(defun mhc-calendar-input-exit ()
+  (setq mhc-calendar-date-separator nil)
+  (setq mhc-calendar-date-noduration nil)
+  (setq mhc-calendar-call-buffer nil))
 
 (defun mhc-calendar-exit ()
   (interactive)
@@ -901,12 +928,19 @@ The keys that are defined for mhc-calendar-mode are:
   (interactive)
   (let ((yy 1) (mm 1) (dd 1) date pos)
     (setq mhc-calendar-call-buffer (current-buffer))
+    (setq mhc-calendar-date-noduration nil)
     (save-excursion
       (setq pos (point))
       (goto-char (point-min))
-      (if (and (re-search-forward "^$" nil t)
+      (if (and (re-search-forward "^-*$" nil t)
 	       (< pos (point)))
-	  (setq mhc-calendar-date-separator "")
+	  (progn
+	    (setq mhc-calendar-date-separator "")
+	    (save-excursion
+	      (goto-char pos)
+	      (and (re-search-backward "x-[^:]+: " nil t)
+		   (looking-at "^x-sc-day: ")
+		   (setq mhc-calendar-date-noduration t))))
 	(setq mhc-calendar-date-separator nil))
       (goto-char pos)
       (skip-chars-backward "0-9")
@@ -1081,41 +1115,18 @@ The keys that are defined for mhc-calendar-mode are:
     (mhc-face-setup-internal mhc-calendar-hnf-face-alist ow)
     (mhc-face-setup-internal mhc-calendar-hnf-face-alist-internal nil)))
 
-;; MUA ready?
-(defun mhc-calendar/mua-ready-p ()
-  (cond
-   ((eq mhc-mailer-package 'mew)
-    (featurep 'mhc-mew))
-   ((eq mhc-mailer-package 'wl)
-    (featurep 'mhc-wl))
-   ((eq mhc-mailer-package 'gnus)
-    (featurep 'mhc-gnus))
-   ((eq mhc-mailer-package 'cmail)
-    (featurep 'mhc-cmail))
-   (t nil)))
-
 ;;; Pseudo MUA Backend Methods:
 (defun mhc-calendar-insert-summary-contents (inserter)
   (let ((beg (point))
 	(name (or (mhc-record-name
 		   (mhc-schedule-record mhc-tmp-schedule))
-		  "Dummy"))
-	(mhc-mailer-package 'calendar))
+		  "Dummy")))
     (funcall inserter)
     (put-text-property beg (point) 'mhc-calendar/summary-prop name)
     (insert "\n")))
 
-(defun mhc-calendar-eword-decode-string (string)
-  (cond
-   ((fboundp 'mhc-mew-eword-decode-string)
-    (mhc-mew-eword-decode-string string))
-   ((fboundp 'eword-decode-string)
-    (eword-decode-string string))
-   (t string)))
-
 (provide 'mhc-calendar)
 (put 'mhc-calendar 'insert-summary-contents 'mhc-calendar-insert-summary-contents)
-(put 'mhc-calendar 'eword-decode-string 'mhc-calendar-eword-decode-string)
 
 ;;; Copyright Notice:
 

@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1994/07/04
-;; Revised: $Date: 2000/08/04 11:01:24 $
+;; Revised: $Date: 2000/08/07 02:16:21 $
 
 ;;;
 ;;; Commentay:
@@ -77,7 +77,9 @@
 	("Network"
 	 ["Online" mhc-file-toggle-offline mhc-file/offline]
 	 ["Offline" mhc-file-toggle-offline (not mhc-file/offline)]
-	 ["Sync" mhc-file-sync (not mhc-file/offline)])
+	 ["Sync" mhc-file-sync (and (not mhc-file/offline)
+				    (stringp mhc-sync-remote)
+				    (stringp mhc-sync-id))])
 	"----"
 	("PostScript"
 	 ["Preview" mhc-ps-preview t]

@@ -3,7 +3,7 @@
 ;; Author:  TSUCHIYA Masatoshi <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 ;;          Hideyuki SHIRAI <shirai@quickhack.net>
 ;; Created: 2000/06/18
-;; Revised: $Date: 2000/07/26 14:19:25 $
+;; Revised: $Date: 2000/08/07 02:16:21 $
 
 
 ;;; Commentary:
@@ -864,7 +864,7 @@ showpage
 		   (format "%d ( %s)" day (mhc-ps/encode-string str)))
 		 (mhc-ps/compose-subject
 		  nil
-		  (mhc-schedule-subject-as-string schedule) 0)
+		  (mhc-schedule-subject-as-string schedule) mhc-ps-left-margin)
 		 " "))))
 
 
