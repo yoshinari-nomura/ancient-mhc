@@ -3,7 +3,7 @@
 ;; Author:  Yuuichi Teranishi <teranisi@quickhack.net>
 ;;
 ;; Created: 2000/07/26
-;; Revised: $Date: 2000/08/04 02:02:58 $
+;; Revised: $Date: 2000/08/04 02:19:02 $
 
 ;;; Commentary:
 
@@ -40,6 +40,7 @@
   (let (mime-edit-insert-user-agent-field)
     (mime-edit-translate-buffer)
     (save-excursion
+      (goto-char (point-min))
       (if (re-search-forward
 	   (concat "^" (regexp-quote mail-header-separator) "$")
 	   nil t)

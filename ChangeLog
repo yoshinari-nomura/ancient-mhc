@@ -3,6 +3,8 @@
 	* emacs/mhc-mime.el (mhc-mime/draft-reedit): Delete header separator
 	if already exists.
 	Assume text/plain if there is no 'Content-Type' header.
+	(mhc-mime-draft-translate): Go to `point-min' before searching
+	header separator.
 
 2000-08-03  Hideyuki SHIRAI  <shirai@quickhack.net>
 
