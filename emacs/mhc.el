@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1994/07/04
-;; Revised: $Date: 2000/08/10 03:58:02 $
+;; Revised: $Date: 2000/08/25 05:30:38 $
 
 ;;;
 ;;; Commentay:
@@ -17,6 +17,8 @@
 ;; for Mew user:
 ;;   (autoload 'mhc-mew-setup "mhc-mew")
 ;;   (add-hook 'mew-init-hook 'mhc-mew-setup)
+;;; optional setting for Mew-1.94 (Raw JIS header decoding)
+;;  (add-hook 'mew-message-hook 'mhc-mew-decode-header)
 ;;
 ;; for Wanderlust user:
 ;;   (autoload 'mhc-wl-setup "mhc-wl")

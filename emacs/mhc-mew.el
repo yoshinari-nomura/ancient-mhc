@@ -29,6 +29,8 @@
   '((mew-summary-mode . mew-message-mode)
     (mew-virtual-mode . mew-message-mode)))
 
+(defconst mhc-mew/cs-m17n
+  (if (boundp 'mew-cs-m17n) mew-cs-m17n mew-cs-scan))
 
 ;; Setup function:
 
@@ -39,7 +41,6 @@
   (setq mhc-mailer-package 'mew)
   (add-hook 'mew-summary-mode-hook 'mhc-mode)
   (add-hook 'mew-virtual-mode-hook 'mhc-mode)
-  (add-hook 'mew-message-hook 'mhc-mew-decode-header)
   (add-hook 'mew-quit-hook 'mhc-exit))
 
 
@@ -169,7 +170,7 @@
 						  (save-excursion
 						    (end-of-line)
 						    (point))
-						  mew-cs-scan))
+						  mhc-mew/cs-m17n))
 			(beginning-of-line)
 			(forward-line 1))
 		      ;; re-highlight

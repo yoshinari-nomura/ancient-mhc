@@ -167,7 +167,7 @@
 ;; multi pass parser に組み替えるべきかも知れない。
 (defun mhc-parse/internal-parser (record &optional schedule)
   "Internal parseser of schedule headers in this narrowed buffer."
-  (let (func)
+  (let (func (case-fold-search t))
     (while (not (eobp))
       (if (looking-at "\\([^ \t:]+\\):")
 	  (progn

@@ -1,3 +1,14 @@
+2000-08-25  Hideyuki SHIRAI  <shirai@quickhack.net>
+
+	* emacs/mhc.el (toplevel): Add comment (Raw JIS header decode in Mew).
+
+	* emacs/mhc-mew.el (mhc-mew/cs-m17n): New constant.
+	(mhc-mew-decode-header): Support mew-1.95alpha version.
+	(mhc-mew-setup): Remove mhc-mew-decode-header.
+
+	* emacs/mhc-parse.el (mhc-parse/internal-parser): Bind
+	case-fold-search is t, when parse header. (X-Mail-Count: 00976)
+
 2000-08-22  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* emacs/mhc-file.el (mhc-file-sync): Remove rescan feature.
