@@ -4,7 +4,7 @@
 ## Author:  MIYOSHI Masanori <miyoshi@quickhack.net>
 ##          Yoshinari Nomura <nom@quickhack.net>
 ## Created: 2000/7/12
-## Revised: $Date: 2000/07/14 07:26:44 $
+## Revised: $Date: 2000/07/18 04:33:26 $
 
 $LOAD_PATH .unshift('.')
 require 'mhc-make'
@@ -45,23 +45,13 @@ lib_search_path = ['/usr/local/lib', '/usr/local/pilot/lib']
 inc_search_path = ['/usr/local/include', '/usr/local/pilot/include']
 
 if conf['@@MHC_DISABLE_PALM@@'] == '0'
-  if !(conf .search_library(lib_search_path, 
-			    'pisock', 
-			    'pi_socket',
-			    '@@MHC_PILOT_LINK_LIB@@', false, true) and
-       conf .search_include(inc_search_path,
-			    'pi-dlp.h', 
-			    '@@MHC_PILOT_LINK_INC@@', false, true))
-    STDERR .print "#######################################################\n"
-    STDERR .print "Error: Could not find libpisock. "
-    STDERR .print "Error: check path and set\n"
-    STDERR .print "Error:   --pilot-link-lib=DIR and --pilot-link-inc=DIR.\n"
-    STDERR .print "Error: or\n"
-    STDERR .print "Error:  --disable-palm\n"
-    STDERR .print "ERror: if you don't need palm support.\n"
-    STDERR .print "#######################################################\n"
-    exit(1)
-  end
+  conf .search_library(lib_search_path, 
+		       'pisock', 
+		       'pi_socket',
+		       '@@MHC_PILOT_LINK_LIB@@', false, true)
+  conf .search_include(inc_search_path,
+		       'pi-dlp.h', 
+		       '@@MHC_PILOT_LINK_INC@@', false, true)
 end
 
 ################################################################
