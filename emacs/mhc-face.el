@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 2000/02/08
-;; Revised: $Date: 2000/06/27 13:07:02 $
+;; Revised: $Date: 2000/07/18 09:16:14 $
 
 ;;;
 ;;; Commentay:
@@ -101,31 +101,48 @@ refer to mhc-calendar-hnf-face-alist-internal.")
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; make faces arrange.
 
-(defun mhc-face-get-gray-face (face)
-  (let ((gray-symbol (intern (concat (symbol-name face) "-gray"))))
-    (if (mhc-facep gray-symbol)
-	()
-      (copy-face face gray-symbol)
-      (set-face-background gray-symbol "gray"))
-    gray-symbol))
+(defvar mhc-face-effect-alist
+  ;;             fg      bg        bold  talic  ul
+  '((today    . (nil     "gray"    nil   nil    nil))
+    (busy     . (nil      nil      t     nil    nil))
+    (saturday . ("Blue"   nil      nil   nil    nil))
+    (sunday   . ("Red"    nil      nil   nil    nil))))
 
-(defun mhc-face-get-busy-face (face)
-  (let ((busy-symbol (intern (concat (symbol-name face) "-busy"))))
-    (if (mhc-facep busy-symbol)
+;; get decolated face from face and effect
+;; ex. mhc-summary-face + today -> mhc-summary-face-today
+(defun mhc-face-get-effect (face effect)
+  (let ((new-face (intern (concat (symbol-name face) "-"
+				  (symbol-name effect))))
+	effect-list)
+    (if (mhc-facep new-face)
 	()
-      (copy-face face busy-symbol)
-      (or (make-face-bold busy-symbol nil t)
-	  (and (fboundp 'set-face-bold-p)
-	       (set-face-bold-p busy-symbol t))))
-    busy-symbol))
+      (copy-face face new-face)
+      (if (setq effect-list (cdr (assq effect mhc-face-effect-alist)))
+	  (let ((fg (nth 0 effect-list))
+		(bg (nth 1 effect-list))
+		(bl (nth 2 effect-list))
+		(it (nth 3 effect-list))
+		(ul (nth 4 effect-list)))
+	    (if fg (set-face-foreground  new-face fg))
+	    (if bg (set-face-background  new-face bg))
+	    (if ul (set-face-underline-p new-face t))
+	    ;;
+	    (if bl (or (make-face-bold new-face nil t)
+		       (and (fboundp 'set-face-bold-p)
+			    (set-face-bold-p new-face t))))
+	    ;;
+	    (if it (or (make-face-italic new-face nil t)
+		       (and (fboundp 'set-face-italic-p)
+			    (set-face-italic-p new-face t)))))))
+    new-face))
+;; 
+;; (make-face-italic  new-face nil t))))
+    
+(defsubst mhc-face-get-today-face (face)
+  (mhc-face-get-effect face 'today))
 
-(defun mhc-face-get-underline-face (face)
-  (let ((busy-symbol (intern (concat (symbol-name face) "-uline"))))
-    (if (mhc-facep busy-symbol)
-	()
-      (copy-face face busy-symbol)
-      (set-face-underline-p busy-symbol t))
-    busy-symbol))
+(defsubst mhc-face-get-busy-face (face)
+  (mhc-face-get-effect face 'busy))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; setup faces.
