@@ -3,13 +3,13 @@
 ## Author:  Yoshinari Nomura <nom@quickhack.net>
 ##
 ## Created: 1999/09/01
-## Revised: $Date: 2000/06/26 04:08:40 $
+## Revised: $Date: 2000/08/03 07:46:44 $
 ##
 
 require 'mhc-date'
 begin
   require 'mhc_pilib'
-rescue
+rescue LoadError
 #  STDERR .print "Warning: require 'mhc_pilib' was failed."
 end
 
