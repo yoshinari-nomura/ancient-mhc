@@ -4,8 +4,26 @@
                         Yoshinari Nomura
 
 Created: 1999/09/01
-Revised: $Date: 2000/07/13 00:42:56 $
+Revised: $Date: 2000/09/25 02:19:32 $
 
+
+** $B%+%l%s%H%P!<%8%g%s$rMxMQ$9$k:]$NCm0U(B
+
+$B!&(B emacs 19.x $B$K$OBP1~$7$F$$$^$;$s!#(B
+
+$B!&(B TODO $B$N;EMM$O!":#8eJQ99$5$l$k2DG=@-$,$"$j$^$9$N$G!"(B
+     $B%G!<%?$N8_49@-$,$J$/$J$k$+$b$7$l$^$;$s!#(B
+
+$B!&(B X-SC-Next: $B$G(B 1$B%U%!%$%k$KJ#?t$N%"!<%F%#%/%k$,=q$1$k5!G=$b(B
+   $B;EMMJQ99$5$l$kM=Dj$G$9!#(B
+
+$B!&(B C-cC-c $B;~$N%3%s%U%j%/%H%A%'%C%/$,$^$@$"$j$^$;$s!#(B
+
+$B!&(B C-cC-c $B;~$N%A%'%C%/$,4E$$$G$9!#(B
+    + X-SC-Subject $B$,$J$$(B
+    + X-SC-Day: X-SC-Cond: $B$NN>J}$K2?$b$J$$(B
+    + X-SC-Duration: $B$K4V0c$C$?HO0O$r;XDj$9$k(B
+   $BEy!"0lEY$b%9%1%8%e!<%k$K8=$l$J$$$h$&$J>l9g$K!"LB;R$K$J$j$^$9!#(B
 
 ** $B$O$8$a$K(B:
 
@@ -50,44 +68,58 @@ MHC $B$O!"M=Dj$N>pJs$r(B MH $B$HF1$87A<0$GJ]B8$7$^$9!#$=$N$?$a!">e5-0J30$N%D!
 
 MHC $B$O!"0J2<$N$h$&$J%3%^%s%I$rMxMQ$7$F$$$^$9!#(B
 
-gemcal        -- Ruby 1.4.2 + ruby-gtk 0.22
-mhc-sync      -- Ruby 1.4.2 + ssh
-palm2mhc      -- Ruby 1.4.2 + pilot-link $B$N%i%$%V%i%j(B
-mhc2palm      -- Ruby 1.4.2 + pilot-link $B$N%i%$%V%i%j(B
-today, mscan  -- Perl 5.004
-mhc.el        -- Mew (1.94$B0J9_(B) $B$+(B Wanderlust (2.2.10$B0J9_(B) $B$,F0$/4D6-(B
+gemcal        -- Ruby 1.4.x + ruby-gtk 0.2[23]
+mhc-sync      -- Ruby 1.4.x + ssh
+palm2mhc      -- Ruby 1.4.x + pilot-link $B$N%i%$%V%i%j(B
+mhc2palm      -- Ruby 1.4.x + pilot-link $B$N%i%$%V%i%j(B
+today         -- Ruby 1.4.x
+mhc.el        -- Mew/Wanderlust/Gnus/cmail $B$,F0$/4D6-(B
 
 $B>e5-$N$$$:$l$b(B UNIX $B$H(B Windows9x $B$GF0$/$h$&$K$7$F$$$k$D$b$j$G$9!#(B
-(Win9x $B$G$OL$3NG'!#(Bmscan, today, mhc.el $B$O!"F0:n$7$?$H$NJs9p$"$j!#(B)
 
 ** $B%G%#%l%/%H%j$NFbMF(B:
 
-mscan         -- $B%3%^%s%I%i%$%s$N%9%1%8%e!<%k0lMw%D!<%k(B
-today         -- $B:#F|$NM=Dj$r(B $BI=<((B/$B%a!<%k(B $B$9$k%D!<%k(B
-gemcal        -- ruby/gtk $B$K$h$k(B GUI $B%G%9%/%H%C%W%+%l%s%@!<(B
-mhc-sync      -- 2$B$D$N(B PC $B4V$G%G!<%?F14|$r<h$k%3%^%s%I!#(B
-mhc2palm      -- mhc $B$+$i(B Palm/WorkPad $B$X$N%G!<%?E>Aw(B
-palm2mhc      -- Palm/WorkPad $B$+$i(B mhc $B$X$N%G!<%?E>Aw(B
-emacs/        -- Mew/Wanderlust/Gnus $B$rM=DjF~NO!&1\Mw$H$7$F$b(B
-                 $B;H$($k$h$&$K$9$k%Q%C%1!<%8(B
-samples/      -- $B5YF|!&5-G0F|$N%5%s%W%k(B
-ruby-ext/     -- MHC $B7A<0$NM=Dj$r07$&%i%$%V%i%j(B
-		 (gemcal, palm2mhc, mhc2palm $B$+$i$b;HMQ(B)
-xpm/          -- gemcal $B$G;H$C$F$$$k%\%?%s$N3(!#(B
-experimental/ -- $B<B83%3!<%I(B
-00readme.jis  -- $B$3$N%U%!%$%k(B
-00copyright   -- $BCx:n8"I=<((B
-00changes     -- $B99?7MzNr(B
+today             -- $B:#F|$NM=Dj$r(B $BI=<((B/$B%a!<%k(B $B$9$k%D!<%k(B
+gemcal            -- ruby/gtk $B$K$h$k(B GUI $B%G%9%/%H%C%W%+%l%s%@!<(B
+mhc-sync          -- 2$B$D$N(B PC $B4V$G%G!<%?F14|$r<h$k%3%^%s%I!#(B
+mhc2palm          -- mhc $B$+$i(B Palm/WorkPad $B$X$N%G!<%?E>Aw(B
+palm2mhc          -- Palm/WorkPad $B$+$i(B mhc $B$X$N%G!<%?E>Aw(B
+emacs/            -- Mew/Wanderlust/Gnus $B$rM=DjF~NO!&1\Mw$H$7$F$b(B
+                     $B;H$($k$h$&$K$9$k%Q%C%1!<%8(B
+samples/          -- $B5YF|!&5-G0F|$N%5%s%W%k(B
+ruby-ext/         -- MHC $B7A<0$NM=Dj$r07$&%i%$%V%i%j(B
+		     (gemcal, palm2mhc, mhc2palm $B$+$i$b;HMQ(B)
+xpm/              -- gemcal $B$G;H$C$F$$$k%\%?%s$N3(!#(B
+experimental/     -- $B<B83%3!<%I(B
+00readme.jis      -- $B$3$N%U%!%$%k(B
+00readme.w32.jis  -- $B$3$N%U%!%$%k(B
+00copyright       -- $BCx:n8"I=<((B
+00changes         -- $B99?7MzNr(B
 
 ** $B%$%s%9%H!<%k(B:
 
-$B%I%-%e%a%s%HN`$,$^$@@0Hw$5$l$F$$$^$;$s!#%5%V%G%#%l%/%H%j$K<}$a$i$l$F$$(B
-$B$k%U%!%$%k$+!"%9%/%j%W%H$=$N$b$N$NCf$K=q$$$F$"$j$^$9!#(B
+$B%-%e%a%s%HN`$,$^$@@0Hw$5$l$F$$$^$;$s!#(B
+
+emacs $B4X78$O!"(Bemacs/ $B$N2<$G!"(BMakefile $B$rJT=8$7$F!"(B
+make $B$rC!$/$H%3%s%Q%$%k$G$-$^$9!#(B
+
+$B$=$NB>$N(B ruby $B4X78$O!"%H%C%W%G%#%l%/%H%j$+$i!"(B
+
+  ruby configure.rb 
+  ruby make.rb
+  ruby make.rb install
+
+$B$HC!$$$F2<$5$$!#(Bpilot-link $B%i%$%V%i%j$,%7%9%F%`$KF~$C$F$$$J$$>l9g$O!"(B
+
+  ruby configure.rb --disable-palm
+
+$B$H$7$F2<$5$$!#$3$N>l9g!"(Bmhc2palm palm2mhc $B$O;H$($^$;$s!#(B
 
 ** $B$5$i$J$k>pJs(B:
 
 MHC $B$K4X$9$k$*OC$r$9$k%a%$%j%s%0%j%9%H$r>e$2$^$7$?!#(B
 ($B5DO@$OF|K\8l$G8r$5$l$F$$$^$9!#(B)
+
 mhc-ctl@quickhack.net $B$K(B
 
     subscribe Your Name ($BNc(B: subscribe Yoshinari Nomura)
@@ -97,8 +129,8 @@ mhc-ctl@quickhack.net $B$K(B
 
     mhc@quickhack.net
 
-$B08$F$+(B nom@quickhack.net $B$K2<$5$$!#$^$?!"(Biij $B$NBg86$5$s$,!"(Bmhc $B$N(B CGI $B%$%s%?!<(B
-$B%U%'!<%9$H!"(Bmhc $B$N%Z!<%8$r:n@.$5$l$F$$$^$9!#9g$;$F8fMw2<$5$$!#(B
+$B08$F$+(B nom@quickhack.net $B$K2<$5$$!#$^$?!"(Biij $B$NBg86$5$s$,!"(Bmhc $B$N(B CGI 
+$B%$%s%?!<%U%'!<%9$H!"(Bmhc $B$N%Z!<%8$r:n@.$5$l$F$$$^$9!#9g$;$F8fMw2<$5$$!#(B
 
     web-mhc $BCV>l(B   http://mhc.hauN.org/web-mhc/
 

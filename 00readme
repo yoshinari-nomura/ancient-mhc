@@ -4,7 +4,7 @@
                         Yoshinari Nomura
 
 Created: 1999/09/01
-Revised: $Date: 2000/06/22 00:43:55 $
+Revised: $Date: 2000/09/25 02:19:32 $
 
 ** DESCRIPTION:
 
@@ -50,26 +50,27 @@ editors, UNIX commandline tools or your own scripts.
 
 MHC is supposed to work on systems which has
 
-gemcal        -- Ruby 1.4.2 + ruby-gtk 0.22
-mhc-sync      -- Ruby 1.4.2 + ssh
-palm2mhc      -- Ruby 1.4.2 + pilot-link library (libpisock)
-mhc2palm      -- Ruby 1.4.2 + pilot-link library (libpisock)
-today, mscan  -- Perl 5.004
+gemcal        -- Ruby 1.4 + ruby-gtk 0.22
+mhc-sync      -- Ruby 1.4 + ssh
+palm2mhc      -- Ruby 1.4 + pilot-link library (libpisock)
+mhc2palm      -- Ruby 1.4 + pilot-link library (libpisock)
+today         -- Ruby 1.4
 mhc.el        -- Environments which Mew (1.94 or later)
-                 or Wanderlust (ver 2.2.10 or later) supports.
+                 or Wanderlust (ver 2.2.10 or later) or
+                 Gnus or cmail supports.
 
 All tools are supposed to work on UNIX and Windows9x.
-(I've never tested under Win9x. mscan, today, mhc.el were reported to work.)
+(I've never tested under Win9x. today, mhc.el were reported to work.)
 
 ** MANIFEST:
 
-mscan         -- commandline schedule lister like scan of MH.
 today         -- display/sendmail today's schedule to you.
 gemcal        -- desktop scheduler. (written in ruby/gtk)
 mhc-sync      -- Data synchronization tool between 2 PCs.
 mhc2palm      -- data transfer from MHC to Palm/WrokPad.
 palm2mhc      -- data transfer from Palm/WrokPad to MHC.
 emacs/        -- mhc.el changes Mew/Wanderlust to a nifty scheduler.
+icons/        -- icons for mhc.el
 samples/      -- sample anniversary list.
 ruby-ext/     -- ruby/gtk libs required by gemcal, palm2mhc, mhc2palm, mhc-sync
 xpm/          -- small button designs required by gemcal
@@ -81,7 +82,17 @@ experimental/ -- experimental codes.
 ** INSTALL:
 
 Sorry I've not written documents yet.
-Each manpage may be included in sub directory or embedded the tool itself.
+
+Edit emacs/Makefile and type make in emacs/ directory to install mhc.el.
+For Ruby staff, type:
+
+  ruby configure.rb 
+  ruby make.rb
+  ruby make.rb install
+
+if you don't need Palm support, try:
+
+  ruby configure.rb --disable-palm
 
 ** FOR MORE INFORMATION:
 
