@@ -1,3 +1,8 @@
+2003-10-14  Hiroya Murata <lapis-lazuli@pop06.odn.ne.jp> / nom
+
+	* emacs/mhc-wl.el (mhc-wl-summary-mode-setup): Bind
+	`wl-summary-lazy-highlight' and `wl-summary-lazy-update-mark' to nil. 
+
 2003-10-13  Yoshinari Nomura  <nom@quickhack.net>
 
 	* configure.rb: Change default path for gemcal xpm.
