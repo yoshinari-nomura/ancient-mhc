@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1994/07/04
-;; Revised: $Date: 2003/12/19 01:16:36 $
+;; Revised: $Date: 2004/05/01 16:13:25 $
 
 ;;;
 ;;; Commentay:
@@ -673,9 +673,9 @@ Returns t if the importation was succeeded."
 		  "\nX-SC-Duration: "
 		  "\nX-SC-Alarm: " (or alarm "")
 		  "\nX-SC-Record-Id: " (mhc-record-create-id) "\n")
+	  (mhc-draft-mode)
 	  (mhc-highlight-message 'for-draft)
 	  (goto-char (point-min))
-	  (mhc-draft-mode)
 	  succeed))))
 
 (defun mhc-import (&optional get-original)

@@ -81,8 +81,8 @@ using T-gnus, `mhc-mime-get-import-buffer' must be used instead of
 this function."
   (gnus-summary-select-article)
   (if get-original
-      (cons gnus-original-article-buffer gnus-article-buffer)
-    gnus-article-buffer))
+      (cons gnus-original-article-buffer (gnus-copy-article-buffer))
+    (gnus-copy-article-buffer)))
 
 (defsubst mhc-gnus/date-to-group-name (date)
   (mhc-date-format date "%s/%02d/%02d" mhc-base-folder yy mm))
@@ -151,10 +151,15 @@ this function."
 (defun mhc-gnus-highlight-message (for-draft)
   "Hilight message in the current buffer.
 If FOR-DRAFT is non-nil, Hilight message as draft message."
-  (let ((gnus-article-buffer (current-buffer))
-	;; Adhoc fix to avoid errors in gnus-article-add-buttons().
-	(gnus-button-marker-list))
-    (gnus-article-highlight)))
+  (if for-draft
+      (progn
+	(require 'message)
+	(set (make-local-variable 'font-lock-defaults)
+	     '(message-font-lock-keywords t)))
+    (let ((gnus-article-buffer (current-buffer))
+	  ;; Adhoc fix to avoid errors in gnus-article-add-buttons().
+	  (gnus-button-marker-list))
+      (gnus-article-highlight))))
 
 (defalias 'mhc-gnus-decode-string 'rfc2047-decode-string)
 
