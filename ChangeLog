@@ -1,3 +1,8 @@
+2001-06-15  Hideyuki SHIRAI  <shirai@quickhack.net>
+
+	* samples/DOT.schedule.sample.jp: Fix 'UMI-NO-HI', 'KEIROU-NO-HI'
+	and 'FURIKAE-KYUJITSU' to be accompanied by 'Happy Monday low'.
+
 2001-05-30  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* emacs/mhc-mew.el (mhc-mew-draft-reedit-file): Fix 'raw JIS' vs
