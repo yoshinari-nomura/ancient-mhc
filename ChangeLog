@@ -1,6 +1,10 @@
 2000-10-30  Yoshinari Nomura  <nom@quickhack.net>
 
 	* mhc-sync.in (MhcScheduleDB#scan_all):
+	 don't use regexp option `p' for Ruby 1.6x. (Again)
+        (TNX, Mr. WATANABE Hirofumi <eban@os.rim.or.jp>)
+
+	* mhc-sync.in (MhcScheduleDB#scan_all):
 	don't use regexp option `p' for Ruby 1.6x.
 
 	* emacs/mhc-summary.el (mhc-summary-make-contents):
