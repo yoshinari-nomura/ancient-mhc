@@ -1,3 +1,21 @@
+2000-12-15  Hideyuki SHIRAI  <shirai@quickhack.net>
+
+	* emacs/mhc-calendar.el (mhc-calendar-toggle-insert-rectangle):
+	Function come back.
+
+2000-12-15  Yuuichi Teranishi  <teranisi@quickhack.net>
+
+	* emacs/mhc-wl.el (mhc-wl-mime-get-mime-structure): New function.
+	(toplevel): Register `mhc-wl-mime-get-mime-structure'.
+
+	* emacs/mhc-e21.el: New file.
+
+	* emacs/MHC-MK (make-mhc/module-alist): Added setting for mhc-e21.
+
+	* emacs/mhc.el (toplevel): require 'mhc-e21 if Emacs-21.x.
+
+	* emacs/mhc-mime.el (mhc-mime-get-mime-structure): Fixed doc-string.
+
 2000-12-14  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* emacs/mhc-date.el (mhc-date-digit-to-ww-string): Typo fix.

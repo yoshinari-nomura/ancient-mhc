@@ -5,7 +5,7 @@
 ;;          MIYOSHI Masanori <miyoshi@ask.ne.jp>
 ;;
 ;; Created: 05/12/2000
-;; Reviesd: $Date: 2000/12/14 10:39:55 $
+;; Reviesd: $Date: 2000/12/15 06:23:02 $
 
 ;;; Configration Variables:
 
@@ -305,6 +305,12 @@ ww-japanese-long => \"土曜日\"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; make rectangle like calendar.el
+
+(defun mhc-calendar-toggle-insert-rectangle (&optional hide-private)
+  "Toggle 3 month calendar."
+  (interactive "P")
+  (setq mhc-insert-calendar (not mhc-insert-calendar))
+  (mhc-rescan-month hide-private))
 
 (defun mhc-calendar-setup ()
   (setq mhc-calendar/week-header nil)
