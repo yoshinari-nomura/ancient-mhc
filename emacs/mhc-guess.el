@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1999/04/13
-;; Revised: $Date: 2000/08/21 08:46:04 $
+;; Revised: $Date: 2000/12/13 04:24:16 $
 ;;
 
 ;;;
@@ -63,6 +63,11 @@
 
 (defvar mhc-guess-date-regexp-list
   `(
+    (,(concat "\\([０-９0-9][０-９0-9][０-９0-9][０-９0-9]\\)[-−/／]"
+	      "\\([０-９0-9][０-９0-9]\\)[-−/／]"
+	      "\\([０-９0-9][０-９0-9]\\)")
+     mhc-guess/make-date-from-yyyymmdd 1 2 3)
+
     (,(concat "\\([来今０-９0-9]+\\)[\n　 ]*月[\n 　]*の?[\n 　]*"
 	      "\\([０-９0-9]+\\)日?"
 	      "\\([（）()月火水木金土日曜\n 　 ]*"
@@ -235,6 +240,15 @@
 ;; make date from string.
 ;;
 
+
+(defun mhc-guess/make-date-from-yyyymmdd (now yy-str mm-str dd-str)
+  (let (date)
+    (if (setq date (mhc-date-new 
+		    (mhc-guess/string-to-int yy-str)
+		    (mhc-guess/string-to-int mm-str)
+		    (mhc-guess/string-to-int dd-str)
+		    t)) ; noerror is t.
+	(cons date nil))))
 
 (defun mhc-guess/make-date-from-mmdd
   (now mm-str dd-str &optional mm-str2 dd-str2 relative)
