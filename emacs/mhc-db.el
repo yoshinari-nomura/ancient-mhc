@@ -216,6 +216,7 @@ FROM, TO は 1970/01/01 からの経過日数を用いて指定"
       (delete-region (point-min) (point-max))
       (mhc-insert-file-contents-as-coding-system mhc-default-coding-system
 						 (mhc-record-name original-record))
+      (mhc-draft-reedit-buffer buffer buffer)
       (let (record dayinfo schedule)
 	(while (setq record (mhc-parse-buffer)
 		     dayinfo (mhc-logic-eval-for-date (list (mhc-record-sexp record)) except-day)
