@@ -2,7 +2,7 @@
 
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;; Created: 2000/07/18
-;; Revised: $Date: 2000/08/07 09:26:28 $
+;; Revised: $Date: 2001/01/22 08:39:24 $
 
 ;; (autoload 'mhc-cmail-setup "mhc-cmail")
 ;; (add-hook 'cmail-startup-hook 'mhc-cmail-setup)
@@ -89,6 +89,16 @@
       (setq end (cmail-page-max))
       (narrow-to-region beg end)
       (current-buffer))))
+
+(defun mhc-cmail-mime-get-mime-structure ()
+  (let ((page (cmail-get-page-number-from-summary)) beg end)
+    (save-excursion
+      (cmail-get-folder)
+      (cmail-n-page page)
+      (setq beg (point))
+      (setq end (cmail-page-max))
+      (narrow-to-region beg end)
+      (get-text-property (point) 'mime-view-entity))))
 
 (defun mhc-cmail/date-to-buffer (date)
   "**cmail-summary**")
@@ -285,6 +295,7 @@
     (progn
       (put 'mhc-cmail 'get-import-buffer   'mhc-mime-get-import-buffer)
       (put 'mhc-cmail 'mime-get-raw-buffer 'mhc-cmail-mime-get-raw-buffer)
+      (put 'mhc-cmail 'mime-get-mime-structure 'mhc-cmail-mime-get-mime-structure)
       (put 'mhc-cmail 'draft-setup-new     'mhc-mime-draft-setup-new)
       (put 'mhc-cmail 'draft-reedit-buffer 'mhc-mime-draft-reedit-buffer)
       (put 'mhc-cmail 'draft-reedit-file   'mhc-mime-draft-reedit-file)
