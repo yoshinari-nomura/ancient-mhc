@@ -1,3 +1,7 @@
+2002-10-29  Yoichi NAKAYAMA <yoichi@eken.phys.nagoya-u.ac.jp> / shirai
+
+	* emacs/mhc-vars.el (mhc-use-wide-scope): Fix type.
+
 2002-10-28  HASHI Hiroaki  <bridge@st.rim.or.jp> / nom
 
 	* ruby-ext/lib/mhc-schedule.rb (priority_as_string):

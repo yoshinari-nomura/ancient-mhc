@@ -113,8 +113,8 @@
   "*Wide scope method in summary mode."
   :group 'mhc
   :type '(radio (const :tag "No use" nil)
-		(const :tag "Complete week scope" 'week)
-		(const :tag "Wide week scope" 'wide)
+		(const :tag "Complete week scope" week)
+		(const :tag "Wide week scope" wide)
 		(integer :tag "Scope wide size (>=0)" 3)))
 
 (provide 'mhc-vars)
