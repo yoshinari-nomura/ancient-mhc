@@ -1,3 +1,8 @@
+2000-08-29  Hideyuki SHIRAI  <shirai@quickhack.net>
+
+	* emacs/mhc-mew.el (mhc-mew/lc-ascii): New constant.
+	(mhc-mew/cs-m17n): Modify default setting.
+
 2000-08-25  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* emacs/mhc.el (toplevel): Add comment (Raw JIS header decode in Mew).

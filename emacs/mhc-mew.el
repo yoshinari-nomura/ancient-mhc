@@ -30,7 +30,10 @@
     (mew-virtual-mode . mew-message-mode)))
 
 (defconst mhc-mew/cs-m17n
-  (if (boundp 'mew-cs-m17n) mew-cs-m17n mew-cs-scan))
+  (if (>= emacs-major-version 20) 'ctext '*ctext*))
+
+(defconst mhc-mew/lc-ascii
+  (if (>= emacs-major-version 20) 'ascii 0))
 
 ;; Setup function:
 
@@ -164,7 +167,7 @@
 					 (point)
 					 (save-excursion (end-of-line)
 							 (point)))
-					(list mew-lc-ascii)))
+					(list mhc-mew/lc-ascii)))
 			    ;; decode!
 			    (mew-cs-decode-region (point) 
 						  (save-excursion
