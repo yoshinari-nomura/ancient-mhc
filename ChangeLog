@@ -1,3 +1,8 @@
+2001-10-17  Yoshinari Nomura  <nom@quickhack.net>
+
+	* emacs/mhc-guess.el (mhc-guess/guess):
+	sort consider match length in case scores are same.
+
 2001-10-14  MIYOSHI Masanori  <miyoshi@boreas.dti.ne.jp>
 
 	* 00readme.w32.jis: Add a way to specify MUA using configure.rb.
