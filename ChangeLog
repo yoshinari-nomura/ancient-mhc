@@ -1,3 +1,7 @@
+2004-01-12  Yoshinari Nomura  <nom@quickhack.net>
+
+	* ruby-ext/lib/mhc-date.rb, today.in: ruby 1.8 syntax compliant.
+
 2004-01-04  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* emacs/mhc-mew.el (mhc-mew/header-string): Support the new format
