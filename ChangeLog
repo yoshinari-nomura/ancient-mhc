@@ -1,3 +1,8 @@
+2000-08-07  Yoshinari NOMURA  <nom@quickhack.net>
+
+	* emacs/mhc-cmail.el (mhc-cmail-setup):
+	add mhc-mode to cmail-folders-mode-hook.
+
 2000-08-06  Yoshinari Nomura  <nom@quickhack.net>
 
 	* emacs/mhc-guess.el (toplevel): set -> defvar.
