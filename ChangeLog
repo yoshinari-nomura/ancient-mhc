@@ -1,3 +1,10 @@
+2001-02-03  Yoshinari Nomura  <nom@quickhack.net>
+
+	* ruby-ext/lib/mhc-schedule.rb (MhcSchedule::occur_min/max):
+	  Sometimes palm makes empty @day - @exception.
+	  ex. X-SC-Day: 20000911 !20000911
+	  workaround for that problem.
+
 2001-02-01  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* emacs/mhc-cvs.el (mhc-cvs/unknown-file): Treat character when ignore
