@@ -328,13 +328,13 @@
 
 (defun mhc-mew-eword-decode-string (string)
   (let ((ret ""))
+    (while (string-match "\n" string)
+      (setq string (replace-match "" nil nil string)))
     (while (string-match (concat mhc-mew-header-decode-regex
-				 "\\([ \t]*\n[ \t]+\\)"
+				 "\\([ \t]+\\)"
 				 mhc-mew-header-decode-regex)
 				 string)
       (setq string (replace-match "\\1\\3" nil nil string)))
-    (while (string-match "\n" string)
-      (setq string (replace-match "" nil nil string)))
     (while (string-match "[ \t\][ \t\]+" string)
       (setq string (replace-match " " nil nil string)))
     (while (not (string= string ""))
