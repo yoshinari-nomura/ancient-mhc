@@ -1,46 +1,61 @@
+;;; -*- Mode: outline -*-
 ################################################################
  00todo.jis
 ################################################################
 
 Created: 2000/03/08
-Revised: $Date: 2000/05/29 15:08:23 $
+Revised: $Date: 2000/06/23 03:26:34 $
 
-思い付き・順不同
+* 思い付き・順不同
 
-・ mhc-mailer-package による動作変更の仕組みを検討
-・ Windows で Ruby/Gtk, Palm 関連を簡単に使えるような
-     pre-compiled package の作成
-・ mhc でのアラーム (gemcal 側のアラーム OFF 機能)
-・ 高速化 (土屋さんの高速化手法)
-・ 3ヶ月カレンダーの高速化 / 別バッファ化
-   (白井さん作 mhc-calendar.el)
+** mhc-mailer-package による動作変更の仕組みを検討
 
-・ 各種入力補完
-・ mscan 復活 (today の高機能版のようなもの)
-・ TODO の実装
-・ 各種便利なオペレーション
+** Windows で Ruby/Gtk, Palm 関連を簡単に使えるような
+   pre-compiled package の作成
+
+** mhc でのアラーム (gemcal 側のアラーム OFF 機能)
+
+** 各種入力補完
+
+** TODO の実装
+
+** 各種便利なオペレーション
       + とにかく対応するファイルを開く (今の C-c m)
       + 日付けと時間だけを *変更*
       + 繰り返し記事の一件だけの日時等 *変更*
       + スケジュールを別な日にも *複写* して編集
-・ gemcal (Win) の漢字コード問題
-・ iCalendar への対応
-・ Duration の柔軟な記述 (! を使えるようにしたい)
-・ 英語メールからの guess (僕には実装できないだろう)
-・ guess の高機能化
-      + 来週金曜日、12時半
-・ xemacs 対応強化 (寺西さんの icon)
-・ 花田による Yet Another Web サポート (早くリリースして)
+
+** gemcal (Win) の漢字コード問題
+
+** iCalendar への対応
+
+** Duration の柔軟な記述 (! を使えるようにしたい)
+
+** 英語メールからの guess (僕には実装できないだろう)
+
+** guess の高機能化
+      + 12:00 〜 15:00 -> 12:00-15:00 を guess.
+
+** 花田による Yet Another Web サポート
       + Web からの入力
       + Private Proxy の強化
       + Meeting 2000 相当の物を用意
-・ J-Phone (じゃなくてもいいが) にメールを送ってアラーム
-・ major-mode 化?
-・ ドキュメント整理
-・ コードの整理 (いつも)
-・ かっこいい configure
-・ emacs/Makefile
-・ その他の mailer サポート(?)
 
-・ C-c| でアラームを聞くようにしたい。デフォルト時間を指定しておきたい。
-・ C-cc で Category指定 -> そのまま rescan。
+** J-Phone (じゃなくてもいいが) にメールを送ってアラーム
+
+** major-mode 化?
+
+** ドキュメント整理
+
+** かっこいい configure
+
+** その他の mailer サポート
+   cmail, AL-Mail(?)
+
+** C-c| でアラームを聞く。デフォルト時間を指定しておきたい。
+
+** C-cc で Category指定 -> そのまま rescan。
+
+** today を別名にして --format=ps をもう少し自然に書けるようにする。
+
+** mhc2palm, palm2mhc の統合, emacs からの実行。
