@@ -3,7 +3,7 @@
 ;; Author:  Yuuichi Teranishi <teranisi@gohome.org>
 ;;
 ;; Created: 1999/12/02
-;; Revised: $Date: 2000/07/03 00:50:18 $
+;; Revised: $Date: 2000/07/03 05:38:04 $
 
 (defcustom mhc-xmas-icon-alist nil
   "*Alist to define icons.
@@ -62,7 +62,7 @@ Example:
 (defun mhc-put-icon (icons)
   "Put ICONS on current buffer.
 Icon is decided by `mhc-xmas-icon-alist'."
-  (let (start space)
+  (let (start space extent glyphs)
     (setq icons
 	  (delq nil
 		(mapcar (lambda (icon)
@@ -71,11 +71,22 @@ Icon is decided by `mhc-xmas-icon-alist'."
     (when icons
       (setq space (make-string (length icons) ? ))
       (setq start (point))
-      (insert space space) ; Icon is 2 character width.
-      (put-text-property start (point) 'invisible t)
-      (while icons
-	(set-extent-begin-glyph (make-extent (point) (point)) (car icons))
-	(setq icons (cdr icons))))))
+      (while (setq extent (extent-at (point) nil 'mhc-icon extent 'at))
+	(setq glyphs (cons (extent-end-glyph extent) glyphs)))
+      (insert space space)
+      (setq extent (make-extent start (point)))
+      (set-extent-property extent 'invisible t))
+    (while glyphs
+      (setq extent (make-extent (point)(point)))
+      (set-extent-properties extent '(mhc-icon t))
+      (set-extent-end-glyph extent (car glyphs))
+      (setq glyphs (cdr glyphs)))
+    (setq icons (nreverse icons))
+    (while icons
+      (setq extent (make-extent (point) (point)))
+      (set-extent-properties extent '(mhc-icon t))
+      (set-extent-end-glyph extent (car icons))
+      (setq icons (cdr icons)))))
 
 (provide 'mhc-xmas)
 

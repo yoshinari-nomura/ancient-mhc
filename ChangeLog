@@ -1,5 +1,10 @@
 2000-07-03  Yuuichi Teranishi  <teranisi@quickhack.net>
 
+	* emacs/mhc-xmas.el (mhc-put-icon): Fix problem
+	when glyph extent already exists.
+
+	* icons/Party.xbm, icons/Party.xpm: New files.
+
 	* emacs/mhc-bm.el (mhc-bm-icon-alist): New variable.
 	(Renamed from mhc-bm-category-icon-alist.)
 	All other related portions are changed.
