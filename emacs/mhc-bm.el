@@ -3,7 +3,7 @@
 ;; Author:  Yuuichi Teranishi <teranisi@gohome.org>
 ;;
 ;; Created: 2000/05/27
-;; Revised: $Date: 2000/08/02 02:30:15 $
+;; Revised: $Date: 2000/08/04 02:31:43 $
 
 (require 'bitmap)
 (require 'mhc-face)
@@ -13,7 +13,7 @@
     ("Private"     . ("Private.xbm" "HotPink"))
     ("Todo"         .("CheckBox.xbm" "Red"))
     ("Done"        . ("CheckedBox.xbm" "Red"))
-    ("Conflict"    . ("Conflict.xpm" "Yellow")))
+    ("Conflict"    . ("Conflict.xbm" "Yellow")))
   "*Alist to define icons.
 Each element should have the form
  (NAME . (ICON-FILE FG BG))
