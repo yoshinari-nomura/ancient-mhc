@@ -1,3 +1,8 @@
+2002-11-09  MIYOSHI Masanori  <miyoshi@boreas.dti.ne.jp>
+
+	* mhc2ol.in: Remove an irrelevant substitution of DayOfMonth in
+	YearlyNth.
+
 2002-11-06  Yuuichi Teranishi  <teranisi@gohome.org>
 
 	* emacs/mhc-wl.el (mhc-wl-summary-mode-setup): Follow the recent

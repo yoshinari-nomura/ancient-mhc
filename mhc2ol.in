@@ -8,7 +8,7 @@
 ##          
 ##
 ## Created: 2001/09/15
-## Revised: $Date: 2002/09/06 06:15:24 $
+## Revised: $Date: 2002/11/09 08:01:15 $
 ##
 
 $DEBUG = false
@@ -136,7 +136,6 @@ module RepeatPattern
       rp = ol_appoint .GetRecurrencePattern()
       rp .RecurrenceType = OlConst::OlRecursYearNth
       rp .Duration = 60 * 24
-      rp .DayOfMonth = @start .d()
       rp .MonthOfYear = @start .m()
       rp .DayOfWeekMask = (1 << @dow)
       rp .Instance = @wom + 1 # Instance(week of month) begins with 1
