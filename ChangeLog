@@ -1,3 +1,14 @@
+2004-06-15  Yoshinari Nomura  <nom@quickhack.net>
+
+	* ruby-ext/lib/mhc-palm.rb
+	(PilotApptRecord#to_xsc): Put only start in X-SC-Time: in case
+		                  satrt is same as end.
+	(TNX, Mr. KOIE Hidetaka <hide@koie.org>)
+
+	* ruby-ext/lib/mhc-schedule.rb
+	(MhcScheduleItem#to_palm): correct handling of 'Last' keyword.
+	(TNX, Mr. KOIE Hidetaka <hide@koie.org>)
+
 2004-05-27  Yoshiaki Kasahara  <kasahara@nc.kyushu-u.ac.jp>
 
 	* gemcal.in (MhcScheduleEdit::initialize): Fix arguments for
