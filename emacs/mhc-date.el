@@ -4,7 +4,7 @@
 ;;          TSUCHIYA Masatoshi <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 ;;
 ;; Created: 2000/06/14
-;; Revised: $Date: 2000/06/18 15:58:36 $
+;; Revised: $Date: 2000/06/20 00:32:20 $
 
 ;;;
 ;;; Commentary:
@@ -372,7 +372,7 @@
       (setq yy (+ yy pp) mm (- xx (* 12 pp)))
       (if (mhc-date/check yy mm dd)
 	  (mhc-date-new yy mm dd)
-	(mhc-date-new yy mm 1 t)))))
+	(mhc-date-new yy mm (mhc-date/last-day-of-month yy mm))))))
 
 (defmacro mhc-date-mm-  (date c) `(mhc-date-mm+ ,date (- ,c)))
 (defmacro mhc-date-mm++ (date)   `(mhc-date-mm+ ,date 1))
@@ -426,6 +426,12 @@
       (aref ["Sunday" "Monday" "Tuesday" "Wednesday"
 	     "Thursday" "Friday" "Sataday"] ww)
     (aref ["Sun" "Mon" "Tue" "Wed" "Thu" "Fri" "Sat"] ww)))
+
+(defun mhc-date-digit-to-ww-japanese-string (ww &optional long)
+  (if long
+      (aref ["日曜日" "月曜日" "火曜日" "水曜日"
+	     "木曜日" "金曜日" "土曜日"] ww)
+    (aref ["日" "月" "火" "水" "木" "金" "土"] ww)))
 
 (defun mhc-date-digit-to-oo-string (oo &optinal long)
   (aref  ["1st" "2nd" "3rd" "4th" "5th"] oo))

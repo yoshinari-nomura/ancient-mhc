@@ -1,3 +1,8 @@
+2000-06-20  Hideyuki SHIRAI  <shirai@rdmg.mgcs.mei.co.jp>
+
+	* emacs/mhc-date.el (mhc-date-mm+): If check is nil, return last-day instead of '1'.
+	(mhc-date-digit-to-ww-japanese-string): New function, return japanese day of week.
+
 2000-06-19  Hideyuki SHIRAI  <shirai@rdmg.mgcs.mei.co.jp>
 
 	* emacs/mhc-mew.el (mhc-mew-summary-display-article): Implemented.
