@@ -96,9 +96,11 @@
   :type 'character)
 
 (defcustom mhc-use-month-separator t
-  "*If non-nil, insert separator in summary buffer for wide scope."
+  "*Insert separator in summary buffer for wide scope."
   :group 'mhc
-  :type 'boolean)
+  :type '(choice (const :tag "Insert (full width)" t)
+		 (integer :tag "Insert (number of width)")
+		 (const :tag "Not use" nil)))
 
 (defcustom mhc-summary-month-separator ?=
   "*Character of the separator as 'mhc-use-month-separator'."
@@ -547,9 +549,23 @@ If optional argument FOR-DRAFT is non-nil, Hilight message as draft message."
   (let ((width (mhc-misc-get-width))
 	hr)
     (if wide
-	(progn
+	(if (stringp str)
+	    (let ((hr1 (make-string 4 mhc-summary-month-separator))	;; xxxx 4 ?
+		  hr2)
+	      (mhc-face-put hr1 'mhc-summary-face-month-separator)
+	      (mhc-face-put str 'mhc-summary-face-cw)
+	      (setq hr2 (mhc-summary/make-string (- width
+						    (if (numberp mhc-use-month-separator)
+							mhc-calendar-width 2)
+						    (length hr1) (length str))
+						 mhc-summary-month-separator))
+	      (mhc-face-put hr2 'mhc-summary-face-separator)
+	      (setq hr (concat hr1 str hr2)))
 	  (setq hr (mhc-summary/make-string
-		    (- width 2) mhc-summary-month-separator))
+		    (if (numberp mhc-use-month-separator)
+			mhc-use-month-separator
+		      (- width 2))
+		    mhc-summary-month-separator))
 	  (mhc-face-put hr 'mhc-summary-face-month-separator))
       (if (stringp str)
 	  (let ((hr1 (make-string 4 mhc-summary-separator))	;; xxxx 4 ?
@@ -567,7 +583,6 @@ If optional argument FOR-DRAFT is non-nil, Hilight message as draft message."
 					    mhc-summary-separator)))
 	(mhc-face-put hr 'mhc-summary-face-separator)))
     (insert hr "\n")))
-
 
 (defvar mhc-summary/today nil)
 

@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1994/07/04
-;; Revised: $Date: 2004/10/07 05:21:46 $
+;; Revised: $Date: 2004/10/07 10:06:35 $
 
 ;;;
 ;;; Commentay:
@@ -499,7 +499,11 @@ If HIDE-PRIVATE, private schedules are suppressed."
     (when (and bfrom bto)
       (mhc-summary-make-contents bfrom bto mailer category-predicate secret)
       (if mhc-use-month-separator
-	  (mhc-summary/insert-separator 'wide)
+	  (mhc-summary/insert-separator
+	   'wide
+	   (when (and mhc-summary/cw-separator
+		      (eq (mhc-end-day-of-week) (mhc-date-ww bto)))
+	     (format " CW %d " (mhc-date-cw (mhc-date++ bto)))))
 	(if (and mhc-use-week-separator
 		 (eq (mhc-end-day-of-week) (mhc-date-ww bto)))
 	    (mhc-summary/insert-separator
@@ -509,7 +513,11 @@ If HIDE-PRIVATE, private schedules are suppressed."
     (mhc-summary-make-contents from to mailer category-predicate secret)
     (when (and afrom ato)
       (if mhc-use-month-separator
-	  (mhc-summary/insert-separator 'wide)
+	  (mhc-summary/insert-separator
+	   'wide
+	   (when (and mhc-summary/cw-separator
+		      (eq mhc-start-day-of-week (mhc-date-ww afrom)))
+	     (format " CW %d " (mhc-date-cw afrom))))
 	(if (and mhc-use-week-separator
 		 (eq mhc-start-day-of-week (mhc-date-ww afrom)))
 	    (mhc-summary/insert-separator
