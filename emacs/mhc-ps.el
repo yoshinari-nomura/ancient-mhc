@@ -2,7 +2,7 @@
 
 ;; Author:  TSUCHIYA Masatoshi <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 ;; Created: 2000/06/18
-;; Revised: $Date: 2000/06/24 09:09:36 $
+;; Revised: $Date: 2000/06/24 11:44:01 $
 
 
 ;;; Commentary:
@@ -751,10 +751,13 @@ showpage
 	(nreverse ret))))))
 
 
-(defun mhc-ps/escape-bracket (string)
-  (let ((start 0) buf)
-    (while (string-match "\\(\\((\\)\\|\\()\\)\\)" string start)
-      (setq buf (cons (if (match-beginning 2) "\\(" "\\)")
+(defun mhc-ps/encode-string (string)
+  (let ((start 0) buf ch)
+    (while (string-match "[()\\\\]" string start)
+      (setq ch (aref string (match-beginning 0))
+	    buf (cons (if (eq ch ?\() "\\("
+			(if (eq ch ?\)) "\\)"
+			  "\\\\"))
 		      (cons (substring string start (match-beginning 0)) buf))
 	    start (match-end 0)))
     (eval (cons 'concat (nreverse (cons (substring string start) buf))))))
@@ -766,7 +769,7 @@ showpage
 	(day (mhc-day-day-of-month dayinfo)))
     (if (or begin end)
 	(mapconcat (lambda (str)
-		     (format "%d ( %s)" day (mhc-ps/escape-bracket str)))
+		     (format "%d ( %s)" day (mhc-ps/encode-string str)))
 		   (cons (concat
 			  (if begin (mhc-time-to-string begin) "")
 			  (if end (concat "-" (mhc-time-to-string end)) ""))
@@ -774,7 +777,7 @@ showpage
 						 mhc-ps-left-margin))
 		   " ")
       (mapconcat (lambda (str)
-		   (format "%d ( %s)" day (mhc-ps/escape-bracket str)))
+		   (format "%d ( %s)" day (mhc-ps/encode-string str)))
 		 (mhc-ps/compose-subject (mhc-schedule-subject-as-string schedule) 0)
 		 " "))))
 
