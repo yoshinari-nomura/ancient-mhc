@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1999/12/10
-;; Revised: $Date: 2000/07/24 03:46:33 $
+;; Revised: $Date: 2000/08/05 19:56:12 $
 
 ;;;
 ;;; Commentay:
@@ -75,7 +75,10 @@
 
 (defun mhc-minibuf-candidate-nth-obj (&optional alist n)
   (let ((candidate (mhc-minibuf/get-nth-candidate alist n)))
-    (if candidate (mhc-guess-get-date-or-time candidate))))
+    (if candidate (cons
+		   (mhc-guess-get-date-or-time candidate)
+		   (mhc-guess-get-date-or-time-end candidate)))))
+
 ;;
 ;; move candidate by score.
 ;;
@@ -142,7 +145,7 @@
   (delete-region
    (save-excursion
      (while (and (not (bobp))
-		 (string-match "[0-9:/]"
+		 (string-match "[0-9:/-]"
 			       (buffer-substring
 				(1- (point)) (point))))
        (forward-char -1))
@@ -174,6 +177,9 @@
 	;; in minibuffer
 	(if non-minibuf
 	    ()
+	  ;; (if (string-match "-" str)
+	  ;; (delete-region (point-min) (point-max))
+	  ;; (mhc-minibuf-delete-word))
 	  (mhc-minibuf-delete-word)
 	  (insert str))))))
 
@@ -189,11 +195,22 @@
 ;; input functions for mhc.
 ;;
 
-(defun mhc-minibuf/date-to-string (date)
-  (mhc-date-format date "%04d/%02d/%02d" yy mm dd))
+(defun mhc-minibuf/date-to-string (date-cons)
+  (let ((date (car date-cons))
+	(date2 (cdr date-cons)))
+    (concat
+     (mhc-date-format date "%04d/%02d/%02d" yy mm dd)
+     (if date2
+	 (mhc-date-format date2 "-%04d/%02d/%02d" yy mm dd)
+       ""))))
 
-(defun mhc-minibuf/time-to-string (time)
-  (mhc-time-to-string time))
+(defun mhc-minibuf/time-to-string (time-cons)
+  (let ((time (car time-cons))
+	(time2 (cdr time-cons)))
+    (if time2 
+	(concat
+	 (mhc-time-to-string time) "-" (mhc-time-to-string time2))
+      (mhc-time-to-string time))))
 
 (defun mhc-input-day (&optional prompt default candidate)
   (interactive)
