@@ -3,7 +3,7 @@
 ## Author:  Yoshinari Nomura <nom@quickhack.net>
 ##
 ## Created: 1999/09/01
-## Revised: $Date: 2003/10/29 12:48:13 $
+## Revised: $Date: 2004/06/15 13:44:53 $
 ##
 
 require 'mhc-date'
@@ -590,7 +590,13 @@ class PilotApptRecord < PilotRecord
     xsc["Alarm"]      = alarm
     xsc["Day"]        = @exception .collect{|t| '!' + t .to_xscday} .join(' ')
     xsc["Day"]       += ' ' + @beg .to_xscday if !repeat?
-    xsc["Time"]  = ' ' + @beg .to_xsctime + '-' + @fin .to_xsctime if !event?
+    if !event?
+      if @beg .to_xsctime == @fin .to_xsctime
+        xsc["Time"]  = ' ' + @beg .to_xsctime
+      else
+        xsc["Time"]  = ' ' + @beg .to_xsctime + '-' + @fin .to_xsctime
+      end
+    end
 
     if repeat?
       if @repeatFrequency > 1
