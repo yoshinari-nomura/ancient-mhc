@@ -1,3 +1,9 @@
+2004-01-04  Hideyuki SHIRAI  <shirai@quickhack.net>
+
+	* emacs/mhc-mew.el (mhc-mew/header-string): Support the new format
+	of summary for Mew 4.
+	(mhc-mew/header-string-review): Ditto.
+	
 2003-12-19  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* emacs/mhc.el (mhc-edit): Ask Alarm when direct input.

@@ -30,12 +30,16 @@
 
 ;; Mew 4.x or later use invisible property at (beginning-of-line)
 (defconst mhc-mew/header-string
-  (let ((str "0 | "))
+  (let ((str (concat (if (boundp 'mew-summary-form-header)
+			 "" "0")
+		     " | ")))
     (put-text-property 0 (length str) 'invisible 'mhc str)
     str))
 
 (defconst mhc-mew/header-string-review
-  (let ((str (concat "0" (char-to-string mew-mark-review) "| ")))
+  (let ((str (concat (if (boundp 'mew-summary-form-header)
+			 "" "0")
+		     (char-to-string mew-mark-review) "| ")))
     (put-text-property 0 (length str) 'invisible 'mhc str)
     str))
 
