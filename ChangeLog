@@ -1,3 +1,20 @@
+2000-06-21  Yoshinari Nomura  <nom@quickhack.net>
+
+	* ruby-ext/lib/mhc-schedule.rb (MhcScheduleItem::initializse):
+	  add record-id correctly. (MFC)
+
+	* adb2mhc (to_mhc): ignore cron job '|', support daily schedule. (MFC)
+
+	* ruby-ext/lib/mhc-gtk.rb:
+	  Gtk::CAN_ -> Gtk::Widget::CAN_* for ruby-gtk 0.23. (MFC)
+
+	* gemcal, xpm/next_year.xpm, xpm/prev_year.xpm:
+	  Add buttons to goto next/prev year.(MFC)
+
+	* today: new feature --format=ps was added. (MFC)
+
+	* mhc-sync: mhc-sync deal with 'A' status. (MFC)
+
 2000-06-17  Yoshinari Nomura  <nom@quickhack.net>,
             MIYOSHI Masanori  <miyoshi@ask.ne.jp>
 
