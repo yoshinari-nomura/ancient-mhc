@@ -1,5 +1,8 @@
 2000-08-10  Yuuichi Teranishi  <teranisi@quickhack.net>
 
+	* emacs/mhc-wl.el (mhc-wl-summary-exit): Don't switch to original
+	buffer if it is already appeared.
+
 	* emacs/mhc.el (mhc-browse-x-url-function): New user option.
 	(mhc-browse-x-url): New function.
 
