@@ -1,3 +1,7 @@
+2000-06-19  Hideyuki SHIRAI  <shirai@rdmg.mgcs.mei.co.jp>
+
+	* emacs/mhc-mew.el (mhc-mew-summary-display-article): Implemented.
+
 2000-06-19  Yuuichi Teranishi  <teranisi@quickhack.net>
 
 	* emacs/mhc-wl.el (mhc-wl/date-to-folder): Fixed.

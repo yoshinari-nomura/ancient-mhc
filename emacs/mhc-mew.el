@@ -9,12 +9,6 @@
 
 ;; This file is a part of MHC, includes MUA backend methods for Mew.
 
-
-;;; TODO:
-
-;; (1) Define mhc-mew-summary-display-article.
-
-
 ;;; Code:
 
 (require 'mew)
@@ -60,6 +54,11 @@
 	(setq folder (buffer-substring (match-beginning 1) (match-end 1))
 	      number (buffer-substring (match-beginning 2) (match-end 2)))
 	(mhc-summary-folder-to-path folder number)))))
+
+
+(defun mhc-mew-summary-display-article ()
+  "Display the article on the current."
+  (mew-summary-display 'force))
 
 
 (defun mhc-mew-get-import-buffer (get-original)
@@ -193,6 +192,7 @@
 
 (provide 'mhc-mew)
 (put 'mhc-mew 'summary-filename 'mhc-mew-summary-filename)
+(put 'mhc-mew 'summary-display-article 'mhc-mew-summary-display-article)
 (put 'mhc-mew 'get-import-buffer 'mhc-mew-get-import-buffer)
 (put 'mhc-mew 'draft-mode 'mhc-mew-draft-mode)
 (put 'mhc-mew 'generate-summary-buffer 'mhc-mew-generate-summary-buffer)
