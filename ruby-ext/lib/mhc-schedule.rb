@@ -3,7 +3,7 @@
 ## Author:  Yoshinari Nomura <nom@quickhack.net>
 ##
 ## Created: 1999/07/16
-## Revised: $Date: 2001/02/06 13:37:09 $
+## Revised: $Date: 2001/05/22 02:02:43 $
 ##
 
 ################################################################
@@ -1015,7 +1015,9 @@ class File
       if File .file?(obj + '/' + MTIME_FILE)
 	File .utime(atime, mtime, obj + '/' + MTIME_FILE)
       else
-	File .open(obj + '/' + MTIME_FILE, "w") .close
+	f = File .open(obj + '/' + MTIME_FILE, "w")
+	f .print 'x' # FreeBSD requires this.
+	f .close
       end
     end
     File .utime(atime, mtime, obj)
