@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1994/07/04
-;; Revised: $Date: 2000/10/03 14:57:37 $
+;; Revised: $Date: 2000/10/03 15:11:09 $
 
 ;;;
 ;;; Commentay:
@@ -277,7 +277,7 @@
       (mhc-expr/gettoken obj)
       (setq ret (mhc-expr/expression obj))
       (if (mhc-expr/token obj)
-	  (error "Syntax Error")
+	  (error "Syntax Error.")
 	ret))))
 
 (defun mhc-expr-compile (string)
@@ -897,6 +897,8 @@ Returns t if the importation was succeeded."
     (mhc-face-setup)
     (mhc-calendar-setup)
     (mhc-file-setup)
+    (setq mhc-default-category-predicate-sexp
+	  (mhc-expr-compile mhc-default-category))
     (and (mhc-use-icon-p) (mhc-icon-setup))
     (and mhc-calendar-link-hnf (mhc-calendar-hnf-face-setup))
     (mhc-summary-line-inserter-setup)
