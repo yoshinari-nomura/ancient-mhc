@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1994/07/04
-;; Revised: $Date: 2000/07/18 04:29:00 $
+;; Revised: $Date: 2000/07/18 08:42:47 $
 
 ;;;
 ;;; Commentay:
@@ -71,7 +71,13 @@
 	["Insert Schedule" mhc-insert-schedule (not buffer-read-only)]
 	["3 months Mini calendar" mhc-calendar t]
 	["Toggle 3 months calendar" mhc-cal-toggle-insert-rectangle
-	 (mhc-summary-buffer-p)]))
+	 (mhc-summary-buffer-p)]
+	"----"
+	("PostScript"
+	 ["Preview" mhc-ps-preview t]
+	 ["Print" mhc-ps-print t]
+	 ["Save" mhc-ps-save t]
+	 ["Insert buffer" mhc-ps-insert-buffer t])))
 
 (defvar mhc-mode-map
   (let ((map (make-sparse-keymap)))
@@ -852,6 +858,8 @@ C-c ?    mhc-draft-insert-calendar
     (mhc-summary-line-inserter-setup)
     (autoload 'mhc-ps-preview "mhc-ps" "*Preview PostScript calendar." t)
     (autoload 'mhc-ps-print "mhc-ps" "*Print PostScript calendar." t)
+    (autoload 'mhc-ps-save "mhc-ps" "*Save PostScript calendar." t)
+    (autoload 'mhc-ps-insert-buffer "mhc-ps" "*Insert PostScript calendar." t)
     (setq mhc-setup-p t)
     (run-hooks mhc-setup-hook)))
   

@@ -1,8 +1,9 @@
 ;;; -*- mode: Emacs-Lisp; coding: euc-japan -*-
 
 ;; Author:  TSUCHIYA Masatoshi <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+;;          Hideyuki SHIRAI <shirai@quickhack.net>
 ;; Created: 2000/06/18
-;; Revised: $Date: 2000/06/28 03:32:07 $
+;; Revised: $Date: 2000/07/18 08:42:47 $
 
 
 ;;; Commentary:
@@ -78,7 +79,7 @@
   :type '(radio (const :tag "Landscape" t)
 		(const :tag "Portrait" nil)))
 
-(defcustom mhc-ps-truncate-lines t
+(defcustom mhc-ps-truncate-lines nil
   "*Truncate line."
   :group 'mhc
   :type 'boolean)
@@ -90,6 +91,11 @@
 
 (defcustom mhc-ps-string-width 20
   "*Width of the each schedule."
+  :group 'mhc
+  :type 'integer)
+
+(defcustom mhc-ps-string-column 7
+  "*Column of the each schedule."
   :group 'mhc
   :type 'integer)
 
@@ -271,17 +277,17 @@ def
 
 /titlefontsize 48 def
 /weekdayfontsize 10 def
-/datefontsize 30 def
+/datefontsize 24 def
 /footfontsize 20 def
 
 /topgridmarg 35 def
 /leftmarg 35 def
-/daytopmarg 10 def
+/daytopmarg 14 def
 /dayleftmarg 5 def
 
 % layout constants - don't change these, things probably won't work
 
-/rows 5 def
+/mainrows @WEEKS@ def
 /subrows 6 def
 
 % calendar constants - change these if you want a French revolutionary calendar
@@ -336,7 +342,7 @@ def
 	/day 2 1 roll def
 	day start add 1 sub 7 mod daywidth mul
 	day start add 1 sub 7 div truncate dayheight neg mul 
-	-5 
+	-5
 	numevents day start add get -10 mul add
 	numevents
 	day start add 
@@ -399,10 +405,10 @@ def
 		1.0 setlinewidth
 		submonth 0 eq
 		{
-			/rowsused rows 1 sub def
+			/rowsused mainrows 1 sub def
 		}
 		{
-			/rowsused rows def
+			/rowsused subrows 1 sub def
 		}
 		ifelse
 		0 1 rowsused {
@@ -458,13 +464,7 @@ def
         } if
 		submonth 0 eq
 		{
-			isdouble
-			{
-				day prtdouble
-			}
-			{
-				day prtnum
-			} ifelse
+			day prtnum
 		}
 		{
 			day daywidth centernum
@@ -482,48 +482,6 @@ def
 			daywidth 0 rmoveto
 		} ifelse
 	} for
-} def
-/isdouble {				% overlay today with next/last week?
-	days start add rows days_week mul gt
-	{
-		day start add rows days_week mul gt
-		{
-			true true
-		}
-		{
-			day start add rows 1 sub days_week mul gt
-			day days_week add days le and
-			{
-				false true
-			}
-			{
-				false
-			} ifelse
-		} ifelse
-	}
-	{
-		false
-	} ifelse
-} def
-
-/prtdouble {
-	gsave
-	  dayfont findfont datefontsize 2 mul 3 div scalefont setfont
-	  exch
-	  {
-		\(23/\) stringwidth pop dayheight rmoveto
-		prtnum
-	  }
-	  {
-		0 datefontsize 5 div rmoveto
-		prtnum
-		0 datefontsize -5 div rmoveto
-		gsave
-		  dayfont findfont datefontsize scalefont setfont
-		  \(/\) show
-		grestore
-	  } ifelse
-	grestore
 } def
 
 /drawfill {				% place fill squares on calendar
@@ -560,13 +518,13 @@ def
 	x0 y0 moveto
 	submonth 0 ne
 	{
-		/lastday rows 1 add days_week mul def
+		/lastday subrows days_week mul def
 		days_week 1 sub daywidth mul -440 rmoveto
 	}
 	{
-		/lastday rows days_week mul 2 sub fillstart add def
+		/lastday mainrows days_week mul 2 sub fillstart add def
 		days_week 3 sub fillstart add daywidth mul
-		-440 dayheight add rmoveto
+		@FOFFSET@ dayheight add rmoveto
 	} ifelse
 	lastday -1 ndays start 1 add add
 	{
@@ -580,8 +538,17 @@ def
 		grestore
 		day weekday 1 eq
 		{
-			x0 y0 moveto
-			days_week 1 sub daywidth mul -440 dayheight add rmoveto
+			submonth 0 ne
+			{
+				x0 y0 moveto
+				days_week 1 sub daywidth mul
+				-440 dayheight add rmoveto
+			}
+			{
+				x0 y0 moveto
+				days_week 1 sub daywidth mul
+				@FOFFSET@ dayheight add rmoveto
+			} ifelse
 		}
 		{
 			daywidth neg 0 rmoveto
@@ -590,9 +557,9 @@ def
 } def
 
 /usefirst {				% are last two boxes used by days?
-	start ndays add rows days_week mul 3 sub gt
+	start ndays add mainrows days_week mul 3 sub gt
 	start 2 ge and
-	
+	mainrows 6 eq or
 } def
 
 /calendar
@@ -613,7 +580,7 @@ def
 		Bannerstring show
 		% Show footnotes left-center-right
 		eventfont findfont footfontsize scalefont setfont
-		/bottomrow { dayheight rows mul 5 sub neg } def
+		/bottomrow { dayheight mainrows mul 5 sub neg } def
 		0 bottomrow moveto
 		Lfootstring show
 		daywidth days_week mul Rfootstring stringwidth pop sub
@@ -693,30 +660,41 @@ calendar
 grestore
 
 showpage
-
 ")
 
 (defconst mhc-ps/replace-table
-  '(("@MONTH@"     . (format "%d" month))
-    ("@YEAR@"      . (format "%d" year))
-    ("@TFONT@"     . mhc-ps-title-font)
-    ("@DFONT@"     . mhc-ps-day-font)
-    ("@EFONT@"     . mhc-ps-event-font)
-    ("@JFONT@"     . mhc-ps-japanese-font)
-    ("@HOLIDAYS@"  . holidays-buffer)
-    ("@SCHEDULES@" . schedules-buffer)
-    ("@BANNER@"    . "")
-    ("@LFOOT@"     . "")
-    ("@RFOOT@"     . "")
-    ("@CFOOT@"     . "")
-    ("@SCALE@"     . (if mhc-ps-paper-type "1.0 1.0" "0.75 0.75"))
-    ("@ROTATE@"    . (if mhc-ps-paper-type "90" "0"))
-    ("@TRANSLATE@" . (if mhc-ps-paper-type "50 -120" "50 900"))))
+      '(("@MONTH@"     . (format "%d" month))
+	("@YEAR@"      . (format "%d" year))
+	("@TFONT@"     . mhc-ps-title-font)
+	("@DFONT@"     . mhc-ps-day-font)
+	("@EFONT@"     . mhc-ps-event-font)
+	("@JFONT@"     . mhc-ps-japanese-font)
+	("@HOLIDAYS@"  . holidays-buffer)
+	("@SCHEDULES@" . schedules-buffer)
+	("@WEEKS@"     . (number-to-string weeks))
+	("@FOFFSET@"   . (if (eq weeks 6) "-535" "-440"))
+	("@BANNER@"    . (user-login-name))
+	("@LFOOT@"     . "")
+	("@RFOOT@"     . "")
+	("@CFOOT@"     . "")
+	("@SCALE@"     . (cond
+			  ((and mhc-ps-paper-type (eq weeks 6)) "0.85 0.85")
+			  (mhc-ps-paper-type "1.0 1.0")
+			  (t "0.75 0.75")))
+	("@ROTATE@"    . (if mhc-ps-paper-type "90" "0"))
+	("@TRANSLATE@" . (cond
+			  ((and mhc-ps-paper-type (eq weeks 6)) "120 -120")
+			  (mhc-ps-paper-type "50 -120")
+			  (t "50 900")))))
 
+(defun mhc-ps/weeks (date)
+  (if (> (+ (mhc-date-dd (mhc-date-mm-last date))
+	    (mhc-date-ww (mhc-date-mm-first date)))
+	 35) 6 5))
 
 (defun mhc-ps/substring (str width)
   (let ((clist (mhc-string-to-char-list str))
-	cw (i 0) (w 0) (ow 0) (spc (string-to-char " ")))
+	cw (i 0) (w 0) (ow 0) (spc ?\ ))
     (catch 'loop
       (while clist
 	(setq w (+ w (char-width (car clist))))
@@ -725,40 +703,60 @@ showpage
 	(setq clist (cdr clist))))
     (substring str 0 i)))
 
-(defun mhc-ps/compose-subject (subject margin)
+(defun mhc-ps/compose-subject (time subject margin)
   (let ((mstr (make-string margin ?\ ))
-	pos)
+	pos str)
     ;; Delete characters to emphasize subject.
     (and (string-match "^\\*+[ \t\r\f\n]*" subject)
 	 (setq pos (match-end 0))
 	 (string-match "[ \t\r\f\n]*\\*+$" subject)
 	 (setq subject (substring subject pos (match-beginning 0))))
-    (setq subject (concat mstr subject))
+    (if time
+	(setq str (concat time " " subject))
+      (setq str subject))
     (cond
-     ((<= (string-width subject) mhc-ps-string-width)
-      (list subject))
+     ((<= (string-width str) mhc-ps-string-width)
+      (list str))
      (mhc-ps-truncate-lines
-      (setq subject (mhc-ps/substring subject mhc-ps-string-width))
-      (if (= (string-width subject) mhc-ps-string-width)
-	  (list subject)
-	(list (concat subject "$"))))
+      (if (null time)
+	  (list
+	   (if (= (string-width
+		   (setq subject (mhc-ps/substring subject mhc-ps-string-width)))
+		  mhc-ps-string-width)
+	       (concat subject "$")
+	     subject))
+	(setq subject (concat mstr subject))
+	(if (= (string-width
+		(setq subject (mhc-ps/substring subject mhc-ps-string-width)))
+	       mhc-ps-string-width)
+	    (setq subject (concat subject "$")))
+	(list time subject)))
      (t
       (with-temp-buffer
 	(let ((fill-column mhc-ps-string-width)
-	      (left-margin margin)
+	      (left-margin 0)
 	      ret)
-	  (insert subject)
-	  ;; FIXME: fill-region は Emacs のバージョンによって動作がかなり
-	  ;; 異なっているので、違いを吸収する何らかの処置が必要。
+	  (insert str)
 	  (fill-region (point-min) (point-max))
 	  (goto-char (point-min))
+	  (if (= (forward-line 1) 0)
+	      (let ((fill-column (- mhc-ps-string-width margin)))
+		(fill-region (point) (point-max))))
+	  (delete-region (goto-char (point-max))
+			 (progn (skip-chars-backward " \t\n") (point)))
+	  (goto-char (point-min))
+	  (setq ret (list (buffer-substring
+			   (point) (progn (end-of-line) (point)))))
+	  (forward-line 1)
 	  (while (not (eobp))
-	    (setq ret (cons (buffer-substring
-			     (point) (progn (end-of-line) (point)))
-			    ret))
+	    (setq ret (cons
+		       (concat
+			mstr
+			(buffer-substring
+			 (point) (progn (end-of-line) (point))))
+		       ret))
 	    (forward-line 1))
 	  (nreverse ret)))))))
-
 
 (defun mhc-ps/encode-string (string)
   (let ((start 0) buf ch)
@@ -779,20 +777,24 @@ showpage
     (if (or begin end)
 	(mapconcat (lambda (str)
 		     (format "%d ( %s)" day (mhc-ps/encode-string str)))
-		   (cons (concat
-			  (if begin (mhc-time-to-string begin) "")
-			  (if end (concat "-" (mhc-time-to-string end)) ""))
-			 (mhc-ps/compose-subject (mhc-schedule-subject-as-string schedule)
-						 mhc-ps-left-margin))
+		   (mhc-ps/compose-subject
+		    (concat
+		     (if begin (mhc-time-to-string begin) "")
+		     (if end (concat "-" (mhc-time-to-string end)) ""))
+		    (mhc-schedule-subject-as-string schedule)
+		    mhc-ps-left-margin)
 		   " ")
       (mapconcat (lambda (str)
 		   (format "%d ( %s)" day (mhc-ps/encode-string str)))
-		 (mhc-ps/compose-subject (mhc-schedule-subject-as-string schedule) 0)
+		 (mhc-ps/compose-subject
+		  nil
+		  (mhc-schedule-subject-as-string schedule) 0)
 		 " "))))
 
 
-(defun mhc-ps/make-contents (year month &optional category category-is-invert)
-  (let (schedules-buffer holidays-buffer)
+(defun mhc-ps/make-contents (file year month &optional category category-is-invert)
+  (let ((weeks (mhc-ps/weeks (mhc-date-new year month 1)))
+	schedules-buffer holidays-buffer)
     (let ((dayinfo-list (mhc-db-scan-month year month)))
       (while dayinfo-list
 	(let ((schedules (mhc-day-schedules (car dayinfo-list))))
@@ -803,18 +805,18 @@ showpage
 			(mhc-schedule-in-category-p (car schedules) category)))
 	      (if (mhc-schedule-in-category-p (car schedules) "holiday")
 		  (setq holidays-buffer
-			(cons (mhc-ps/schedule-to-string (car dayinfo-list) (car schedules))
+			(cons (mhc-ps/schedule-to-string
+			       (car dayinfo-list) (car schedules))
 			      holidays-buffer))
 		(setq schedules-buffer
-		      (cons (mhc-ps/schedule-to-string (car dayinfo-list) (car schedules))
+		      (cons (mhc-ps/schedule-to-string
+			     (car dayinfo-list) (car schedules))
 			    schedules-buffer))))
 	    (setq schedules (cdr schedules))))
 	(setq dayinfo-list (cdr dayinfo-list))))
     (setq schedules-buffer (mapconcat 'identity (nreverse schedules-buffer) " ")
 	  holidays-buffer (mapconcat 'identity (nreverse holidays-buffer) " "))
-    (save-excursion
-      (set-buffer (mhc-get-buffer-create " *mhc-ps*"))
-      (delete-region (point-min) (point-max))
+    (with-temp-buffer
       (insert mhc-ps/string)
       (let ((case-fold-search nil)
 	    (alist mhc-ps/replace-table)
@@ -827,27 +829,54 @@ showpage
 	  (while (search-forward key nil t)
 	    (delete-region (- (point) (length key)) (point))
 	    (insert value))))
+      (and file
+	  (mhc-write-region-as-coding-system
+	   mhc-ps-coding-system (point-min) (point-max) (expand-file-name file)
+	   nil 'nomsg))
       (buffer-substring (point-min) (point-max)))))
 
+(defvar mhc-ps/process-file-alist '())
 
-(defun mhc-ps/start-process (command arguments year month category category-is-invert)
+(defun mhc-ps/process (command arguments file buffer year month
+			       category category-is-invert)
   (mhc-setup)
+  (message "PostScript creating ...")
   (let ((contents
-	 (mhc-ps/make-contents year month category category-is-invert)))
-    (if contents
+	 (mhc-ps/make-contents file year month category category-is-invert)))
+    (if (null contents)
+	(message "No PostScript create.")
+      (cond
+       ((stringp command)
 	(let ((process
 	       (apply (function start-process)
 		      (format "mhc-ps-%s" command)
 		      (mhc-get-buffer-create (format " *mhc-ps-%s*" command))
-		      command
-		      arguments)))
-	  (if (fboundp 'set-process-coding-system)
-	      (set-process-coding-system
-	       process mhc-ps-coding-system mhc-ps-coding-system)
-	    (set-process-input-coding-system process mhc-ps-coding-system)
-	    (set-process-output-coding-system process mhc-ps-coding-system))
-	  (process-send-string process contents)
-	  (process-send-eof process)))))
+		      command (append arguments (list (expand-file-name file))))))
+	  (set-process-coding-system
+	   process mhc-ps-coding-system mhc-ps-coding-system)
+	  (set-process-sentinel process 'mhc-ps/process-sentinel)
+	  (setq mhc-ps/process-file-alist
+		(cons (cons process file) mhc-ps/process-file-alist))
+	  (message "PostScript creating ... done.")))
+       ((eq command 'save)
+	(message "PostScript saving ... (%s) done." file))
+       ((eq command 'buffer)
+	(pop-to-buffer (get-buffer-create buffer))
+	(cond
+	 ((boundp 'buffer-file-coding-system)
+	  (setq buffer-file-coding-system mhc-ps-coding-system))
+	 ((boundp 'file-coding-system)
+	  (setq file-coding-system mhc-ps-coding-system)))
+	(save-excursion
+	  (insert contents))
+	(message "PostScript inserting ... (%s) done." buffer))))))
+
+
+(defun mhc-ps/process-sentinel (process event)
+  (let ((al (assoc process mhc-ps/process-file-alist)))
+    (and (cdr al) (file-writable-p (cdr al)) (delete-file (cdr al)))
+    (setq mhc-ps/process-file-alist
+	  (delete al mhc-ps/process-file-alist))))
 
 
 ;;;###autoload
@@ -862,12 +891,13 @@ showpage
       (mhc-date-mm date)
       (cdr category)
       (car category))))
-  (mhc-ps/start-process mhc-ps-preview-command
-			mhc-ps-preview-command-arguments
-			year
-			month
-			category
-			category-is-invert))
+  (mhc-ps/process mhc-ps-preview-command mhc-ps-preview-command-arguments
+		  (expand-file-name
+		   (format "mhc%04d%02d.ps" year month)
+		   (mhc-summary-folder-to-path mhc-base-folder))
+		  nil
+		  year month
+		  category category-is-invert))
 
 
 ;;;###autoload
@@ -882,12 +912,57 @@ showpage
       (mhc-date-mm date)
       (cdr category)
       (car category))))
-  (mhc-ps/start-process mhc-ps-print-command
-			mhc-ps-print-command-arguments
-			year
-			month
-			category
-			category-is-invert))
+  (mhc-ps/process mhc-ps-print-command mhc-ps-print-command-arguments
+		  (expand-file-name
+		   (format "mhc%04d%02d.ps" year month)
+		   (mhc-summary-folder-to-path mhc-base-folder))
+		  nil
+		  year month
+		  category category-is-invert))
+
+;;;###autoload
+(defun mhc-ps-save (year month file &optional category category-is-invert)
+  "*Save PostScript calendar."
+  (interactive
+   (let* ((cdate (or (mhc-current-date) (mhc-calendar-get-date)))
+	  (date (mhc-input-month "Month: " cdate))
+	  (category (mhc-category-convert mhc-default-category))
+	  (file (read-file-name "Save file: "
+				(expand-file-name
+				 (mhc-date-format date "mhc%04d%02d.ps"
+						  yy mm)
+				 (mhc-summary-folder-to-path mhc-base-folder)))))
+     (list
+      (mhc-date-yy date)
+      (mhc-date-mm date)
+      file
+      (cdr category)
+      (car category))))
+  (mhc-ps/process 'save nil
+		  file nil
+		  year month
+		  category category-is-invert))
+
+
+;;;###autoload
+(defun mhc-ps-insert-buffer (year month buffer &optional category category-is-invert)
+  "*Insert PostScript calendar."
+  (interactive
+   (let* ((cdate (or (mhc-current-date) (mhc-calendar-get-date)))
+	  (date (mhc-input-month "Month: " cdate))
+	  (category (mhc-category-convert mhc-default-category))
+	  (buffer (read-buffer "Insert buffer: "
+			       "*mhc-postscript*")))
+     (list
+      (mhc-date-yy date)
+      (mhc-date-mm date)
+      buffer
+      (cdr category)
+      (car category))))
+  (mhc-ps/process 'buffer nil
+		  nil buffer
+		  year month
+		  category category-is-invert))
 
 
 (provide 'mhc-ps)
