@@ -9,6 +9,9 @@
 
 2000-08-02  Hideyuki SHIRAI  <shirai@quickhack.net>
 
+	* emacs/mhc.el (mhc-setup): Run hook with symbol name.
+	(mhc-exit): Ditto.
+	
 	* emacs/mhc-calendar.el (mhc-calendar-insert-summary-contents):
 	Bind mhc-mailer-package to 'calendar as decode-string.
 	(mhc-calendar-eword-decode-string): New function, decode encoded word

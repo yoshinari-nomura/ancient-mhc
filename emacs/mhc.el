@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1994/07/04
-;; Revised: $Date: 2000/08/02 02:30:15 $
+;; Revised: $Date: 2000/08/02 06:11:09 $
 
 ;;;
 ;;; Commentay:
@@ -748,7 +748,7 @@ Returns t if the importation was succeeded."
     (autoload 'mhc-ps-save "mhc-ps" "*Save PostScript calendar." t)
     (autoload 'mhc-ps-insert-buffer "mhc-ps" "*Insert PostScript calendar." t)
     (setq mhc-setup-p t)
-    (run-hooks mhc-setup-hook)))
+    (run-hooks 'mhc-setup-hook)))
   
 (defcustom mhc-exit-hook nil
   "Run hook after mhc-exit."
@@ -760,7 +760,7 @@ Returns t if the importation was succeeded."
   (mhc-file-exit)
   (mhc-slot-clear-cache)
   (mhc-kill-all-buffers)
-  (run-hooks mhc-exit-hook))
+  (run-hooks 'mhc-exit-hook))
 
 
 ;;; Copyright Notice:
