@@ -86,7 +86,7 @@
 (defun mhc-logic-day-as-string-list (logicinfo)
   (mapcar (lambda (day)
 	    (if (consp day)
-		(mhc-date-format (car day) "! %04d%02d%02d" yy mm dd)
+		(mhc-date-format (car day) "!%04d%02d%02d" yy mm dd)
 	      (mhc-date-format day "%04d%02d%02d" yy mm dd)))
 	  (mhc-logic/day logicinfo)))
 
