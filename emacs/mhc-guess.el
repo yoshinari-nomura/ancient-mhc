@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1999/04/13
-;; Revised: $Date: 2003/10/10 11:18:46 $
+;; Revised: $Date: 2003/11/05 01:12:43 $
 ;;
 
 ;;;
@@ -118,6 +118,11 @@
      mhc-guess/make-time-from-hhmm 1 2 5 7 6)
     ))
 
+(defvar mhc-guess-location-list '()
+  "*List of the regexps of the location, like this
+  '(\"第?[0-9０-９〇-九]+応接室?\"
+    \"第?[0-9０-９〇-九]+会議室[0-9０-９〇-九]?\"))")
+
 (defvar mhc-guess-location-regexp-list
   `(
     (,(concat "場所[ 　]*[：:]*[\n 　]*\\([^\n 　]+\\)")
@@ -145,6 +150,8 @@
     ("\\(Jul\\|Aug\\|Sep\\|Oct\\|Nov\\|Dec\\)"      -200 t   -20)
     ("^\\([ a-zA-Z]*>\\)+ *"                        -200 t   -15)
     ))
+
+(defvar mhc-guess/location-regexp-list nil)
 
 ;;
 ;; manipulate guess-candidate structure.
@@ -187,9 +194,21 @@
 (defun mhc-guess-time (&optional hint1)
   (mhc-guess/guess mhc-guess-time-regexp-list hint1))
 
-
+(defun mhc-guess-location-setup ()
+  (if mhc-guess-location-list
+      (let ((list mhc-guess-location-list)
+	    regex)
+	(while list
+	  (setq regex (concat regex "\\(" (car list) "\\)"))
+	  (setq list (cdr list))
+	  (when list (setq regex (concat regex "\\|"))))
+ 	(setq mhc-guess/location-regexp-list
+ 	      (cons `(,regex mhc-guess/make-location-from-string 0)
+ 		    mhc-guess-location-regexp-list)))
+    (setq mhc-guess/location-regexp-list mhc-guess-location-regexp-list)))
+  
 (defun mhc-guess-location (&optional hint1)
-  (mhc-guess/guess mhc-guess-location-regexp-list hint1))
+  (mhc-guess/guess mhc-guess/location-regexp-list hint1))
 
 (defun mhc-guess/guess (control-regexp-lst &optional hint1 now)
   (let ((score-list

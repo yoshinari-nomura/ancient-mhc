@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1994/07/04
-;; Revised: $Date: 2003/10/10 12:02:34 $
+;; Revised: $Date: 2003/11/05 01:12:43 $
 
 ;;;
 ;;; Commentay:
@@ -922,6 +922,7 @@ Returns t if the importation was succeeded."
     (and (mhc-use-icon-p) (mhc-icon-setup))
     (and mhc-calendar-link-hnf (mhc-calendar-hnf-face-setup))
     (mhc-summary-line-inserter-setup)
+    (mhc-guess-location-setup)
     (autoload 'mhc-ps "mhc-ps" "*Create PostScript calendar with selected method." t)
     (autoload 'mhc-ps-preview "mhc-ps" "*Preview PostScript calendar." t)
     (autoload 'mhc-ps-print "mhc-ps" "*Print PostScript calendar." t)
@@ -940,6 +941,7 @@ Returns t if the importation was succeeded."
   (and (mhc-use-icon-p) (mhc-icon-setup))
   (and mhc-calendar-link-hnf (mhc-calendar-hnf-face-setup))
   (mhc-summary-line-inserter-setup)
+  (mhc-guess-location-setup)
   (or (and (mhc-summary-buffer-p)
 	   (mhc-rescan-month mhc-default-hide-private-schedules))
       (and (mhc-calendar-p) (mhc-calendar-rescan)))

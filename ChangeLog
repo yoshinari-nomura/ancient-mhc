@@ -1,3 +1,14 @@
+2003-11-05  Hideyuki SHIRAI  <shirai@quickhack.net>
+
+	* emacs/mhc-guess.el (mhc-guess-location-list): New user option.
+	(mhc-guess/location-regexp-list): New internal variable.
+	(mhc-guess-location-setup): New function.
+	(mhc-guess-location): Use `mhc-guess/location-regexp-list'
+	instead of `mhc-guess-location-regexp-list'.
+
+	* emacs/mhc.el (mhc-setup, mhc-reset): Call
+	`mhc-guess-location-setup'.
+
 2003-11-03  MIYOSHI Masanori  <miyoshi@boreas.dti.ne.jp>
 
 	* ruby-ext/lib/mhc-date.rb (MhcTime::<=>): Verify that the types
