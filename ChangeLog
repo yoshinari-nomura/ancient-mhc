@@ -1,3 +1,10 @@
+2000-08-22  Hideyuki SHIRAI  <shirai@quickhack.net>
+
+	* emacs/mhc-file.el (mhc-file-sync): Remove rescan feature.
+
+	* emacs/mhc-sync.el (mhc-sync/start-process): Rescan after mhc-sync
+	command.
+
 2000-08-21  KOIE Hidetaka <hide@koie.org>,
 	TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 

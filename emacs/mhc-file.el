@@ -161,13 +161,8 @@
   (if mhc-file/offline
       (message "\"M-x mhc-file-toggle-offline\" first.")
     (message "mhc file sync ...")
-    (if (null (mhc-file/sync))
-	nil
-      (or (and (mhc-summary-buffer-p)
-	       (mhc-rescan-month mhc-default-hide-private-schedules))
-	  (and (mhc-calendar-p) (mhc-calendar-rescan)))
-      (message "mhc file sync ... done.")
-      t)))
+    (when (mhc-file/sync)
+      (message "mhc file sync ... done."))))
 
 
 ;; almost same as (make-directory dirname t)

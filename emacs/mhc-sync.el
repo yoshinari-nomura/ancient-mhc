@@ -4,7 +4,7 @@
 ;; Author:  Hideyuki SHIRAI <shirai@quickhack.net>
 ;;
 ;; Created: 2000/06/12
-;; Revised: $Date: 2000/08/07 02:16:21 $
+;; Revised: $Date: 2000/08/22 02:25:59 $
 
 ;;; Commentary:
 
@@ -86,8 +86,11 @@
 	  (sit-for 0.1)
 	  (discard-input)))
       (sit-for 1)
-      (mhc-window-pop))
-    t)))
+      (mhc-window-pop)
+      (or (and (mhc-summary-buffer-p)
+	       (mhc-rescan-month mhc-default-hide-private-schedules))
+	  (and (mhc-calendar-p) (mhc-calendar-rescan)))
+      t))))
 
 (defun mhc-sync/filter (process string)
   (if (bufferp (process-buffer process))
