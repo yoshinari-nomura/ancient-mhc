@@ -1,3 +1,7 @@
+2003-10-13  Yoshinari Nomura  <nom@quickhack.net>
+
+	* configure.rb: Change default path for gemcal xpm.
+
 2003-10-13  Toshiaki Tanaka <toc@yan.ne.jp> / nom
 
 	* emacs/mhc-vars.el (mhc-category-as-private): New variable.
