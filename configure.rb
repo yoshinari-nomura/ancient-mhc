@@ -4,7 +4,7 @@
 ## Author:  MIYOSHI Masanori <miyoshi@quickhack.net>
 ##          Yoshinari Nomura <nom@quickhack.net>
 ## Created: 2000/7/12
-## Revised: $Date: 2002/11/21 00:04:11 $
+## Revised: $Date: 2003/10/13 07:26:29 $
 
 $LOAD_PATH .unshift('.')
 require 'mhc-make'
@@ -54,7 +54,7 @@ conf = MhcConfigure .new(local_config_table) .parse_argv
 
 # XXX: ukai
 if conf['@@MHC_XPM_PATH@@'] == ''
-  conf['@@MHC_XPM_PATH@@'] = conf['@@MHC_LIBDIR@@'] + '/xpm'
+  conf['@@MHC_XPM_PATH@@'] = conf['@@MHC_LIBDIR@@'] + '/mhc/xpm'
 end
 
 ################################################################
