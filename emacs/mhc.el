@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1994/07/04
-;; Revised: $Date: 2001/09/13 08:07:16 $
+;; Revised: $Date: 2001/10/30 14:14:35 $
 
 ;;;
 ;;; Commentay:
@@ -51,6 +51,7 @@
 
 (cond
  ((eval-when-compile (and (not (featurep 'xemacs))
+			  (not (eq system-type 'windows-nt))
 			  (>= emacs-major-version 21)))
   (require 'mhc-e21))
  ((eval-when-compile

@@ -1,3 +1,7 @@
+2001-10-30  MIYOSHI Masanori  <miyoshi@boreas.dti.ne.jp>
+
+	* emacs/mhc.el: Use bitmap-mule on NTEmacs21.
+
 2001-10-28  MIYOSHI Masanori  <miyoshi@boreas.dti.ne.jp>
 
 	* ruby-ext/lib/mhc-kconv.rb: Renamed from mhc-kconv.rb.in.
