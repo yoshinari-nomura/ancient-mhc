@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1994/07/04
-;; Revised: $Date: 2001/10/30 14:14:35 $
+;; Revised: $Date: 2001/12/25 15:40:56 $
 
 ;;;
 ;;; Commentay:
@@ -44,7 +44,6 @@
 (require 'mhc-date)
 (require 'mhc-guess)
 (require 'mhc-schedule)
-(require 'mhc-minibuf)
 (require 'mhc-face)
 (require 'mhc-calendar)
 (require 'mhc-draft)
@@ -63,6 +62,7 @@
   (require 'mhc-xmas))
  (t (defun mhc-use-icon-p ())))
   
+(require 'mhc-minibuf)
 (require 'mhc-summary)
 (provide 'mhc)
 

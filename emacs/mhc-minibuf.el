@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1999/12/10
-;; Revised: $Date: 2001/01/31 11:26:37 $
+;; Revised: $Date: 2001/12/25 15:40:55 $
 
 ;;;
 ;;; Commentay:
@@ -348,19 +348,19 @@
 
 (defvar mhc-category-hist nil)
 
-(defun mhc-input-category (&optional prompt default)
-  (interactive)
-  (let (in)
-    (and default
-	 (listp default)
-	 (setq default (mapconcat 'identity default " ")))
-    (if (string= "" (setq in (read-from-minibuffer 
-			      (or prompt "Category: ")
-			      (or default "")
-			      nil nil 'mhc-category-hist)))
-	nil
-      (mhc-misc-split in))))
-
+(unless (fboundp 'mhc-input-category)
+  (defun mhc-input-category (&optional prompt default)
+    (interactive)
+    (let (in)
+      (and default
+	   (listp default)
+	   (setq default (mapconcat 'identity default " ")))
+      (if (string= "" (setq in (read-from-minibuffer 
+				(or prompt "Category: ")
+				(or default "")
+				nil nil 'mhc-category-hist)))
+	  nil
+	(mhc-misc-split in)))))
 
 (provide 'mhc-minibuf)
 

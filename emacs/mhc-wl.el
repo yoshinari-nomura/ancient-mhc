@@ -35,9 +35,10 @@
 (static-if (fboundp 'elmo-message-file-name)
     (defun mhc-wl-summary-filename ()
       "Return FILENAME on current line ."
-      (elmo-message-file-name
-       wl-summary-buffer-elmo-folder
-       (wl-summary-message-number)))
+      (let ((number (wl-summary-message-number)))
+	(if number 
+	    (elmo-message-file-name wl-summary-buffer-elmo-folder number)
+	  (error "No schedule data"))))
   (defun mhc-wl-summary-filename ()
     "Return FILENAME on current line."
     (let* ((fld-num (elmo-multi-get-real-folder-number
