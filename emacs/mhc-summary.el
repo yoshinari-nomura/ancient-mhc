@@ -605,7 +605,7 @@ If optional argument FOR-DRAFT is non-nil, Hilight message as draft message."
 		   (car schedules)
 		   (and secret
 			(mhc-schedule-in-category-p
-			 (car schedules) "private"))
+			 (car schedules) mhc-category-as-private))
 		   'mhc-summary-line-insert
 		   mailer)
 		  (setq mhc-tmp-first nil)))
@@ -664,7 +664,8 @@ If optional argument FOR-DRAFT is non-nil, Hilight message as draft message."
 		(mhc-summary-insert-contents
 		 (car schedules)
 		 (and secret
-		      (mhc-schedule-in-category-p (car schedules) "private"))
+		      (mhc-schedule-in-category-p (car schedules)
+						  mhc-category-as-private))
 		 'mhc-todo-line-insert
 		 mailer))
 	    (setq schedules (cdr schedules)))))))
@@ -681,7 +682,8 @@ If optional argument FOR-DRAFT is non-nil, Hilight message as draft message."
 	  (mhc-summary-insert-contents
 	   (car schedules)
 	   (and secret
-		(mhc-schedule-in-category-p (car schedules) "private"))
+		(mhc-schedule-in-category-p (car schedules)
+					    mhc-category-as-private))
 	   'mhc-memo-line-insert
 	   mailer))
 	(setq schedules (cdr schedules))))))
