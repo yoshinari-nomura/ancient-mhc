@@ -1,3 +1,16 @@
+2000-07-13  Yoshinari Nomura  <nom@quickhack.net>
+
+	* make.rb.in, configure.rb, 
+	  ruby-ext/lib/make.RB.in, ruby-ext/make.rb.in:
+	change newline CRLF -> LF.
+
+	* 00readme.jis: fix typo.
+
+	* ruby-ext/extconf.rb: add LD_RUN_PATH.
+	check exsitance of pilot-link and make a safe Makefile.
+
+	* today: Removed.
+
 2000-07-13  MIYOSHI Masanori  <miyoshi@ask.ne.jp>
 
 	* ruby-ext/lib/mhc-kconv.rb.in: Renamed from today and modified
