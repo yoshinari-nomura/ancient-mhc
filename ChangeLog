@@ -1,3 +1,23 @@
+2000-08-02  Hideyuki SHIRAI  <shirai@quickhack.net>
+
+	* emacs/mhc-calendar.el (mhc-calendar-insert-summary-contents):
+	Bind mhc-mailer-package to 'calendar as decode-string.
+	(mhc-calendar-eword-decode-string): New function, decode encoded word
+	using Mew or SEMI.
+
+	* emacs/mhc-mew.el (mhc-mew/date-to-buffer): Change format parameter.
+	(mhc-mew-get-import-buffer): When call mew-summary-display-asis, add
+	option (get full message).
+	(mhc-mew-draft-setup-new): Use mew-header-set().
+	(mhc-mew-draft-reedit-buffer): Use mew-header-set(). Remove "X-Mew"
+	header.
+	(mhc-mew-draft-reedit-file): Use mew-header-set(). Remove "X-Mew"
+	header. Use mew-decode-rfc822-header() as header decode.
+	(mhc-mew-highlight-message): New function, highlight mhc-draft-mode.
+	(mhc-mew-draft-translate): New function, make mime message.
+	(mhc-mew/make-message):  Ditto.
+	(mhc-mew-eword-decode-string): New function, decode encoded word.
+	
 2000-08-02  Yuuichi Teranishi  <teranisi@quickhack.net>
 
 	* icons/CheckBox.xpm: New file.

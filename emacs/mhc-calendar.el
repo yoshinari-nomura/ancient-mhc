@@ -5,7 +5,7 @@
 ;;          MIYOSHI Masanori <miyoshi@ask.ne.jp>
 ;;
 ;; Created: 05/12/2000
-;; Reviesd: $Date: 2000/07/24 03:46:33 $
+;; Reviesd: $Date: 2000/08/02 05:30:12 $
 
 ;;; Configration Variables:
 
@@ -1099,15 +1099,23 @@ The keys that are defined for mhc-calendar-mode are:
   (let ((beg (point))
 	(name (or (mhc-record-name
 		   (mhc-schedule-record mhc-tmp-schedule))
-		  "Dummy")))
+		  "Dummy"))
+	(mhc-mailer-package 'calendar))
     (funcall inserter)
     (put-text-property beg (point) 'mhc-calendar/summary-prop name)
     (insert "\n")))
 
+(defun mhc-calendar-eword-decode-string (string)
+  (cond
+   ((fboundp 'mhc-mew-eword-decode-string)
+    (mhc-mew-eword-decode-string string))
+   ((fboundp 'eword-decode-string)
+    (eword-decode-string string))
+   (t string)))
 
 (provide 'mhc-calendar)
 (put 'mhc-calendar 'insert-summary-contents 'mhc-calendar-insert-summary-contents)
-
+(put 'mhc-calendar 'eword-decode-string 'mhc-calendar-eword-decode-string)
 
 ;;; Copyright Notice:
 
