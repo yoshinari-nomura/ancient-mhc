@@ -2,10 +2,10 @@
 ;; mhc-calendar.el -- MHC Mini calendar
 ;;
 ;; Author:  Hideyuki SHIRAI <shirai@quickhack.net>
-;;          MIYOSHI Masanori <miyoshi@ask.ne.jp>
+;;          MIYOSHI Masanori <miyoshi@quickhack.net>
 ;;
 ;; Created: 05/12/2000
-;; Reviesd: $Date: 2001/09/13 08:07:16 $
+;; Reviesd: $Date: 2001/10/28 01:20:35 $
 
 ;;; Configration Variables:
 

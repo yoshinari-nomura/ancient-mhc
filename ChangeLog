@@ -1,3 +1,18 @@
+2001-10-28  MIYOSHI Masanori  <miyoshi@boreas.dti.ne.jp>
+
+	* ruby-ext/lib/mhc-kconv.rb: Renamed from mhc-kconv.rb.in.
+	Change my mail address.
+	(MhcKconv): Detect kanji code in runtime.
+
+	* emacs/mhc-calendar.el: Change my mail address.
+
+	* mhc2ol.in (RepeatPattern::Period::get_duration): New method.
+	(usage): Improve command-line help.
+	(Exporter::setup_ol_appointments): Set duration of schedules
+	explicitly.
+
+	* configure.rb: remove ruby-ext/lib/mhc-kconv.rb.in.
+
 2001-10-17  Yoshinari Nomura  <nom@quickhack.net>
 
 	* emacs/mhc-guess.el (mhc-guess/guess):

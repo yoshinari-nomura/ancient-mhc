@@ -8,7 +8,7 @@
 ##          
 ##
 ## Created: 2001/09/15
-## Revised: $Date: 2001/10/11 16:04:38 $
+## Revised: $Date: 2001/10/28 01:20:35 $
 ##
 
 $DEBUG = false
@@ -33,6 +33,10 @@ module RepeatPattern
 
     def get_period()
       [@start, @finish]
+    end
+
+    def get_duration()
+      (@finish - @start + 1) * 60 * 24 # min
     end
 
     def handle_recurrence(ol_appoint)
@@ -152,7 +156,7 @@ usage: mhc2ol [-a | -i | -N] [-n] [-r dir] [-c category] [YYYYMMDD-yyyymmdd]
              all the original records of Outlook will remain.
     -i     : Copy mhc articles into Outlook.
              all the original records of Outlook will be lost.
-    -N     : Copy only the articles that are modified since
+    -N     : Copy only the articles that has been modified since
              the last execution.
     -n     : Do nothing effectives. Useful for checking.
     -c     : Copy only the mhc articles of which the category
@@ -366,15 +370,18 @@ class Exporter
       sdate += " " + stime .to_s if sdate && stime
       edate += " " + etime .to_s if edate && etime
 
-      # If any time is not specified, the appointment is a kind of AllDayEvent.
-      if !stime && !etime
-	edate = nil if sdate == edate
-	appoint .AllDayEvent = true
-      end
-
       print "Date: ", sdate, "-", edate, "\n" if @@flag_verbose
       appoint .Start = sdate
-      appoint .End = edate
+      # If any time is not specified, the appointment is a kind of AllDayEvent.
+      if !stime && !etime
+	appoint .AllDayEvent = true
+	if sdate != edate
+	  appoint .End = edate
+	  appoint .Duration = period .get_duration() if sdate && edate
+	end
+      else
+	appoint .End = edate
+      end
 
       appoint .Categories = sch .category_as_string()
       appoint .Body = MhcKconv::todisp(sch .dump())

@@ -4,7 +4,7 @@
 ## Author:  MIYOSHI Masanori <miyoshi@quickhack.net>
 ##          Yoshinari Nomura <nom@quickhack.net>
 ## Created: 2000/7/12
-## Revised: $Date: 2001/09/30 01:43:04 $
+## Revised: $Date: 2001/10/28 01:20:35 $
 
 $LOAD_PATH .unshift('.')
 require 'mhc-make'
@@ -95,7 +95,6 @@ infile_list = [
   'make.rb.in:0755', 
   'today.in:0755',
   'emacs/make.rb.in:0755',
-  'ruby-ext/lib/mhc-kconv.rb.in:0644', 
   'ruby-ext/lib/mhc-gtk.rb.in:0644', 
   'ruby-ext/extconf.rb.in:0755'
 ]

@@ -2,14 +2,16 @@
 
 ### mhc-kconv.rb
 ##
-## Author:  MIYOSHI Masanori <miyoshi@ask.ne.jp>
+## Author:  MIYOSHI Masanori <miyoshi@quickhack.net>
 ##
 ##
 
 require 'kconv'
 
 module MhcKconv
-  DISP_CODE = Kconv::@@MHC_KCODE@@
+  DISP_CODE = if /cygwin|mingw32|mswin32|os2_emx|sharp-human/ =~ RUBY_PLATFORM
+		Kconv::SJIS else Kconv::EUC end
+
   def todisp(string)
     Kconv::kconv(string, DISP_CODE, Kconv::AUTO)
   end
