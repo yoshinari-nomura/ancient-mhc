@@ -2,7 +2,7 @@
 
 ;; Author:  TSUCHIYA Masatoshi <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 ;; Created: 2000/06/18
-;; Revised: $Date: 2000/06/19 01:07:52 $
+;; Revised: $Date: 2000/06/19 01:15:31 $
 
 
 ;;; Commentary:
@@ -34,7 +34,7 @@
 ;; Japanized and improved handling holidays
 ;; by SUZUKI Shingo <ichimal@takopen.cs.uec.ac.jp> in Feb 2000.
 ;;
-;; Rewritten stuffs with Emacs Lisp
+;; Stuffs rewritten with Emacs Lisp
 ;; by TSUCHIYA Masatoshi <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 ;; in Jun 2000.
 
