@@ -1,3 +1,13 @@
+2000-10-19  Hideyuki SHIRAI  <shirai@quickhack.net>
+
+	* emacs/mhc-cvs.el (mhc-cvs-repository-path, mhc-cvs-module-name):
+	New variables. Means CVSROOT and module name.
+	(mhc-cvs/shrink-file-name): New function. Convert absolute path to
+	relative path from '~/Mail/schedule'.
+	(mhc-cvs/add, mhc-cvs/remove): Exec CVS use relative path.
+	TNX, Mr. Hajime BABA <baba@kusastro.kyoto-u.ac.jp>.
+	(mhc-cvs/sync): Exec rescan if mhc-mode buffer.
+
 2000-10-16  Yoshinari Nomura  <nom@quickhack.net>
 
 	* emacs/mhc-db.el (mhc-db-add-exception-rule):

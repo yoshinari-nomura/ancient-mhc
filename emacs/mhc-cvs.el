@@ -41,7 +41,16 @@
 ;; これらの準備を行ってから、普通に mhc を呼び出す。そうすると、初回起
 ;; 動時に CVS レポジトリの所在を問い合わせるので、適切に入力すると、ス
 ;; ケジュールファイルを CVS を通して管理するようになる。
-
+;; もし、決まった CVS レポジトリがあり、標準的な場所でないのなら
+;;
+;;     (setq mhc-cvs-repository-path ":ext:user@server:/cvsroot")
+;;
+;; のように ~/.emacs に書いておけば、そちらが優先する。また、CVS の
+;; module 名が "schedule" (mhc-base-folder 参照) でないのなら、その名前を
+;;
+;;     (setq mhc-cvs-module-name "foo/schedule")
+;;
+;; のように設定しておくとよい。
 
 ;;; Customize Variables:
 (defcustom mhc-cvs-global-options
@@ -56,6 +65,16 @@
   :group 'mhc
   :type '(cons (string :tag "Directory Separator ")
 	       (string :tag "Escape Character    ")))
+
+(defcustom mhc-cvs-repository-path nil
+  "*CVS repository path."
+  :group 'mhc
+  :type 'string)
+
+(defcustom mhc-cvs-module-name nil
+  "*MHC module name."
+  :group 'mhc
+  :type 'string)
 
 
 ;;; Internal Variable:
@@ -89,27 +108,42 @@
 	(mhc-cvs/sync)
       (let ((module (file-name-nondirectory (mhc-summary-folder-to-path mhc-base-folder)))
 	    (mhc-cvs/default-directory (mhc-summary-folder-to-path "")))
-	(mhc-cvs/backend "-d" (mhc-cvs/read-repository-path) "checkout" module)))))
+	(if mhc-cvs-module-name
+	    (mhc-cvs/backend "-d" (mhc-cvs/read-repository-path) "checkout"
+			     "-d" module mhc-cvs-module-name)
+	  (mhc-cvs/backend "-d" (mhc-cvs/read-repository-path) "checkout" module))))))
 
 (defun mhc-cvs/read-repository-path ()
   "CVSレポジトリのパス名を入力する関数"
-  (let* ((default (catch 'found
-		    (mapcar (lambda (dir)
-			      (and (stringp dir)
-				   (file-directory-p dir)
-				   (throw 'found dir)))
-			    (list
-			     (getenv "CVSROOT")
-			     (expand-file-name "~/cvsroot")
-			     (expand-file-name "~/CVS")))
-		    nil)) ; 候補が見つからなかった場合
-	 (dir (read-from-minibuffer
-	       (if default
-		   (format "Input CVS repository path (default %s): " default)
-		 "Input CVS repository path: "))))
-    (if (not (string< "" dir))
-	default
-      dir)))
+  (or mhc-cvs-repository-path
+      (let* ((default (catch 'found
+			(mapcar (lambda (dir)
+				  (and (stringp dir)
+				       (throw 'found dir)))
+				(list
+				 (getenv "CVSROOT")
+				 (expand-file-name "~/cvsroot")
+				 (expand-file-name "~/CVS")))
+			nil)) ; 候補が見つからなかった場合
+	     (dir (read-from-minibuffer
+		   (if default
+		       (format "Input CVS repository path (default %s): " default)
+		     "Input CVS repository path: "))))
+	(if (not (string< "" dir))
+	    default
+	  dir))))
+
+(defun mhc-cvs/shrink-file-name (file)
+  "ファイル名の相対パスを得る関数"
+  (let ((base (concat
+	       "^"
+	       (regexp-quote
+		(file-name-as-directory
+		 (mhc-summary-folder-to-path mhc-base-folder))))))
+    (setq file (expand-file-name file))
+    (if (string-match base file)
+	(substring file (match-end 0))
+      file)))
 
 (defun mhc-cvs/close (&optional offline)
   "ネットワークの状態に依存する終了処理関数"
@@ -119,6 +153,10 @@
   "リモートのスケジュールファイルとローカルのスケジュールファイルの同期を取る関数"
   (mhc-cvs/delay-add-and-remove (mhc-summary-folder-to-path mhc-base-folder))
   (mhc-cvs/update)
+  ;; rescan if mhc
+  (or (and (mhc-summary-buffer-p)
+	   (mhc-rescan-month mhc-default-hide-private-schedules))
+      (and (mhc-calendar-p) (mhc-calendar-rescan)))
   t) ; return value
 
 (defun mhc-cvs/delay-add-and-remove (directory)
@@ -180,6 +218,7 @@
     (if offline
 	(not (copy-file filename added t))
       (if (file-exists-p added) (delete-file added))
+      (setq filename (mhc-cvs/shrink-file-name filename))
       (and (= 0 (mhc-cvs/backend "add" filename))
 	   (mhc-cvs/modify filename)))))
 
@@ -194,6 +233,7 @@
       (if (file-exists-p added) (delete-file added))
       (if (file-exists-p removed) (delete-file removed))
       (if (file-exists-p filename) (delete-file filename))
+      (setq filename (mhc-cvs/shrink-file-name filename))
       (and (= 0 (mhc-cvs/backend "remove" filename))
 	   (mhc-cvs/modify filename)))))
 
