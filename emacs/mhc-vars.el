@@ -117,6 +117,16 @@
 		(const :tag "Wide week scope" wide)
 		(integer :tag "Scope wide size (>=0)" 3)))
 
+(defcustom mhc-default-alarm "5 minute"
+  "*Default alarm string in making draft."
+  :group 'mhc
+  :type 'string)
+
+(defcustom mhc-ask-alarm nil
+  "*If non-nil value, ask the alarm string in making draft."
+  :group 'mhc
+  :type 'boolean)
+
 (provide 'mhc-vars)
 
 ;;; Copyright Notice:
