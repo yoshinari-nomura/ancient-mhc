@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1999/12/10
-;; Revised: $Date: 2003/10/10 10:00:38 $
+;; Revised: $Date: 2003/10/10 12:01:12 $
 
 ;;;
 ;;; Commentay:
@@ -410,6 +410,14 @@
 				nil nil 'mhc-category-hist)))
 	  nil
 	(mhc-misc-split in)))))
+
+(defvar mhc-alarm-hist nil)
+
+(defun mhc-input-alarm (&optional prompt default)
+  (interactive)
+  (read-from-minibuffer  (or prompt "Alarm: ")
+			 (or default mhc-default-alarm)
+			 nil nil 'mhc-alarm-hist))
 
 (provide 'mhc-minibuf)
 
