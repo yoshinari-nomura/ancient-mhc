@@ -97,9 +97,12 @@
 (defun mhc-wl-summary-exit ()
   (let ((buffer mhc-wl-exit-buffer))
     (kill-buffer (current-buffer))
-    (if (and buffer
-	     (buffer-live-p buffer))
-	(switch-to-buffer buffer))))
+    (when (and buffer
+	       (buffer-live-p buffer))
+      (if (get-buffer-window buffer)
+	  (unless (eq (current-buffer) buffer)
+	    (delete-window)))
+      (switch-to-buffer buffer))))
 
 
 (defun mhc-wl-summary-mode-setup (date)
