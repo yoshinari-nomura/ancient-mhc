@@ -1,11 +1,11 @@
-2004-05-05  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+2004-05-05  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
 	* emacs/mhc-gnus.el (mhc-gnus-summary-mode-setup): Reset caches
 	kept by backlog mechanism and `gnus-original-article-buffer', in
 	order to fix the problem that correct articles are not selected
 	after deleting a schedule.
 
-2004-05-04  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+2004-05-04  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
 	* emacs/mhc.el (toplevel): Add autoload of `easy-menu-add' to
 	suppress a byte-compile warning.
@@ -36,14 +36,14 @@
 	`duration-begin', `duration-end', `month-list' and
 	`require-duration' to suppress byte-compile warnings.
 
-2004-05-02  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+2004-05-02  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
 	* emacs/MHC-MK (make-mhc/module-alist): Check that mime-edit.el is
 	available when before byte-compiling mhc-mime.el for Gnus.
 
 	* emacs/mhc-draft.el (mhc-draft-unuse-hdr-list): Add Gnus-Warning.
 
-2004-05-01  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+2004-05-01  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
 	* emacs/mhc.el (mhc-edit): Call `mhc-draft-mode' before calling
 	`mhc-highlight-message', in order to keep buffer-local variables
@@ -321,7 +321,7 @@
 
 	* ruby-ext/lib/mhc-palm.rb: add methods for address book.
 
-2002-10-16  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+2002-10-16  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
 	* emacs/mhc-gnus.el (toplevel): Set `eword-decode-string' for
 	Oort-Gnus; Add autoloads for `gnus-copy-article-buffer',
@@ -712,7 +712,7 @@
 	* mhc-make.rb (MhcConfigTable): 'default' fields should be a
 	string.
 
-2001-04-05  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+2001-04-05  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
 	* emacs/mhc-mime.el (mhc-mime-decode-header): Ad-hoc fix for
 	`X-SC-Schedule' header.
@@ -739,7 +739,7 @@
 	* mhc-make.rb (install): 
 	  dig destination directories before installation.
 
-2001-03-10  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+2001-03-10  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
 	* emacs/mhc-calendar.el (toplevel): Condition to define
 	`easy-menu-add' is changed to avoid redundancy of definition.
@@ -982,7 +982,7 @@
 
 	* emacs/mhc-cvs.el (mhc-cvs/modify): Exec CVS use relative path.
 
-2000-10-20  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+2000-10-20  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
 	* emacs/mhc-cvs.el (mhc-cvs-rsh): New variable.
 	(mhc-cvs/backend): Refer `mhc-cvs-rsh' to set a process
@@ -1107,7 +1107,7 @@
 	command.
 
 2000-08-21  KOIE Hidetaka <hide@koie.org>,
-	TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+	TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
 	* emacs/mhc-file.el (mhc-file-line-status-strings): New variable
 	to customze status string.
@@ -1795,7 +1795,7 @@
 		
 	* gemcal : Change some global variables to local variables.
 
-2000-07-08  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+2000-07-08  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
 	* emacs/mhc-logic.el (mhc-logic/compile-schedule): Fix
 	inconsistency after compile of schedule predicate.
@@ -2072,7 +2072,7 @@
 		  mhc-ps-truncate-lines is nil, use fill-region again.
 	
 
-2000-06-24  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+2000-06-24  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
 	* emacs/mhc-ps.el (mhc-ps/encode-string): New function.
 	(mhc-ps/schedule-to-string): Add code to handle subjects, which
@@ -2124,12 +2124,12 @@
 
 	* emacs/MHC-MK (comment): Change exemplum for Meadow.
 	
-2000-06-22  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+2000-06-22  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
 	* 00readme, 00readme.jis: Follow changes in mailing list address
 	and URL.
 
-2000-06-21  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+2000-06-21  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
 	* emacs/mhc.el (mhc-cal-make-rectangle): Follow changes in mhc-day.el.
 
@@ -2207,7 +2207,7 @@
 	(mhc-wl-insert-summary-contents): Ditto.
 	(mhc-wl/schedule-foldermsg): Eliminated.
 
-2000-06-19  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+2000-06-19  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
 	* emacs/mhc-ps.el (mhc-ps-left-margin): New variable.
 	(mhc-ps-string-width): New variable.
@@ -2215,7 +2215,7 @@
 	(mhc-ps/schedule-to-string): Add handling long subject.
 	(mhc-ps/make-contents): Fix order of schedules.
 
-2000-06-19  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+2000-06-19  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
 	* emacs/mhc-summary.el (mhc-summary-search-date): Renamed
 	`mhc-summary-search-day'.
@@ -2242,7 +2242,7 @@
 
 	* emacs/mhc.el (mhc-goto-today): Fix typo.
 
-2000-06-19  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+2000-06-19  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
 	* emacs/mhc.el (mhc-setup): Add autoload definition of
 	`mhc-ps-preview' and `mhc-ps-print'.
@@ -2257,7 +2257,7 @@
 
 	* today: new feature --format=ps was added.
 
-2000-06-19  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+2000-06-19  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
 	* emacs/MHC-MK: Add mhc-ps.el.
 
@@ -2266,7 +2266,7 @@
 
 	* emacs/mhc-date.el: Fix typo.
 
-2000-06-18  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+2000-06-18  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
 	* emacs/mhc-ps.el: New file.
 
@@ -2294,7 +2294,7 @@
 	* emacs/mhc-date.el (mhc-date/to-list2):
 	fix for `ww' before 1970.
 
-2000-06-18  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+2000-06-18  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
 	* emacs/mhc.el: Follow reconstruction of mhc-date.el.
 	* emacs/mhc-db.el: Ditto.
@@ -2320,7 +2320,7 @@
 
 	* palm2mhc: call ad_sch() in non interactive mode.
 
-2000-06-17  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+2000-06-17  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
 	* emacs/nnmhc.el (nnmhc-request-article): Hack for
 	`gnus-bbdb/update-record'.
@@ -2328,7 +2328,7 @@
 	* emacs/mhc.el (mhc-edit): Disable to succeed to the record id of
 	the original schedule.
 
-2000-06-17  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+2000-06-17  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
 	* emacs/mhc.el: Removed dependency declaration above mhc-sync.el.
 	(mhc-modify-file): Alter the file opening codes, removed
@@ -2364,7 +2364,7 @@
 	* emacs/mhc-header.el (mhc-header-get-value): Move point to the
 	top of this narrowed buffer, in order to search specified header.
 
-2000-06-16  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+2000-06-16  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
 	* emacs/mhc.el (mhc-goto-month): Refer
 		  `mhc-default-hide-private-schedules' 
@@ -2388,7 +2388,7 @@
 	(make-mhc-install-package): Fix icon-dir, has overlapped '/'.
 	(make-mhc/install-file): copy-file with keep-time.
 
-2000-06-14  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+2000-06-14  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
 	* emacs/mhc-parse.el (mhc-parse/internal-parser): Always skip
 	non-header lines.
@@ -2402,7 +2402,7 @@
 	(mhc-calendar-view-file, mhc-calendar-hnf-view): Push window configuration and set view-exit-action for window configuration.
 	(mhc-calendar-view-exit-action): New function for view exit action.
 
-2000-06-14  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+2000-06-14  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
 	* emacs/mhc-calendar.el (mhc-calendar): Added autoload magic.
 
@@ -2428,7 +2428,7 @@
 	(make-mhc-install-package): Install "auto-autoloads" and "custom-load".
 	Install icons.
 
-2000-06-13  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+2000-06-13  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
 	* emacs/Makefile: Make a change in using MHC-MK.
 
@@ -2474,7 +2474,7 @@
 
 	* mhc-sync: mhc-sync deal with 'A' status.
 
-2000-06-07  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+2000-06-07  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
 	* emacs/mhc-parse.el (mhc-parse/old-style-date): New function to
 	parse X-SC-Date.
@@ -2494,7 +2494,7 @@
 	* emacs/mhc-wl.el (mhc-wl-summary-mode-setup):
 	Deleted workaround for removal of MHC buffer.
 
-2000-06-06  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+2000-06-06  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
 	* emacs/mhc-calendar.el: Follow changes in main trunk.
 
@@ -2503,7 +2503,7 @@
 
 	* emacs/mhc-parse.el: Add fearture to parse X-SC-Schedule.
 
-2000-06-05  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+2000-06-05  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
 	* emacs/mhc-gnus.el (mhc-gnus-encode-string): New function.
 	(mhc-gnus-insert-summary-contents): Replace eword-encode-string
@@ -2516,7 +2516,7 @@
 	(mhc-calendar-hnf-search-title): New function.
 	(mhc-calendar-hnf-edit, mhc-calendar-hnf-view): Goto TITLE position.
 
-2000-06-03  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+2000-06-03  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
 	* emacs/mhc-compat.el (mhc-defgroup): Removed.
 	(mhc-defcustom): Ditto.
@@ -2564,7 +2564,7 @@
 	(mhc-calendar-hnf-summary-insert): More colorful, but i have no
 		knowledge of hnf. 
 	
-2000-06-01  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+2000-06-01  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
 	* emacs/mhc-logic.el (mhc-logic/week-of-month-alist): Key string
 	are modified in lower case.
@@ -2654,7 +2654,7 @@
 	* emacs/mhc-wl.el (toplevel): Don't require 'mhc-mew.
 	(mhc-wl-generate-summary-buffer): Define as function.
 
-2000-05-30  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+2000-05-30  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
 	* mhc-file.el (mhc-file/backup-and-remove): Change path for
 	removed schedule files.
@@ -2664,12 +2664,12 @@
 	* mhc.el (mhc-draft-finish): Change to preserve draft buffer when
 	mhc-db-add-record-from-buffer returns nil.
 
-2000-05-30  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+2000-05-30  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
 	* emacs/mhc-day.el (mhc-day-day-of-week-as-string): Fix typo.
 	* emacs/mhc-logic.el (mhc-logic/day-of-week-alist): Ditto.
 
-2000-05-30  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+2000-05-30  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
 	* emacs/CHANGES.ja, emacs/Makefile, emacs/mhc-compat.el,
 	emacs/mhc-cvs.el, emacs/mhc-day.el, emacs/mhc-db.el,

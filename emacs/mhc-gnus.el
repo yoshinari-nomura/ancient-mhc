@@ -2,7 +2,7 @@
 
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>,
 ;;          MIYOSHI Masanori <miyoshi@hrl.hitachi.co.jp>,
-;;          TSUCHIYA Masatoshi <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+;;          TSUCHIYA Masatoshi <tsuchiya@namazu.org>
 ;; Created: 2000/05/10
 ;; Revised: $Date$
 

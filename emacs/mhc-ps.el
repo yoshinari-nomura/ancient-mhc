@@ -1,9 +1,9 @@
 ;;; -*- mode: Emacs-Lisp; coding: euc-japan -*-
 
-;; Author:  TSUCHIYA Masatoshi <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+;; Author:  TSUCHIYA Masatoshi <tsuchiya@namazu.org>
 ;;          Hideyuki SHIRAI <shirai@quickhack.net>
 ;; Created: 2000/06/18
-;; Revised: $Date: 2002/11/11 05:27:15 $
+;; Revised: $Date: 2004/05/06 16:35:12 $
 
 
 ;;; Commentary:
@@ -36,7 +36,7 @@
 ;; by SUZUKI Shingo <ichimal@takopen.cs.uec.ac.jp> in Feb 2000.
 ;;
 ;; Stuffs rewritten with Emacs Lisp
-;; by TSUCHIYA Masatoshi <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+;; by TSUCHIYA Masatoshi <tsuchiya@namazu.org>
 ;; in Jun 2000.
 
 

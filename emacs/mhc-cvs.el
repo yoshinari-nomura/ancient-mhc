@@ -1,6 +1,6 @@
 ;;; -*- mode: Emacs-Lisp; coding: euc-japan -*-
 
-;; Author:  TSUCHIYA Masatoshi <tsuchiya@pine.kuee.kyoto-u.ac.jp>,
+;; Author:  TSUCHIYA Masatoshi <tsuchiya@namazu.org>,
 ;;          Hideyuki SHIRAI <shirai@quickhack.net>
 ;; Created: 2000/04/25
 ;; Revised: $Date$

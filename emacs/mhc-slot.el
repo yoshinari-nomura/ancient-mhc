@@ -1,7 +1,7 @@
 ;;; -*- mode: Emacs-Lisp; coding: euc-japan -*-
 
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>,
-;;          TSUCHIYA Masatoshi <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+;;          TSUCHIYA Masatoshi <tsuchiya@namazu.org>
 ;; Created: 2000/04/30
 ;; Revised: $Date$
 

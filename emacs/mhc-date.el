@@ -1,10 +1,10 @@
 ;;; mhc-date.el -- Digit style Date Calculation Lib.
 
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>,
-;;          TSUCHIYA Masatoshi <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+;;          TSUCHIYA Masatoshi <tsuchiya@namazu.org>
 ;;
 ;; Created: 2000/06/14
-;; Revised: $Date: 2002/09/23 04:08:58 $
+;; Revised: $Date: 2004/05/06 16:35:13 $
 
 ;;;
 ;;; Commentary:
