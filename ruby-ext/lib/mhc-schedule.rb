@@ -3,7 +3,7 @@
 ## Author:  Yoshinari Nomura <nom@quickhack.net>
 ##
 ## Created: 1999/07/16
-## Revised: $Date: 2003/10/29 12:48:13 $
+## Revised: $Date: 2004/06/15 13:34:39 $
 ##
 
 ################################################################
@@ -764,6 +764,9 @@ class MhcScheduleItem
 	cond_wek .each{|wek_str|
 	  ord = MhcDate::O_LABEL .index(ord_str)
 	  wek = MhcDate::W_LABEL .index(wek_str)
+	  if ord == 5
+	    ord = 4
+	  end
 	  sch2 = MhcScheduleItem .new .add_cond(ord_str) .add_cond(wek_str)
 	  beg2 = beg .dup
 	  while !sch2 .occur_on?(beg2) ## xxx 多分これは不要?
