@@ -3,7 +3,7 @@
 ;; Author:  Yuuichi Teranishi <teranisi@gohome.org>
 ;;
 ;; Created: 2000/11/21
-;; Revised: $Date: 2001/12/25 15:40:55 $
+;; Revised: $Date: 2002/10/15 12:02:22 $
 
 (defcustom mhc-e21-icon-alist 
   '(("Conflict"   . "Conflict.xpm")
@@ -130,20 +130,6 @@ Icon is decided by `mhc-e21-icon-alist'."
 			      'local-map mhc-e21-icon-keymap))))
 	(add-text-properties pos (point) props))
       (setq icons (cdr icons)))))
-
-(defun mhc-input-category (&optional prompt default)
-  (interactive)
-  (let ((completion-ignore-case t)
-	(table (nconc (mapcar (lambda (x) (list (car x)))
-			      mhc-category-face-alist)
-		      (list (list "Todo") (list "Done")))))
-    (completing-read-multiple (or prompt "Category: ")  ;PROMPT
-			      table
-			      nil                 ;PREDICATE
-			      nil                 ;REQUIRE-MATCH
-			      default             ;INITIAL-INPUT
-			      'mhc-category-hist  ;HIST
-			      )))
 
 (provide 'mhc-e21)
 

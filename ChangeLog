@@ -1,3 +1,11 @@
+2002-10-15  Hideyuki SHIRAI  <shirai@quickhack.net>
+
+	* emacs/mhc-minibuf.el (mhc-input-category): Use completing
+	method when `completing-read-multiple' exists.
+	Tkanks to Mr. Yoichi NAKAYAMA.
+
+	* emacs/mhc-e21.el (mhc-input-category): Move to mhc-minibuff.el.
+
 2002-10-03  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* emacs/mhc-calendar.el (mhc-calendar-count-days-region): Display

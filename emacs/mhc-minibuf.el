@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1999/12/10
-;; Revised: $Date: 2001/12/25 15:40:55 $
+;; Revised: $Date: 2002/10/15 12:02:22 $
 
 ;;;
 ;;; Commentay:
@@ -348,7 +348,23 @@
 
 (defvar mhc-category-hist nil)
 
-(unless (fboundp 'mhc-input-category)
+(if (fboundp 'completing-read-multiple)
+    (defun mhc-input-category (&optional prompt default)
+      (interactive)
+      (let ((completion-ignore-case t)
+	    (table (nconc (delete '("Todo")
+				  (delete '("Done")
+					  (mapcar (lambda (x) (list (car x)))
+						  mhc-category-face-alist)))
+			  (list '("Todo") '("Done")))))
+	(completing-read-multiple (or prompt "Category: ")  ;PROMPT
+				  table
+				  nil                 ;PREDICATE
+				  nil                 ;REQUIRE-MATCH
+				  default             ;INITIAL-INPUT
+				  'mhc-category-hist  ;HIST
+				  )))
+
   (defun mhc-input-category (&optional prompt default)
     (interactive)
     (let (in)
