@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1994/07/04
-;; Revised: $Date: 2004/10/07 10:38:00 $
+;; Revised: $Date: 2005/01/14 12:07:54 $
 
 ;;;
 ;;; Commentay:
@@ -550,6 +550,17 @@ If HIDE-PRIVATE, private schedules are suppressed."
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; import, edit, delete, modify
+
+(defcustom mhc-input-sequences '(date time subject location category alarm)
+  "*Sequence of the inputs."
+  :group 'mhc
+  :type '(repeat (choice (const :tag "Date" date)
+			 (const :tag "Time" time)
+			 (const :tag "Subject" subject)
+			 (const :tag "Location" location)
+			 (const :tag "Category" category)
+			 (const :tag "Alarm" alarm))))
+
 (defun mhc-edit (&optional import-buffer)
   "Edit a new schedule.
 If optional argument IMPORT-BUFFER is specified, import its content.
@@ -591,45 +602,56 @@ Returns t if the importation was succeeded."
 					  (cdr import-buffer)
 					import-buffer))
 				     (mhc-parse-buffer)))
-			 (schedule (car (mhc-record-schedules original))))
-		    ;; input date
-		    (setq date
-			  (mhc-input-day "Date: "
-					 current-date
-					 (mhc-guess-date)))
-		    ;; input time
-		    (setq time
-			  (mhc-input-time "Time: "
-					  (mhc-schedule-time-as-string
-					   schedule)
-					  (mhc-guess-time
-					   (mhc-minibuf-candidate-nth-begin))))
-		    ;; input subject
-		    (setq subject
-			  (mhc-input-subject
-			   "Subject: "
-			   (mhc-misc-sub
-			    (or (mhc-record-subject original)
-				(mhc-header-narrowing
-				  (mhc-header-get-value "subject")))
-			    "^\\(Re:\\)? *\\(\\[[^\]]+\\]\\)? *"
-			    "")))
-		    ;; input location
-		    (setq location
-			  (mhc-input-location
-			   "Location: "
-			   (mhc-schedule-location schedule)))
-		    ;; input category
-		    (setq category
-			  (mhc-input-category
-			   "Category: "
-			   (mhc-schedule-categories-as-string schedule)))
-		    ;; input alarm
-		    (if mhc-ask-alarm
-			(setq alarm
-			      (mhc-input-alarm
-			       "Alarm: "
-			       mhc-default-alarm)))
+			 (schedule (car (mhc-record-schedules original)))
+			 (inputs (copy-sequence mhc-input-sequences))
+			 input)
+		    (while (setq input (car inputs))
+		      (setq inputs (delq input inputs))
+		      (cond
+		       ((eq input 'date)
+			;; input date
+			(setq date
+			      (mhc-input-day "Date: "
+					     current-date
+					     (mhc-guess-date))))
+		       ((eq input 'time)
+			;; input time
+			(setq time
+			      (mhc-input-time "Time: "
+					      (mhc-schedule-time-as-string
+					       schedule)
+					      (mhc-guess-time
+					       (mhc-minibuf-candidate-nth-begin)))))
+		       ((eq input 'subject)
+			;; input subject
+			(setq subject
+			      (mhc-input-subject
+			       "Subject: "
+			       (mhc-misc-sub
+				(or (mhc-record-subject original)
+				    (mhc-header-narrowing
+				      (mhc-header-get-value "subject")))
+				"^\\(Re:\\)? *\\(\\[[^\]]+\\]\\)? *"
+				""))))
+		       ((eq input 'location)
+			;; input location
+			(setq location
+			      (mhc-input-location
+			       "Location: "
+			       (mhc-schedule-location schedule))))
+		       ((eq input 'category)
+			;; input category
+			(setq category
+			      (mhc-input-category
+			       "Category: "
+			       (mhc-schedule-categories-as-string schedule))))
+		       ;; input alarm
+		       ((eq input 'alarm)
+			(if mhc-ask-alarm
+			    (setq alarm
+				  (mhc-input-alarm
+				   "Alarm: "
+				   mhc-default-alarm))))))
 		    ;;
 		    (setq priority (mhc-schedule-priority schedule)))
 		;; Answer was no.
@@ -639,13 +661,24 @@ Returns t if the importation was succeeded."
 		(setq succeed nil)
 		(kill-buffer draft-buffer)))
 	  ;; No import (it succeeds).
-	  (setq date (mhc-input-day "Date: " current-date)
-		time (mhc-input-time "Time: ")
-		subject (mhc-input-subject "Subject: ")
-		location (mhc-input-location "Location: ")
-		category (mhc-input-category "Category: "))
-	  (if mhc-ask-alarm
-	      (setq alarm (mhc-input-alarm "Alarm: " mhc-default-alarm))))
+	  (let ((inputs (copy-sequence mhc-input-sequences))
+		input)
+	    (while (setq input (car inputs))
+	      (setq inputs (delq input inputs))
+	      (cond
+	       ((eq input 'date)
+		(setq date (mhc-input-day "Date: " current-date)))
+	       ((eq input 'time)
+		(setq time (mhc-input-time "Time: ")))
+	       ((eq input 'subject)
+		(setq subject (mhc-input-subject "Subject: ")))
+	       ((eq input 'location)
+		(setq location (mhc-input-location "Location: ")))
+	       ((eq input 'category)
+		(setq category (mhc-input-category "Category: ")))
+	       ((eq input 'alarm)
+		(if mhc-ask-alarm
+		    (setq alarm (mhc-input-alarm "Alarm: " mhc-default-alarm))))))))
       ;; Quit.
       (quit
        (and (interactive-p)

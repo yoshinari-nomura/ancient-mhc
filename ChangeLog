@@ -1,3 +1,8 @@
+2005-01-14  Hideyuki SHIRAI  <shirai@quickhack.net>
+
+	* emacs/mhc.el (mhc-input-sequences): New option.
+	(mhc-edit): Inquire the input by turns of `mhc-input-sequences'.
+
 2004-11-26  Yoichi NAKAYAMA  <yoichi@geiin.org>
 
 	* emacs/mhc-cvs.el (mhc-cvs/backend): Handle non-number return
