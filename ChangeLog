@@ -1,3 +1,80 @@
+2000-06-27  Yuuichi Teranishi  <teranisi@quickhack.net>
+
+	* emacs/mhc.el (mhc-current-date): New implementation.
+
+	* emacs/mhc-summary.el (mhc-summary/line-parse-format):
+	Treat characters after '%' as spec, insert as-is otherwise.
+	(mhc-summary-line-format): Likewise.
+	(mhc-summary-todo-line-format): Likewise.
+	(mhc-summary-icon-position): Eliminated.
+
+	* emacs/mhc-mew.el (mhc-mew-insert-summary-contents): Fixed.
+
+	* emacs/mhc-summary.el (mhc-summary-line-format): New user option.
+	(mhc-summary-todo-line-format): Ditto.
+	(mhc-summary-insert-contents): Rewrite.
+	(mhc-summary/insert-dayinfo): Ditto.
+	(mhc-summary-search-date): Ditto.
+	(mhc-summary-make-todo-list): Ditto.
+	(mhc-summary/insert-strings): Eliminated.
+	(mhc-summary/schedule-to-contents): Ditto.
+	(mhc-summary/insert-dayinfo-internal): Ditto.
+	(mhc-tmp-day-face): New variable.
+	(mhc-tmp-dayinfo): Ditto.
+	(mhc-tmp-schedule): Ditto.
+	(mhc-tmp-begin): Ditto.
+	(mhc-tmp-end): Ditto.
+	(mhc-tmp-conflict): Ditto.
+	(mhc-tmp-first): Ditto.
+	(mhc-tmp-private): Ditto.
+	(mhc-tmp-day): Ditto.
+	(mhc-tmp-lank): Ditto.
+	(mhc-tmp-deadline): Ditto.
+	(mhc-summary-line-format-alist): Ditto.
+	(mhc-summary-todo-line-format-alist): Ditto.
+	(mhc-summary/line-inserter): Ditto.
+	(mhc-summary-todo/line-inserter): Ditto.
+	(mhc-summary/line-insert): New macro.
+	(mhc-summary/line-year-string): New function.
+	(mhc-summary/line-month-string): Ditto.
+	(mhc-summary/line-day-string): Ditto.
+	(mhc-summary/line-day-of-week-string): Ditto.
+	(mhc-summary/line-subject-string): Ditto.
+	(mhc-summary/line-location-string): Ditto.
+	(mhc-summary-todo/line-deadline-string): Ditto.
+	(mhc-summary-todo/line-deadline-face): Ditto.
+	(mhc-summary/line-parse-format): Ditto.
+	(mhc-summary-line-inserter-setup): Ditto.
+	(mhc-summary-line-insert): Ditto.
+	(mhc-summary-todo-line-inserter-setup): Ditto.
+	(mhc-summary-todo-line-insert): Ditto.
+	(mhc-summary/line-parse-format): Use `mhc-use-icon-p'.
+	Use `string-to-list' instead of `string-to-char-list'.
+	(toplevel): Require 'mhc-day, 'mhc-schedule, and 'bytecomp.
+
+	* emacs/mhc-wl.el (mhc-wl-insert-summary-contents):
+	New implementation.
+	(mhc-wl-summary-search-date): Eliminated.
+
+	* emacs/mhc-mew.el (mhc-mew-insert-summary-contents):
+	Likewise.
+
+	* emacs/mhc-gnus.el (mhc-gnus-insert-summary-contents):
+	Likewise.
+
+	* emacs/mhc-calendar.el (mhc-calendar-insert-summary-contents):
+	Likewise.
+
+	* emacs/mhc-xmas.el (mhc-put-icon): Changed argument.
+	(mhc-get-icon): Eliminated.
+
+	* emacs/mhc-bm.el: Likewise.
+
+	* emacs/mhc-face.el (mhc-face-category-to-face):
+	Consider `category' is nil.
+
+	* emacs/mhc.el (mhc-setup): Initialize summary inserter.
+
 2000-06-26  Yoshinari Nomura  <nom@quickhack.net>
 
 	* 00usage.jis: New file.
