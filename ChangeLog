@@ -1,3 +1,10 @@
+2004-09-13  Hideyuki SHIRAI  <shirai@quickhack.net>
+
+	* emacs/mhc.el (mhc-goto-today): Execute beginning-of-line();
+	Emacs-21.3.50 something wrong?
+
+	* emacs/mhc-mew.el (mhc-mew-summary-mode-setup): Fix last change.
+
 2004-09-08  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
 	* emacs/mhc.el (mhc-edit): Remove schedule headers just before

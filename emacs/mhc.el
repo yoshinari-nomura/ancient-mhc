@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1994/07/04
-;; Revised: $Date: 2004/09/08 09:12:09 $
+;; Revised: $Date: 2004/09/13 05:17:46 $
 
 ;;;
 ;;; Commentay:
@@ -397,26 +397,26 @@ Unless NO-DISPLAY, display it."
   (interactive "P")
   (let ((now (mhc-date-now))
 	(buf-date (mhc-current-date-month)))
-    (if buf-date
-	(progn
-	  (goto-char (point-min))
-	  (mhc-date-let now
-	    (if (and (= yy (mhc-date-yy buf-date))
-		     (= mm (mhc-date-mm buf-date)))
-		(when (mhc-summary-search-date now)
-		  (forward-line 0)
-		  (or (pos-visible-in-window-p (point))
-		      (recenter))
-		  (or no-display
-		      (mhc-summary-display-article)))
-	      (when (and mhc-use-wide-scope
-			 (mhc-summary-search-date (mhc-date-mm-first buf-date)))
-		(forward-line 0)
-		(or (pos-visible-in-window-p (point))
-		    (recenter))
-		(or no-display
-		    (mhc-summary-display-article)))))))))
-
+    (when buf-date
+      (goto-char (point-min))
+      (mhc-date-let now
+	(if (and (= yy (mhc-date-yy buf-date))
+		 (= mm (mhc-date-mm buf-date)))
+	    (when (mhc-summary-search-date now)
+	      (forward-line 0)
+	      (or (pos-visible-in-window-p (point))
+		  (recenter))
+	      (or no-display
+		  (mhc-summary-display-article)))
+	  (when (and mhc-use-wide-scope
+		     (mhc-summary-search-date (mhc-date-mm-first buf-date)))
+	    (forward-line 0)
+	    (or (pos-visible-in-window-p (point))
+		(recenter))
+	    (or no-display
+		(mhc-summary-display-article)))))
+      ;; Emacs-21.3.50 something wrong
+      (beginning-of-line))))
 
 (defun mhc-rescan-month (&optional hide-private)
   "*Rescan schedules of this buffer.
