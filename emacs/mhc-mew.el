@@ -249,55 +249,65 @@
 	
 
 (defun mhc-mew-draft-translate ()
-  (let (ct cte boundary beg end)
-    (mhc-header-narrowing
-      ;; Mew can't encode Mime-Version ?
-      (setq ct (mhc-header-get-value "content-type"))
-      (setq cte (mhc-header-get-value "content-transfer-encoding"))
-      (mhc-header-delete-header "mime-version")
-      (mhc-header-delete-header "content-type")
-      (mhc-header-delete-header "content-transfer-encoding"))
-    (when (and ct (string-match "^multipart/" ct)
-	       (or (string-match "boundary=\"\\([^\"]+\\)\"" ct)
-		   (string-match "boundary=\\(.+\\)" ct)))
-      (setq boundary (regexp-quote (mew-match 1 ct)))
-      (let ((case-fold-search nil))
-	(unless (and boundary
-		     (re-search-forward (concat "^--" boundary "$") nil t)
-		     (re-search-forward (concat "^--" boundary "--$") nil t))
-	  ;; looks like Broken multi-part message.
-	  (setq boundary nil))))
-    (if (null (mew-header-end))
-	(mhc-header-narrowing
-	  (mew-header-encode-region (point-min) (point-max)))
-      (mew-header-encode-region (point-min) (mew-header-end))
-      (mew-header-clear)
-      (insert "\n"))
-    (if (null boundary)
-	;; text/plain
+  (let ((bufstr (buffer-substring (point-min) (point-max)))
+	ct cte boundary beg end)
+    (condition-case nil
 	(progn
 	  (mhc-header-narrowing
-	    (mhc-header-put-value "Mime-Version" "1.0"))
-	  (mhc-mew/make-message))
-      ;; Multipart
-      (mhc-header-narrowing
-	(mhc-header-put-value "Mime-Version" "1.0")
-	(mhc-header-put-value "Content-Type" (or ct mew-ct-txt))
-	(mhc-header-put-value "Content-Transfer-Encoding" (or cte mew-7bit)))
-      (when (and (re-search-forward (concat "^--" boundary "$") nil t)
-		 (forward-line)
-		 (setq beg (point))
-		 (re-search-forward (concat "\n--" boundary "\\(--\\)?$") nil t)
-		 (setq end (match-beginning 0)))
-	;; first sub-part
-	(goto-char beg)
-	(when (or (looking-at "^content-type: +text/plain")
-		  (looking-at "^$"))
-	  (save-excursion
-	    (save-restriction
-	      (narrow-to-region beg end)
-	      (mhc-mew/make-message))))))))
-
+	    ;; Mew can't encode Mime-Version ?
+	    (setq ct (mhc-header-get-value "content-type"))
+	    (setq cte (mhc-header-get-value "content-transfer-encoding"))
+	    (mhc-header-delete-header "mime-version")
+	    (mhc-header-delete-header "content-type")
+	    (mhc-header-delete-header "content-transfer-encoding"))
+	  (when (and ct (string-match "^multipart/" ct)
+		     (or (string-match "boundary=\"\\([^\"]+\\)\"" ct)
+			 (string-match "boundary=\\(.+\\)" ct)))
+	    (setq boundary (regexp-quote (mew-match 1 ct)))
+	    (let ((case-fold-search nil))
+	      (unless (and boundary
+			   (re-search-forward (concat "^--" boundary "$") nil t)
+			   (re-search-forward (concat "^--" boundary "--$") nil t))
+		;; looks like Broken multi-part message.
+		(setq boundary nil))))
+	  (if (null (mew-header-end))
+	      (mhc-header-narrowing
+		(mew-header-encode-region (point-min) (point-max)))
+	    (mew-header-encode-region (point-min) (mew-header-end))
+	    (mew-header-clear)
+	    (insert "\n"))
+	  (if (null boundary)
+	      ;; text/plain
+	      (progn
+		(mhc-header-narrowing
+		  (mhc-header-put-value "Mime-Version" "1.0"))
+		(mhc-mew/make-message))
+	    ;; Multipart
+	    (mhc-header-narrowing
+	      (mhc-header-put-value "Mime-Version" "1.0")
+	      (mhc-header-put-value "Content-Type" (or ct mew-ct-txt))
+	      (mhc-header-put-value "Content-Transfer-Encoding" (or cte mew-7bit)))
+	    (when (and (re-search-forward (concat "^--" boundary "$") nil t)
+		       (forward-line)
+		       (setq beg (point))
+		       (re-search-forward (concat "\n--" boundary "\\(--\\)?$") nil t)
+		       (setq end (match-beginning 0)))
+	      ;; first sub-part
+	      (goto-char beg)
+	      (when (or (looking-at "^content-type: +text/plain")
+			(looking-at "^$"))
+		(save-excursion
+		  (save-restriction
+		    (narrow-to-region beg end)
+		    (mhc-mew/make-message)))))))
+      (error
+       (let ((buffer-read-only nil)
+	     (inhibit-read-only t))
+	 (delete-region (point-min) (point-max))
+	 (insert bufstr)
+	 (goto-char (point-min))
+	 (ding t)
+	 (error "Draft buffer has some illegal headers. Please fix it."))))))
 
 (defun mhc-mew/make-message ()
   (mew-charset-sanity-check (point-min) (point-max))
