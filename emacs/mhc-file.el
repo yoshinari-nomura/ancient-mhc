@@ -129,7 +129,12 @@
 	  (const :tag "Short format" (" Mhc" . " MHC"))
 	  (cons :tag "User definition"
 		(string :tag "String for offline")
-		(string :tag "String for online"))))
+		(string :tag "String for online")))
+  :set (lambda (symbol value)
+	 (set-default symbol value)
+	 (if (assq 'mhc-mode minor-mode-alist)
+	     (setcdr (assq 'mhc-mode minor-mode-alist) (list (mhc-file-line-status))))
+	 (force-mode-line-update)))
 
 (defun mhc-file-line-status ()
   "Return status string for mode line."
