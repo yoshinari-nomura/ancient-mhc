@@ -1,5 +1,7 @@
 2000-06-06  Yoshinari Nomura  <nom@quickhack.net>
 
+	* emacs/00usage.jis: Descriptions about bytecompile.
+
 	* emacs/mhc.el (mhc-cal-make-rectangle): speedup.
 
 	* emacs/mhc-schedule.el (mhc-db-busy-p): Use cache for speedup.
