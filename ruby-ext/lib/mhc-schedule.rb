@@ -3,7 +3,7 @@
 ## Author:  Yoshinari Nomura <nom@quickhack.net>
 ##
 ## Created: 1999/07/16
-## Revised: $Date: 2002/09/06 06:15:24 $
+## Revised: $Date: 2002/10/28 05:52:08 $
 ##
 
 ################################################################
@@ -522,7 +522,11 @@ class MhcScheduleItem
   end
 
   def priority_as_string
-    return @priority .to_s
+    if @priority == 0
+      return ""
+    else
+      return @priority .to_s
+    end
   end
 
   def set_priority(pri)
