@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1994/07/04
-;; Revised: $Date: 2002/09/11 07:25:02 $
+;; Revised: $Date: 2002/09/17 08:08:19 $
 
 ;;;
 ;;; Commentay:
@@ -497,9 +497,9 @@ If HIDE-PRIVATE, private schedules are suppressed."
     (unless (eq 'direct mailer)
       (when (and (eq mhc-todo-position 'bottom)
 		 (or mhc-insert-todo-list mhc-insert-memo-list))
-	(mhc-summary/insert-separator))
+	(mhc-summary/insert-separator)
 	(insert (make-string mhc-todo-mergin ?\n))
-	(mhc-summary-make-todo-memo today mailer category-predicate secret)
+	(mhc-summary-make-todo-memo today mailer category-predicate secret))
       (when mhc-insert-calendar
 	(mhc-calendar-insert-rectangle-at
 	 date
