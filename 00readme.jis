@@ -7,102 +7,102 @@ Created: 1999/09/01
 Revised: 2000/05/22 10:01:08
 
 
-** ¤Ï¤¸¤á¤Ë:
+** $B$O$8$a$K(B:
 
-MHC ¤Ï¡¢¤Û¤È¤ó¤É¤ÎÍ½Äê¤òÅÅ»Ò¥á¡¼¥ë¤Ç¼õ¤±¼è¤ë¤è¤¦¤Ê¿Í¤Î¤¿¤á¤Ë¥Ç¥¶¥¤¥ó¤µ
-¤ì¤Þ¤·¤¿¡£MHC ¤ò»È¤¦¤È¡¢´ÊÃ±¤ËÅÅ»Ò¥á¥¤¥ë¤«¤éÍ½Äê¤Î¾ðÊó¤ò¼è¤ê¹þ¤à¤³¤È¤¬
-¤Ç¤­¤Þ¤¹¡£
+MHC $B$O!"$[$H$s$I$NM=Dj$rEE;R%a!<%k$G<u$1<h$k$h$&$J?M$N$?$a$K%G%6%$%s$5(B
+$B$l$^$7$?!#(BMHC $B$r;H$&$H!"4JC1$KEE;R%a%$%k$+$iM=Dj$N>pJs$r<h$j9~$`$3$H$,(B
+$B$G$-$^$9!#(B
 
-ºÇ¿·ÈÇ¤Î¥Ñ¥Ã¥±¡¼¥¸¤Ï¡¢°Ê²¼¤«¤éÆþ¼ê¤Ç¤­¤Þ¤¹:
+$B:G?7HG$N%Q%C%1!<%8$O!"0J2<$+$iF~<j$G$-$^$9(B:
  http://www.quickhack.net/mhc/
 
-MHC ¤Ï°Ê²¼¤Î¤è¤¦¤ÊÆÃÄ¹¤ò¤â¤Ã¤Æ¤¤¤Þ¤¹:
+MHC $B$O0J2<$N$h$&$JFCD9$r$b$C$F$$$^$9(B:
 
-+ ¼è¤ê°·¤¤¤ä¤¹¤¤¥·¥ó¥×¥ë¤Ê¥Ç¡¼¥¿¹½Â¤
-+ UNIX ¤È Windows ¤Î¥Þ¥ë¥Á¥×¥é¥Ã¥È¥Û¡¼¥à¥µ¥Ý¡¼¥È
-+ Í½Äê¤Î½ÀÆð¤Êµ­½Ò
-+ Ê¬¤«¤ê¤ä¤¹¤¯¡¢¶¯ÎÏ¤ÊÍ½Äê¤Îµ­½ÒË¡¡£
-  ³ÆÍ½Äê¤Ï¡¢°Ê²¼¤Î¤è¤¦¤Ê¾ðÊó¤òÊÝ»ý¤¹¤ë¤³¤È¤¬¤Ç¤­¤Þ¤¹:
++ $B<h$j07$$$d$9$$%7%s%W%k$J%G!<%?9=B$(B
++ UNIX $B$H(B Windows $B$N%^%k%A%W%i%C%H%[!<%`%5%]!<%H(B
++ $BM=Dj$N=@Fp$J5-=R(B
++ $BJ,$+$j$d$9$/!"6/NO$JM=Dj$N5-=RK!!#(B
+  $B3FM=Dj$O!"0J2<$N$h$&$J>pJs$rJ];}$9$k$3$H$,$G$-$^$9(B:
 
-    ÆüÉÕ, ¥µ¥Ö¥¸¥§¥¯¥È, ³«»Ï/½ªÎ»»þ´Ö (¤Ê¤¯¤Æ¤â¤¤¤¤)
-    ¥¢¥é¡¼¥à,
-    Ê£¿ô¤Î¥«¥Æ¥´¥ê,
-    ·«¤êÊÖ¤·¤Î¥ë¡¼¥ë,
-    ·«¤êÊÖ¤·¤Î´ü´Ö,
-    ·«¤êÊÖ¤·¤«¤éÎã³°Åª¤Ë³°¤·¤¿¤¤ÆüÉÕ
-    ·«¤êÊÖ¤·¤Ë¡¢Îã³°Åª¤Ë²Ã¤¨¤¿¤¤ÆüÉÕ
-    ³Ð½ñ¤­¡¢Í½ÄêÈ¯À¸¤Î¸µ¤Ë¤Ê¤Ã¤¿¥á¡¼¥ë¡£
+    $BF|IU(B, $B%5%V%8%'%/%H(B, $B3+;O(B/$B=*N;;~4V(B ($B$J$/$F$b$$$$(B)
+    $B%"%i!<%`(B,
+    $BJ#?t$N%+%F%4%j(B,
+    $B7+$jJV$7$N%k!<%k(B,
+    $B7+$jJV$7$N4|4V(B,
+    $B7+$jJV$7$+$iNc30E*$K30$7$?$$F|IU(B
+    $B7+$jJV$7$K!"Nc30E*$K2C$($?$$F|IU(B
+    $B3P=q$-!"M=DjH/@8$N85$K$J$C$?%a!<%k!#(B
 
-+ ¥³¥Þ¥ó¥É¥é¥¤¥ó, emacs, GUI, Web ¤È¤¤¤Ã¤¿Ê£¿ô¤Î¥æ¡¼¥¶¥¤¥ó¥¿¡¼¥Õ¥§¡¼¥¹
-  MHC ¤Ï¸½ºß¡¢°Ê²¼¤Î¤è¤¦¤Ê¥¤¥ó¥¿¡¼¥Õ¥§¡¼¥¹¤òÄó¶¡¤·¤Æ¤¤¤Þ¤¹:
++ $B%3%^%s%I%i%$%s(B, emacs, GUI, Web $B$H$$$C$?J#?t$N%f!<%6%$%s%?!<%U%'!<%9(B
+  MHC $B$O8=:_!"0J2<$N$h$&$J%$%s%?!<%U%'!<%9$rDs6!$7$F$$$^$9(B:
 
-    + Mew ¤ä Wanderlust ¤È¶¨Ä´¤·¤ÆÆ°¤¯ Elisp ¥Ñ¥Ã¥±¡¼¥¸  (mhc.el)
-    + Ruby/Gtk ¤Çµ­½Ò¤µ¤ì¤¿ GUI ¥«¥ì¥ó¥À¡¼ (gemcal)
-    + CGI ¥Ù¡¼¥¹¤Î Web ¥¤¥ó¥¿¡¼¥Õ¥§¡¼¥¹    (web-mhc)
-	(¥Ñ¥Ã¥±¡¼¥¸¤Ë¤Ï´Þ¤Þ¤ì¤Æ¤Þ¤»¤ó¡£http://mhc.hauN.org/web-mhc/ »²¾È)
-    + ¥³¥Þ¥ó¥É¥é¥¤¥ó¤Ç¤ÎÍ½Äê°ìÍ÷É½¼¨¥Ä¡¼¥ë (mscan)
+    + Mew $B$d(B Wanderlust $B$H6(D4$7$FF0$/(B Elisp $B%Q%C%1!<%8(B  (mhc.el)
+    + Ruby/Gtk $B$G5-=R$5$l$?(B GUI $B%+%l%s%@!<(B (gemcal)
+    + CGI $B%Y!<%9$N(B Web $B%$%s%?!<%U%'!<%9(B    (web-mhc)
+	($B%Q%C%1!<%8$K$O4^$^$l$F$^$;$s!#(Bhttp://mhc.hauN.org/web-mhc/ $B;2>H(B)
+    + $B%3%^%s%I%i%$%s$G$NM=Dj0lMwI=<(%D!<%k(B (mscan)
 
-MHC ¤Ï¡¢Í½Äê¤Î¾ðÊó¤ò MH ¤ÈÆ±¤¸·Á¼°¤ÇÊÝÂ¸¤·¤Þ¤¹¡£¤½¤Î¤¿¤á¡¢¾åµ­°Ê³°¤Î¥Ä¡¼
-¥ë¤«¤é¤Ç¤â¡¢¥á¡¼¥ë¤È»÷¤¿Áàºî¤ò¤¹¤ë¤³¤È¤¬¤Ç¤­¤Þ¤¹¡£¼«Ê¬ÆÈ¼«¤Î¥¹¥¯¥ê¥×¥È¤ò
-½ñ¤¯¤³¤È¤â´ÊÃ±¤Ç¤¹¡£
+MHC $B$O!"M=Dj$N>pJs$r(B MH $B$HF1$87A<0$GJ]B8$7$^$9!#$=$N$?$a!">e5-0J30$N%D!<(B
+$B%k$+$i$G$b!"%a!<%k$H;w$?A`:n$r$9$k$3$H$,$G$-$^$9!#<+J,FH<+$N%9%/%j%W%H$r(B
+$B=q$/$3$H$b4JC1$G$9!#(B
 
-** Æ°ºî´Ä¶­:
+** $BF0:n4D6-(B:
 
-MHC ¤Ï¡¢°Ê²¼¤Î¤è¤¦¤Ê¥³¥Þ¥ó¥É¤òÍøÍÑ¤·¤Æ¤¤¤Þ¤¹¡£
+MHC $B$O!"0J2<$N$h$&$J%3%^%s%I$rMxMQ$7$F$$$^$9!#(B
 
 gemcal        -- Ruby 1.4.2 + ruby-gtk 0.22
 mhc-sync      -- Ruby 1.4.2 + ssh
-palm2mhc      -- Ruby 1.4.2 + pilot-link ¤Î¥é¥¤¥Ö¥é¥ê
-mhc2palm      -- Ruby 1.4.2 + pilot-link ¤Î¥é¥¤¥Ö¥é¥ê
+palm2mhc      -- Ruby 1.4.2 + pilot-link $B$N%i%$%V%i%j(B
+mhc2palm      -- Ruby 1.4.2 + pilot-link $B$N%i%$%V%i%j(B
 today, mscan  -- Perl 5.004
-mhc.el        -- Mew (1.94°Ê¹ß) ¤« Wanderlust (2.2.10°Ê¹ß) ¤¬Æ°¤¯´Ä¶­
+mhc.el        -- Mew (1.94$B0J9_(B) $B$+(B Wanderlust (2.2.10$B0J9_(B) $B$,F0$/4D6-(B
 
-¾åµ­¤Î¤¤¤º¤ì¤â UNIX ¤È Windows9x ¤ÇÆ°¤¯¤è¤¦¤Ë¤·¤Æ¤¤¤ë¤Ä¤â¤ê¤Ç¤¹¡£
-(Win9x ¤Ç¤ÏÌ¤³ÎÇ§¡£mscan, today, mhc.el ¤Ï¡¢Æ°ºî¤·¤¿¤È¤ÎÊó¹ð¤¢¤ê¡£)
+$B>e5-$N$$$:$l$b(B UNIX $B$H(B Windows9x $B$GF0$/$h$&$K$7$F$$$k$D$b$j$G$9!#(B
+(Win9x $B$G$OL$3NG'!#(Bmscan, today, mhc.el $B$O!"F0:n$7$?$H$NJs9p$"$j!#(B)
 
-** ¥Ç¥£¥ì¥¯¥È¥ê¤ÎÆâÍÆ:
+** $B%G%#%l%/%H%j$NFbMF(B:
 
-mscan         -- ¥³¥Þ¥ó¥É¥é¥¤¥ó¤Î¥¹¥±¥¸¥å¡¼¥ë°ìÍ÷¥Ä¡¼¥ë
-today         -- º£Æü¤ÎÍ½Äê¤ò É½¼¨/¥á¡¼¥ë ¤¹¤ë¥Ä¡¼¥ë
-gemcal        -- ruby/gtk ¤Ë¤è¤ë GUI ¥Ç¥¹¥¯¥È¥Ã¥×¥«¥ì¥ó¥À¡¼
-mhc-sync      -- 2¤Ä¤Î PC ´Ö¤Ç¥Ç¡¼¥¿Æ±´ü¤ò¼è¤ë¥³¥Þ¥ó¥É¡£
-mhc2palm      -- mhc ¤«¤é Palm/WorkPad ¤Ø¤Î¥Ç¡¼¥¿Å¾Á÷
-palm2mhc      -- Palm/WorkPad ¤«¤é mhc ¤Ø¤Î¥Ç¡¼¥¿Å¾Á÷
-emacs/        -- Mew/Wanderlust/Gnus ¤òÍ½ÄêÆþÎÏ¡¦±ÜÍ÷¤È¤·¤Æ¤â
-                 »È¤¨¤ë¤è¤¦¤Ë¤¹¤ë¥Ñ¥Ã¥±¡¼¥¸
-samples/      -- µÙÆü¡¦µ­Ç°Æü¤Î¥µ¥ó¥×¥ë
-ruby-ext/     -- MHC ·Á¼°¤ÎÍ½Äê¤ò°·¤¦¥é¥¤¥Ö¥é¥ê
-		 (gemcal, palm2mhc, mhc2palm ¤«¤é¤â»ÈÍÑ)
-xpm/          -- gemcal ¤Ç»È¤Ã¤Æ¤¤¤ë¥Ü¥¿¥ó¤Î³¨¡£
-experimental/ -- ¼Â¸³¥³¡¼¥É
-00readme.jis  -- ¤³¤Î¥Õ¥¡¥¤¥ë
-00copyright   -- Ãøºî¸¢É½¼¨
-00changes     -- ¹¹¿·ÍúÎò
+mscan         -- $B%3%^%s%I%i%$%s$N%9%1%8%e!<%k0lMw%D!<%k(B
+today         -- $B:#F|$NM=Dj$r(B $BI=<((B/$B%a!<%k(B $B$9$k%D!<%k(B
+gemcal        -- ruby/gtk $B$K$h$k(B GUI $B%G%9%/%H%C%W%+%l%s%@!<(B
+mhc-sync      -- 2$B$D$N(B PC $B4V$G%G!<%?F14|$r<h$k%3%^%s%I!#(B
+mhc2palm      -- mhc $B$+$i(B Palm/WorkPad $B$X$N%G!<%?E>Aw(B
+palm2mhc      -- Palm/WorkPad $B$+$i(B mhc $B$X$N%G!<%?E>Aw(B
+emacs/        -- Mew/Wanderlust/Gnus $B$rM=DjF~NO!&1\Mw$H$7$F$b(B
+                 $B;H$($k$h$&$K$9$k%Q%C%1!<%8(B
+samples/      -- $B5YF|!&5-G0F|$N%5%s%W%k(B
+ruby-ext/     -- MHC $B7A<0$NM=Dj$r07$&%i%$%V%i%j(B
+		 (gemcal, palm2mhc, mhc2palm $B$+$i$b;HMQ(B)
+xpm/          -- gemcal $B$G;H$C$F$$$k%\%?%s$N3(!#(B
+experimental/ -- $B<B83%3!<%I(B
+00readme.jis  -- $B$3$N%U%!%$%k(B
+00copyright   -- $BCx:n8"I=<((B
+00changes     -- $B99?7MzNr(B
 
-** ¥¤¥ó¥¹¥È¡¼¥ë:
+** $B%$%s%9%H!<%k(B:
 
-¥É¥­¥å¥á¥ó¥ÈÎà¤¬¤Þ¤ÀÀ°È÷¤µ¤ì¤Æ¤¤¤Þ¤»¤ó¡£¥µ¥Ö¥Ç¥£¥ì¥¯¥È¥ê¤Ë¼ý¤á¤é¤ì¤Æ¤¤
-¤ë¥Õ¥¡¥¤¥ë¤«¡¢¥¹¥¯¥ê¥×¥È¤½¤Î¤â¤Î¤ÎÃæ¤Ë½ñ¤¤¤Æ¤¢¤ê¤Þ¤¹¡£
+$B%I%-%e%a%s%HN`$,$^$@@0Hw$5$l$F$$$^$;$s!#%5%V%G%#%l%/%H%j$K<}$a$i$l$F$$(B
+$B$k%U%!%$%k$+!"%9%/%j%W%H$=$N$b$N$NCf$K=q$$$F$"$j$^$9!#(B
 
-** ¤µ¤é¤Ê¤ë¾ðÊó:
+** $B$5$i$J$k>pJs(B:
 
-MHC ¤Ë´Ø¤¹¤ë¤ªÏÃ¤ò¤¹¤ë¥á¥¤¥ê¥ó¥°¥ê¥¹¥È¤ò¾å¤²¤Þ¤·¤¿¡£
-(µÄÏÀ¤ÏÆüËÜ¸ì¤Ç¸ò¤µ¤ì¤Æ¤¤¤Þ¤¹¡£)
-mhc-ctl@quickhack.net ¤Ë
+MHC $B$K4X$9$k$*OC$r$9$k%a%$%j%s%0%j%9%H$r>e$2$^$7$?!#(B
+($B5DO@$OF|K\8l$G8r$5$l$F$$$^$9!#(B)
+mhc-ctl@quickhack.net $B$K(B
 
-    subscribe Your Name (Îã: subscribe Yoshinari Nomura)
+    subscribe Your Name ($BNc(B: subscribe Yoshinari Nomura)
 
-¤Î¤è¤¦¤Ë½ñ¤¤¤¿¥á¡¼¥ë¤òÁ÷¤Ã¤Æ²¼¤µ¤¤¡£(Æþ²ñ¤Î³ÎÇ§¥á¡¼¥ë¤¬Íè¤Þ¤¹)
-¥³¥á¥ó¥È¡¦¥Ð¥°¥ì¥Ý¡¼¥ÈÅù¤Ï¡¢
+$B$N$h$&$K=q$$$?%a!<%k$rAw$C$F2<$5$$!#(B($BF~2q$N3NG'%a!<%k$,Mh$^$9(B)
+$B%3%a%s%H!&%P%0%l%]!<%HEy$O!"(B
 
     mhc@quickhack.net
 
-°¸¤Æ¤« nom@quickhack.net ¤Ë²¼¤µ¤¤¡£¤Þ¤¿¡¢iij ¤ÎÂç¸¶¤µ¤ó¤¬¡¢mhc ¤Î CGI ¥¤¥ó¥¿¡¼
-¥Õ¥§¡¼¥¹¤È¡¢mhc ¤Î¥Ú¡¼¥¸¤òºîÀ®¤µ¤ì¤Æ¤¤¤Þ¤¹¡£¹ç¤»¤Æ¸æÍ÷²¼¤µ¤¤¡£
+$B08$F$+(B nom@quickhack.net $B$K2<$5$$!#$^$?!"(Biij $B$NBg86$5$s$,!"(Bmhc $B$N(B CGI $B%$%s%?!<(B
+$B%U%'!<%9$H!"(Bmhc $B$N%Z!<%8$r:n@.$5$l$F$$$^$9!#9g$;$F8fMw2<$5$$!#(B
 
-    web-mhc ÃÖ¾ì   http://mhc.hauN.org/web-mhc/
+    web-mhc $BCV>l(B   http://mhc.hauN.org/web-mhc/
 
-MHC ¤ÎºÇ¿·ÈÇ¤Ï¡¢²¼µ­¤«¤éÆþ¼ê¤Ç¤­¤Þ¤¹:
+MHC $B$N:G?7HG$O!"2<5-$+$iF~<j$G$-$^$9(B:
   http://www.quickhack.net/mhc/
 
 -- 00readme.jis ends here.
