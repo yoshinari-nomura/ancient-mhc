@@ -1,3 +1,11 @@
+2000-07-18  Yoshinari Nomura  <nom@quickhack.net>
+
+	* emacs/mhc-cmail.el: New file.
+
+	* emacs/mhc.el (mhc-current-date-month):
+	  use local-variable mhc-summary-buffer-current-date-month
+	  instead of buffer name.
+
 2000-07-18  Toshihiko SHIMOKAWA  <toshi@tea.forus.or.jp>
 
 	* next_year.xpm: correct color information
