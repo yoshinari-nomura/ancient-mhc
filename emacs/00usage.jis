@@ -3,7 +3,7 @@
 ################################################################
 
 Created: 1999/04/07
-Revised: $Date: 2000/10/04 01:16:36 $
+Revised: $Date: 2000/10/04 02:03:44 $
 
 mhc の使いかた
 
@@ -130,7 +130,7 @@ mhc の使いかた
     C-c. t  3ヶ月カレンダーの表示をトグルする
     C-c. ?  Emacs 標準の Calender like な3ヶ月カレンダーを表示する。
         (mhc-calendar-mode といいます。この mode の説明は xxxxx
-	とりあえず、M-x describe-mode して調べてください ^^;)
+        とりあえず、M-x describe-mode して調べてください ^^;)
 
     C-c.p C-c.n  は prefix arg で、何ヶ月進む/戻るを指定できます。
     C-c.s は prefix arg で、Private カテゴリのサブジェクトを別な文字列
@@ -147,19 +147,19 @@ mhc の使いかた
 
    draft-buffer から X-SC-* を直に編集:
 
-	X-SC-Day:
-	X-SC-Time:
-	X-SC-Duration:
-	X-SC-Cond:
-	X-SC-Alarm:
+        X-SC-Day:
+        X-SC-Time:
+        X-SC-Duration:
+        X-SC-Cond:
+        X-SC-Alarm:
 
         X-SC-Day: には、19990409 のように、日付をスペースで区切って、
         複数入力することができるようになっています。
 
-		X-SC-Day: 19990409 19990413   …  1999年4月9日と 13日
+                X-SC-Day: 19990409 19990413   …  1999年4月9日と 13日
 
-	X-SC-Time: には 12:00-13:00 や 19:00 のように時間を入力します。
-	祭日のように時間が指定できないイベントは、空白にしておくことも
+        X-SC-Time: には 12:00-13:00 や 19:00 のように時間を入力します。
+        祭日のように時間が指定できないイベントは、空白にしておくことも
         できます。
 
         X-SC-Duration: には、19990409-19990430 のように、
@@ -167,60 +167,60 @@ mhc の使いかた
         終わりか始めのどちらかを省略してもかまいません。
         (例: 19991121-)
         ただしこれで指定した期間は、
-	X-SC-Day: X-SC-Cond: で指定した条件をより限定するために使われ
-	るので、X-SC-Duration: だけではイベントを記述できません。
+        X-SC-Day: X-SC-Cond: で指定した条件をより限定するために使われ
+        るので、X-SC-Duration: だけではイベントを記述できません。
         空白にしておくと特に Duration では制限を設けないことを意味します。
 
         X-SC-Cond: は、以下のキーワードを記述することができます。
  
-           00-31 			月の内の日を表す数字
-	   1st 2nd 3rd 4th 5th Last	週を表す序数
-	   Sun Mon ... Sat              曜日を表す
-	   Jan Feb ... Dec              月を表す
+           00-31                        月の内の日を表す数字
+           1st 2nd 3rd 4th 5th Last     週を表す序数
+           Sun Mon ... Sat              曜日を表す
+           Jan Feb ... Dec              月を表す
 
-	   X-SC-Cond: Tue Fri           毎週火曜と金曜
-	   X-SC-Cond: 31 Aug            毎年 8月 31日
-	   X-SC-Cond: 1st 3rd Fri       第1,3 金曜日
+           X-SC-Cond: Tue Fri           毎週火曜と金曜
+           X-SC-Cond: 31 Aug            毎年 8月 31日
+           X-SC-Cond: 1st 3rd Fri       第1,3 金曜日
 
-	   X-SC-Cond: Fri
+           X-SC-Cond: Fri
            X-SC-Day:  !19990409         毎週金曜日。ただし 4/9 は除く
     
-	   X-SC-Cond: Fri 13		13日の金曜日ではなくて、
-					毎月13日と毎週金曜日
+           X-SC-Cond: Fri 13            13日の金曜日ではなくて、
+                                        毎月13日と毎週金曜日
 
    minibuffer から: 
 
-	Date: (yyyy/mm/dd):  の場所では、
+        Date: (yyyy/mm/dd):  の場所では、
 
-	1999/4/5 のように入力できます。スペースで区切って、複数を入力
+        1999/4/5 のように入力できます。スペースで区切って、複数を入力
         することができます。yyyy や mm を省略した場合は、
         先頭の日付に関しては、現在の 年と月が仮定されます。
         2番目以降は、1つ前の日付の年と月が仮定されます。
         `-' で区切って連続する何日かを指定することも可能です。
 
-	minibuffer からは、
-	繰り返しの条件等を入力できません。
-	とりあえず開始時間を適当に入れて、draft-buffer で編集して下さい。
+        minibuffer からは、
+        繰り返しの条件等を入力できません。
+        とりあえず開始時間を適当に入れて、draft-buffer で編集して下さい。
 
     .schedule に記述
 
-	祭日や記念日のように、おそらく変更がないようなイベントは、
-	~/.schedule に入力しておくこともできます。
+        祭日や記念日のように、おそらく変更がないようなイベントは、
+        ~/.schedule に入力しておくこともできます。
 
-	   X-SC-Cond: Sep 19
+           X-SC-Cond: Sep 19
            X-SC-Subject: 結婚記念日
 
-	sample として、DOT.schedule.sample を付けています。
+        sample として、DOT.schedule.sample を付けています。
 
 4. スケジュール情報の保存場所
 
-	通常のスケジュールの情報は、+schedule/yyyy/mm に保存されるよう
-	になっています。(例えば +schedule/1999/04)
+        通常のスケジュールの情報は、+schedule/yyyy/mm に保存されるよう
+        になっています。(例えば +schedule/1999/04)
 
         しかし、月にまたがるような繰り返しのスケジュールを 
-	+schedule/yyyy/mm に入れてしまうと、他の月をスキャンしたときに
+        +schedule/yyyy/mm に入れてしまうと、他の月をスキャンしたときに
         見えなくなってしまうので、月をまたがるようなスケジュールは、
-	+schedule/intersect というフォルダに全部入れることになっていま
+        +schedule/intersect というフォルダに全部入れることになっていま
         す。したがって、
 
         yyyy年 mm月のスケジュールは、 
@@ -237,37 +237,37 @@ mhc の使いかた
 
 5. スケジュールの消去
 
-	C-c. d でスケジュールの消去をすると、現在のところ、
-	+schedule/trash に移動するようになっています。
-	繰り返しのスケジュールの場合、'y' 'y' と答えると、
-	全部がいっぺんに見えなくなってし
-	まうので、気を付けてください。
+        C-c. d でスケジュールの消去をすると、現在のところ、
+        +schedule/trash に移動するようになっています。
+        繰り返しのスケジュールの場合、'y' 'y' と答えると、
+        全部がいっぺんに見えなくなってし
+        まうので、気を付けてください。
 
-	1回分だけ消したい場合は、'y' 'n' と答えましょう。
-	C-c. m して、X-SC-Day: に外したい日に該当する
-	!yyyymmdd を追加した状態になります。
+        1回分だけ消したい場合は、'y' 'n' と答えましょう。
+        C-c. m して、X-SC-Day: に外したい日に該当する
+        !yyyymmdd を追加した状態になります。
 
 6. X-SC-Category:
 
-	X-SC-Category: には、空白で区切ったキーワードを入力することが
+        X-SC-Category: には、空白で区切ったキーワードを入力することが
         できます。ユーザが自由に設定できます。大文字小文字の区別はあり
         ません。
 
         現在は、DOT.schedule.sample の中で Holiday というカテゴリ名を
-	使っています。
+        使っています。
 
         C-c.c で、mhc が表示する項目をカテゴリによって限定することができます。
 
-	Private や Leisure というカテゴリを設定している人は、
+        Private や Leisure というカテゴリを設定している人は、
 
         (setq mhc-default-category "!(private || leasure)")
 
-	と書いておくと、普段は private と leasure についての表示を 
+        と書いておくと、普段は private と leasure についての表示を 
         Summary に出しません。仕事に生きる人は、
 
-	(setq mhc-default-category "work")
+        (setq mhc-default-category "work")
 
-	としておくとよいでしょう。:-)
+        としておくとよいでしょう。:-)
 
         Private というカテゴリは C-uC-c.s のときに特別な意味を発揮します。
         Private というカテゴリのスケジュールがあるバッファで
