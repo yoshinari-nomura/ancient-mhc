@@ -3,7 +3,7 @@
 ## Author:  Yoshinari Nomura <nom@quickhack.net>
 ##
 ## Created: 1999/07/16
-## Revised: $Date: 2001/01/22 09:06:25 $
+## Revised: $Date: 2001/02/03 06:20:12 $
 ##
 
 ################################################################
@@ -628,7 +628,10 @@ class MhcScheduleItem
     if !(@cond_wek .empty? && @cond_num .empty?)
       max = DURATION_MAX .dup
     else
+      # Sometimes palm makes empty @day - @exception.
+      # ex. X-SC-Day: 20000911 !20000911
       max = (@day - @exception) .max
+      max = DURATION_MAX .dup if !max
     end
     max = @duration_e if max && @duration_e && max > @duration_e
     return max
@@ -639,6 +642,9 @@ class MhcScheduleItem
       min = DURATION_MIN .dup
     else
       min = (@day - @exception) .min
+      # Sometimes palm makes empty @day - @exception.
+      # ex. X-SC-Day: 20000911 !20000911
+      min = DURATION_MIN .dup if !min 
     end
     min = @duration_b if min && @duration_b  && min < @duration_b
     return min
