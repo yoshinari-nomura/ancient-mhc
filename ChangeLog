@@ -1,11 +1,35 @@
+2000-06-26  Yoshinari Nomura  <nom@quickhack.net>
+
+	* mhc/gemcal (MhcScheduleEdit#conv_description):
+	New function to divide non X-SC- headers from body. Fix
+		duplication of non X-SC- headers.
+
+	* mhc/ruby-ext/lib/mhc-schedule.rb 
+	 (MhcScheduleItem#set_non_xsc_header): New function to divide non X-SC-
+	    headers from body.
+	(MhcScheduleItem#dump_without_xsc_header): Ditto.
+	(MhcScheduleItem#to_palm): datebk3 compliant (I hope).
+
+	* mhc/ruby-ext/lib/mhc-palm.rb (PilotApptRecord#to_xsc):
+	datebk3 compliant (I hope).
+
+	* mhc/ruby-ext/lib/mhc-gtk.rb (GtkTimeRangeEdit):
+	fix for setting end time.
+
+	* mhc/00todo.jis: updated.
+
+	* mhc/ruby-ext/extconf.rb: add header check.
+
 2000-06-26  Hideyuki SHIRAI  <shirai@rdmg.mgcs.mei.co.jp>
 
-	* emacs/mhc-compat.el (mhc-string-width): Remove function. This defined by APEL.
+	* emacs/mhc-compat.el (mhc-string-width): Remove function. This
+		  defined by APEL.
 	(mhc-char-width): Ditto.
 	(mhc-string-to-list): Ditto.
 
-	* emacs/mhc-ps.el (mhc-ps/compose-subject): If mhc-ps-truncate-lines is nil
-	, use fill-region again.
+	* emacs/mhc-ps.el (mhc-ps/compose-subject): If
+		  mhc-ps-truncate-lines is nil, use fill-region again.
+	
 
 2000-06-24  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 
@@ -21,7 +45,8 @@
 
 	* emacs/mhc-ps.el (mhc-ps-truncate-lines): New variable.
 	(mhc-ps/substring): New function.
-	(mhc-ps/compose-subject): Subject handle as string. Effect mhc-ps-truncate-lines.
+	(mhc-ps/compose-subject): Subject handle as string. Effect
+		mhc-ps-truncate-lines.
 	(mhc-ps-preview): Effect default month.
 	(mhc-ps-print): Ditto.
 
