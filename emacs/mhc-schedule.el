@@ -1,9 +1,9 @@
 ;;; mhc-schedule.el -- schedule item manager.
 
-;; Author:  Yoshinari Nomura <nom@quickhack.net>
+;; Author:  Yoshinari Nomura <nom@mew.org>
 ;;
 ;; Created: 1997/10/12
-;; Revised: $Date: 2000/05/29 14:59:25 $
+;; Revised: 2000/04/26 16:58:56
 
 ;;;
 ;;; Commentay:
@@ -629,6 +629,8 @@
 (defvar mhc-db-slot-mtime-cache nil)
 (defvar mhc-db-log-file         nil)
 (defvar mhc-db-alist ())
+(defvar mhc-db-holiday-cache ())
+(defvar mhc-db-busy-cache    ())
 
 (defun mhc-db-setup (rcfile base-dir)
   ;; (message "Setup mhc DB ...")
@@ -638,6 +640,8 @@
 		     (expand-file-name ".mhc-db-log" base-dir)))
 
   (setq mhc-db-alist ())
+  (setq mhc-db-holiday-cache ())
+  (setq mhc-db-busy-cache    ())
   (setq mhc-db-slot-mtime-cache ())
   ;; (mhc-db-scan (ddate-now))
   ;; (mhc-db-scan (ddate-mm-inc (ddate-now)))
@@ -649,8 +653,10 @@
 	(expand-file-name "intersect" mhc-db-base-dir)
 	mhc-db-rc-file))
 
-(defun mhc-db-busy-p (date)
-  (mhc-db-search1 date nil nil t))
+(defsubst mhc-db-busy-p (date &optional update)
+  (or (cdr (assoc date mhc-db-busy-cache))
+      (progn (mhc-db-search1 date nil nil update)
+	     (cdr (assoc date mhc-db-busy-cache)))))
 
 (defun mhc-db-busy-on-p (date btime &optional etime exc-path)
   (let ((sch-list (mhc-db-search1 date nil nil t))
@@ -671,7 +677,8 @@
 (defun mhc-db-search1 (date &optional category category-is-invert update-slot)
   (let ((mon (ddate-mm-s date)) (wek (ddate-ww-s date))
 	(ord (ddate-oo-s date)) (num (ddate-dd-s date))
-	(all "all") (last "Last") (ret nil) (keys nil) (sch nil) (sch-list nil)
+	(all "all") (last "Last") (ret nil) (keys nil) (sch nil)
+	(sch-list nil) (busy nil)
 	(search-key nil) (slot-list (mhc-db-date-to-slot date)))
     (setq search-key (list (ddate-to-s date)
 			   (concat mon ord wek) (concat mon all wek)
@@ -681,6 +688,14 @@
 	(setq search-key
 	      (cons (concat all last wek)
 		    (cons (concat mon last wek) search-key))))
+    (setq mhc-db-busy-cache
+	  (cons (cons date nil)
+		(delete (assoc date mhc-db-busy-cache)
+			mhc-db-busy-cache)))
+    (setq mhc-db-holiday-cache
+	  (cons (cons date nil)
+		(delete (assoc date mhc-db-holiday-cache)
+			mhc-db-holiday-cache)))
     (while slot-list
       (if update-slot (mhc-db-update-slot (car slot-list)))
       (setq keys search-key)
@@ -698,7 +713,18 @@
 			    (not (mhc-sch-in-category-p sch category)))
 		       (and (not category-is-invert)
 			    (mhc-sch-in-category-p sch category))))
- 	      (setq ret (cons sch ret)))
+ 	      (progn
+		(setq ret (cons sch ret))
+		(if (and (not busy) sch-list)
+		    (setq mhc-db-busy-cache
+			  (cons (cons date sch-list)
+				(delete (assoc date mhc-db-busy-cache)
+					mhc-db-busy-cache))))
+		(if (mhc-sch-in-category-p sch "Holiday")
+		    (setq mhc-db-holiday-cache
+			  (cons (cons date t)
+				(delete (assoc date mhc-db-holiday-cache)
+					mhc-db-holiday-cache))))))
 	  (setq sch-list (cdr sch-list)))
 	(setq keys (cdr keys)))
       (setq slot-list (cdr slot-list)))
@@ -869,7 +895,6 @@
       ()
     (mhc-db-scan-slot slot)))
 
-
 (defun mhc-db-scan-slot (slot)
   (let ((obj slot))
     (cond
@@ -915,20 +940,17 @@
   (if (mhc-sch-path sch)
       (directory-file-name (file-name-directory (mhc-sch-path sch)))))
 
-(defun mhc-db-holiday-p (ddate)
-  (let ((sch-lst (mhc-db-search1 ddate)))
-    (catch 'true
-      (while sch-lst
-	(if (mhc-sch-in-category-p (car sch-lst) "Holiday")
-	    (throw 'true t))
-	(setq sch-lst (cdr sch-lst))))))
+(defsubst mhc-db-holiday-p (date &optional update)
+  (or (cdr (assoc date mhc-db-holiday-cache))
+      (progn (mhc-db-search1 date nil nil update)
+	     (cdr (assoc date mhc-db-holiday-cache)))))
 
 (provide 'mhc-schedule)
 
 ;;; Copyright Notice:
 
-;; Copyright (C) 1999, 2000 Yoshinari Nomura. All rights reserved.
-;; Copyright (C) 2000 MHC developing team. All rights reserved.
+;; Copyright (C) 1999, 2000 Yoshinari Nomura.
+;; All rights reserved.
 
 ;; Redistribution and use in source and binary forms, with or without
 ;; modification, are permitted provided that the following conditions
@@ -943,11 +965,11 @@
 ;;    may be used to endorse or promote products derived from this software
 ;;    without specific prior written permission.
 ;; 
-;; THIS SOFTWARE IS PROVIDED BY THE TEAM AND CONTRIBUTORS ``AS IS''
+;; THIS SOFTWARE IS PROVIDED BY Yoshinari Nomura AND CONTRIBUTORS ``AS IS''
 ;; AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 ;; LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
 ;; FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL
-;; THE TEAM OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+;; Yoshinari Nomura OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 ;; INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 ;; (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
 ;; SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
