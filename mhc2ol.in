@@ -1,0 +1,650 @@
+#!@@MHC_RUBY_PATH@@ -Ke
+# -*- ruby -*-
+
+### mhc2ol -- copy articles from mhc to Outlook.
+##
+## Author:  MIYOSHI Masanori <miyoshi@quickhack.net>
+##          Yoshinari Nomura <nom@quickhack.net>
+##          
+##
+## Created: 2001/09/15
+## Revised: $Date: 2001/09/30 01:43:04 $
+##
+
+$DEBUG = false
+
+STDOUT .sync= true
+STDERR .sync= true
+
+require 'win32ole'
+require 'mhc-kconv'
+require 'mhc-date'
+require 'mhc-schedule'
+
+module OlConst
+end
+
+module RepeatPattern
+  class Period
+    def initialize(start, finish)
+      @start = start
+      @finish = finish
+    end
+
+    def get_period()
+      [@start, @finish]
+    end
+
+    def handle_recurrence(ol_appoint)
+    end
+  end
+  
+  class NonRepeat < Period
+    def initialize(start)
+      super(start, start)
+    end
+  end
+
+  class Daily < Period
+    def initialize(start, finish, interval)
+      super(start, finish)
+      @interval = interval
+    end
+  end
+
+  class Weekly < Period
+    def initialize(start, finish, interval, dow)
+      super(start, finish)
+      @interval = interval
+      @dow = dow
+    end
+
+    def handle_recurrence(ol_appoint)
+      rp = ol_appoint .GetRecurrencePattern()
+      rp .Interval = @interval
+      mask = 0
+      for i in 0..6
+	mask += (1 << i) if @dow[i]
+      end
+      rp .RecurrenceType = OlConst .const_get("OlRecursWeekly")
+      rp .DayOfWeekMask = mask
+    end
+  end
+
+  class MonthlyByDate < Period
+    def initialize(start, finish, interval)
+      super(start, finish)
+      @interval = interval
+    end
+
+    def handle_recurrence(ol_appoint)
+      # DBI: multiple days should be supported.
+      rp = ol_appoint .GetRecurrencePattern()
+      rp .RecurrenceType = OlConst .const_get("OlRecursMonthly")
+      rp .DayOfMonth = @start .d()
+    end
+  end
+
+  class MonthlyByDow < Period
+    def initialize(start, finish, interval, wom, dow)
+      super(start, finish)
+      @interval = interval
+      @wom = wom
+      @dow = dow
+    end
+
+    def handle_recurrence(ol_appoint)
+      # DBI: multiple days should be supported.
+      rp = ol_appoint .GetRecurrencePattern()
+      rp .Interval = @interval
+      rp .RecurrenceType = OlConst .const_get("OlRecursMonthNth")
+      rp .DayOfWeekMask = (1 << @dow)
+      rp .Instance = @wom + 1 # Instance(week of month) begins with 1
+    end
+  end
+
+  class Yearly < Period
+    def initialize(start, finish, interval)
+      super(start, finish)
+      @interval = interval
+    end
+
+    def handle_recurrence(ol_appoint)
+      # DBI: multiple months should be supported.
+      rp = ol_appoint .GetRecurrencePattern()
+      rp .RecurrenceType = OlConst .const_get("OlRecursYearly")
+      rp .Duration = 60 * 24
+      rp .Interval = @interval
+      rp .DayOfMonth = @start .d()
+      rp .MonthOfYear = @start .m()
+    end
+  end
+
+  class YearlyNth < Period
+    def initialize(start, finish, wom, dow)
+      super(start, finish)
+      @wom = wom
+      @dow = dow
+    end
+
+    def handle_recurrence(ol_appoint)
+      # DBI: multiple months should be supported.
+      rp = ol_appoint .GetRecurrencePattern()
+      rp .RecurrenceType = OlConst .const_get("OlRecursYearNth")
+      rp .Duration = 60 * 24
+      rp .DayOfMonth = @start .d()
+      rp .MonthOfYear = @start .m()
+      rp .DayOfWeekMask = (1 << @dow)
+      rp .Instance = @wom + 1 # Instance(week of month) begins with 1
+    end
+  end
+end
+
+
+def usage
+  print '
+usage: mhc2ol [-a | -i | -N] [-n] [-r dir] [-c category] [YYYYMMDD-yyyymmdd]
+
+  mhc2ol -- Add/Copy mhc articles to Outlook.
+
+    -v     : Verbose mode.
+    -a     : Add mhc articles to Outlook.
+             all the original records of Outlook will remain.
+    -i     : Copy mhc articles into Outlook.
+             all the original records of Outlook will be lost.
+    -N     : Copy only the articles that are modified since
+             the last execution.
+    -n     : Do nothing effectives. Useful for checking.
+    -c     : Copy only the mhc articles of which the category
+             matches the specified regexp.
+    -r dir : Set repository directory of the mhc.
+             ~/Mail/schedule
+
+    YYYYMMDD-yyyymmdd : set a start and end date of scanning mhc.
+                        if omitted, scan from 3 months ago to
+                        3 months after.
+'
+  exit 1
+end
+
+##
+## sub routines.
+##
+class MhcScheduleItem
+  ## the following method is imported from mhc-schedule.rb
+  ## convert to Outlook Datebook record.
+  def to_outlook()
+    dates = []
+    day_cp = day .dup()
+    ### for repeat
+    beg, fin = occur_min, occur_max
+    fin = nil if fin == DURATION_MAX
+
+    ## First, treat X-SC-Day: field.
+    while day_cp .length > 0
+      if day_cp .length > 1 && day_cp .length == day_cp .max - day_cp .min + 1
+	## repeat in a series of days -- make up as a daily.
+	dates << RepeatPattern::Daily .new(day_cp .min, day_cp .max, 1)
+	day_cp = []
+      else
+	dates << RepeatPattern::NonRepeat .new(day_cp .shift)
+      end
+    end
+
+    ## Second, treat X-SC-Cond: field.
+    if cond .length == cond_wek .length && cond_wek .length > 0
+      ## weekly
+      weeks = []
+      for w in 0 .. 6
+	weeks << cond_wek .include?(MhcDate::W_LABEL[w]) ? true : false
+      end
+      dates << RepeatPattern::Weekly .new(beg, fin, 1, weeks)
+
+    elsif  cond_ord .length >= 1  &&
+	  !cond_ord .include?('5th') &&
+	   cond_wek .length >= 1  &&
+	   cond_num .length == 0  && 
+	   cond_mon .length == 0
+      ## monthly by day
+      cond_ord .each{|ord_str|
+	cond_wek .each{|wek_str|
+	  ord = MhcDate::O_LABEL .index(ord_str)
+	  wek = MhcDate::W_LABEL .index(wek_str)
+	  sch2 = MhcScheduleItem .new .add_cond(ord_str) .add_cond(wek_str)
+	  beg2 = beg .dup
+	  while !sch2 .occur_on?(beg2) ## xxx 多分これは不要?
+	    beg2 .succ!
+	  end
+	  dates << RepeatPattern::MonthlyByDow .new(beg2, fin, 1, ord, wek)
+	}
+      }
+    elsif cond_num .length == 1 &&
+	  cond_num .length == cond .length
+      ## monthly by date
+      while !occur_on?(beg) ## xxx こっちは必要
+	beg .succ!
+      end
+      dates << RepeatPattern::MonthlyByDate .new(beg, fin, 1)
+
+    elsif cond_num .length == 1 &&
+	  cond_mon .length == 1 &&
+	  cond_wek .length == 0 &&
+	  cond_ord .length == 0
+      ## yearly by date
+      y = beg .y
+      m = MhcDate::M_LABEL .index(cond_mon[0]) + 1
+      d = cond_num[0] .to_i
+      date = MhcDate .new(y, m, d)
+      if date < beg
+	date .y_succ! 
+      end
+      ## 2/29 はどうする?
+      dates << RepeatPattern::Yearly .new(date, fin, 1)
+
+    elsif cond_ord .length == 1  &&
+	  cond_ord[0] != '5th'   &&
+	  cond_wek .length == 1  &&
+	  cond_num .length == 0  && 
+	  cond_mon .length == 1
+      ## yearly by day
+      ord = MhcDate::O_LABEL .index(cond_ord[0])
+      wek = MhcDate::W_LABEL .index(cond_wek[0])
+      m   = MhcDate::M_LABEL .index(cond_mon[0]) + 1
+      date = MhcDate .new(beg .y, m, 1)
+      if date .m < beg .m 
+	date .y_succ!
+      end
+      while !occur_on?(date)
+	date .succ!
+      end
+      dates << RepeatPattern::YearlyNth .new(date, fin, ord, wek)
+
+    elsif cond .empty?
+      ## do nothing
+    else
+      ## conversion failed.
+      dates = []
+    end
+
+    if dates .empty?
+      # STDERR .print "#{occur_min .to_js} : #{subject} unsupported. ignored..\n"
+      return nil
+    else
+      return dates
+    end
+  end
+end
+
+class Exporter
+  @@sync_file = File .expand_path("~/Mail/schedule/.ol_sync")
+  @@flag_verbose = false
+  @@flag_install = false
+  @@flag_noharm = false
+  @@flag_timestamp = false
+
+  def initialize(mdb, outlook)
+    @mhc_db = mdb
+    @outlook = outlook
+    @category_regexp = ""
+    @last_sync_infos = []
+    if @@flag_timestamp
+      begin
+	fp = open(@@sync_file, 'r')
+	@last_sync_infos = Marshal .load(fp)
+      rescue
+      ensure
+	fp .close() if fp
+      end
+    else
+      begin
+	File .delete(@@sync_file)
+      rescue
+      end
+    end
+    @ol_name_space = @outlook .GetNamespace("MAPI")
+    folder_type = OlConst .const_get("OlFolderCalendar")
+    @ol_calendar = @ol_name_space .GetDefaultFolder(folder_type)
+  end
+
+  def get_ol_appointment(id)
+    ap = nil
+    begin
+      ap = @ol_name_space .GetItemFromID(id, @ol_calendar.StoreID)
+      if ap.Parent.DefaultItemType != OlConst .const_get("OlAppointmentItem")
+	ap = nil
+      end
+    rescue
+    end
+    ap
+  end
+  private :get_ol_appointment
+
+  def ol_is_update?(ol_infos)
+    is_update = false
+    for info in ol_infos
+      entry_id = info[0]
+      last_modified_time = info[1]
+      appoint = get_ol_appointment(entry_id)
+      if appoint == nil || appoint .LastModificationTime != last_modified_time
+	is_update = false
+	break
+      end
+      is_update = true
+    end
+    is_update
+  end
+  private :ol_is_update?
+
+  def delete_ol_appointments(ol_infos)
+    for info in ol_infos
+      entry_id = info[0]
+      appoint = get_ol_appointment(entry_id)
+      if appoint
+	print "deleting ", appoint .Subject, "\n" if @@flag_verbose
+	appoint .delete()
+      end
+    end
+  end
+  private :delete_ol_appointments
+
+  def setup_ol_appointments(periods, sch)
+    ol_info = []
+    for period in periods
+      appoint = @outlook .CreateItem(OlConst .const_get("OlAppointmentItem"))
+      sdate, edate = period .get_period()
+      sdate = Exporter .to_ol_date(sdate)
+      edate = Exporter .to_ol_date(edate)
+
+      print "Subject:", MhcKconv::todisp(sch .subject()), "\n" if @@flag_verbose
+      appoint .Subject = MhcKconv::todisp(sch .subject())
+      appoint .Location = MhcKconv::todisp(sch .location()) if sch.location()
+	
+      print "Time: ", sch .time_as_string(), "\n" if @@flag_verbose
+	
+      stime, etime = sch .time()
+      etime = stime if !etime
+      sdate += " " + stime .to_s if sdate && stime
+      edate += " " + etime .to_s if edate && etime
+
+      # If any time is not specified, the appointment is a kind of AllDayEvent.
+      if !stime && !etime
+	edate = nil if sdate == edate
+	appoint .AllDayEvent = true
+      end
+
+      print "Date: ", sdate, "-", edate, "\n" if @@flag_verbose
+      appoint .Start = sdate
+      appoint .End = edate
+
+      appoint .Categories = sch .category_as_string()
+      appoint .Body = MhcKconv::todisp(sch .dump())
+
+      # a reminder is valid for a future schedule.
+      if sch .alarm() != nil then
+	appoint .ReminderSet = true
+	appoint .ReminderMinutesBeforeStart = sch .alarm() / 60
+      else
+	appoint .ReminderSet = false
+      end
+
+      # handle recurrence.
+      period .handle_recurrence(appoint)
+
+      appoint .Save()
+      ol_info << [appoint .EntryID, appoint .LastModificationTime]
+    end
+    ol_info
+  end
+  private :setup_ol_appointments
+
+  def send_to_outlook(periods, sch)
+    if sch. path()
+      file = sch .path()
+      rec_id = sch .rec_id()
+    else
+      file = MhcScheduleDB::DEF_RCFILE
+      rec_id = (sch .subject() + sch .category_as_string()\
+		+ sch .cond_as_string() + "@dot.schedule")
+    end
+    sync_info = [rec_id,  File .mtime(file)]
+
+    # check if schedules are up-to-date.
+    is_update = false
+    last_sync_info = @last_sync_infos .assoc(rec_id)
+  
+    if last_sync_info
+      @last_sync_infos .delete(last_sync_info)
+      mhc_last_modified_time = last_sync_info[1]
+      ol_last_sync_infos = last_sync_info[2]
+      mhc_is_modified = (File .mtime(file) != mhc_last_modified_time)
+      is_update = ol_is_update?(ol_last_sync_infos) unless mhc_is_modified
+      delete_ol_appointments(ol_last_sync_infos) unless is_update
+    end
+    if is_update
+      sync_info << ol_last_sync_infos
+      print "copying to Outlook is skipped!\n" if @@flag_verbose
+    else
+      sync_info << setup_ol_appointments(periods, sch)
+      print "\n"  if @@flag_verbose
+    end
+    sync_info
+  end
+  private :send_to_outlook
+
+  def export(from, to)
+    @sync_infos = []
+    sch_count, sent = 0, 0
+    @mhc_db .each_sch(from, to) {|sch|
+      next unless sch .category_as_string() =~ @category_regexp
+      sch_count += 1
+      print "adding ", MhcKconv::todisp(sch .subject), "\n" if @@flag_verbose
+  
+      if periods = sch .to_outlook()
+	if @@flag_verbose
+	  print "    converted into #{periods .length} Outlook article(s)."
+	end
+
+	if !$flag_noharm
+	  print " sending to Outlook ...\n    " if @@flag_verbose
+	  sync_info = send_to_outlook(periods, sch)
+	  if ! sync_info .nil?
+	    @sync_infos << sync_info
+	    sent += 1
+	    print "."
+	  else
+	    print MhcKconv::todisp("(#{sch .subject}) write_error\n")
+	  end
+	else
+	  print " not sent.\n" if @@flag_verbose
+	end
+      else
+	print "failed to convert."
+	print MhcKconv::todisp("  subject: #{sch .subject}\n")
+	print "  first occured: #{sch .occur_min}\n"
+	print "  path: #{file}\n"
+      end
+      print "\n"  if @@flag_verbose
+    }
+    print "\n"
+    print "\n#{sent}/#{sch_count} article(s) successfully sent.\n"
+    @sync_infos
+  end
+
+  def delete_unmanaged_schedules()
+    for table in @last_sync_infos
+      ol_infos = table[2]
+      for info in ol_infos
+	entry_id = info[0]
+	appoint = get_ol_appointment(entry_id)
+	appoint .delete() if appoint
+      end
+    end
+  end
+
+  def write_sync_info()
+    begin
+      fp = open(@@sync_file, 'w')
+      Marshal .dump(@sync_infos, fp)
+    rescue
+    ensure
+      fp .close() if fp
+    end
+  end
+
+  def delete_ol_schedules()
+    if @@flag_install
+      print "delete all articles in Outlook."
+      if !@@flag_noharm
+	items = @ol_calendar .items()
+	index = items .Count
+	while index > 0 do
+	  items .Remove(index)
+	  index -= 1
+	end
+      end
+      print ".. done.\n"
+    end
+  end
+
+  def Exporter.set_sync_filename(name)
+    @@sync_file = name
+  end
+
+  def Exporter.set_flag_verbose(flag)
+    @@flag_verbose = flag
+  end
+
+  def Exporter.set_flag_install(flag)
+    @@flag_install = flag
+  end
+
+  def Exporter.set_flag_noharm(flag)
+    @@flag_noharm = flag
+  end
+
+  def Exporter.set_flag_timestamp(flag)
+    @@flag_timestamp = flag
+  end
+
+  def Exporter.to_ol_date(date)
+    format("%4d/%02d/%02d", date .y(), date .m(), date .d()) if date
+  end
+
+  def set_category_regexp(category_regexp)
+    @category_regexp = category_regexp
+  end
+end
+
+##
+## option check.
+##
+
+$flag_verbose = false
+$flag_noharm, $flag_append, $flag_install = false, false, false
+$flag_from, $flag_to = nil, nil
+$flag_timestamp = nil
+$flag_category_regexp = ""
+$flag_dir = File .expand_path("~/Mail/schedule")
+
+while ARGV .length > 0
+  case ARGV[0]
+  when '-v'
+    $flag_verbose = true
+  when '-a'
+    $flag_append  = true
+  when '-i'
+    $flag_install = true
+  when '-n'
+    $flag_noharm  = true
+  when '-r'
+    ARGV .shift
+    $flag_dir = ARGV[0]
+  when '-c'
+    ARGV .shift
+    $flag_category_regexp = ARGV[0]
+  when /^(\d{8})-(\d{8})$/
+    $flag_from, $flag_to = MhcDate .new($1), MhcDate .new($2)
+  when '-N'
+    $flag_timestamp = true
+  else
+    usage()
+  end
+  ARGV .shift
+end
+
+$flag_from = MhcDate .new .m_succ!(-3) if !$flag_from
+$flag_to   = MhcDate .new .m_succ!(+3) if !$flag_to
+
+usage() if (!($flag_append || $flag_install || $flag_timestamp) || ($flag_append && $flag_install && $flag_timestamp))
+
+##
+## Initialize Outlook OLE Automation object
+##
+
+if !$flag_noharm
+  begin
+    outlook = WIN32OLE .new('Outlook.Application')
+    WIN32OLE .const_load(outlook, OlConst)
+  rescue
+    STDERR .print("Cannot find Outlook in your PC!\n")
+    STDERR .print("Please install Outlook (*NOT* Outlook Express) before execute this command.\n")
+    exit(1)
+  end
+end
+
+##
+## Open mhc & copy to Outlook
+##
+
+mdb = MhcScheduleDB .new($flag_dir)
+
+Exporter .set_sync_filename($flag_dir + "/.ol_sync")
+Exporter .set_flag_verbose($flag_verbose)
+Exporter .set_flag_install($flag_install)
+Exporter .set_flag_noharm($flag_noharm)
+Exporter .set_flag_timestamp($flag_timestamp)
+exporter = Exporter .new(mdb, outlook)
+exporter .set_category_regexp($flag_category_regexp)
+exporter .delete_ol_schedules()
+exporter .export($flag_from, $flag_to)
+exporter .delete_unmanaged_schedules()
+exporter .write_sync_info()
+
+##
+## close Outlook & exit
+##
+
+exit 0
+
+### Copyright Notice:
+
+## Copyright (C) 1999, 2000 Yoshinari Nomura. All rights reserved.
+## Copyright (C) 2000 MHC developing team. All rights reserved.
+
+## Redistribution and use in source and binary forms, with or without
+## modification, are permitted provided that the following conditions
+## are met:
+## 
+## 1. Redistributions of source code must retain the above copyright
+##    notice, this list of conditions and the following disclaimer.
+## 2. Redistributions in binary form must reproduce the above copyright
+##    notice, this list of conditions and the following disclaimer in the
+##    documentation and/or other materials provided with the distribution.
+## 3. Neither the name of the team nor the names of its contributors
+##    may be used to endorse or promote products derived from this software
+##    without specific prior written permission.
+## 
+## THIS SOFTWARE IS PROVIDED BY THE TEAM AND CONTRIBUTORS ``AS IS''
+## AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+## LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+## FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL
+## THE TEAM OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+## INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+## (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+## SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+## HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+## STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+## ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+## OF THE POSSIBILITY OF SUCH DAMAGE.
+
+### mhc2ol ends here

@@ -1,4 +1,101 @@
-* $B$O$8$a$K(B
+* $B$3$N%U%!%$%k$NFbMF(B
+
+$B$3$N%U%!%$%k$K$O!"0J2<$K<($9(B Windows $B8GM-$N>pJs$N>pJs$,4^$^$l$F$$(B
+$B$^$9!#(B
+
+ o mhc2ol $B$N;H$$J}(B
+ o Windows $B$G(B mhc2palm/palm2mhc $B$rF0$+$9<j=g(B
+
+* mhc2ol $B$N;H$$J}(B
+
+** $B$O$8$a$K(B
+
+mhc2ol $B$O!"(BMHC $B$N%9%1%8%e!<%k$r!"(BMicrosoft $B<R$N%9%1%8%e!<%k4IM}%=(B
+$B%U%H(B Outlook (*1)$B$KE>Aw$9$k%9%/%j%W%H$G$9!#(BOutlook $B$N(B OLE $B%3%s%H(B
+$B%m!<%k$rMxMQ$7$F$$$k$?$a!"(BWindows $B%^%7%s$G$7$+F0$-$^$;$s!#(B
+
+mhc2ol $B$rMxMQ$9$k$3$H$G!"(BOutlook $B7PM3$G!"(BWindowsCE $B%^%7%s$K%9%1(B
+$B%8%e!<%k$rE>Aw$G$-$k$h$&$K$J$j$^$9!#(B
+
+$B$^$?!"(Bcygwin $B$rMxMQ$7$?(B mhc2palm $B$G$OBP1~$G$-$F$$$J$+$C$?(B($B$H;W$&(B)
+USB $B@\B3$N(B Palm $B$K$b%9%1%8%e!<%k$rE>Aw$G$-$k$h$&$K$J$j$^$9!#$?$@(B
+$B$7!"(BOutlook $B$H(B Palm $B$GF14|$r$H$k%D!<%k$,JLESI,MW$G$9!#$3$N$h$&$J(B
+$B%D!<%k$H$7$F$O!"(BIntellisync for Palm (*2),PocketMirror (*3) $B$J$I(B
+$B$,$"$j$^$9!#(B
+
+ *1) MUA $B$N(B Outlook Express $B$G$O$"$j$^$;$s!#(B
+ *2) http://www.pumatech.co.jp/product/personal/workpad/is_wp_00.html
+ *3) http://www.chapura.com/html/products/pocketmirror/highlights.html
+
+
+** $BA0Ds>r7o(B
+
+$B0J2<$N%=%U%H%&%'%"$r$r;vA0$K%$%s%9%H!<%k$7$F;H$($k$h$&$K$7$F$*$/(B
+$BI,MW$,$"$j$^$9!#(B
+
+(1) ruby
+    http://www.ruby-lang.org/
+    ruby-1.6.4 $B0J9_$GF0:n3NG':Q$_$G$9!#(B
+
+(2) win32ole
+    http://homepage1.nifty.com/markey/ruby/win32ole/
+    win32ole-0.2.8 $B0J9_$GF0:n3NG':Q$_$G$9!#(B
+
+(3) Outlook
+    Outlook 2000$B$GF0:n3NG':Q$_$G$9!#(B
+
+(4) MHC $B$N(B ruby $B%i%$%V%i%j(B
+    MHC $B%Q%C%1!<%8$N(B ruby-ext/lib $B0J2<$KB8:_$9$k$b$N$G$9!#DL>o$N(B
+    $B<j=g$G(B MHC $B$r%$%s%9%H!<%k$9$k$3$H$G<+F0E*$K%$%s%9%H!<%k$5$l$^(B
+    $B$9!#(B
+
+
+** $B%$%s%9%H!<%k(B
+
+Configure.rb $B$H(B make.rb $B$r;H$C$?DL>o$N<j=g$G(B MHC $B$r%$%s%9%H!<%k$9(B
+$B$k$3$H$G!"(BWindows $B4D6-$G$O!"(Bmhc2ol $B$,<+F0E*$K%$%s%9%H!<%k$5$l$^$9!#(B
+
+
+** $B;H$$J}(B
+
+Unix $B7O$N%7%'%k$r;H$C$?<B9TNc$r2<5-$K<($7$^$9!#>\$7$/$O!"%3%^%s%I(B
+$B%i%$%s!&%X%k%W$r;2>H$7$F2<$5$$!#$3$N%X%k%W$O!"%*%W%7%g%s$J$7$G(B 
+mhc2ol $B$r5/F0$9$k$3$H$G8+$k$3$H$,$G$-$^$9!#(B
+
+*** Outlook $B$r=i4|2=$7$FE>Aw(B
+
+$ mhc2ol -i
+
+Outlook $B$N%G!<%?$rA4$F:o=|$7$?8e$G!"(BMHC $B$N%9%1%8%e!<%k$r(B Outlook
+$B$KE>Aw$7$^$9!#(B
+
+*** Outlook $B$r=i4|2=$7$J$$$GE>Aw(B
+
+$ mhc2ol -a
+
+Outlook $B$N%G!<%?$r:o=|$7$J$$$G!"(BMHC $B$N%9%1%8%e!<%k$r(B Outlook $B$KE>(B
+$BAw$7$^$9!#(B
+
+*** $BI,MW:G>.8B$N%9%1%8%e!<%k$rE>Aw(B
+
+$ mhc2ol -N
+
+$B%9%1%8%e!<%k$N%?%$%`%9%?%s%W$rHf3S$7$F!"I,MW:G>.8B$N%9%1%8%e!<%k(B
+$B$r(B Outlook $B$KE>Aw$7$^$9!#L5BL$JE>Aw$rHr$1$k$?$a$K!"A02s$NE>Aw8e$K!"(B
+$B?75,:n@.$5$l$?%9%1%8%e!<%k$d=$@5$5$l$?%9%1%8%e!<%k$@$1$rA*Br$7$F(B
+$BE>Aw$7$^$9!#K|$,0l!"F0:n$,JQ$K$J$C$?>l9g$O!">e5-(B `-i' $B%*%W%7%g%s(B
+$B$G!"(BOutlook $B$N%9%1%8%e!<%k$r=i4|2=$7$F$/$@$5$$!#(B
+
+
+** $B@)8B(B
+
+MHC $B$N%9%1%8%e!<%k$NA4$F$N7A<0$K$OBP1~$G$-$F$$$^$;$s!#(B 
+$BFC$K(B X-SC-Cond: $B$G$NJ#;($J;XDj$r$7$?>l9g$O%@%a$@$H;W$$$^$9!#(B
+
+
+* Windows $B$G(B mhc2palm/palm2mhc $B$rF0$+$9<j=g(B
+
+** $B$O$8$a$K(B
 
 $B$3$NJ8=q$O(B Windows 9X/NT/2000 $B$G(B mhc2palm $B$H(B palm2mhc $B$rF0$+$9<j(B
 $B=g$r$^$H$a$?$b$N$G$9!#(B
@@ -11,12 +108,12 @@ O $B%=!<%9$+$i%3%s%Q%$%k$9$kJ}K!(B
 $B$$?M$K$*4+$a$G$9!#0lJ}!"8e<T$O!"(BUNIX $B7O$N%D!<%k$NCN<1$,I,MW$G$"$j!"(B
 $B$d$d>e5i<T8~$1$G$9!#(B
 
-* $B%P%$%J%j%Q%C%1!<%8$rMxMQ$9$kJ}K!(B
+** $B%P%$%J%j%Q%C%1!<%8$rMxMQ$9$kJ}K!(B
 
 $B$3$3$G$O!"%3%s%Q%$%k:Q$_$N%P%$%J%j%Q%C%1!<%8$rMxMQ$7$F!"4D6-$r9=(B
 $BC[$9$kJ}K!$r@bL@$7$^$9!#(B
 
-** ruby $B$N%$%s%9%H!<%k(B
+*** ruby $B$N%$%s%9%H!<%k(B
 
 mhc2palm $B$H(B palm2mhc $B$O(B Ruby $B%9%/%j%W%H$J$N$G!"<B9T$9$k$K$O(B ruby 
 $B$N<B9T4D6-$,I,MW$G$9!#(B
@@ -38,7 +135,7 @@ Windows 2000/NT $B$N>l9g!'(B
 $B!V%3%s%H%m!<%k%Q%M%k!W"*!V%7%9%F%`!W"*!V4D6-!W$G!"4D6-JQ?t(B Path 
 $B$K(B C:\rbcw145 $B$rDI2C$7$^$9!#(B
 
-** cygwin1.dll $B$N%$%s%9%H!<%k(B
+*** cygwin1.dll $B$N%$%s%9%H!<%k(B
 
 $BA0=R$N(B ruby $B$r<B9T$9$k$K$O!"(Bcygwin1.dll $B$,I,MW$G$9!#2<5-$N>l=j$+(B
 $B$i(B cygwin-1.1.X.tar.gz $B$rF~<j$7$F!"$3$NCf$K4^$^$l$k(B cygwin1.dll 
@@ -53,18 +150,18 @@ http://sourceware.cygnus.com/cygwin/snapshots/
 $B%$%kL>$rJQ99$7$F!"(BC:\rbcw145 $B$K%3%T!<$7$^$9!#$?$@$7!"(Bbz2 $B7A<0$N%U%!(B
 $B%$%k$r?-D%$9$k%D!<%k$,I,MW$H$J$j$^$9!#(B
 
-** mhc_pilib.dll $B$N%$%s%9%H!<%k(B
+*** mhc_pilib.dll $B$N%$%s%9%H!<%k(B
 
 ruby $B$+$i(B Palm $B$K%"%/%;%9$9$k$?$a$N%i%$%V%i%j(B mhc_pilib.dll $B$r(B
 http://www.quickhack.net/mhc/arc/distfiles/
 $B$+$iF~<j$7$F!"(BC:\rbcw145\lib $B$K%3%T!<$7$^$9!#(B
 
-** ruby $B3HD%%i%$%V%i%j$N%$%s%9%H!<%k(B
+*** ruby $B3HD%%i%$%V%i%j$N%$%s%9%H!<%k(B
 
 MHC $B$N(B ruby-ext/lib $B$K4^$^$l$k(B ruby $B%9%/%j%W%H(B($B3HD%;R$,(B .rb)$B$r(B 
 C:\rbcw145\lib $B$K%3%T!<$7$^$9!#(B
 
-** mhc2palm, palm2mhc $B$N%$%s%9%H!<%k(B
+*** mhc2palm, palm2mhc $B$N%$%s%9%H!<%k(B
 
 MHC $B$K4^$^$l$k(B mhc2palm $B$H(B palm2mhc $B$r(B($B$D$$$G$K!"(Badb2mhc, gemcal,
 mhc-sync, today $B$b(B)$B$rE,Ev$J%G%#%l%/%H%j$K%3%T!<$7$^$9!#$3$3$G$O!"(B
@@ -72,7 +169,7 @@ C:\mhc $B$K%3%T!<$9$k$3$H$K$7$^$9!#(B
 
 $B0J>e$G!"(Bmhc2palm $B$H(B palm2mhc $B$,MxMQ$G$-$k$h$&$K$J$j$^$9!#(B
 
-** mhc2palm, palm2mhc $B$NMxMQJ}K!(B
+*** mhc2palm, palm2mhc $B$NMxMQJ}K!(B
 
 mhc2palm, palm2mhc $B$O!"(BDOS $B%W%m%s%W%H!"$^$?$O!"%3%^%s%I%W%m%s%W%H(B
 $B$+$i<B9T$7$^$9!#<!$NE@$KCm0U$7$F$/$@$5$$!#(B
@@ -94,12 +191,12 @@ Palm $B$N%/%l%$%I%k$,%7%j%"%k%]!<%H$N(B1$BHV(B(com1)$B$K@\B3$5$l$F$$$k>l9g
 
 $ ruby C:\mhc\mhc2palm -i -d com1
 
-* $B%=!<%9$+$i%3%s%Q%$%k$9$kJ}K!(B
+** $B%=!<%9$+$i%3%s%Q%$%k$9$kJ}K!(B
 
 $B$3$3$G$O!"I,MW$J%D!<%kN`$r%=!<%9$+$i%3%s%Q%$%k$9$kJ}K!$r@bL@$7$^(B
 $B$9!#(BUnix $B7O$N%D!<%k$NCN<1$,I,MW$H$J$j$^$9!#(B
 
-** Cygwin $B$N%$%s%9%H!<%k(B
+*** Cygwin $B$N%$%s%9%H!<%k(B
 
 $B$^$:!"3F<o%D!<%k$r%3%s%Q%$%k$9$k$?$a$K!"(BCygwin $B$r%$%s%9%H!<%k$7$^(B
 $B$9!#$3$l0J9_!"(BCygwin 1.1.X $B$,%$%s%9%H!<%k$7$F$"$k$3$H$rA0Ds$H$7$F(B
@@ -117,7 +214,7 @@ http://www.jaist.ac.jp/~fujieda/cygwin/
 $B0J2<!"(BCygwin $B$N(B sh.exe $B$^$?$O(B bash.exe $B$r%7%'%k$H$7$FMxMQ$9$k$b$N(B
 $B$H$7$F@bL@$7$^$9!#(B
 
-** ruby $B$N%$%s%9%H!<%k(B
+*** ruby $B$N%$%s%9%H!<%k(B
 
 mhc2palm/palm2mhc $B$O(B Ruby $B%9%/%j%W%H$J$N$G!"<B9T$N$?$a$K$O(B ruby 
 $B$N<B9T4D6-$,I,MW$G$9!#$3$3$G$O!"8e=R$9$k(B ruby $B3HD%%i%$%V%i%j$N%$(B
@@ -136,7 +233,7 @@ $ make
 $ make test (=> test succeeded)
 $ make install
 
-** pilot-link $B$N%$%s%9%H!<%k(B
+*** pilot-link $B$N%$%s%9%H!<%k(B
 
 pilot-link $B$K4^$^$l$k(B libpisock $B$,!"(BPalm $B$HO"7H$9$k$?$a$KI,MW$H$J(B
 $B$j$^$9!#(B
@@ -162,7 +259,7 @@ pilot-link.0.9.3.cygwin20.1b.diff $B$r;H$C$F$/$@$5$$!#$3$N%Q%C%A$O!"(B
 http://www.quickhack.net/mhc/arc/distfiles/
 $B$+$iF~<j$G$-$^$9!#(B
 
-** ruby $B3HD%%i%$%V%i%j$N%$%s%9%H!<%k(B
+*** ruby $B3HD%%i%$%V%i%j$N%$%s%9%H!<%k(B
 
 ruby $B$+$i(B libpisock $B$r8F$S=P$9$?$a$N3HD%%i%$%V%i%j$r%$%s%9%H!<%k$7$^(B
 $B$9!#$3$N%i%$%V%i%j$O!"(BMHC $B$K4^$^$l$F$$$^$9!#(B
@@ -184,7 +281,7 @@ $ ruby ./extconf.rb
 $ make
 $ make install
 
-** mhc2palm, palm2mhc $B$N%$%s%9%H!<%k(B
+*** mhc2palm, palm2mhc $B$N%$%s%9%H!<%k(B
 
 MHC $B$K4^$^$l$k(B mhc2palm $B$H(B palm2mhc $B$r(B ($B$D$$$G$K!"(Badb2mhc, gemcal,
 mhc-sync, today $B$b(B)$B%Q%9$,DL$C$?$H$3$m$K%3%T!<$7$^$9!#Nc$($P!"(B
@@ -194,7 +291,7 @@ $ cp adb2mhc gemcal mhc-sync mhc2palm palm2mhc today /usr/local/bin
 
 $B0J>e$G!"(Bmhc2palm $B$H(B palm2mhc $B$,MxMQ$G$-$k$h$&$K$J$j$^$9!#(B
 
-** mhc2palm, palm2mhc $B$NMxMQJ}K!(B
+*** mhc2palm, palm2mhc $B$NMxMQJ}K!(B
 
 mhc2palm, palm2mhc $B$O!"(Bsh.exe $B$d(B bash.exe $B$J$I$N%7%'%k$+$i<B9T$7(B
 $B$^$9!#<!$NE@$KCm0U$7$F$/$@$5$$!#(B

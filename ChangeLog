@@ -1,3 +1,15 @@
+2001-09-30  MIYOSHI Masanori  <miyoshi@boreas.dti.ne.jp>
+
+	* 00readme.w32.jis: Add information on mhc2ol.
+
+	* 00usage.jis: Ditto.
+
+	* configure.rb: Add an entry of mhc2ol.
+
+	* make.rb.in: Ditto.
+
+	* mhc2ol.in: New file.
+
 2001-09-13  Yuuichi Teranishi  <teranisi@quickhack.net>
 
 	* emacs/mhc.el (toplevel): Require 'cl at compile time;

@@ -4,7 +4,7 @@
 ################################################################
 
 Created: 2000/06/26
-Revised: $Date: 2001/02/09 09:51:21 $
+Revised: $Date: 2001/09/30 01:43:04 $
 
 将来ちゃんとしたドキュメントを用意する予定ですが、
 それまでは、このファイルと emacs/00usage.jis 及び、
@@ -247,6 +247,42 @@ adb2mhc は、HP200LX のスケジュールソフト用データ (adb ファイル
   % adb2mhc --mhc-dir /tmp/schedule appt.adb
 
 のようにすると、/tmp/schedule 以下に MHC 形式のファイルが多数生成されます。
+
+** mhc2ol -- MHC のデータを Outlook に転送する
+
+mhc2ol は、MHC のスケジュールを、Microsoft 社のスケジュール管理ソフト 
+Outlook に転送するスクリプトです。Outlook の OLE コントロールを利用し
+ているため、Windows マシンでしか動きません。
+
+詳しくは、00readme.w32.jis を参照してください。
+
+usage: mhc2ol [-a | -i | -N] [-n] [-r dir] [-c category] [YYYYMMDD-yyyymmdd]
+
+以下のようなオプションがあります。
+
+    -v        verbose mode. 実行時に色々な表示を行います。
+
+    -a        Outlook に MHC のデータを追加 (Append) します。
+	      つまり全ての Outlook 上のデータは保存されます。
+
+    -i        Outlook に MHC のデータを導入 (Install) します。
+	      つまり全ての Outlook 上のデータは消去されます。
+
+    -N        スケジュールのタイムスタンプを比較して、必要最小限
+              のスケジュールを Outlook に転送します。通常はこの
+              オプションを利用します。
+
+    -n        実行の過程を示すだけで、実際の転送は行いません。
+              mhc2ol が何をするのかを見るのに有効でしょう。
+
+    -c        Outlook に転送する MHC スケジュールのカテゴリを、
+              Ruby の正規表現で指定します。
+
+    -r dir    MHC のデータを保存しているディレクトリを指定します。
+              デフォルトは ~/Mail/schedule です。
+
+    YYYYMMDD-yyyymmdd   MHC から転送するデータの範囲を指定します。
+                        デフォルトは、3ヶ月前 〜 3ヶ月後です。
 
 **  experimental/gp2mhc -- Giga Pocket to MHC の使い方
 

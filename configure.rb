@@ -4,7 +4,7 @@
 ## Author:  MIYOSHI Masanori <miyoshi@quickhack.net>
 ##          Yoshinari Nomura <nom@quickhack.net>
 ## Created: 2000/7/12
-## Revised: $Date: 2001/05/10 14:02:13 $
+## Revised: $Date: 2001/09/30 01:43:04 $
 
 $LOAD_PATH .unshift('.')
 require 'mhc-make'
@@ -99,6 +99,10 @@ infile_list = [
   'ruby-ext/lib/mhc-gtk.rb.in:0644', 
   'ruby-ext/extconf.rb.in:0755'
 ]
+
+if /cygwin|mingw32/ =~ RUBY_PLATFORM
+  infile_list << 'mhc2ol.in:0755'
+end
 
 file = File .open('configure.log', 'w')
 conf .each_macro{|key, val|

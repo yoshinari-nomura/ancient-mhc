@@ -13,7 +13,7 @@ $LOAD_PATH .unshift('@@MHC_TOPDIR@@')
 require 'mhc-make'
 include MhcMake
 
-INSTALL_FILES = [
+install_files = [
   'adb2mhc:0755:@@MHC_BINDIR@@',
   'gemcal:0755:@@MHC_BINDIR@@', 
   'mhc-sync:0755:@@MHC_BINDIR@@', 
@@ -34,6 +34,12 @@ INSTALL_FILES = [
   'xpm/save.xpm:0644:@@MHC_XPM_PATH@@',
   'xpm/today.xpm:0644:@@MHC_XPM_PATH@@'
 ]
+
+if /cygwin|mingw32/ =~ RUBY_PLATFORM
+  install_files << 'mhc2ol:0755:@@MHC_BINDIR@@'
+end
+
+INSTALL_FILES = install_files
 
 doit()
 
