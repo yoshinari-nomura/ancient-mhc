@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1999/04/13
-;; Revised: $Date: 2004/03/31 10:43:47 $
+;; Revised: $Date: 2004/04/01 05:51:42 $
 ;;
 
 ;;;
@@ -104,7 +104,7 @@ You can specify following symbols as a list.
  		   "\\([０-９0-9]+\\)日?\\(間\\)?"
 	      "\\)?")
      mhc-guess/make-date-from-mmdd 2 3 8 9 10)
-    
+
     ;; USA style date format
     (,(concat "\\(Jan\\(uary\\)?\\|Feb\\(ruary\\)?\\|Mar\\(ch\\)?\\|"
 	      "Apr\\(il\\)?\\|May\\|June?\\|July?\\|Aug\\(ust\\)?\\|"
@@ -403,15 +403,16 @@ You can specify following symbols as a list.
 	  '(("Jan" . "1") ("Feb" . "2") ("Mar" . "3") ("Apr" . "4")
 	    ("May" . "5") ("Jun" . "6") ("Jul" . "7") ("Aug" . "8")
 	    ("Sep" . "9") ("Oct" . "10") ("Nov" . "11") ("Dec" . "12")))
-	 (mm-str (cdr (assoc (substring month-str 0 3) month-alist)))
+	 (mm-str (cdr (assoc (capitalize (substring month-str 0 3))
+			     month-alist)))
 	 (yy-length (length yy-str)))
     (cond ((= yy-length 4)		; "yyyy"
 	   (mhc-guess/make-date-from-yyyymmdd now yy-str mm-str dd-str))
-	  ((= yy-length 3)		; "'yy"
+	  ((or (= yy-length 3) (= yy-length 2)) ; "'yy" or "yy"
 	   (mhc-guess/make-date-from-yyyymmdd
 	    now
 	    (concat (substring (format-time-string "%Y") 0 2)
-		    (substring yy-str 1 3))
+		    (substring yy-str -2))
 	    mm-str dd-str))
 	  (t
 	   (mhc-guess/make-date-from-mmdd now mm-str dd-str)))))
@@ -487,7 +488,7 @@ You can specify following symbols as a list.
 	       (t
 		nil)))
        (cdr (assoc-ignore-case dow dow-alist))))))
-		
+
 ;;
 ;; make time from string.
 ;;
