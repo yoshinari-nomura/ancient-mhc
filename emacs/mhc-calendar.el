@@ -5,14 +5,80 @@
 ;;          MIYOSHI Masanori <miyoshi@ask.ne.jp>
 ;;
 ;; Created: 05/12/2000
-;; Reviesd: $Date: 2000/07/05 09:58:22 $
+;; Reviesd: $Date: 2000/07/24 03:46:33 $
+
+;;; Configration Variables:
+
+(defcustom mhc-calendar-separator ?|
+  "*Character of the separator between Summary and Vertical calendar."
+  :group 'mhc
+  :type 'character)
+
+(defcustom mhc-calendar-day-strings ["Su" "Mo" "Tu" "We" "Th" "Fr" "Sa"]
+  "*Vector of \"day of week\" for 3-month calendar header.
+This vector must have seven elements
+and each element must have \"two columns strings\"."
+  :group 'mhc
+  :type '(vector string))
+
+(defcustom mhc-calendar-header-function 'mhc-calendar-make-header
+  "*Function of \"make calendar header\" for 3-month calendar.
+Assigned function must have one option \"date\"
+and must return string like \"   December 2000\"."
+  :group 'mhc
+  :type 'function)
+
+(defcustom mhc-calendar-mode-hook nil
+  "*Hook called in mhc-calendar-mode."
+  :group 'mhc
+  :type 'hook)
+
+(defcustom mhc-calendar-create-buffer-hook nil
+  "*Hook called in mhc-calendar-create-buffer."
+  :group 'mhc
+  :type 'hook)
+
+(defcustom mhc-calendar-start-column 4
+  "*Size of left margin."
+  :group 'mhc
+  :type 'integer)
+
+(defcustom mhc-calendar-next-offset 24
+  "*Offset of next month start column (greater or equal 23)."
+  :group 'mhc
+  :type 'integer)
+
+(defcustom mhc-calendar-height (if (and (featurep 'xemacs) window-system) 12 9)
+  "*Offset of next month start column (greater or equal 9)."
+  :group 'mhc
+  :type 'integer)
+
+(defcustom mhc-calendar-view-summary nil
+  "*View day's summary if *non-nil*."
+  :group 'mhc
+  :type 'boolean)
+
+(defcustom mhc-calendar-link-hnf nil
+  "*Support HNF(Hyper Nikki File) mode if *non-nil*."
+  :group 'mhc
+  :type 'boolean)
+
+(defcustom mhc-calendar-use-mouse-highlight t
+  "*Highlight mouse pointer."
+  :group 'mhc
+  :type 'boolean)
+
+(defcustom mhc-calendar-view-file-hook nil
+  "*Hook called in mhc-calendar-view-file."
+  :group 'mhc
+  :type 'hook)
 
 ;; internal variables
 (defvar mhc-calendar/buffer "*mhc-calendar*")
 (defvar mhc-calendar-date nil)
 (defvar mhc-calendar-view-date nil)
 (defvar mhc-calendar-call-buffer nil)
-(defvar mhc-calendar-separator nil)
+(defvar mhc-calendar-date-separator nil)
 (defvar mhc-calendar-mode-map nil)
 (defvar mhc-calendar-mode-menu-spec nil)
 
@@ -163,6 +229,101 @@
 	   ["Quit" mhc-calendar-quit t]
 	   ["Kill" mhc-calendar-exit t]
 	   ["Help" describe-mode t]))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; make rectangle like calendar.el
+
+(defvar mhc-calendar/week-header nil)
+(defvar mhc-calendar/separator-str nil)
+
+(defun mhc-calendar-toggle-insert-rectangle ()
+  (interactive)
+  (setq mhc-insert-calendar (not mhc-insert-calendar))
+  (when (mhc-summary-buffer-p)
+    (mhc-rescan-month mhc-default-hide-private-schedules)))
+
+(defun mhc-calendar-setup ()
+  (setq mhc-calendar/week-header nil)
+  (setq mhc-calendar/separator-str (char-to-string mhc-calendar-separator))
+  (mhc-face-put mhc-calendar/separator-str 'mhc-summary-face-separator)
+  (let ((i 0) day)
+    (while (< i 7)
+      (setq day (aref mhc-calendar-day-strings i))
+      (cond
+       ((= i 0)
+	(mhc-face-put day 'mhc-calendar-face-sunday))
+       ((= i 6)
+	(mhc-face-put day 'mhc-calendar-face-saturday))
+       (t (mhc-face-put day 'mhc-calendar-face-default)))
+      (setq mhc-calendar/week-header
+	    (concat mhc-calendar/week-header
+		    (if mhc-calendar/week-header " ") day))
+      (setq i (1+ i)))))
+
+(defun mhc-calendar-insert-rectangle-at (date col)
+  (save-excursion
+    (put-text-property (point-min) (point-max) 'rear-nonsticky t)
+    (goto-char (point-min))
+    (mhc-misc-move-to-column col)
+    (mhc-misc-insert-rectangle
+     (nconc (mhc-calendar/make-rectangle (mhc-date-mm-- date)
+					 mhc-calendar/separator-str)
+	    (list (concat mhc-calendar/separator-str " "))
+	    (mhc-calendar/make-rectangle date mhc-calendar/separator-str)
+	    (list (concat mhc-calendar/separator-str " "))
+	    (mhc-calendar/make-rectangle (mhc-date-mm++ date)
+					 mhc-calendar/separator-str)))))
+
+(defun mhc-calendar-make-header (date)
+  (mhc-date-format date "   %s %04d"
+		   (mhc-date-digit-to-mm-string mm t) yy))
+
+(defun mhc-calendar/make-rectangle (&optional date separator)
+  (let* ((today (mhc-date-now))
+	 (days (mhc-db-scan-month (mhc-date-yy (or date today))
+				  (mhc-date-mm (or date today)) t))
+	 (separator (if separator separator mhc-calendar/separator-str))
+	 (month (list (concat separator " " mhc-calendar/week-header)
+		      (concat separator " "
+			      (funcall mhc-calendar-header-function
+				       (or date today)))))
+	 (i (mhc-day-day-of-week (car days)))
+	 week color)
+    (while (> i 0)
+      (setq week (cons "  " week)
+	    i (1- i)))
+    (while days
+      (setq color
+	    (cond
+	     ((= 0 (mhc-day-day-of-week (car days)))
+	      'mhc-calendar-face-sunday)
+	     ((mhc-day-holiday (car days)) 
+	      (mhc-face-category-to-face "Holiday"))
+	     ((= 6 (mhc-day-day-of-week (car days))) 
+	      'mhc-calendar-face-saturday)
+	     (t 'mhc-calendar-face-default)))
+      (if (mhc-date= today (mhc-day-date (car days)))
+	  (setq color (mhc-face-get-today-face color)))
+      (if (mhc-day-busy-p (car days))
+	  (setq color (mhc-face-get-busy-face color)))
+      (setq week (cons (format "%2d" (mhc-day-day-of-month (car days))) week))
+      (if color
+	  (mhc-face-put (car week) color))
+      (if (= 6 (mhc-day-day-of-week (car days)))
+	  (setq month (cons (mapconcat
+			     (function identity)
+			     (cons separator (nreverse week))
+			     " ")
+			    month)
+		week nil))
+      (setq days (cdr days)))
+    (if week
+	(setq month (cons (mapconcat
+			   (function identity)
+			   (cons separator (nreverse week))
+			   " ")
+			  month)))
+    (nreverse month)))
 
 ;; function
 (defun mhc-calendar-mode ()
@@ -325,21 +486,22 @@ The keys that are defined for mhc-calendar-mode are:
   (let ((buffer-read-only nil)
 	(caldate (mhc-date-mm+ date -1))
 	(col mhc-calendar-start-column)
-	(prefix " +|") (spcchar (string-to-char " ")) (i 3))
+	(prefix " +|")
+	(i 3))
     (set-text-properties (point-min) (point-max) nil)
     (erase-buffer)
     (message "mhc-calendar create ...")
     (while (> i 0)
       (goto-char (point-min))
       (mhc-misc-move-to-column col)
-      (mhc-misc-insert-rectangle (mhc-cal-make-rectangle caldate))
+      (mhc-misc-insert-rectangle (mhc-calendar/make-rectangle caldate "|"))
       (setq caldate (mhc-date-mm+ caldate 1))
       (setq col (+ col mhc-calendar-next-offset))
       (setq i (1- i)))
     (goto-char (point-min))
     (while (re-search-forward prefix nil t)
       (delete-region (match-end 0) (match-beginning 0))
-      (insert (make-string (- (match-end 0) (match-beginning 0)) spcchar)))
+      (insert (make-string (- (match-end 0) (match-beginning 0)) ?\ )))
     (setq mhc-calendar-date date)
     (mhc-calendar/put-property-date)
     (and mhc-calendar-link-hnf (mhc-calendar/hnf-mark-diary-entries))
@@ -429,7 +591,7 @@ The keys that are defined for mhc-calendar-mode are:
 
 (defun mhc-calendar-get-day-insert (&optional arg)
   (interactive "P")
-  (let ((separator mhc-calendar-separator)
+  (let ((separator mhc-calendar-date-separator)
 	(callbuf mhc-calendar-call-buffer)
 	str bufalist)
     (if (and (stringp separator)
@@ -469,8 +631,8 @@ The keys that are defined for mhc-calendar-mode are:
     (if (stringp separator)
 	(if (string= separator "n")
 	    (setq separator ""))
-      (if (stringp mhc-calendar-separator)
-	  (setq separator mhc-calendar-separator)
+      (if (stringp mhc-calendar-date-separator)
+	  (setq separator mhc-calendar-date-separator)
 	(setq separator "")))
     (if (string= separator "\\")
 	(mhc-date-format date
@@ -528,7 +690,7 @@ The keys that are defined for mhc-calendar-mode are:
   (interactive)
   (let ((win (get-buffer-window mhc-calendar/buffer))
 	(buf (get-buffer mhc-calendar/buffer)))
-    (setq mhc-calendar-separator nil)
+    (setq mhc-calendar-date-separator nil)
     (setq mhc-calendar-call-buffer nil)
     (if (null win)
 	()
@@ -714,7 +876,7 @@ The keys that are defined for mhc-calendar-mode are:
 (defun mhc-minibuf-insert-calendar ()
   (interactive)
   (let ((yy 1) (mm 1) (dd 1) date pos)
-    (setq mhc-calendar-separator "/")
+    (setq mhc-calendar-date-separator "/")
     (setq mhc-calendar-call-buffer (current-buffer))
     (save-excursion
       (setq pos (point))
@@ -744,8 +906,8 @@ The keys that are defined for mhc-calendar-mode are:
       (goto-char (point-min))
       (if (and (re-search-forward "^$" nil t)
 	       (< pos (point)))
-	  (setq mhc-calendar-separator "")
-	(setq mhc-calendar-separator nil))
+	  (setq mhc-calendar-date-separator "")
+	(setq mhc-calendar-date-separator nil))
       (goto-char pos)
       (skip-chars-backward "0-9")
       (cond
@@ -821,7 +983,7 @@ The keys that are defined for mhc-calendar-mode are:
   (let ((cdate (mhc-date-mm-first (mhc-date-mm+ mhc-calendar-date -1)))
 	(edate (mhc-date-mm-last (mhc-date-mm+ mhc-calendar-date 1)))
 	(flst (mhc-calendar/hnf-file-list mhc-calendar-date))
-	(mark "'") (spcchar (string-to-char " ")))
+	(mark "'"))
     (mhc-face-put mark 'mhc-calendar-hnf-face-mark)
     (while (<= cdate edate)
       (if (member (mhc-date-format cdate "d%04d%02d%02d.hnf" yy mm dd) flst)
@@ -829,7 +991,7 @@ The keys that are defined for mhc-calendar-mode are:
 	    (goto-char (+ 2 (mhc-calendar/tp-any (point-min) (point-max)
 						 'mhc-calendar/date-prop cdate)))
 	    (insert mark)
-	    (if (eq (char-after (point)) spcchar)
+	    (if (eq (char-after (point)) ?\ )
 		(delete-char 1))))
       (setq cdate (1+ cdate)))))
 
@@ -928,6 +1090,8 @@ The keys that are defined for mhc-calendar-mode are:
     (featurep 'mhc-wl))
    ((eq mhc-mailer-package 'gnus)
     (featurep 'mhc-gnus))
+   ((eq mhc-mailer-package 'cmail)
+    (featurep 'mhc-cmail))
    (t nil)))
 
 ;;; Pseudo MUA Backend Methods:

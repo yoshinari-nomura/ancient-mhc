@@ -86,51 +86,6 @@
 		(const :tag "Lazy check" 0)
 		(const :tag "No use" nil)))
 
-(defcustom mhc-calendar-mode-hook nil
-  "*Hook called in mhc-calendar-mode."
-  :group 'mhc
-  :type 'hook)
-
-(defcustom mhc-calendar-create-buffer-hook nil
-  "*Hook called in mhc-calendar-create-buffer."
-  :group 'mhc
-  :type 'hook)
-
-(defcustom mhc-calendar-start-column 4
-  "*Size of left margin."
-  :group 'mhc
-  :type 'integer)
-
-(defcustom mhc-calendar-next-offset 24
-  "*Offset of next month start column (greater or equal 23)."
-  :group 'mhc
-  :type 'integer)
-
-(defcustom mhc-calendar-height (if (and (featurep 'xemacs) window-system) 12 9)
-  "*Offset of next month start column (greater or equal 9)."
-  :group 'mhc
-  :type 'integer)
-
-(defcustom mhc-calendar-view-summary nil
-  "*View day's summary if *non-nil*."
-  :group 'mhc
-  :type 'boolean)
-
-(defcustom mhc-calendar-link-hnf nil
-  "*Support HNF(Hyper Nikki File) mode if *non-nil*."
-  :group 'mhc
-  :type 'boolean)
-
-(defcustom mhc-calendar-use-mouse-highlight t
-  "*Highlight mouse pointer."
-  :group 'mhc
-  :type 'boolean)
-
-(defcustom mhc-calendar-view-file-hook nil
-  "*Hook called in mhc-calendar-view-file."
-  :group 'mhc
-  :type 'hook)
-
 (provide 'mhc-vars)
 
 ;;; Copyright Notice:

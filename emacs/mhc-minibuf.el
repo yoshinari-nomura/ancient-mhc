@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1999/12/10
-;; Revised: $Date: 2000/06/21 01:25:28 $
+;; Revised: $Date: 2000/07/24 03:46:33 $
 
 ;;;
 ;;; Commentay:
@@ -254,7 +254,7 @@
 	  (setq error t)))
 	(setq str-list (cdr str-list)))
       (if error (beep)))
-    (setq mhc-calendar-separator nil)
+    (setq mhc-calendar-date-separator nil)
     (setq mhc-calendar-call-buffer nil)
     (mhc-date-sort ret)))
 

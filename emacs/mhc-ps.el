@@ -3,7 +3,7 @@
 ;; Author:  TSUCHIYA Masatoshi <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 ;;          Hideyuki SHIRAI <shirai@quickhack.net>
 ;; Created: 2000/06/18
-;; Revised: $Date: 2000/07/19 00:00:06 $
+;; Revised: $Date: 2000/07/24 03:46:33 $
 
 
 ;;; Commentary:
@@ -867,20 +867,29 @@ showpage
 	   process mhc-ps-coding-system mhc-ps-coding-system)
 	  (set-process-sentinel process 'mhc-ps/process-sentinel)
 	  (setq mhc-ps/process-file-alist
-		(cons (cons process (expand-file-name file)) mhc-ps/process-file-alist))
+		(cons (cons process (expand-file-name file))
+		      mhc-ps/process-file-alist))
 	  (message "PostScript creating ... done.")))
        ((eq command 'save)
 	(message "PostScript saving ... (%s) done." file))
        ((eq command 'buffer)
 	(pop-to-buffer (get-buffer-create buffer))
-	(cond
-	 ((boundp 'buffer-file-coding-system)
-	  (setq buffer-file-coding-system mhc-ps-coding-system))
-	 ((boundp 'file-coding-system)
-	  (setq file-coding-system mhc-ps-coding-system)))
-	(save-excursion
-	  (insert contents))
-	(message "PostScript inserting ... (%s) done." buffer))))))
+	(kill-new contents)
+	(let ((msg "Insert PostScript data ? (y or n) ")
+	      (char nil))
+	  (message msg)
+	  (while (null char)
+	    (setq char (read-char-exclusive))
+	    (if (or (eq ?y char) (eq ?\  char)
+		    (eq ?n char) (eq ?\177 char))
+		()
+	      (setq char nil)
+	      (message (concat "Please answer y or n. " msg))))
+	  (if (or (eq ?y char) (eq ?\  char))
+	      (save-excursion
+		(insert contents)
+		(message "PostScript insert to \"%s\"." buffer))
+	    (message "PostScript data to the latest kill in the kill ring."))))))))
 
 
 (defun mhc-ps/process-sentinel (process event)

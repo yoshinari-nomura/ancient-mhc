@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1994/07/04
-;; Revised: $Date: 2000/07/21 09:12:05 $
+;; Revised: $Date: 2000/07/24 03:46:33 $
 
 ;;;
 ;;; Commentay:
@@ -70,7 +70,7 @@
 	["Delete"       mhc-delete (mhc-summary-buffer-p)]
 	["Insert Schedule" mhc-insert-schedule (not buffer-read-only)]
 	["3 months Mini calendar" mhc-calendar t]
-	["Toggle 3 months calendar" mhc-cal-toggle-insert-rectangle
+	["Toggle 3 months calendar" mhc-calendar-toggle-insert-rectangle
 	 (mhc-summary-buffer-p)]
 	"----"
 	("PostScript"
@@ -94,7 +94,7 @@
     (define-key map "\C-cc" 'mhc-set-default-category)
     (define-key map "\C-ci" 'mhc-insert-schedule)
     (define-key map "\C-c?" 'mhc-calendar)
-    (define-key map "\C-ct" 'mhc-cal-toggle-insert-rectangle)
+    (define-key map "\C-ct" 'mhc-calendar-toggle-insert-rectangle)
     map)
   "Keymap for `mhc-mode'.")
 
@@ -271,9 +271,6 @@ If HIDE-PRIVATE, private schedules are suppressed."
 
 (defvar mhc-face-week-color-paint-thick nil)
 
-(defvar mhc-use-week-separator 6
-  "*if number 0 .. 6, insert separator in summary buffer.")
-
 (defvar mhc-summary-buffer-current-date-month nil
   "Indicate summary buffer's month. It is also used by mhc-summary-buffer-p")
 (make-variable-buffer-local 'mhc-summary-buffer-current-date-month)
@@ -295,7 +292,7 @@ If HIDE-PRIVATE, private schedules are suppressed."
 		 from)
 	       mailer cat inv-cat secret))
 	  (if mhc-insert-calendar
-	      (mhc-cal-insert-rectangle-at date (- (window-width) 24))) ;; xxx
+	      (mhc-calendar-insert-rectangle-at date (- (window-width) 24))) ;; xxx
 	  (mhc-summary-mode-setup date mailer)
 	  (mhc-mode 1)
 	  (setq inhibit-read-only nil)
@@ -551,7 +548,7 @@ C-c ?    mhc-draft-insert-calendar
   (interactive "P")
   (if (or no-confirm (y-or-n-p "Kill draft buffer ?"))
       (progn
-	(setq mhc-calendar-separator nil)
+	(setq mhc-calendar-date-separator nil)
 	(setq mhc-calendar-call-buffer nil)
 	(kill-buffer (current-buffer))
 	(mhc-window-pop))))
@@ -563,7 +560,7 @@ C-c ?    mhc-draft-insert-calendar
   (interactive)
   (let ((record 
 	 (mhc-parse-buffer (mhc-record-new mhc-draft-buffer-file-name))))
-    (setq mhc-calendar-separator nil)
+    (setq mhc-calendar-date-separator nil)
     (setq mhc-calendar-call-buffer nil)
     (mhc-header-delete-separator)
     (if (mhc-db-add-record-from-buffer record (current-buffer))
@@ -676,78 +673,6 @@ C-c ?    mhc-draft-insert-calendar
 (defun mhc-current-date-month ()
   mhc-summary-buffer-current-date-month)
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; make rectangle like calendar.el
-
-(defun mhc-cal-toggle-insert-rectangle ()
-  (interactive)
-  (setq mhc-insert-calendar (not mhc-insert-calendar))
-  (when (mhc-summary-buffer-p)
-    (mhc-rescan-month mhc-default-hide-private-schedules)))
-
-(defconst mhc-cal-week-header "| Su Mo Tu We Th Fr Sa")
-
-(defun mhc-cal-insert-rectangle-at (date col)
-  (save-excursion
-    (put-text-property (point-min) (point-max) 'rear-nonsticky t)
-    (goto-char (point-min))
-    (mhc-misc-move-to-column col)
-    (mhc-misc-insert-rectangle
-     (nconc (mhc-cal-make-rectangle (mhc-date-mm-- date))
-	    (list "| ")
-	    (mhc-cal-make-rectangle date)
-	    (list "| ")
-	    (mhc-cal-make-rectangle (mhc-date-mm++ date))))))
-
-(defun mhc-cal-make-rectangle (&optional date)
-  (let* ((today (mhc-date-now))
-	 (days (mhc-db-scan-month (mhc-date-yy (or date today))
-				  (mhc-date-mm (or date today)) t))
-	 (month (list mhc-cal-week-header
-		      (mhc-date-format (or date today)
-				       "|    %s %04d"
-				       (mhc-date-digit-to-mm-string mm t)
-				       yy)))
-	 (i (mhc-day-day-of-week (car days)))
-	 week color)
-    (while (> i 0)
-      (setq week (cons "  " week)
-	    i (1- i)))
-    (while days
-      (setq color
-	    (cond
-	     ((= 0 (mhc-day-day-of-week (car days)))
-	      'mhc-calendar-face-sunday)
-	     ((mhc-day-holiday (car days)) 
-	      (mhc-face-category-to-face "Holiday"))
-	     ((= 6 (mhc-day-day-of-week (car days))) 
-	      'mhc-calendar-face-saturday)
-	     (t 'mhc-calendar-face-default)))
-      (if (mhc-date= today (mhc-day-date (car days)))
-	  (setq color (mhc-face-get-today-face color)))
-      (if (mhc-day-busy-p (car days))
-	  (setq color (mhc-face-get-busy-face color)))
-      (setq week (cons (format "%2d" (mhc-day-day-of-month (car days)))
-		       week))
-      (if color
-	  (mhc-face-put (car week) color))
-      (if (= 6 (mhc-day-day-of-week (car days)))
-	  (setq month (cons (mapconcat
-			     (function identity)
-			     (cons "|" (nreverse week))
-			     " ")
-			    month)
-		week nil))
-      (setq days (cdr days)))
-    (if week
-	(setq month (cons (mapconcat
-			   (function identity)
-			   (cons "|" (nreverse week))
-			   " ")
-			  month)))
-    (nreverse month)))
-
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; misc.
 
@@ -848,10 +773,7 @@ C-c ?    mhc-draft-insert-calendar
 	      (cons (cons 'mhc-mode mhc-mode-map)
 		    minor-mode-map-alist)))
     (mhc-face-setup)
-    (put-text-property 2 4 'face 'mhc-calendar-face-sunday  
-		       mhc-cal-week-header)
-    (put-text-property 20 22 'face 
-		       'mhc-calendar-face-saturday mhc-cal-week-header)
+    (mhc-calendar-setup)
     (mhc-file-setup)
     (and (mhc-use-icon-p) (mhc-icon-setup))
     (and mhc-calendar-link-hnf (mhc-calendar-hnf-face-setup))

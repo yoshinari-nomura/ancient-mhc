@@ -60,6 +60,16 @@
 
 ;;; Global Variables:
 
+(defcustom mhc-use-week-separator 6
+  "*if number 0 .. 6, insert separator in summary buffer."
+  :group 'mhc
+  :type 'integer)
+
+(defcustom mhc-summary-separator ?-
+  "*Character of the separator as 'mhc-use-week-separator'."
+  :group 'mhc
+  :type 'character)
+
 (defcustom mhc-summary-string-conflict "[C]"
   "*String which indicates conflicts in summary buffer."
   :group 'mhc
@@ -310,7 +320,7 @@ PROP-VALUE is the property value correspond to PROP-TYPE.
 
 ;;; Codes:
 (defun mhc-summary/insert-separator ()
-  (let ((hr (make-string (- (window-width) 24) ?-)))
+  (let ((hr (make-string (- (window-width) 24) mhc-summary-separator)))
     (mhc-face-put hr 'mhc-summary-face-separator)
     (insert hr "\n")))
 

@@ -1,3 +1,32 @@
+2000-07-24  Hideyuki SHIRAI  <shirai@quickhack.net>
+
+	* emacs/mhc.el (mhc-cal-*):
+	Functions and variables move to mhc-calendar.el and rename 'mhc-calender-*'.
+	(mhc-setup): Execute (mhc-calender-setup).
+	(mhc-draft-kill): Rename mhc-calendar-separator to mhc-calendar-date-separator.
+	(mhc-draft-finish): Ditto.
+
+	* emacs/mhc-vars.el (mhc-calendar-*): Move to mhc-calendar.el.
+
+	* emacs/mhc-minibuf.el (mhc-input-day):
+	Rename mhc-calendar-separator to mhc-calendar-date-separator.
+	
+	* emacs/mhc-summary.el (mhc-use-week-separator): Move from mhc.el.
+	(mhc-summary-separator): New variable.
+	(mhc-summary/insert-separator): Use mhc-summary-separator.
+
+	* emacs/mhc-calendar.el (mhc-calendar-toggle-insert-rectangle):
+	Move from mhc.el and rename.
+	(mhc-calendar-insert-rectangle-at): Ditto.
+	(mhc-calendar/make-rectangle): Ditto.
+	(mhc-calendar-setup): New function.
+	(mhc-calendar-make-header): Ditto.
+	(mhc-calendar-separator): New variable.
+	(mhc-calendar-day-strings): Ditto.
+	(mhc-calendar-header-function): Ditto.
+
+	* emacs/mhc-ps.el (mhc-ps/process): If (eq method 'buffer), ask exec insert.
+
 2000-07-21  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* emacs/mhc-db.el (mhc-db-add-record-from-buffer):
