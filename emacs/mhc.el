@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1994/07/04
-;; Revised: $Date: 2000/08/25 05:30:38 $
+;; Revised: $Date: 2000/10/03 14:52:06 $
 
 ;;;
 ;;; Commentay:
@@ -160,26 +160,164 @@
   (force-mode-line-update)
   (run-hooks 'mhc-mode-hook))
 
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; category
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; lexical analyzer part for category.
 ;;
 
+(defsubst mhc-expr/new ()
+  (vector nil nil nil nil))
+
+(defsubst mhc-expr/token (expr-obj)        ;; literal
+  (aref expr-obj 0))
+(defsubst mhc-expr/token-type (expr-obj)   ;; symbolized
+  (aref expr-obj 1))
+(defsubst mhc-expr/string (expr-obj)       ;; currently parsing string.
+  (aref expr-obj 2))
+
+(defsubst mhc-expr/set-token (expr-obj val)
+  (aset expr-obj 0 val))
+(defsubst mhc-expr/set-token-type (expr-obj val)
+  (aset expr-obj 1 val))
+(defsubst mhc-expr/set-string (expr-obj val)
+  (aset expr-obj 2 val))
+
+(defconst mhc-expr-token-type-alist
+  '(
+    ("[^!&|()\t \n]+"  . symbol)
+    ("!"              . negop)
+    ("&&"             . andop)
+    ("||"             . orop)
+    ("("              . lparen)
+    (")"              . rparen)))
+
+;; Eat one token from parsing string in obj.
+(defun mhc-expr/gettoken (obj)
+  (let ((string (mhc-expr/string obj))
+	(token-alist mhc-expr-token-type-alist)
+	(token-type nil)
+	(token      nil))
+    ;; delete leading white spaces.
+    (if (string-match "^[\t ]+" string)
+	(setq string (substring string (match-end 0))))
+    (while (and token-alist (not token-type))
+      (if (string-match (concat "^" (car (car token-alist))) string)
+	  (setq token      (substring string 0 (match-end 0))
+		string     (substring string (match-end 0))
+		token-type (cdr (car token-alist))))
+      (setq token-alist (cdr token-alist)))
+
+    (mhc-expr/set-token      obj token)
+    (mhc-expr/set-string     obj string)
+    (mhc-expr/set-token-type obj token-type)
+    obj))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; recursive descent parser for category.
+;;
+
+;;
+;; expression -> term ("||" term)*
+;;
+(defun mhc-expr/expression (obj)
+  (let ((ret (list (mhc-expr/term obj))))
+    (while (eq (mhc-expr/token-type obj) 'orop)
+      (mhc-expr/gettoken obj)
+      (setq ret (cons (mhc-expr/term obj) ret)))
+    (if (= 1 (length ret))
+	(car ret)
+      (cons 'or (nreverse ret)))))
+
+;;
+;; term       -> factor ("&&" factor)*
+;;
+(defun mhc-expr/term (obj)
+  (let ((ret (list (mhc-expr/factor obj))))
+    (while (eq (mhc-expr/token-type obj) 'andop)
+      (mhc-expr/gettoken obj)
+      (setq ret (cons (mhc-expr/factor obj) ret)))
+    (if (= 1 (length ret))
+	(car ret)
+      (cons 'and (nreverse ret)))))
+
+;;
+;; factor     -> "!"* category_name || "(" expression ")"
+;;
+(defun mhc-expr/factor (obj)
+  (let ((ret)
+	(neg-flag nil))
+    (while (eq (mhc-expr/token-type obj) 'negop)
+      (setq neg-flag (not neg-flag))
+      (mhc-expr/gettoken obj))
+    (cond
+     ;; symbol
+     ((eq (mhc-expr/token-type obj) 'symbol)
+      (setq ret (list 'mhc-schedule-in-category-p
+		      'schedule (mhc-expr/token obj)))
+      (mhc-expr/gettoken obj))
+     ;; ( expression )
+     ((eq (mhc-expr/token-type obj) 'lparen)
+      (mhc-expr/gettoken obj)
+      (setq ret (mhc-expr/expression obj))
+      (if (not (eq (mhc-expr/token-type obj) 'rparen))
+	  (error "Syntax error."))
+      (mhc-expr/gettoken obj))
+     ;; error
+     (t
+      (error "Syntax error.")
+      ;; (error "Missing category name or `(' %s %s"
+      ;;  mhc-expr-token mhc-expr-parsing-string)
+      ))
+    (if neg-flag (list 'not ret) ret)))
+
+(defun mhc-expr-parse (string)
+  (let ((obj (mhc-expr/new)) (ret nil))
+    (if (or (not string) (string= string ""))
+	t
+      (mhc-expr/set-string obj string)
+      (mhc-expr/gettoken obj)
+      (setq ret (mhc-expr/expression obj))
+      (if (mhc-expr/token obj)
+	  (error "Syntax Error")
+	ret))))
+
+(defun mhc-expr-compile (string)
+  (byte-compile
+   `(lambda (schedule)
+      ,(mhc-expr-parse string)
+      )))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; category
+;;
 (defvar mhc-default-category nil)
+(defvar mhc-default-category-predicate-sexp
+  (mhc-expr-compile ""))
+
+(defvar mhc-default-category-hist nil)
+
+(defun mhc-input-subject (&optional prompt default)
+  (interactive)
+  (read-from-minibuffer  (or prompt "Subject: ")
+			 (or default "")
+			 nil nil 'mhc-subject-hist))
 
 (defun mhc-set-default-category ()
   (interactive)
-  (setq mhc-default-category (mhc-input-category "Default Category: "
-			      mhc-default-category)))
+  (setq mhc-default-category 
+	(read-from-minibuffer "Default Category: "
+			      (or mhc-default-category "")
+			      nil nil 'mhc-default-category-hist))
+  (setq mhc-default-category-predicate-sexp
+	(mhc-expr-compile mhc-default-category)))
 
-(defun mhc-category-convert (lst)
-  (let (ret inv)
-    ;; preceding `!' means invert logic.
-    (if (and lst (string-match "^!" (car lst)))
-	(setq lst (cons (substring (car lst) (match-end 0)) (cdr lst))
-	      inv t))
-    (cons inv lst)))
+; (defun mhc-category-convert (lst)
+;   (let (ret inv)
+;     ;; preceding `!' means invert logic.
+;     (if (and lst (string-match "^!" (car lst)))
+; 	(setq lst (cons (substring (car lst) (match-end 0)) (cdr lst))
+; 	      inv t))
+;     (cons inv lst)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; goto-*
@@ -209,12 +347,10 @@ If HIDE-PRIVATE, priavate schedules are suppressed."
     (if mhc-default-hide-private-schedules
 	(not current-prefix-arg)
       current-prefix-arg)))
-  (let ((category (mhc-category-convert mhc-default-category)))
-    (mhc-scan-month date
-		    (mhc-summary-mailer-type)
-		    (cdr category)
-		    (car category)
-		    hide-private)))
+  (mhc-scan-month date
+		  (mhc-summary-mailer-type)
+		  mhc-default-category-predicate-sexp
+		  hide-private))
 
 (defun mhc-goto-this-month (&optional hide-private)
   "*Show schedules of this month.
@@ -264,13 +400,11 @@ If HIDE-PRIVATE, private schedules are suppressed."
     (if mhc-default-hide-private-schedules
 	(not current-prefix-arg)
       current-prefix-arg)))
-  (let ((category (mhc-category-convert mhc-default-category))
-	(line (+ (count-lines (point-min) (point))
+  (let ((line (+ (count-lines (point-min) (point))
 		 (if (= (current-column) 0) 1 0))))
     (mhc-scan-month (mhc-current-date-month)
 		    (mhc-summary-mailer-type)
-		    (cdr category)
-		    (car category)
+		    mhc-default-category-predicate-sexp
 		    hide-private)
     (goto-line line)
     (beginning-of-line)))
@@ -285,7 +419,7 @@ If HIDE-PRIVATE, private schedules are suppressed."
   "Indicate summary buffer's month. It is also used by mhc-summary-buffer-p")
 (make-variable-buffer-local 'mhc-summary-buffer-current-date-month)
 
-(defun mhc-scan-month (date mailer cat inv-cat secret)
+(defun mhc-scan-month (date mailer category-predicate secret)
   (let ((from  (mhc-date-mm-first date))
 	(to    (mhc-date-mm-last date))
 	(today (mhc-date-now)))
@@ -296,17 +430,17 @@ If HIDE-PRIVATE, private schedules are suppressed."
       (when (and (eq mhc-todo-position 'top)
 		 mhc-insert-todo-list)
 	(mhc-summary-make-todo-list
-	 today mailer cat inv-cat secret)
+	 today mailer category-predicate secret)
 	(insert (make-string mhc-todo-mergin ?\n))
 	(mhc-summary/insert-separator)))
-    (mhc-summary-make-contents from to mailer cat inv-cat secret)
+    (mhc-summary-make-contents from to mailer category-predicate secret)
     (unless (eq 'direct mailer)
       (when (and (eq mhc-todo-position 'bottom)
 		 mhc-insert-todo-list)
 	(mhc-summary/insert-separator)
 	(insert (make-string mhc-todo-mergin ?\n))
 	(mhc-summary-make-todo-list
-	 today mailer cat inv-cat secret))
+	 today mailer category-predicate secret))
       (if mhc-insert-calendar
 	  (mhc-calendar-insert-rectangle-at date (- (window-width) 24))) ;; xxx
       (mhc-summary-mode-setup date mailer)
@@ -671,12 +805,10 @@ Returns t if the importation was succeeded."
 (defun mhc-insert-schedule (&optional hide-private)
   (interactive "P")
   (set-mark (point))
-  (let ((category (mhc-category-convert mhc-default-category)))
-    (mhc-scan-month (mhc-input-month "Month ")
-		    'direct ;; insert into current buffer.
-		    (cdr category)
-		    (car category)
-		    hide-private))
+  (mhc-scan-month (mhc-input-month "Month ")
+		  'direct ;; insert into current buffer.
+		  mhc-default-category-predicate-sexp
+		  hide-private)
   (exchange-point-and-mark))
 
 (defvar mhc-date-hist nil)
