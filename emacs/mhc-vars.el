@@ -65,6 +65,11 @@
   :group 'mhc
   :type 'boolean)
 
+(defcustom mhc-insert-zombi-list nil
+  "*If non nil value, display ZOMBI list."
+  :group 'mhc
+  :type 'boolean)
+
 (defcustom mhc-default-coding-system
   (if (>= emacs-major-version 20) 'iso-2022-7bit-ss2 '*iso-2022-ss2-7*)
   "*Default coding system for MHC schedule files."

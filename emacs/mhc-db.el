@@ -159,6 +159,26 @@ FROM, TO は 1970/01/01 からの経過日数を用いて指定"
 			  nil
 			(> (car a) (car b)))))))))
 
+(defun mhc-db-scan-zombi (day)
+  "ゾンビの取得"
+  (let ((schedules (mapcar
+		    (lambda (f) (car (mhc-record-schedules f)))
+		    (apply (function nconc)
+			   (delq nil
+				 (mapcar (lambda (x)
+					   (and x
+						(setq x (mhc-slot-records x))
+						(copy-sequence x)))
+					 (list (mhc-slot-get-intersect-schedule)))))))
+	schedule zombis)
+    (while (setq schedule (car schedules))
+      (unless (or (delq nil (append (mhc-schedule-condition schedule) nil))
+		  (and mhc-insert-todo-list
+		       (mhc-schedule-in-category-p schedule "todo")))
+	(setq zombis (cons schedule zombis)))
+      (setq schedules (cdr schedules)))
+    zombis))
+
 
 (defun mhc-db-add-record-from-buffer (record buffer &optional force-refile)
   (let* ((slot (mhc-logic-record-to-slot record))

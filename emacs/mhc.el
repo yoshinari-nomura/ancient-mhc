@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1994/07/04
-;; Revised: $Date: 2001/12/25 15:40:56 $
+;; Revised: $Date: 2002/09/10 12:05:39 $
 
 ;;;
 ;;; Commentay:
@@ -483,6 +483,9 @@ If HIDE-PRIVATE, private schedules are suppressed."
 	(mhc-summary-make-todo-list
 	 today mailer category-predicate secret)
 	(insert (make-string mhc-todo-mergin ?\n))
+	(when mhc-insert-zombi-list
+	  (mhc-summary-make-zombi-list
+	   today mailer category-predicate secret))
 	(mhc-summary/insert-separator)))
     (unless (eq 'direct mailer)
       (setq mhc-summary-buffer-current-date-month
@@ -502,7 +505,10 @@ If HIDE-PRIVATE, private schedules are suppressed."
 	(mhc-summary/insert-separator)
 	(insert (make-string mhc-todo-mergin ?\n))
 	(mhc-summary-make-todo-list
-	 today mailer category-predicate secret))
+	 today mailer category-predicate secret)
+	(when mhc-insert-zombi-list
+	  (mhc-summary-make-zombi-list
+	   today mailer category-predicate secret)))
       (if mhc-insert-calendar
 	  (mhc-calendar-insert-rectangle-at
 	   date

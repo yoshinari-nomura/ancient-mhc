@@ -545,6 +545,23 @@ If optional argument FOR-DRAFT is non-nil, Hilight message as draft message."
 	    (setq schedules (cdr schedules)))))))
 
 
+(defun mhc-summary-make-zombi-list
+  (day mailer &optional category-predicate secret)
+  (let ((schedules (mhc-db-scan-zombi day))
+	(mhc-tmp-day day))
+    (if schedules
+	(progn
+	  (insert "ZOMBI(s)\n")
+	  (while schedules
+	    (mhc-summary-insert-contents
+	     (car schedules)
+	     (and secret
+		  (mhc-schedule-in-category-p (car schedules) "private"))
+	     'mhc-todo-line-insert
+	     mailer)
+	    (setq schedules (cdr schedules)))))))
+
+
 (defun mhc-summary/line-year-string ()
   (if mhc-tmp-first
       (format "%4d" (mhc-day-year mhc-tmp-dayinfo))
