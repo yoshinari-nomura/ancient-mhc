@@ -3,7 +3,7 @@
 ;; Author:  Yuuichi Teranishi <teranisi@gohome.org>
 ;;
 ;; Created: 2000/05/27
-;; Revised: $Date: 2000/07/03 00:50:17 $
+;; Revised: $Date: 2000/07/27 04:16:10 $
 
 (require 'bitmap)
 (require 'mhc-face)
@@ -20,7 +20,8 @@ Example:
     (\"Private\"     . (\"Private.xbm\" \"HotPink\"))
     (\"Anniversary\" . (\"Anniversary.xbm\" \"SkyBlue\"))
     (\"Birthday\"    . (\"Birthday.xbm\"))
-    (\"Other\"       . (\"Other.xbm\" \"Red\")))"
+    (\"Other\"       . (\"Other.xbm\" \"Red\"))
+    (\"Conflict\"    . (\"Conflict.xpm\" \"Yellow\")))"
   :group 'mhc
   :type '(repeat
 	  :inline t
@@ -86,6 +87,10 @@ Example:
 (defun mhc-use-icon-p ()
   "Returns t if MHC displays icon."
   (and window-system mhc-use-icon))
+
+(defun mhc-icon-exists-p (name)
+  "Returns non-nil if icon with NAME exists."
+  (cdr (assoc (downcase name) mhc-bm/bmstr-alist)))
 
 (defun mhc-put-icon (icons)
   "Put ICONS on current buffer.

@@ -198,11 +198,14 @@ third one is replaced with day of month."
 	    (make-string 6 ? )
 	  (format "-%02d:%02d" (/ mhc-tmp-end 60) (% mhc-tmp-end 60)))
 	'face 'mhc-summary-face-time)
-    (?c (and (not mhc-tmp-private)
-	     (if mhc-tmp-conflict (or (mhc-use-icon-p)
-				      mhc-summary-string-conflict)))
-	(if (mhc-use-icon-p) 'icon 'face)
-	(if (mhc-use-icon-p) (list "Conflict") 'mhc-summary-face-conflict))
+    (?c (if mhc-tmp-conflict
+	    (if (and (mhc-use-icon-p) (mhc-icon-exists-p "conflict"))
+		t
+	      mhc-summary-string-conflict))
+	(if (and (mhc-use-icon-p) (mhc-icon-exists-p "conflict"))
+	    'icon 'face)
+	(if (and (mhc-use-icon-p) (mhc-icon-exists-p "conflict"))
+	    (list "conflict") 'mhc-summary-face-conflict))
     (?i (not mhc-tmp-private) 'icon (mhc-schedule-categories mhc-tmp-schedule))
     (?s (mhc-summary/line-subject-string)
 	'face 
@@ -527,6 +530,7 @@ PROP-VALUE is the property value correspond to PROP-TYPE.
 (defun mhc-summary-line-inserter-setup ()
   "Setup MHC summary and todo line inserter."
   (interactive)
+  (if (mhc-use-icon-p) (call-interactively 'mhc-icon-setup))
   (mhc-summary/line-inserter-setup-internal
    mhc-summary/line-inserter
    mhc-summary-line-format

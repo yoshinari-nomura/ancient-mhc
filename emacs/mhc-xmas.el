@@ -3,7 +3,7 @@
 ;; Author:  Yuuichi Teranishi <teranisi@gohome.org>
 ;;
 ;; Created: 1999/12/02
-;; Revised: $Date: 2000/07/03 05:49:52 $
+;; Revised: $Date: 2000/07/27 04:16:10 $
 
 (defcustom mhc-xmas-icon-alist nil
   "*Alist to define icons.
@@ -16,7 +16,8 @@ Example:
     (\"Private\"     . \"Private.xpm\")
     (\"Anniversary\" . \"Anniversary.xpm\")
     (\"Birthday\"    . \"Birthday.xpm\")
-    (\"Other\"       . \"Other.xpm\"))"
+    (\"Other\"       . \"Other.xpm\")
+    (\"Conflict\"    . \"Conflict.xpm\"))"
   :group 'mhc
   :type '(repeat 
 	  :inline t
@@ -45,6 +46,7 @@ Example:
 ;; Icon interface
 (defun mhc-icon-setup ()
   "Initialize MHC icons."
+  (interactive)
   (if (interactive-p)
       (setq mhc-xmas/glyph-alist nil))
   (or mhc-xmas/glyph-alist
@@ -58,6 +60,10 @@ Example:
   (and (device-on-window-system-p)
        (featurep 'xpm)
        mhc-use-icon))
+
+(defun mhc-icon-exists-p (name)
+  "Returns non-nil if icon with NAME exists."
+  (cdr (assoc (downcase name) mhc-xmas/glyph-alist)))
 
 (defun mhc-put-icon (icons)
   "Put ICONS on current buffer.
