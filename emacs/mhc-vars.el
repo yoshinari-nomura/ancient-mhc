@@ -56,7 +56,9 @@
 (defcustom mhc-vertical-calendar-length 3
   "*Length of vertical calendar in summary buffer."
   :group 'mhc
-  :type  'integer)
+  :type '(radio (integer :tag "Show length (current month is center)" 3)
+		(cons (integer :tag "             Show length" 3)
+		      (integer :tag "Length of before current" 1))))
 
 (defcustom mhc-insert-todo-list t
   "*If non nil value, display TODO list."

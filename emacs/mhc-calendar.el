@@ -5,7 +5,7 @@
 ;;          MIYOSHI Masanori <miyoshi@ask.ne.jp>
 ;;
 ;; Created: 05/12/2000
-;; Reviesd: $Date: 2001/03/21 08:59:41 $
+;; Reviesd: $Date: 2001/03/21 10:13:12 $
 
 ;;; Configration Variables:
 
@@ -341,8 +341,12 @@ ww-japanese-long => \"土曜日\"
 	(mhc-summary-search-date date))
       (beginning-of-line)
       (mhc-misc-move-to-column col)
-      (setq m (or months 3))
-      (setq center (/ (1+ m) 2))
+      (if (consp months)
+	  (progn
+	    (setq m (car months))
+	    (setq center (- m (cdr months))))
+	(setq m (or months 3))
+	(setq center (/ (1+ m) 2)))
       (while (> m 0)
 	(setq rect
 	      (nconc 

@@ -1,3 +1,11 @@
+2001-03-21  Hideyuki SHIRAI  <shirai@quickhack.net>
+
+	* emacs/mhc-vars.el (mhc-vertical-calendar-length): Allow cons of
+	integer.
+
+	* emacs/mhc-calendar.el (mhc-calendar-insert-rectangle-at): Option
+	month allow cons of integer.
+
 2001-03-21  Yoshinari Nomura  <nom@quickhack.net>
 
 	* emacs/mhc-calendar.el, emacs/mhc-vars.el, emacs/mhc.el:
