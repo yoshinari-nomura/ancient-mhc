@@ -451,20 +451,19 @@ from 'month before last' to 'this month next year'."
       (when mhcp
 	(setq loop t)
 	(while loop
-	  (message
-	   (format "[file: %s] ? A)dd CVS repository, R)emove immediately, M)ove to trash"
-		   file))
+	  (message "[file: %s] ? A)dd CVS repository, R)emove immediately, M)ove to trash"
+		   file)
 	  (condition-case nil
 	      (setq char (read-char))
 	    (error (setq char ?Z)))	;; dummy set
 	  (cond
 	   ((memq char '(?a ?A))
 	    (setq loop nil)
-	    (message (format "[file: %s]  Add CVS repository..." file))
+	    (message "[file: %s]  Add CVS repository..." file)
 	    (mhc-record/append-log record 'add)
 	    (and (= 0 (mhc-cvs/backend (list "add" file)))
 		 (mhc-cvs/modify expf))
-	    (message (format "[file: %s]  Add CVS repository...done" file)))
+	    (message "[file: %s]  Add CVS repository...done" file))
 	   ((memq char '(?r ?R))
 	    (setq loop nil)
 	    (message "")

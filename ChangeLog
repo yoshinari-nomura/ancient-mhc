@@ -1,3 +1,9 @@
+2003-05-12  Hideyuki SHIRAI  <shirai@quickhack.net>
+
+	* emacs/mhc-cvs.el (mhc-cvs/unknown-file): Correct the wrong use
+	of `message'.  Thanks to Yoichi NAKAYAMA <yoichi@geiin.org> for
+	his suggestion.
+
 2003-04-28  MIYOSHI Masanori  <miyoshi@boreas.dti.ne.jp>
 
 	* mhc2ol.in (MonthlyByDow.handle_recurrence): Limit the range of
