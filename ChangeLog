@@ -1,3 +1,9 @@
+2000-10-30  Yoshinari Nomura  <nom@quickhack.net>
+
+	* emacs/mhc-summary.el (mhc-summary-make-contents):
+	  Fix duplication of week separator
+	  at the end of mont. (TNX, Mr. KOIE Hidetaka <hide@koie.org>)
+
 2000-10-21  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* emacs/mhc-cvs.el (mhc-cvs/add, mhc-cvs/remove): Do not shrink
