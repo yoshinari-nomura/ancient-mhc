@@ -1,4 +1,5 @@
 #!@@MHC_RUBY_PATH@@ -Ke
+# -*- ruby -*-
 
 require 'mkmf'
 
@@ -12,6 +13,8 @@ $LDFLAGS = "@@MHC_LDFLAGS@@"
 if @@MHC_DISABLE_PALM@@ == 0
   CONFIG["LDSHARED"] = "LD_RUN_PATH=@@MHC_PILOT_LINK_LIB@@ " +
     CONFIG["LDSHARED"]
+
+  have_library('pisock')
   create_makefile("mhc_pilib")
 else
   print "creating make.rb\n"
