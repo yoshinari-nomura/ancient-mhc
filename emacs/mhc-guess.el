@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1999/04/13
-;; Revised: $Date: 2005/03/16 08:13:19 $
+;; Revised: $Date: 2005/04/04 09:09:25 $
 ;;
 
 ;;;
@@ -474,7 +474,8 @@ You can specify following symbols as a list.
 		       ("Wednesday" . "水") ("Thursday" . "木")
 		       ("Friday" . "金") ("Saturday" . "土")
 		       ("Sunday" . "日")))
-	  (rel (downcase rel-word)))
+	  (rel (when (stringp rel-word)
+		 (downcase rel-word))))
       (mhc-guess/make-date-from-relative-week
        now
        (if (null rel)

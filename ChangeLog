@@ -1,3 +1,9 @@
+2005-04-04  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* emacs/mhc-guess.el (mhc-guess/make-date-from-english-relative-week):
+	Check that a argument `rel-word' is a string before calling
+	`downcase' in order to avoid wrong type argument error.
+
 2005-03-23  Yoshiaki Kasahara <kasahara@nc.kyushu-u.ac.jp>
 
 	* ruby-ext/lib/mhc-gtk.rb.in: Use explicit regexp
