@@ -6,7 +6,7 @@
 ## Author:  Yoshinari Nomura <nom@quickhack.net>
 ##
 ## Created: 1999/10/08
-## Revised: $Date: 2000/07/18 12:21:51 $
+## Revised: $Date: 2000/07/18 12:30:34 $
 ##
 
 $DEBUG = false
@@ -81,7 +81,6 @@ while ARGV .length > 0
     $flag_install = true
   when '-n'
     $flag_noharm  = true
-    $flag_verbose = true
   when '-d'
     ARGV .shift
     $flag_device  = ARGV[0]
