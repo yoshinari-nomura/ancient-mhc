@@ -11,8 +11,10 @@ Revised: 2000/04/26 16:59:41
 ・ Windows で Ruby/Gtk, Palm 関連を簡単に使えるような
      pre-compiled package の作成
 ・ mhc でのアラーム (gemcal 側のアラーム OFF 機能)
-・ 高速化
+・ 高速化 (土屋さんの高速化手法)
 ・ 3ヶ月カレンダーの高速化 / 別バッファ化
+   (白井さん作 mhc-calendar.el)
+
 ・ 各種入力補完
 ・ mscan 復活 (today の高機能版のようなもの)
 ・ TODO の実装
@@ -25,7 +27,9 @@ Revised: 2000/04/26 16:59:41
 ・ iCalendar への対応
 ・ Duration の柔軟な記述 (! を使えるようにしたい)
 ・ 英語メールからの guess (僕には実装できないだろう)
-・ xemacs 対応強化 (icon 貼りたい)
+・ guess の高機能化
+      + 来週金曜日、12時半
+・ xemacs 対応強化 (寺西さんの icon)
 ・ 花田による Yet Another Web サポート (早くリリースして)
       + Web からの入力
       + Private Proxy の強化
@@ -38,3 +42,5 @@ Revised: 2000/04/26 16:59:41
 ・ emacs/Makefile
 ・ その他の mailer サポート(?)
 
+・ C-c| でアラームを聞くようにしたい。デフォルト時間を指定しておきたい。
+・ C-cc で Category指定 -> そのまま rescan。
