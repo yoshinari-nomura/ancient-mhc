@@ -74,12 +74,22 @@
 ;;; Global Variables:
 
 (defcustom mhc-use-week-separator 6
-  "*if number 0 .. 6, insert separator in summary buffer."
+  "*If number 0 .. 6, insert separator in summary buffer."
   :group 'mhc
   :type 'integer)
 
 (defcustom mhc-summary-separator ?-
   "*Character of the separator as 'mhc-use-week-separator'."
+  :group 'mhc
+  :type 'character)
+
+(defcustom mhc-use-month-separator t
+  "*If non-nil, insert separator in summary buffer for wide scope."
+  :group 'mhc
+  :type 'boolean)
+
+(defcustom mhc-summary-month-separator ?=
+  "*Character of the separator as 'mhc-use-month-separator'."
   :group 'mhc
   :type 'character)
 
@@ -434,9 +444,16 @@ If optional argument FOR-DRAFT is non-nil, Hilight message as draft message."
 
 
 ;;; Codes:
-(defun mhc-summary/insert-separator ()
-  (let ((hr (make-string (- (window-width) 24) mhc-summary-separator)))
-    (mhc-face-put hr 'mhc-summary-face-separator)
+(defun mhc-summary/insert-separator (&optional wide)
+  (let (hr)
+    (if wide
+	(progn
+	  (setq hr (make-string
+		    (- (window-width) 2) mhc-summary-month-separator))
+	  (mhc-face-put hr 'mhc-summary-face-month-separator))
+      (setq hr (make-string
+		(- (window-width) 24) mhc-summary-separator))
+      (mhc-face-put hr 'mhc-summary-face-separator))
     (insert hr "\n")))
 
 

@@ -77,6 +77,11 @@
 		(const :tag "CVS" mhc-cvs)
 		(symbol :tag "Other")))
 
+(defcustom mhc-file-sync-enable-offline nil
+  "*If non-nil, enable mhc-file-sync when status is offline."
+  :group 'mhc
+  :type '(radio (const :tag "Disable when offline" nil)
+		(const :tag "Enable when offline" t)))
 
 ;;; Internal Variables
 (defvar mhc-file/offline (not mhc-default-network-status)
@@ -143,25 +148,26 @@
 	  (car mhc-file-line-status-strings)
 	(cdr mhc-file-line-status-strings))))
 
-(defun mhc-file-toggle-offline ()
+(defun mhc-file-toggle-offline (&optional full)
   "*Toggle line status of file manipulation backend."
-  (interactive)
+  (interactive "P")
   (setq mhc-file/offline (not mhc-file/offline))
   (if (assq 'mhc-mode minor-mode-alist)
       (setcdr (assq 'mhc-mode minor-mode-alist) (list (mhc-file-line-status))))
   (if mhc-file/offline
       (message "mhc-file is offline.")
     (if (y-or-n-p "Sync schedule files right now ? ")
-	(mhc-file-sync))
+	(mhc-file-sync full))
     (message "mhc-file is online.")))
 
-(defun mhc-file-sync ()
+
+(defun mhc-file-sync (&optional full)
   "*Sync schedule files."
-  (interactive)
-  (if mhc-file/offline
+  (interactive "P")
+  (if (and mhc-file/offline (not mhc-file-sync-enable-offline))
       (message "\"M-x mhc-file-toggle-offline\" first.")
     (message "mhc file sync ...")
-    (when (mhc-file/sync)
+    (when (mhc-file/sync full)
       (message "mhc file sync ... done."))))
 
 

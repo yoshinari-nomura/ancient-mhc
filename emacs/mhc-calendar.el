@@ -5,7 +5,7 @@
 ;;          MIYOSHI Masanori <miyoshi@ask.ne.jp>
 ;;
 ;; Created: 05/12/2000
-;; Reviesd: $Date: 2000/12/15 06:23:02 $
+;; Reviesd: $Date: 2001/01/31 11:26:35 $
 
 ;;; Configration Variables:
 
@@ -156,32 +156,32 @@ ww-japanese-long => \"土曜日\"
 ;; mhc-calendar functions
 ;; macros
 (defmacro  mhc-calendar-p ()
-  (` (eq major-mode 'mhc-calendar-mode)))
+  `(eq major-mode 'mhc-calendar-mode))
 
 (defmacro mhc-calendar/in-date-p ()		;; return 'date from 01/01/1970'
-  (` (get-text-property (point) 'mhc-calendar/date-prop)))
+  `(get-text-property (point) 'mhc-calendar/date-prop))
 
 (defmacro mhc-calendar/in-summary-p ()		;; return 'schedule filename'
-  (` (or (get-text-property (point) 'mhc-calendar/summary-prop)
-	 (save-excursion
-	   (beginning-of-line)
-	   (get-text-property (point) 'mhc-calendar/summary-prop)))))
+  `(or (get-text-property (point) 'mhc-calendar/summary-prop)
+       (save-excursion
+	 (beginning-of-line)
+	 (get-text-property (point) 'mhc-calendar/summary-prop))))
 
 (defmacro mhc-calendar/in-summary-hnf-p ()	;; return 'title count'
-  (` (or (get-text-property (point) 'mhc-calendar/summary-hnf-prop)
-	 (save-excursion
-	   (beginning-of-line)
-	   (get-text-property (point) 'mhc-calendar/summary-hnf-prop)))))
+  `(or (get-text-property (point) 'mhc-calendar/summary-hnf-prop)
+       (save-excursion
+	 (beginning-of-line)
+	 (get-text-property (point) 'mhc-calendar/summary-hnf-prop))))
 
 (defmacro mhc-calendar/get-date-colnum (col)
-  (` (cond
-      ((< (, col) (+ mhc-calendar-next-offset mhc-calendar-start-column)) -1)
-      ((< (, col) (+ (* mhc-calendar-next-offset 2) mhc-calendar-start-column)) 0)
-      (t 1))))
+  `(cond
+    ((< ,col (+ mhc-calendar-next-offset mhc-calendar-start-column)) -1)
+    ((< ,col (+ (* mhc-calendar-next-offset 2) mhc-calendar-start-column)) 0)
+    (t 1)))
 
 (defmacro mhc-calendar/buffer-substring-to-num (pos)
-  (` (string-to-number
-      (buffer-substring (match-beginning (, pos)) (match-end (, pos))))))
+  `(string-to-number
+    (buffer-substring (match-beginning ,pos) (match-end ,pos))))
 
 ;; Avoid warning of byte-compiler.
 (eval-when-compile
@@ -332,8 +332,12 @@ ww-japanese-long => \"土曜日\"
 
 (defun mhc-calendar-insert-rectangle-at (date col)
   (save-excursion
+    (setq date (mhc-date-mm-first date))
     (put-text-property (point-min) (point-max) 'rear-nonsticky t)
     (goto-char (point-min))
+    (when mhc-use-wide-scope
+      (mhc-summary-search-date date))
+    (beginning-of-line)
     (mhc-misc-move-to-column col)
     (mhc-misc-insert-rectangle
      (nconc (mhc-calendar/make-rectangle (mhc-date-mm-- date)

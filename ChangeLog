@@ -1,3 +1,53 @@
+2001-01-31  Hideyuki SHIRAI  <shirai@quickhack.net>
+
+	* emacs/mhc.el (mhc-prefix-map, mhc-mode-menu-spec): Add new keybind
+	and new menu.
+	(mhc-goto-today): Move to cursol to 1st day of month when not today.
+	(mhc-rescan-month): Scan this month when called non mhc summary
+	buffer.
+	(mhc-scan-month): Support Wide Scope summary.
+	(mhc-browse-x-url): "X-Uri" header handling.
+	(mhc-month-hist, mhc-input-month, mhc-input-time-regex,
+	mhc-subject-hist, mhc-input-subject, mhc-location-hist,
+	mhc-input-location, mhc-category-hist, mhc-input-category):
+	Move to mhc-minibuf.el
+
+	* emacs/mhc-minibuf.el (mhc-month-hist, mhc-input-month,
+	mhc-input-time-regex, mhc-subject-hist, mhc-input-subject,
+	mhc-location-hist, mhc-input-location, mhc-category-hist,
+	mhc-input-category): Move from mhc.el.
+	
+	* emacs/mhc-face.el (mhc-symbol-face-alist-internal): Add
+	mhc-summary-face-month-separator.
+
+	* emacs/mhc-vars.el (mhc-use-wide-scope): New customizable variables.
+
+	* emacs/mhc-sync.el (mhc-sync/start-process): Add option 'full'.
+
+	* emacs/mhc-file.el (mhc-file-sync-enable-offline): New customizable
+	variables.
+	(mhc-file-toggle-offline): Add 'full' option.
+	(mhc-file-sync): Add 'full' option. enable-offline handling.
+
+	* emacs/mhc-cvs.el (mhc-cvs-default-update-duration): New customizable
+	variables.
+	(mhc-cvs/backend): Option require a list argument.
+	(mhc-cvs/close, mhc-cvs/add, mhc-cvs/modify): Call mhc-cvs/backend()
+	with list argument.
+	(mhc-cvs/sync): Ditto. Add 'full' option.
+	(mhc-cvs/update-dirs, mhc-cvs/update-dirs-exist): New functions.
+	(mhc-cvs/update): Call mhc-cvs/backend() with list argument. Add
+	'full' option. Unknown files handling.
+	(mhc-cvs/unknown-file): New function.
+
+	* emacs/mhc-logic.el (mhc-logic-parse-day): nrevers at days.
+
+	* emacs/mhc-summary.el (mhc-use-month-separator,
+	mhc-summary-month-separator): New customizable variables.
+	(mhc-summary/insert-separator): Handling wide scope.
+
+	* emacs/mhc-ps.el (mhc-ps): New function for easy PostScript handling.
+
 2001-01-30  OHARA Shigeki <os@iij.ad.jp>
 
 	* mhc-make.rb: Fixed $? bug.

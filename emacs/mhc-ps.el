@@ -3,7 +3,7 @@
 ;; Author:  TSUCHIYA Masatoshi <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 ;;          Hideyuki SHIRAI <shirai@quickhack.net>
 ;; Created: 2000/06/18
-;; Revised: $Date: 2000/12/20 12:06:09 $
+;; Revised: $Date: 2001/01/31 11:26:37 $
 
 
 ;;; Commentary:
@@ -1018,6 +1018,39 @@ showpage
     (setq mhc-ps/process-file-alist
 	  (delete al mhc-ps/process-file-alist))))
 
+;;;###autoload
+(defun mhc-ps (&optional arg)
+  "*Create PostScript calendar with selected method."
+  (interactive "P")
+  (let ((method 'preview)
+	(date (or (mhc-current-date) (mhc-calendar-get-date)))
+	year month char)
+    (if (or arg (null date))
+	(setq date (mhc-input-month "Month: " date)))
+    (setq year (mhc-date-yy date))
+    (setq month (mhc-date-mm date))
+    (message "pre(V)iew (default), (P)rint, (S)ave, (I)nsert buffer")
+    (condition-case nil
+	(setq char (read-char))
+      (error (setq char ?v)))
+    (cond
+     ((eq char ?p)
+      (mhc-ps-print year month mhc-default-category-predicate-sexp))
+     ((eq char ?s)
+      (mhc-ps-save
+       year month
+       (expand-file-name
+	(mhc-date-format date "mhc%04d%02d.ps" yy mm)
+	(mhc-summary-folder-to-path mhc-base-folder))
+       mhc-default-category-predicate-sexp))
+     ((eq char ?i)
+      (mhc-ps-insert-buffer
+       year month
+       (read-buffer "Insert buffer: " "*mhc-postscript*")
+       mhc-default-category-predicate-sexp))
+     (t
+      (mhc-ps-preview year month mhc-default-category-predicate-sexp)))))
+
 
 ;;;###autoload
 (defun mhc-ps-preview (year month &optional category-predicate)
@@ -1081,8 +1114,7 @@ showpage
   (interactive
    (let* ((cdate (or (mhc-current-date) (mhc-calendar-get-date)))
 	  (date (mhc-input-month "Month: " cdate))
-	  (buffer (read-buffer "Insert buffer: "
-			       "*mhc-postscript*")))
+	  (buffer (read-buffer "Insert buffer: " "*mhc-postscript*")))
      (list
       (mhc-date-yy date)
       (mhc-date-mm date)

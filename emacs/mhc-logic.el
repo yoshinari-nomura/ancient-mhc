@@ -203,7 +203,7 @@
 			    (string-to-number (match-string 4)))
 	    days (cons (if (match-string 1) (cons d nil) d) days))
       (goto-char (match-end 0)))
-    (mhc-logic/set-day logicinfo days)))
+    (mhc-logic/set-day logicinfo (nreverse days)))) ;; xxxxx
 
 
 (defun mhc-logic-parse-old-style-date (logicinfo)

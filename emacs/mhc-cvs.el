@@ -76,6 +76,17 @@
   :type '(cons (string :tag "Directory Separator ")
 	       (string :tag "Escape Character    ")))
 
+(defcustom mhc-cvs-default-update-duration nil
+  "*Default update months duration for mhc-cvs.
+If 'nil', update all directories. '(-2 . 11) means the duration
+from 'month before last' to 'this month next year'."
+  :group 'mhc
+  :type '(choice
+	  (const :tag "All directories" nil)
+	  (cons :tag "Duration"
+		(integer :tag "start month offset" -2)
+		(integer :tag "end month offset  " 11))))
+
 (defcustom mhc-cvs-repository-path nil
   "*CVS repository path."
   :group 'mhc
@@ -95,7 +106,7 @@
 
 (defconst mhc-cvs/tmp-buffer-name " *mhc-cvs*")
 
-(defsubst mhc-cvs/backend (&rest options)
+(defsubst mhc-cvs/backend (options)
   "指定されたオプションを付け加えて CVS を実行する関数"
   (let ((buffer (mhc-get-buffer-create mhc-cvs/tmp-buffer-name))
 	(current-buffer (current-buffer)))
@@ -121,9 +132,11 @@
       (let ((module (file-name-nondirectory (mhc-summary-folder-to-path mhc-base-folder)))
 	    (mhc-cvs/default-directory (mhc-summary-folder-to-path "")))
 	(if mhc-cvs-module-name
-	    (mhc-cvs/backend "-d" (mhc-cvs/read-repository-path) "checkout"
-			     "-d" module mhc-cvs-module-name)
-	  (mhc-cvs/backend "-d" (mhc-cvs/read-repository-path) "checkout" module))))))
+	    (mhc-cvs/backend
+	     (list"-d" (mhc-cvs/read-repository-path) "checkout"
+		  "-d" module mhc-cvs-module-name))
+	  (mhc-cvs/backend
+	   (list "-d" (mhc-cvs/read-repository-path) "checkout" module)))))))
 
 (defun mhc-cvs/read-repository-path ()
   "CVSレポジトリのパス名を入力する関数"
@@ -153,12 +166,12 @@
 
 (defun mhc-cvs/close (&optional offline)
   "ネットワークの状態に依存する終了処理関数"
-  (or offline (= 0 (mhc-cvs/backend "commit" "-m" ""))))
+  (or offline (= 0 (mhc-cvs/backend (list "commit" "-m" "")))))
 
-(defun mhc-cvs/sync ()
+(defun mhc-cvs/sync (&optional full)
   "リモートのスケジュールファイルとローカルのスケジュールファイルの同期を取る関数"
   (mhc-cvs/delay-add-and-remove (mhc-summary-folder-to-path mhc-base-folder))
-  (mhc-cvs/update)
+  (mhc-cvs/update full)
   ;; rescan if mhc
   (or (and (mhc-summary-buffer-p)
 	   (mhc-rescan-month mhc-default-hide-private-schedules))
@@ -240,27 +253,38 @@
 	    (not (write-region "add directory" nil added nil 'nomsg))
 	  (not (copy-file filename added t)))
       (if (file-exists-p added) (delete-file added))
-      (and (= 0 (mhc-cvs/backend "add" (mhc-cvs/shrink-file-name filename)))
+      (and (= 0 (mhc-cvs/backend (list "add" (mhc-cvs/shrink-file-name filename))))
 	   (mhc-cvs/modify filename)))))
 
 (defun mhc-cvs/remove (filename &optional offline)
   "ファイルを削除する関数"
   (let ((added (mhc-cvs/get-added-flag-file-name filename))
-	(removed (mhc-cvs/get-removed-file-name filename)))
+	(removed (mhc-cvs/get-removed-file-name filename))
+    	(new-path (expand-file-name
+		   "trash"
+		   (mhc-summary-folder-to-path mhc-base-folder))))
+    (or (file-directory-p new-path)
+	(make-directory new-path))
     (if offline
-	(if (file-exists-p added)
-	    (progn (delete-file added) (delete-file filename) t)
-	  (not (rename-file filename removed t)))
+	(progn
+	  (if (file-exists-p added)
+	      (progn
+		(delete-file added)
+		(rename-file filename (mhc-misc-get-new-path new-path)))
+	    (copy-file filename (mhc-misc-get-new-path new-path))
+	    (rename-file filename removed t))
+	  t)	;; return value
       (if (file-exists-p added) (delete-file added))
       (if (file-exists-p removed) (delete-file removed))
-      (if (file-exists-p filename) (delete-file filename))
-      (and (= 0 (mhc-cvs/backend "remove" (mhc-cvs/shrink-file-name filename)))
+      (if (file-exists-p filename)
+	  (rename-file filename (mhc-misc-get-new-path new-path)))
+      (and (= 0 (mhc-cvs/backend (list "remove" (mhc-cvs/shrink-file-name filename))))
 	   (mhc-cvs/modify filename)))))
 
 (defun mhc-cvs/modify (filename &optional offline)
   "ファイルを変更する関数"
   (or offline (= 0 (mhc-cvs/backend
-		    "commit" "-m" "" (mhc-cvs/shrink-file-name filename)))))
+		    (list "commit" "-m" "" (mhc-cvs/shrink-file-name filename))))))
 
 
 ;;; CVS Backend Function
@@ -269,11 +293,40 @@
   (mhc-misc-touch-directory directory)
   (mhc-slot-destruct-cache directory))
 
-(defun mhc-cvs/update ()
+
+(defun mhc-cvs/update-dirs-exist (dir)
+  "CVS 管理下の directory か否か判定する"
+  (and (file-directory-p dir)
+       (file-directory-p (expand-file-name "CVS" dir))))
+
+(defun mhc-cvs/update-dirs ()
+  "mhc-cvs-default-update-duration で指定された範囲の directory を返す"
+  (when mhc-cvs-default-update-duration
+    (let ((cdate (or (mhc-current-date) (mhc-calendar-get-date) (mhc-date-now)))
+	  (i (- (cdr mhc-cvs-default-update-duration)
+		(car mhc-cvs-default-update-duration)))
+	  dirs schdir)
+      (when (mhc-cvs/update-dirs-exist
+	     (expand-file-name "intersect" mhc-cvs/default-directory))
+	(setq dirs (cons "intersect" dirs)))
+      (setq cdate (mhc-date-mm+ cdate (car mhc-cvs-default-update-duration)))
+      (while (>= i 0)
+	(setq schdir (mhc-date-format cdate "%04d/%02d" yy mm))
+	(when (mhc-cvs/update-dirs-exist
+	       (expand-file-name
+		schdir (mhc-summary-folder-to-path mhc-base-folder)))
+	  (setq dirs (cons schdir dirs)))
+	(setq cdate (mhc-date-mm++ cdate))
+	(setq i (1- i)))
+      (nreverse dirs))))
+
+(defun mhc-cvs/update (&optional full)
   "cvs update を実行した結果を解析する関数"
   ;; ローカルのスケジュールファイルを update する
-  (prog1 (mhc-cvs/backend "update" "-d" "-I" ".*" "-I" "trash")
-    (let (modified-files conflict-files updated-files commit-fault-files)
+  (prog1 (mhc-cvs/backend (append (list "update" "-d" "-I" ".*" "-I" "trash")
+				  (and (null full) (mhc-cvs/update-dirs))))
+    (let (modified-files conflict-files updated-files
+			 commit-fault-files unknown-files)
       ;; update の結果を解析する
       (let ((buffer (get-buffer mhc-cvs/tmp-buffer-name))
 	    (current-buffer (current-buffer)))
@@ -283,6 +336,10 @@
 	      (goto-char (point-min))
 	      (while (not (eobp))
 		(cond
+		 ((looking-at "\\? ")
+		  (setq unknown-files
+			(cons (buffer-substring (match-end 0) (progn (end-of-line) (point)))
+			      unknown-files)))
 		 ((looking-at "[AMR] ")
 		  (setq modified-files
 			(cons (buffer-substring (match-end 0) (progn (end-of-line) (point)))
@@ -313,9 +370,11 @@
 	(setq updated-files (cdr updated-files)))
       ;; 修正されているファイルは、即座に commit する
       (while modified-files
-	(or (= 0 (mhc-cvs/backend "commit" "-m" "" (car modified-files)))
+	(or (= 0 (mhc-cvs/backend (list "commit" "-m" "" (car modified-files))))
 	    (setq commit-fault-files (cons (car modified-files) commit-fault-files)))
 	(setq modified-files (cdr modified-files)))
+      ;; 手動で書いたと思われるファイルを扱う
+      (when unknown-files (mhc-cvs/unknown-file unknown-files))
       (if commit-fault-files
 	  (message "File(s) are fault to commit: %s"
 		   (mapconcat (lambda (s) s) commit-fault-files ",")))
@@ -326,15 +385,96 @@
 		     (expand-file-name file (mhc-summary-folder-to-path mhc-base-folder)))
 		   conflict-files))))))
 
+
 (defun mhc-cvs-edit-conflict-file (&optional files)
   (if (setq files (or files (get 'mhc-cvs-edit-conflict-file 'conflict-files)))
-      (progn
-	(put 'mhc-cvs-edit-conflict-file 'conflict-files (cdr files))
-	(message "Conflict has been occured. file=%s" (car files))
-	(mhc-modify-file (car files)))
+  (progn
+    (put 'mhc-cvs-edit-conflict-file 'conflict-files (cdr files))
+    (message "Conflict has been occured. file=%s" (car files))
+    (mhc-modify-file (car files)))
     (put 'mhc-cvs-edit-conflict-file 'conflict-files nil)))
-(add-hook 'mhc-draft-finish-hook 'mhc-cvs-edit-conflict-file)
 
+;; この関数は完全ではない。
+(defun mhc-cvs/unknown-file (unknowns)
+  (let (dirs files dir file expf char loop)
+    (while unknowns
+      (setq expf (expand-file-name
+		  (car unknowns)
+		  (mhc-summary-folder-to-path mhc-base-folder)))
+      (cond
+       ((and (file-directory-p expf)
+	     (or (string-match
+		  "^[12][0-9][0-9][0-9]/[01][0-9]$" (car unknowns))
+		 (string-match
+		  "^[12][0-9][0-9][0-9]$" (car unknowns))
+		 (string-match
+		  "^intersect$" (car unknowns))))
+	(setq dirs (cons (car unknowns) dirs)))
+       ((and (file-regular-p expf)
+	     (or (string-match
+		  "^[12][0-9][0-9][0-9]/[01][0-9]/[1-9][0-9]*$" (car unknowns))
+		 (string-match
+		  "^intersect/[1-9][0-9]*$" (car unknowns))))
+	(setq files (cons (car unknowns) files))))
+      (setq unknowns (cdr unknowns)))
+    (while (setq dir (car dirs))
+      (setq dirs (cdr dirs))
+      (mhc-cvs/backend (list "add" dir))
+      (save-excursion
+	(set-buffer mhc-cvs/tmp-buffer-name)
+	(goto-char (point-min))
+	(when (looking-at "\\? ")
+	  (setq file (buffer-substring (match-end 0) (progn (end-of-line) (point))))
+	  (setq expf (expand-file-name
+		      file
+		      (mhc-summary-folder-to-path mhc-base-folder)))
+	  (cond
+	   ((and (file-directory-p expf)
+		 (string-match
+		  "^[12][0-9][0-9][0-9]/[01][0-9]$" file))
+	    (setq dirs (cons file dirs)))
+	   ((and (file-regular-p expf)
+		 (or (string-match
+		      "^[12][0-9][0-9][0-9]/[01][0-9]/[1-9][0-9]*$" file)
+		     (string-match
+		      "^intersect/[1-9][0-9]*$" file)))
+	    (setq files (cons file files)))))))
+    (while (setq file (car files))
+      (setq expf (expand-file-name
+		  file (mhc-summary-folder-to-path mhc-base-folder)))
+      (setq loop t)
+      (while loop
+	(message
+	 (format "[file: %s] ? A)dd CVS repository, R)emove immediately, M)ove to trash"
+		 file))
+	(condition-case nil
+	    (setq char (read-char))
+	  (error (setq char ?Z)))	;; dummy set
+ 	 (cond
+ 	  ((eq char ?a)
+ 	   (setq loop nil)
+	   (message
+	    (format "[file: %s]  Add CVS repository..." file))
+	   (and (= 0 (mhc-cvs/backend (list "add" file)))
+		(mhc-cvs/modify expf))
+	   (message
+	    (format "[file: %s]  Add CVS repository... done." file)))
+	  ((eq char ?r)
+ 	   (setq loop nil)
+	   (message "")
+ 	   (delete-file expf))
+ 	  ((eq char ?m)
+	   (setq loop nil)
+	   (message "")
+ 	   (rename-file
+	    expf
+	    (mhc-misc-get-new-path
+ 	     (expand-file-name "trash"
+			       (mhc-summary-folder-to-path mhc-base-folder)))))))
+      (setq files (cdr files)))))
+
+
+(add-hook 'mhc-draft-finish-hook 'mhc-cvs-edit-conflict-file)
 
 
 (provide 'mhc-cvs)

@@ -4,7 +4,7 @@
 ;; Author:  Hideyuki SHIRAI <shirai@quickhack.net>
 ;;
 ;; Created: 2000/06/12
-;; Revised: $Date: 2000/08/22 02:25:59 $
+;; Revised: $Date: 2001/01/31 11:26:37 $
 
 ;;; Commentary:
 
@@ -54,7 +54,7 @@
 	(make-directory new-path))
     (rename-file file (mhc-misc-get-new-path new-path))))
 
-(defun mhc-sync/start-process ()
+(defun mhc-sync/start-process (&optional full)
   (cond
    ((not (and (stringp mhc-sync-remote) (stringp mhc-sync-id)))
     (message "No remote server specified.")

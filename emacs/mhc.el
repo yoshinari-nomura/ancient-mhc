@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1994/07/04
-;; Revised: $Date: 2000/12/15 02:30:59 $
+;; Revised: $Date: 2001/01/31 11:26:37 $
 
 ;;;
 ;;; Commentay:
@@ -82,13 +82,15 @@
 	("Network"
 	 ["Online" mhc-file-toggle-offline mhc-file/offline]
 	 ["Offline" mhc-file-toggle-offline (not mhc-file/offline)]
-	 ["Sync" mhc-file-sync (and (not mhc-file/offline)
+	 ["Sync" mhc-file-sync (and (not (and mhc-file/offline
+					      (not mhc-file-sync-enable-offline)))
 				    (if (eq mhc-file-method 'mhc-sync)
 					(and (stringp mhc-sync-remote)
 					     (stringp mhc-sync-id))
 				      mhc-file-method))])
 	"----"
 	("PostScript"
+	 ["PostScript" mhc-ps t]
 	 ["Preview" mhc-ps-preview t]
 	 ["Print" mhc-ps-print t]
 	 ["Save" mhc-ps-save t]
@@ -118,6 +120,9 @@
   (define-key mhc-prefix-map "i" 'mhc-insert-schedule)
   (define-key mhc-prefix-map "?" 'mhc-calendar)
   (define-key mhc-prefix-map "t" 'mhc-calendar-toggle-insert-rectangle)
+  (define-key mhc-prefix-map "P" 'mhc-ps)
+  (define-key mhc-prefix-map "T" 'mhc-file-toggle-offline)
+  (define-key mhc-prefix-map "S" 'mhc-file-sync)
   (define-key mhc-mode-map mhc-prefix-key mhc-prefix-map))
 
 (defvar mhc-mode nil "Non-nil when in mhc-mode.")
@@ -332,22 +337,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; goto-*
 
-(defvar mhc-month-hist nil)
-
-(defun mhc-input-month (prompt &optional default)
-  (let ((ret nil)
-	(month-str (mhc-date-format (or default (mhc-date-now)) "%04d/%02d" yy mm)))
-    (while (null ret)
-      (setq month-str 
-	    (read-from-minibuffer
-	     (concat prompt "(yyyy/mm) : ") month-str nil nil 'mhc-month-hist))
-      (if (string-match "\\([0-9]+\\)/\\([0-9]+\\)" month-str)
-	  (setq ret (mhc-date-new
-		     (string-to-number (match-string 1 month-str))
-		     (string-to-number (match-string 2 month-str))
-		     1 t))))
-    ret))
-
 (defun mhc-goto-month (&optional date hide-private)
   "*Show schedules of specified month.
 If HIDE-PRIVATE, priavate schedules are suppressed."
@@ -383,7 +372,7 @@ If HIDE-PRIVATE, private schedules are suppressed."
   (mhc-goto-next-month (- arg)))
 
 (defun mhc-goto-today (&optional no-display)
-  "*Go to the line of today's schedule.
+  "*Go to the line of today's schedule or first day of month.
 Unless NO-DISPLAY, display it."
   (interactive "P")
   (let ((now (mhc-date-now))
@@ -392,15 +381,22 @@ Unless NO-DISPLAY, display it."
 	(progn
 	  (goto-char (point-min))
 	  (mhc-date-let now
-	    (and 
-	     (= yy (mhc-date-yy buf-date))
-	     (= mm (mhc-date-mm buf-date))
-	     (when (mhc-summary-search-date now)
-	       (forward-line 0)
-	       (or (pos-visible-in-window-p (point))
-		   (recenter))
-	       (or no-display
-		   (mhc-summary-display-article)))))))))
+	    (if (and (= yy (mhc-date-yy buf-date))
+		     (= mm (mhc-date-mm buf-date)))
+		(when (mhc-summary-search-date now)
+		  (forward-line 0)
+		  (or (pos-visible-in-window-p (point))
+		      (recenter))
+		  (or no-display
+		      (mhc-summary-display-article)))
+	      (when (and mhc-use-wide-scope
+			 (mhc-summary-search-date (mhc-date-mm-first buf-date)))
+		(forward-line 0)
+		(or (pos-visible-in-window-p (point))
+		    (recenter))
+		(or no-display
+		    (mhc-summary-display-article)))))))))
+		
 
 (defun mhc-rescan-month (&optional hide-private)
   "*Rescan schedules of this buffer.
@@ -412,7 +408,7 @@ If HIDE-PRIVATE, private schedules are suppressed."
       current-prefix-arg)))
   (let ((line (+ (count-lines (point-min) (point))
 		 (if (= (current-column) 0) 1 0))))
-    (mhc-scan-month (mhc-current-date-month)
+    (mhc-scan-month (or (mhc-current-date-month) (mhc-date-now))
 		    (mhc-summary-mailer-type)
 		    mhc-default-category-predicate-sexp
 		    hide-private)
@@ -429,12 +425,47 @@ If HIDE-PRIVATE, private schedules are suppressed."
   "Indicate summary buffer's month. It is also used by mhc-summary-buffer-p")
 (make-variable-buffer-local 'mhc-summary-buffer-current-date-month)
 
+
 (defun mhc-scan-month (date mailer category-predicate secret)
   (let ((from  (mhc-date-mm-first date))
 	(to    (mhc-date-mm-last date))
-	(today (mhc-date-now)))
+	(today (mhc-date-now))
+	bfrom bto afrom ato wweek0 wweek1 wweek2)
     (or (eq 'direct mailer)
 	(mhc-summary-generate-buffer date mailer))
+    (when mhc-use-wide-scope
+      (if (and mhc-use-week-separator
+	       (not (eq mhc-use-week-separator 0)))
+	  (setq wweek0 0 wweek1 6 wweek2 7)
+	(setq wweek0 1 wweek1 0 wweek2 8))
+      (cond
+       ((integerp mhc-use-wide-scope)
+	(setq bfrom (mhc-date- from mhc-use-wide-scope))
+	(setq bto (mhc-date-mm-last bfrom))
+	(setq ato (mhc-date+ to mhc-use-wide-scope))
+	(setq afrom (mhc-date-mm-first ato)))
+       ((eq mhc-use-wide-scope 'week)
+	(if (eq (mhc-date-ww from) wweek0)
+	    (setq bfrom nil bto nil)
+	  (setq bfrom
+		(mhc-date+ (mhc-date- from 7)
+			   (% (mhc-date- wweek2 (mhc-date-ww from)) 7)))
+	  (setq bto (mhc-date-mm-last bfrom)))
+	(if (eq (mhc-date-ww to) wweek1)
+	    (setq afrom nil ato nil)
+	  (setq ato (mhc-date+ to (mhc-date- wweek2 (mhc-date-ww to) 1)))
+	  (setq afrom (mhc-date-mm-first ato))))
+       ((eq mhc-use-wide-scope 'wide)
+	(if (eq (mhc-date-ww from) wweek0)
+	    (setq bfrom (mhc-date- from 7))
+	  (setq bfrom
+		(mhc-date+ (mhc-date- from 7)
+			   (% (mhc-date- wweek2 (mhc-date-ww from)) 7))))
+	(setq bto (mhc-date-mm-last bfrom))
+	(if (eq (mhc-date-ww to) wweek1)
+	    (setq ato (mhc-date+ to 7))
+	  (setq ato (mhc-date+ to (mhc-date- wweek2 (mhc-date-ww to) 1))))
+	(setq afrom (mhc-date-mm-first ato)))))
     (message (mhc-date-format date "Scanning %04d/%02d ..." yy mm))
     (unless (eq 'direct mailer)
       (when (and (eq mhc-todo-position 'top)
@@ -443,7 +474,15 @@ If HIDE-PRIVATE, private schedules are suppressed."
 	 today mailer category-predicate secret)
 	(insert (make-string mhc-todo-mergin ?\n))
 	(mhc-summary/insert-separator)))
+    (when (and bfrom bto)
+      (mhc-summary-make-contents bfrom bto mailer category-predicate secret)
+      (when mhc-use-month-separator
+	(mhc-summary/insert-separator 'wide)))
     (mhc-summary-make-contents from to mailer category-predicate secret)
+    (when (and afrom ato)
+      (when mhc-use-month-separator
+	(mhc-summary/insert-separator 'wide))
+      (mhc-summary-make-contents afrom ato mailer category-predicate secret))
     (unless (eq 'direct mailer)
       (when (and (eq mhc-todo-position 'bottom)
 		 mhc-insert-todo-list)
@@ -460,8 +499,8 @@ If HIDE-PRIVATE, private schedules are suppressed."
       (set-buffer-modified-p nil)
       (setq mhc-summary-buffer-current-date-month
 	    (mhc-date-mm-first date))
-      (mhc-goto-today t))
-    (message (mhc-date-format date "Scanning %04d/%02d ... done." yy mm))))
+      (mhc-goto-today t)
+    (message (mhc-date-format date "Scanning %04d/%02d ... done." yy mm)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; import, edit, delete, modify
@@ -674,7 +713,9 @@ Returns t if the importation was succeeded."
 	url)
     (with-temp-buffer
       (insert-file-contents filename)
-      (if (setq url (mhc-header-narrowing (mhc-header-get-value "x-url")))
+      (if (setq url (mhc-header-narrowing
+		      (or (mhc-header-get-value "x-uri")
+			  (mhc-header-get-value "x-url"))))
 	  (progn
 	    (funcall mhc-browse-x-url-function url)
 	    (message "X-URL browser started."))
@@ -703,43 +744,6 @@ Returns t if the importation was succeeded."
 	  (mhc-draft-mode)
 	  (set (make-local-variable 'mhc-draft-buffer-file-name) file)))
     (message "Specified file(%s) does not exist." file)))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; input x-sc- schedule data from minibuffer.
-
-(defconst mhc-input-time-regex "^\\([0-9]+\\):\\([0-9]+\\)$")
-
-(defvar mhc-subject-hist nil)
-
-(defun mhc-input-subject (&optional prompt default)
-  (interactive)
-  (read-from-minibuffer  (or prompt "Subject: ")
-			 (or default "")
-			 nil nil 'mhc-subject-hist))
-
-(defvar mhc-location-hist nil)
-
-(defun mhc-input-location (&optional prompt default)
-  (interactive)
-  (read-from-minibuffer  (or prompt "Location: ")
-			 (or default "")
-			 nil nil 'mhc-location-hist))
-
-(defvar mhc-category-hist nil)
-
-(defun mhc-input-category (&optional prompt default)
-  (interactive)
-  (let (in)
-    (and default
-	 (listp default)
-	 (setq default (mapconcat 'identity default " ")))
-    (if (string= "" (setq in (read-from-minibuffer 
-			      (or prompt "Category: ")
-			      (or default "")
-			      nil nil 'mhc-category-hist)))
-	nil
-      (mhc-misc-split in))))
-
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -821,26 +825,6 @@ Returns t if the importation was succeeded."
 		  hide-private)
   (exchange-point-and-mark))
 
-(defvar mhc-date-hist nil)
-
-(defun mhc-input-date (&optional prompt default)
-  (interactive)
-  (let* ((date (or default (mhc-date-now)))
-	 yy mm in dlst tlst tstr dstr ret err)
-    ;; input date string.
-    (setq in (read-from-minibuffer
-	      (concat (or prompt "") " (yyyy/mm/dd) : ")
-	      (mhc-date-format date "%04d/%02d/%02d" yy mm dd)
-	      nil nil 'mhc-date-hist))
-    ;; check format
-    (if (not (string-match
-	      "\\([0-9]+\\)/\\([0-9]+\\)/\\([0-9]+\\)"
-	      in))
-	nil
-      (mhc-date-new (string-to-number (match-string 1 in))
-		    (string-to-number (match-string 2 in))
-		    (string-to-number (match-string 3 in))))))
-
 (defun mhc-view-file ()
   "View the schedule on the current line in View mode in another window."
   (interactive)
@@ -910,6 +894,7 @@ Returns t if the importation was succeeded."
     (and (mhc-use-icon-p) (mhc-icon-setup))
     (and mhc-calendar-link-hnf (mhc-calendar-hnf-face-setup))
     (mhc-summary-line-inserter-setup)
+    (autoload 'mhc-ps "mhc-ps" "*Create PostScript calendar with selected method." t)
     (autoload 'mhc-ps-preview "mhc-ps" "*Preview PostScript calendar." t)
     (autoload 'mhc-ps-print "mhc-ps" "*Print PostScript calendar." t)
     (autoload 'mhc-ps-save "mhc-ps" "*Save PostScript calendar." t)

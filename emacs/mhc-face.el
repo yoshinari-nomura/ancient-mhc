@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 2000/02/08
-;; Revised: $Date: 2000/12/14 10:39:55 $
+;; Revised: $Date: 2001/01/31 11:26:36 $
 
 ;;;
 ;;; Commentay:
@@ -48,6 +48,7 @@ refer to mhc-calendar-hnf-face-alist-internal.")
     (mhc-summary-face-today     . (nil "black"       "chocolate"))
     ;;
     (mhc-summary-face-separator . (nil "gray"        nil))
+    (mhc-summary-face-month-separator . (nil "DarkKhaki" nil))
     (mhc-summary-face-time      . (nil "yellowgreen" nil))
     (mhc-summary-face-location  . (nil "black"       "paleturquoise"))
     (mhc-summary-face-conflict  . (nil "white"       "purple"))

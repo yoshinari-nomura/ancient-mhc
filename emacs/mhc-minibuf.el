@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1999/12/10
-;; Revised: $Date: 2000/08/07 02:16:21 $
+;; Revised: $Date: 2001/01/31 11:26:37 $
 
 ;;;
 ;;; Commentay:
@@ -306,6 +306,61 @@
 	 ((string= "" str)
 	  (throw 'ok (list nil nil))))
 	(beep)))))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; input x-sc- schedule data from minibuffer.
+
+
+(defvar mhc-month-hist nil)
+
+(defun mhc-input-month (prompt &optional default)
+  (let ((ret nil)
+	(month-str (mhc-date-format (or default (mhc-date-now)) "%04d/%02d" yy mm)))
+    (while (null ret)
+      (setq month-str 
+	    (read-from-minibuffer
+	     (concat prompt "(yyyy/mm) : ") month-str nil nil 'mhc-month-hist))
+      (if (string-match "\\([0-9]+\\)/\\([0-9]+\\)" month-str)
+	  (setq ret (mhc-date-new
+		     (string-to-number (match-string 1 month-str))
+		     (string-to-number (match-string 2 month-str))
+		     1 t))))
+    ret))
+
+(defconst mhc-input-time-regex "^\\([0-9]+\\):\\([0-9]+\\)$")
+
+(defvar mhc-subject-hist nil)
+
+(defun mhc-input-subject (&optional prompt default)
+  (interactive)
+  (read-from-minibuffer  (or prompt "Subject: ")
+			 (or default "")
+			 nil nil 'mhc-subject-hist))
+
+(defvar mhc-location-hist nil)
+
+(defun mhc-input-location (&optional prompt default)
+  (interactive)
+  (read-from-minibuffer  (or prompt "Location: ")
+			 (or default "")
+			 nil nil 'mhc-location-hist))
+
+(defvar mhc-category-hist nil)
+
+(defun mhc-input-category (&optional prompt default)
+  (interactive)
+  (let (in)
+    (and default
+	 (listp default)
+	 (setq default (mapconcat 'identity default " ")))
+    (if (string= "" (setq in (read-from-minibuffer 
+			      (or prompt "Category: ")
+			      (or default "")
+			      nil nil 'mhc-category-hist)))
+	nil
+      (mhc-misc-split in))))
+
 
 (provide 'mhc-minibuf)
 
