@@ -8,7 +8,7 @@
 ##          
 ##
 ## Created: 2001/09/15
-## Revised: $Date: 2001/09/30 01:43:04 $
+## Revised: $Date: 2001/10/11 16:04:38 $
 ##
 
 $DEBUG = false
@@ -66,7 +66,7 @@ module RepeatPattern
       for i in 0..6
 	mask += (1 << i) if @dow[i]
       end
-      rp .RecurrenceType = OlConst .const_get("OlRecursWeekly")
+      rp .RecurrenceType = OlConst::OlRecursWeekly
       rp .DayOfWeekMask = mask
     end
   end
@@ -80,7 +80,7 @@ module RepeatPattern
     def handle_recurrence(ol_appoint)
       # DBI: multiple days should be supported.
       rp = ol_appoint .GetRecurrencePattern()
-      rp .RecurrenceType = OlConst .const_get("OlRecursMonthly")
+      rp .RecurrenceType = OlConst::OlRecursMonthly
       rp .DayOfMonth = @start .d()
     end
   end
@@ -97,7 +97,7 @@ module RepeatPattern
       # DBI: multiple days should be supported.
       rp = ol_appoint .GetRecurrencePattern()
       rp .Interval = @interval
-      rp .RecurrenceType = OlConst .const_get("OlRecursMonthNth")
+      rp .RecurrenceType = OlConst::OlRecursMonthNth
       rp .DayOfWeekMask = (1 << @dow)
       rp .Instance = @wom + 1 # Instance(week of month) begins with 1
     end
@@ -112,7 +112,7 @@ module RepeatPattern
     def handle_recurrence(ol_appoint)
       # DBI: multiple months should be supported.
       rp = ol_appoint .GetRecurrencePattern()
-      rp .RecurrenceType = OlConst .const_get("OlRecursYearly")
+      rp .RecurrenceType = OlConst::OlRecursYearly
       rp .Duration = 60 * 24
       rp .Interval = @interval
       rp .DayOfMonth = @start .d()
@@ -130,7 +130,7 @@ module RepeatPattern
     def handle_recurrence(ol_appoint)
       # DBI: multiple months should be supported.
       rp = ol_appoint .GetRecurrencePattern()
-      rp .RecurrenceType = OlConst .const_get("OlRecursYearNth")
+      rp .RecurrenceType = OlConst::OlRecursYearNth
       rp .Duration = 60 * 24
       rp .DayOfMonth = @start .d()
       rp .MonthOfYear = @start .m()
@@ -302,7 +302,7 @@ class Exporter
       end
     end
     @ol_name_space = @outlook .GetNamespace("MAPI")
-    folder_type = OlConst .const_get("OlFolderCalendar")
+    folder_type = OlConst::OlFolderCalendar
     @ol_calendar = @ol_name_space .GetDefaultFolder(folder_type)
   end
 
@@ -310,7 +310,7 @@ class Exporter
     ap = nil
     begin
       ap = @ol_name_space .GetItemFromID(id, @ol_calendar.StoreID)
-      if ap.Parent.DefaultItemType != OlConst .const_get("OlAppointmentItem")
+      if ap.Parent.DefaultItemType != OlConst::OlAppointmentItem
 	ap = nil
       end
     rescue
@@ -350,7 +350,7 @@ class Exporter
   def setup_ol_appointments(periods, sch)
     ol_info = []
     for period in periods
-      appoint = @outlook .CreateItem(OlConst .const_get("OlAppointmentItem"))
+      appoint = @outlook .CreateItem(OlConst::OlAppointmentItem)
       sdate, edate = period .get_period()
       sdate = Exporter .to_ol_date(sdate)
       edate = Exporter .to_ol_date(edate)
