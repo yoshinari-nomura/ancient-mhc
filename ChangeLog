@@ -1,3 +1,7 @@
+2000-12-19  Kazuhiro NISHIYAMA <zn@mbf.nifty.com> / nom@quickhack.net
+
+	* mhc-make.rb: filter -> collect.
+
 2000-12-15  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* emacs/mhc-calendar.el (mhc-calendar-toggle-insert-rectangle):
