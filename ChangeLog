@@ -1,3 +1,9 @@
+2003-04-28  MIYOSHI Masanori  <miyoshi@boreas.dti.ne.jp>
+
+	* mhc2ol.in (MonthlyByDow.handle_recurrence): Limit the range of
+	rp.Instance to 5 which means the last week.
+	(MhcScheduleItem.to_outlook): Lower the case of ord_str.
+
 2003-04-15  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* emacs/mhc-mew.el (mhc-mew/header-string)

@@ -8,7 +8,7 @@
 ##          
 ##
 ## Created: 2001/09/15
-## Revised: $Date: 2003/03/07 13:30:04 $
+## Revised: $Date: 2003/04/28 02:32:20 $
 ##
 
 $DEBUG = false
@@ -122,7 +122,8 @@ module RepeatPattern
       rp = get_recurrence(ol_appoint)
       rp .RecurrenceType = OlConst::OlRecursMonthNth
       rp .DayOfWeekMask = (1 << @dow)
-      rp .Instance = @wom + 1 # Instance(week of month) begins with 1
+      # Instance(week of month) begins with 1
+      rp .Instance = [@wom + 1, 5] .min()
     end
   end
 
@@ -235,7 +236,7 @@ class MhcScheduleItem
       ## monthly by day
       cond_ord .each{|ord_str|
 	cond_wek .each{|wek_str|
-	  ord = MhcDate::O_LABEL .index(ord_str)
+	  ord = MhcDate::O_LABEL .index(ord_str .downcase())
 	  wek = MhcDate::W_LABEL .index(wek_str)
 	  sch2 = MhcScheduleItem .new .add_cond(ord_str) .add_cond(wek_str)
 	  beg2 = beg .dup
