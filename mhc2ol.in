@@ -8,7 +8,7 @@
 ##          
 ##
 ## Created: 2001/09/15
-## Revised: $Date: 2003/03/06 13:43:33 $
+## Revised: $Date: 2003/03/07 13:30:04 $
 ##
 
 $DEBUG = false
@@ -162,7 +162,7 @@ end
 
 def usage
   print '
-usage: mhc2ol [-a | -i | -N] [-n] [-s] [-r dir] [-c category] [YYYYMMDD-yyyymmdd]
+usage: mhc2ol [-a | -i | -d | -N] [-n] [-s] [-m] [-r dir] [-c category] [YYYYMMDD-yyyymmdd]
 
   mhc2ol -- Add/Copy mhc articles to Outlook.
 
@@ -171,14 +171,18 @@ usage: mhc2ol [-a | -i | -N] [-n] [-s] [-r dir] [-c category] [YYYYMMDD-yyyymmdd
              all the original records of Outlook will remain.
     -i     : Copy mhc articles into Outlook.
              all the original records of Outlook will be lost.
-    -N     : Copy only the articles that has been modified since
+    -d     : Copy mhc articles into Outlook.
+             Only the records of Outlook in `MHC-sch\' category
+             will be lost.
+    -N     : Copy only the articles that have been modified since
              the last execution.
     -n     : Do nothing effectives. Useful for checking.
     -s     : Split appointments and tasks.
-    -c     : Copy only the mhc articles of which the category
-             matches the specified regexp.
+    -m     : Append an additional category `MHC-sch\'.
     -r dir : Set repository directory of the mhc.
              ~/Mail/schedule
+    -c     : Copy only the mhc articles of which the category
+             matches the specified regexp.
 
     YYYYMMDD-yyyymmdd : set a start and end date of scanning mhc.
                         if omitted, scan from 3 months ago to
@@ -307,6 +311,8 @@ class Exporter
   @@flag_install = false
   @@flag_noharm = false
   @@flag_timestamp = false
+  @@mhc_category_name = 'MHC-sch'
+  @@additional_category = false
 
   def initialize(mdb, outlook)
     @mhc_db = mdb
@@ -425,7 +431,11 @@ class Exporter
 	appoint .Duration = period .get_duration()
       end
 
-      appoint .Categories = sch .category_as_string()
+      cat_string = sch .category_as_string()
+      if @@flag_additional_category
+	cat_string = @@mhc_category_name + "," + cat_string
+      end
+      appoint .Categories = cat_string
       appoint .Body = MhcKconv::todisp(sch .dump())
 
       # a reminder is valid for a future schedule.
@@ -446,17 +456,22 @@ class Exporter
       todo_p = true if cats .delete('todo')
       done_p = true if cats .delete('done')
       appoint .Sensitivity = OlConst::OlPrivate if cats .include?('private')
-      appoint .Categories = cats .join(',')
+      cat_string = cats .join(',')
+      if @@flag_additional_category
+	cat_string = @@mhc_category_name + "," + cat_string
+      end
+      appoint .Categories = cat_string
       $= = old_sp
       appoint .Body = MhcKconv::todisp(sch .dump())
-      appoint .Save() if !$flag_separation
+      appoint .Save() if !$flag_separation  || !todo_p
 
       # Copy TODO
       if todo_p
 	task = @outlook .CreateItem(OlConst::OlTaskItem)
         sdate, edate = sch .duration
         task .StartDate = Exporter .to_ol_date(sdate) || appoint .Start
-	task .DueDate = Exporter .to_ol_date(edate) || appoint .End
+	task .DueDate = Exporter .to_ol_date(edate) || task .StartDate
+
         if done_p
 	  task .Complete = true
 	  task .DateCompleted = appoint .End
@@ -637,23 +652,32 @@ class Exporter
   end
 
   def delete_ol_schedules()
-    if @@flag_install && !@@flag_noharm
-      print "delete all articles in Outlook."
-      if !@@flag_noharm
-	# Appointments
-	items = @ol_calendar .items()
-	index = items .Count
-	while index > 0 do
+    if (@@flag_install || @@flag_discreet) && !@@flag_noharm
+      # Appointments
+      print "deleting appointments in Outlook."
+      items = @ol_calendar .items()
+      index = items .Count
+      while index > 0 do
+	cats = items. Item(index) .Categories
+	unless @@flag_discreet && !cats .include?(@@mhc_category_name)
 	  items .Remove(index)
-	  index -= 1
 	end
-	# Tasks
-	items = @ol_tasks .items()
-	index = items .Count
-	while index > 0 do
+	index -= 1
+	print "."
+      end
+      print ".. done.\n"
+
+      # Tasks
+      print "deleting tasks in Outlook."
+      items = @ol_tasks .items()
+      index = items .Count
+      while index > 0 do
+	cats = items. Item(index) .Categories
+	unless @@flag_discreet && !cats .include?(@@mhc_category_name)
 	  items .Remove(index)
-	  index -= 1
 	end
+	index -= 1
+	print "."
       end
       print ".. done.\n"
     end
@@ -671,12 +695,20 @@ class Exporter
     @@flag_install = flag
   end
 
+  def Exporter.set_flag_discreet(flag)
+    @@flag_discreet = flag
+  end
+
   def Exporter.set_flag_noharm(flag)
     @@flag_noharm = flag
   end
 
   def Exporter.set_flag_timestamp(flag)
     @@flag_timestamp = flag
+  end
+
+  def Exporter.set_flag_additional_category(flag)
+    @@flag_additional_category = flag
   end
 
   def Exporter.to_ol_date(date)
@@ -699,6 +731,8 @@ $flag_timestamp = nil
 $flag_category_regexp = ""
 $flag_dir = File .expand_path("~/Mail/schedule")
 $flag_separation = false
+$flag_discreet = false
+$flag_additional_category = false
 
 while ARGV .length > 0
   case ARGV[0]
@@ -708,6 +742,8 @@ while ARGV .length > 0
     $flag_append  = true
   when '-i'
     $flag_install = true
+  when '-d'
+    $flag_discreet = true
   when '-n'
     $flag_noharm  = true
   when '-r'
@@ -722,6 +758,8 @@ while ARGV .length > 0
     $flag_timestamp = true
   when '-s'
     $flag_separation = true
+  when '-m'
+    $flag_additional_category = true
   else
     usage()
   end
@@ -731,7 +769,15 @@ end
 $flag_from = MhcDate .new .m_succ!(-3) if !$flag_from
 $flag_to   = MhcDate .new .m_succ!(+3) if !$flag_to
 
-usage() if (!($flag_append || $flag_install || $flag_timestamp) || ($flag_append && $flag_install && $flag_timestamp))
+
+usage() unless (($flag_append && !$flag_install \
+		 && !$flag_discreet && !$flag_timestamp) \
+		||(!$flag_append && $flag_install \
+		   && !$flag_discreet && !$flag_timestamp) \
+		|| (!$flag_append && !$flag_install \
+		    && $flag_discreet && !$flag_timestamp) \
+		|| (!$flag_append && !$flag_install \
+		    && !$flag_discreet && $flag_timestamp))
 
 ##
 ## Initialize Outlook OLE Automation object
@@ -755,8 +801,10 @@ mdb = MhcScheduleDB .new($flag_dir)
 Exporter .set_sync_filename($flag_dir + "/.ol_sync")
 Exporter .set_flag_verbose($flag_verbose)
 Exporter .set_flag_install($flag_install)
+Exporter .set_flag_discreet($flag_discreet)
 Exporter .set_flag_noharm($flag_noharm)
 Exporter .set_flag_timestamp($flag_timestamp)
+Exporter .set_flag_additional_category($flag_additional_category)
 exporter = Exporter .new(mdb, outlook)
 exporter .set_category_regexp($flag_category_regexp)
 exporter .delete_ol_schedules()

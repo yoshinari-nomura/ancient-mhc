@@ -1,3 +1,18 @@
+2003-03-07  MIYOSHI Masanori  <miyoshi@boreas.dti.ne.jp>
+
+	* mhc2ol.in (usage): New options `-m' and `-d'.
+	(Exporter): New class varialbes @@mhc_category_name and
+	(Exporter): @@additional_category = false.
+	(Exporter.setup_ol_appointments): Append `MHC-sch' category to
+	Outlook appointments and tasks.
+	(Exporter.setup_ol_appointments): Improve the condition to save an
+	Outlook appointment. Thanks to sakura@tennodai.com.
+	(Exporter.setup_ol_appointments): Improve the derivation of
+	task.DueDate.  Thanks to sakura@tennodai.com.
+	(Exporter.delete_ol_schedules): Support `-d' option.
+	(Exporter.set_flag_discreet): New method.
+	(Exporter.set_flag_additional_category): Ditto.
+
 2003-03-06  MIYOSHI Masanori  <miyoshi@boreas.dti.ne.jp>
 
 	* mhc2ol.in (RepeatPattern.Period.get_duration): Return 60 * 24
