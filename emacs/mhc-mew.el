@@ -333,7 +333,7 @@
 (defconst mhc-mew-header-decode-regex "\\(=\\?[^? \t]+\\?.\\?[^? \t]+\\?=\\)")
 
 (defun mhc-mew-eword-decode-string (string)
-  (let ((ret ""))
+  (let ((ret "") tmpstr)
     (while (string-match "\n" string)
       (setq string (replace-match "" nil nil string)))
     (while (string-match (concat mhc-mew-header-decode-regex
@@ -346,12 +346,13 @@
     (while (not (string= string ""))
       (if (not (string-match mew-header-decode-regex string))
 	  (setq ret (concat ret string) string "")
+	(setq tmpstr (substring string (match-end 0)))
 	(setq ret (concat ret
 			  (substring string 0 (match-beginning 0))
 			  (mew-header-decode (mew-match 1 string)
 					     (mew-match 2 string)
 					     (mew-match 3 string))))
-	(setq string (substring string (match-end 0)))))
+	(setq string tmpstr)))
     ret))
 
 (provide 'mhc-mew)
