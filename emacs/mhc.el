@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1994/07/04
-;; Revised: $Date: 2000/06/21 09:10:25 $
+;; Revised: $Date: 2000/06/22 09:42:42 $
 
 ;;;
 ;;; Commentay:
@@ -170,9 +170,9 @@
 
 (defvar mhc-month-hist nil)
 
-(defun mhc-input-month (prompt)
+(defun mhc-input-month (prompt &optional default)
   (let ((ret nil)
-	(month-str (mhc-date-format (mhc-date-now) "%04d/%02d" yy mm)))
+	(month-str (mhc-date-format (or default (mhc-date-now)) "%04d/%02d" yy mm)))
     (while (null ret)
       (setq month-str 
 	    (read-from-minibuffer

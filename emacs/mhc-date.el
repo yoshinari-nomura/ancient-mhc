@@ -4,7 +4,7 @@
 ;;          TSUCHIYA Masatoshi <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 ;;
 ;; Created: 2000/06/14
-;; Revised: $Date: 2000/06/21 02:20:40 $
+;; Revised: $Date: 2000/06/22 09:42:42 $
 
 ;;;
 ;;; Commentary:
@@ -423,12 +423,12 @@
 
 (defsubst mhc-date-yymm=  (d1 d2)
   (and (mhc-date-yy= d1 d2)
-       (= (mhc-date-mm d1) (mhc-date-mm d1))))
+       (= (mhc-date-mm d1) (mhc-date-mm d2))))
 
 (defsubst mhc-date-yymm<  (d1 d2)
   (or (mhc-date-yy< d1 d2)
       (and (mhc-date-yy= d1 d2)
-	   (< (mhc-date-mm d1) (mhc-date-mm d1)))))
+	   (< (mhc-date-mm d1) (mhc-date-mm d2)))))
 
 (defmacro mhc-date-yymm>  (d1 d2)      `(mhc-date-yymm<  ,d2 ,d1))
 (defmacro mhc-date-yymm<= (d1 d2) `(not (mhc-date-yymm>  ,d1 ,d2)))

@@ -116,7 +116,8 @@
       (mhc-write-region-as-coding-system mhc-default-coding-system
 					 (point-min)
 					 (point-max)
-					 (mhc-record-name record))
+					 (mhc-record-name record)
+					 nil 'nomsg)
       (set-buffer-modified-p nil)
       (if modify
 	  (prog1 (mhc-file-modify (mhc-record-name record))
@@ -148,7 +149,8 @@
 					     (point-min)
 					     (point-max)
 					     mhc-record-log-file
-					     'append)))))
+					     'append
+					     'nomsg)))))
 
 
 

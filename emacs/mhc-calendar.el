@@ -5,7 +5,7 @@
 ;;          MIYOSHI Masanori <miyoshi@ask.ne.jp>
 ;;
 ;; Created: 05/12/2000
-;; Reviesd: $Date: 2000/06/21 01:25:28 $
+;; Reviesd: $Date: 2000/06/22 09:42:42 $
 
 ;; internal variables
 (defvar mhc-calendar/buffer "*mhc-calendar*")
@@ -78,7 +78,7 @@
 (if mhc-calendar-mode-map
     ()
   (setq mhc-calendar-mode-map (make-sparse-keymap))
-  (define-key mhc-calendar-mode-map "."    'mhc-calendar)
+  (define-key mhc-calendar-mode-map "."    'mhc-calendar-goto-today)
   (define-key mhc-calendar-mode-map "g"    'mhc-calendar-goto-month)
   (define-key mhc-calendar-mode-map "r"    'mhc-calendar-rescan)
   (define-key mhc-calendar-mode-map " "    'mhc-calendar-get-day-insert)
@@ -117,7 +117,7 @@
     ()
   (setq mhc-calendar-mode-menu-spec
 	'("Mhc-Calendar"
-	  ["Goto today" mhc-calendar t]
+	  ["Goto today" mhc-calendar-goto-today t]
 	  ["Goto next month" mhc-calendar-inc-month t]
 	  ["Goto prev month" mhc-calendar-dec-month t]
 	  ["Goto month" mhc-calendar-goto-month t]
@@ -168,7 +168,7 @@
 MHC Calendar mode:: major mode to view calendar and select day.
 
 The keys that are defined for mhc-calendar-mode are:
-\\[mhc-calendar]	Jump to today.
+\\[mhc-calendar-goto-today]	Jump to today.
 \\[mhc-calendar-inc-month]	Slide to the next month.
 \\[mhc-calendar-dec-month]	Slide to the previous month.
 \\[mhc-calendar-goto-month]	Jump to your prefer month.
@@ -226,10 +226,19 @@ The keys that are defined for mhc-calendar-mode are:
 
 ;;;###autoload
 (defun mhc-calendar (&optional date)
-  "MHC 3-month mini calender."
+  "Display 3-month mini calender."
   (interactive)
   (or mhc-setup-p (mhc-setup))
-  (mhc-calendar/goto-date (or date (mhc-current-date) (mhc-date-now))))
+  (setq date (or date (mhc-current-date) (mhc-calendar-get-date)))
+  (when (and (get-buffer mhc-calendar/buffer) (set-buffer mhc-calendar/buffer))
+    (setq date (or date mhc-calendar-view-date))
+    (unless (mhc-date-yymm= date mhc-calendar-date)
+      (mhc-calendar/create-buffer date)))
+  (mhc-calendar/goto-date (or date (mhc-date-now))))
+
+(defun mhc-calendar-goto-today ()
+  (interactive)
+  (mhc-calendar (mhc-date-now)))
 
 (defun mhc-calendar/goto-date (date)
   (let ((mhc-calendar-view-summary nil) pos)

@@ -1,3 +1,18 @@
+2000-06-22  Hideyuki SHIRAI  <shirai@rdmg.mgcs.mei.co.jp>
+
+	* emacs/mhc-calendar.el (mhc-calendar): Requested month displays center position.
+	(mhc-calendar-goto-today): New function.
+
+	* emacs/mhc.el (mhc-input-month): Treat default date option.
+
+	* emacs/mhc-date.el (mhc-date-yymm=): Fix mhc-date-mm's option. (d1, d2)
+	(mhc-date-yymm<): Ditto.
+
+	* emacs/mhc-record.el (mhc-record-write-buffer): Add 'nomsg option when write-region.
+	(mhc-record/append-log): Ditto.
+
+	* emacs/MHC-MK (comment): Change exemplum for Meadow.
+	
 2000-06-22  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 
 	* 00readme, 00readme.jis: Follow changes in mailing list address
