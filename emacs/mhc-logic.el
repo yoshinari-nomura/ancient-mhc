@@ -106,7 +106,11 @@
 	  (last-week (> 7 (- (mhc-date/last-day-of-month year month)
 			     day-of-month)))
 	  (new (mhc-day-new year month day-of-month day-of-week)))
-      (mhc-day-set-schedules new (delq nil (mapcar (lambda (sexp) (funcall sexp)) sexp-list)))
+      (mhc-day-set-schedules new (delq nil
+				       (mapcar
+					(lambda (sexp)
+					  (and sexp
+					       (funcall sexp))) sexp-list)))
       new)))
 
 

@@ -47,7 +47,11 @@ FROM, TO は 1970/01/01 からの経過日数を用いて指定"
 	     (sexp-list (mhc-db/get-sexp-list-for-month year month)))
 	(while (<= day to)
 	  (setq new (mhc-day-new day year month day-of-month day-of-week))
-	  (mhc-day-set-schedules new (delq nil (mapcar (lambda (sexp) (funcall sexp)) sexp-list)))
+	  (mhc-day-set-schedules new (delq nil
+					   (mapcar (lambda (sexp) 
+						     (and sexp
+							  (funcall sexp)))
+						   sexp-list)))
 	  (setq list (cons new list)
 		day (1+ day)
 		day-of-month (1+ day-of-month)

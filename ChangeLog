@@ -1,5 +1,10 @@
 2000-07-31  Yuuichi Teranishi  <teranisi@quickhack.net>
 
+	* emacs/mhc-db.el (mhc-db/eval-for-duration): Call `sexp' only if
+	it is non-nil.
+
+	* emacs/mhc-logic.el (mhc-logic-eval-for-date): Ditto.
+
 	* emacs/mhc-mime.el (mhc-mime-get-import-buffer):
 	Bind buffer-read-only as nil while highlighting.
 
