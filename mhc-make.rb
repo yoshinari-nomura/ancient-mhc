@@ -3,7 +3,7 @@
 ## Author:  MIYOSHI Masanori <miyoshi@quickhack.net>
 ##          Yoshinari Nomura <nom@quickhack.net>
 ## Created: 2000/7/12
-## Revised: $Date: 2000/08/05 19:47:46 $
+## Revised: $Date: 2000/08/21 08:48:52 $
 
 require 'rbconfig'
 require 'mkmf'
@@ -353,7 +353,7 @@ class MhcConfigure
     search_path .each{|lib_path|
       print "In #{lib_path} .. "
       $LDFLAGS = "-L#{lib_path}"
-      if have_library("pisock", "pi_socket")
+      if have_library(libname, funcname)
 	found_lib_path = lib_path
 	break
       end
