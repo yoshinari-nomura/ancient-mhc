@@ -229,8 +229,7 @@ function."
   (message-encode-message-body)
   (save-restriction
     (message-narrow-to-headers)
-    (let ((message-newsreader (gnus-extended-version)))
-      (message-generate-headers '(User-Agent Lines)))
+    (message-generate-headers '(Lines))
     (message-remove-header message-ignored-mail-headers t)
     (let ((mail-parse-charset message-default-charset))
       (rfc2047-encode-message-header)))
