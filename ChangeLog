@@ -1,5 +1,9 @@
 2000-05-31  Yuuichi Teranishi  <teranisi@quickhack.net>
 
+	* emacs/mhc-xmas.el: Added copyright notice.
+
+	* emacs/mhc-bm.el: Ditto.
+
 	* emacs/mhc.el (toplevel): Require 'mhc-xmas on XEmacs.
 	Require 'mhc-bm if bitmap is installed.
 	(mhc-use-icon-p): New function.
