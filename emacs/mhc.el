@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@mew.org>
 ;;
 ;; Created: 1994/07/04
-;; Revised: $Date: 2000/05/25 16:49:08 $
+;; Revised: $Date: 2000/05/26 01:06:41 $
 
 ;;;
 ;;; Commentay:
@@ -474,7 +474,9 @@
 	(wl-summary-mode)
 	(wl-summary-buffer-set-folder (mhc-wl-ddate-to-folder ddate))
 	(make-local-variable 'wl-summary-highlight)
-	(setq wl-summary-highlight nil))
+	(setq wl-summary-highlight nil)
+	(setq wl-summary-buffer-number-regexp "[0-9]+")
+	(setq wl-summary-buffer-msgdb '(nil)))
        ((eq type 'gnus)
 	(let (gnus-newsgroup-data)
 	  (gnus-summary-mode (mhc-gnus-ddate-to-vgroup-name ddate)))
