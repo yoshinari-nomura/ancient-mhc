@@ -1,4 +1,4 @@
-#!/usr/local/bin/ruby
+#!/usr/local/bin/ruby -Ke
 
 ##
 ## gp2mhc -- Giga Pocket to MHC

@@ -1,4 +1,4 @@
-#!/usr/local/bin/ruby
+#!/usr/local/bin/ruby -Ke
 
 ### palm2mhc -- copy articles from palm to new mhc repository.
 ##

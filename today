@@ -1,11 +1,11 @@
-#!/usr/local/bin/ruby
+#!/usr/local/bin/ruby -Ke
 
 ## today
 ##
 ## Author:  Yoshinari Nomura <nom@quickhack.net>
 ##
 ## Created: 1999/11/11
-## Revised: $Date: 2000/06/21 08:46:05 $
+## Revised: $Date: 2000/06/23 07:09:14 $
 ##
 ## today was originally written in perl.
 ## This  is a ruby version of it. Original authors were
