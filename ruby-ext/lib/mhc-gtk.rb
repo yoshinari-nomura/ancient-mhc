@@ -3,7 +3,7 @@
 ## Author:  Yoshinari Nomura <nom@quickhack.net>
 ##
 ## Created: 1999/07/16
-## Revised: $Date: 2000/05/29 14:59:25 $
+## Revised: $Date: 2000/06/21 08:46:07 $
 ##
 
 #$DEBUG = true
@@ -24,6 +24,12 @@ when 'SJIS'
 else
   $KANJI_CODE = Kconv::EUC
 end
+
+# xxx: from ruby-gtk 0.23, Gtk::CAN_* changed to Gtk::Widget::CAN_*
+#
+CAN_DEFAULT = Gtk::Widget::CAN_DEFAULT || Gtk::CAN_DEFAULT
+CAN_FOCUS   = Gtk::Widget::CAN_FOCUS   || Gtk::CAN_FOCUS
+
 
 ################################################################
 ##################  Gtk Setup  #################################
@@ -423,12 +429,12 @@ class GtkDayBook < Gtk::VBox
 
     @hbx = GtkButtonBar .new(buttons) if buttons
     @btn = Gtk::Button .new('') .border_width(0) .set_usize(0, 18) \
-           .unset_flags(Gtk::CAN_FOCUS) .set_relief(Gtk::RELIEF_NONE)
+           .unset_flags(CAN_FOCUS) .set_relief(Gtk::RELIEF_NONE)
 
     if need_clist
       @lst = Gtk::CList .new(['Time', 'Desc']) .column_titles_hide \
            .set_selection_mode(Gtk::SELECTION_SINGLE) \
-           .set_column_auto_resize(0, true) .unset_flags(Gtk::CAN_FOCUS) \
+           .set_column_auto_resize(0, true) .unset_flags(CAN_FOCUS) \
            .set_usize(1, 1)
 
       @lst .signal_connect_after('select_row'){|w,r,s,t|
@@ -647,7 +653,7 @@ class GtkConfirm < Gtk::Window
     hbx = Gtk::HBox .new(true , 0)
 
     y = Gtk::Button .new('OK')
-    y .flags |= Gtk::CAN_DEFAULT
+    y .flags |= CAN_DEFAULT
     if btns == 1
       y .grab_default
     end
@@ -656,7 +662,7 @@ class GtkConfirm < Gtk::Window
     
     if btns > 1
       n = Gtk::Button .new('Cancel')
-      n .flags |= Gtk::CAN_DEFAULT
+      n .flags |= CAN_DEFAULT
       n .grab_default
       n .signal_connect('clicked'){p .call(false) if p ; destroy}
       hbx .pack_start(n, true, true, 0)
@@ -745,12 +751,12 @@ class GtkToplevel < Gtk::Window
     hbx = Gtk::HBox .new(true , 0)
 
     y = Gtk::Button .new('OK')
-    y .flags |= Gtk::CAN_DEFAULT
+    y .flags |= CAN_DEFAULT
     y .signal_connect('clicked'){exit}
     hbx .pack_start(y, true, true, 0)
 
     n = Gtk::Button .new('Cancel')
-    n .flags |= Gtk::CAN_DEFAULT
+    n .flags |= CAN_DEFAULT
     n .grab_default
     n .signal_connect('clicked'){top .destroy}
     hbx .pack_start(n, true, true, 0)
@@ -1025,7 +1031,7 @@ class GtkToggleTable < Gtk::Table
 	lbl = label[xs * y + x]
 	if lbl
 	  b = Gtk::ToggleButton .new(lbl .to_s)
-	  b .unset_flags(Gtk::CAN_FOCUS) .border_width(0)
+	  b .unset_flags(CAN_FOCUS) .border_width(0)
 	  @symbols << b
 	  b .signal_connect('toggled'){|w|
 	    p .call(w)
@@ -1073,7 +1079,7 @@ class GtkButtonBar < Gtk::HBox
       pix, map = Gdk::Pixmap .create_from_xpm(w, s, path)
       xpm = Gtk::Pixmap .new(pix, map)
 
-      b = Gtk::Button .new() .unset_flags(Gtk::CAN_FOCUS) .border_width(0)
+      b = Gtk::Button .new() .unset_flags(CAN_FOCUS) .border_width(0)
       b .add(xpm)
       TIPS .set_tip(b, tip, nil)
       self .pack_start(b, false, false, 0)

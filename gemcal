@@ -5,7 +5,7 @@
 ## Author:  Yoshinari Nomura <nom@quickhack.net>
 ##
 ## Created: 1999/09/01
-## Revised: $Date: 2000/05/29 14:59:24 $
+## Revised: $Date: 2000/06/21 08:46:05 $
 ##
 
 # $DEBUG = 1
@@ -503,6 +503,7 @@ end
 class MhcCalendar
   class Visual < GtkToplevel
     BUTTONS = [['prev',  'prev month'], ['next',  'next month'],
+               ['prev_year', 'prev year'], ['next_year', 'next year'],
                ['prev2', 'prev month'], ['next2', 'next month'],
                ['today', 'this month'],	['close', 'close']]
     def initialize(date, x = nil, y = nil)
@@ -533,6 +534,8 @@ class MhcCalendar
     @vml .signal_connect('destroy')          {destroy_handler}
     @vml .signal_connect('next-btn-clicked') {move_month(1)}
     @vml .signal_connect('prev-btn-clicked') {move_month(-1)}
+    @vml .signal_connect('next_year-btn-clicked') {move_month(12)}
+    @vml .signal_connect('prev_year-btn-clicked') {move_month(-12)}
     @vml .signal_connect('next2-btn-clicked'){move_month2(1)}
     @vml .signal_connect('prev2-btn-clicked'){move_month2(-1)}
     @vml .signal_connect('close-btn-clicked'){@vml .destroy}
