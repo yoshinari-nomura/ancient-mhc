@@ -1,3 +1,8 @@
+2000-07-28  Yoshinari Nomura  <nom@quickhack.net>
+
+	* ruby-ext/lib/mhc-schedule.rb (parse_xsc_headers):
+	Allow white spaces after `!' in a Day: field.
+
 2000-07-28  Yuuichi Teranishi  <teranisi@quickhack.net>
 
 	* emacs/mhc.el (toplevel): Require 'mhc-draft.
@@ -54,7 +59,8 @@
 
 2000-07-26  Hideyuki SHIRAI  <shirai@quickhack.net>
 
-	* emacs/mhc-ps.el (mhc-ps-save): Add default option with read-file-name().
+	* emacs/mhc-ps.el (mhc-ps-save): Add default option with
+	  read-file-name().
 	(mhc-ps/make-contents): Support (last|next)-(holiday|schedule).
 	(mhc-ps/replace-table): Ditto.
 	(mhc-ps/string): Ditto. Fix indent for PostScript.
@@ -68,9 +74,11 @@
 2000-07-24  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* emacs/mhc.el (mhc-cal-*):
-	Functions and variables move to mhc-calendar.el and rename 'mhc-calender-*'.
+	Functions and variables move to mhc-calendar.el and rename
+	'mhc-calender-*'.
 	(mhc-setup): Execute (mhc-calender-setup).
-	(mhc-draft-kill): Rename mhc-calendar-separator to mhc-calendar-date-separator.
+	(mhc-draft-kill): Rename mhc-calendar-separator to
+	mhc-calendar-date-separator.
 	(mhc-draft-finish): Ditto.
 
 	* emacs/mhc-vars.el (mhc-calendar-*): Move to mhc-calendar.el.
@@ -92,7 +100,8 @@
 	(mhc-calendar-day-strings): Ditto.
 	(mhc-calendar-header-function): Ditto.
 
-	* emacs/mhc-ps.el (mhc-ps/process): If (eq method 'buffer), ask exec insert.
+	* emacs/mhc-ps.el (mhc-ps/process): If (eq method 'buffer), ask
+	exec insert.
 
 2000-07-21  Hideyuki SHIRAI  <shirai@quickhack.net>
 
