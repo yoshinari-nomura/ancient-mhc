@@ -1,0 +1,18 @@
+/* XPM */
+static char * next_year_xpm[] = {
+/* columns rows colors chars-per-pixel */
+"18 10 3 1",
+/*US*/
+" 	s None	c None",
+".	c Brown",
+/* pixels */
+"   ...   ...      ",
+"   .....   ...    ",
+"   .......   ...  ",
+"   .........   ...",
+"   .......   ...  ",
+"   .....   ...    ",
+"   ...   ...      ",
+"                  ",
+"                  ",
+"                  "};
