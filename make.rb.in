@@ -1,92 +1,40 @@
-#!@@mhc_ruby_path@@
+#!@@MHC_RUBY_PATH@@ -Ke
+
 ## make.rb.in -- Installer for Ruby scripts.
 ##
 ## Author:  MIYOSHI Masanori <miyoshi@quickhack.net>
 ##
 ## Created: 2000/7/12
 ##
-require 'ftools'
-require 'kconv'
 
-RUBY_PATH = "@@mhc_ruby_path@@"
-BINDIR = "@@mhc_bindir@@"
-SCRIPT_FILES = %w(adb2mhc gemcal mhc-sync mhc2palm palm2mhc today)
-SUBDIRS = %w(ruby-ext)
+$LOAD_PATH .unshift('@@MHC_TOPDIR@@')
 
-def process_subdirs(subdirs, *args)
-  target = (args.size() == 1) ? "default" : args[1];
-  while subdir = subdirs.shift()
-    print "Making " + target + " in " + File::expand_path(subdir) + "\n"
-    cd = Dir::pwd()
-    Dir::chdir(subdir)
-    system(RUBY_PATH, *args)
-    Dir::chdir(cd)
-  end
-end
+require 'mhc-make'
+include MhcMake
 
-def default()
-  files = SCRIPT_FILES
-  while filename = files.shift()
-    fin = File::open(filename + ".in")
-    fout = File::open(filename, "w")
-    print "creating: " + filename + "\n";
-    while line = fin.gets()
-      fout.puts(gsub("@mhc_ruby_path@", RUBY_PATH))
-    end
-  end
-  process_subdirs(SUBDIRS, "make.rb")
-end
+INSTALL_FILES = [
+  'adb2mhc:0755:@@MHC_BINDIR@@',
+  'gemcal:0755:@@MHC_BINDIR@@', 
+  'mhc-sync:0755:@@MHC_BINDIR@@', 
+  'mhc2palm:0755:@@MHC_BINDIR@@',
+  'palm2mhc:755:@@MHC_BINDIR@@',
+  'today:0755:@@MHC_BINDIR@@',
+  'xpm/close.xpm:0644:@@MHC_LIBDIR@@/xpm',
+  'xpm/delete.xpm:0644:@@MHC_LIBDIR@@/xpm',
+  'xpm/exit.xpm:0644:@@MHC_LIBDIR@@/xpm',
+  'xpm/month.xpm:0644:@@MHC_LIBDIR@@/xpm',
+  'xpm/next.xpm:0644:@@MHC_LIBDIR@@/xpm',
+  'xpm/next2.xpm:0644:@@MHC_LIBDIR@@/xpm',
+  'xpm/next_year.xpm:0644:@@MHC_LIBDIR@@/xpm',
+  'xpm/open.xpm:0644:@@MHC_LIBDIR@@/xpm',
+  'xpm/prev.xpm:0644:@@MHC_LIBDIR@@/xpm',
+  'xpm/prev2.xpm:0644:@@MHC_LIBDIR@@/xpm',
+  'xpm/prev_year.xpm:0644:@@MHC_LIBDIR@@/xpm',
+  'xpm/save.xpm:0644:@@MHC_LIBDIR@@/xpm',
+  'xpm/today.xpm:0644:@@MHC_LIBDIR@@/xpm',
+]
 
-def clean()
-  files = SCRIPT_FILES + "make.rb"
-  while filename = files.shift()
-    if File::exist?(filename)
-      File::delete(filename)
-      print "removing: " + filename + "\n";
-    end
-  end
-  process_subdirs(SUBDIRS, "make.rb", "clean")
-end
-
-def install()
-  files = SCRIPT_FILES
-  while filename = files.shift()
-    File::install(filename, BINDIR, 0755, true)
-  end
-  xpmdir = "xpm"
-  instdir = File::join(BINDIR, xpmdir)
-  if not File::exist?(instdir)
-    Dir::mkdir(instdir)
-  end
-  Dir::foreach(xpmdir) { |f|
-    filename = File::join(xpmdir, f)
-    if FileTest::file?(filename)
-      File::install(filename, instdir, 0644, true)
-    end
-  }
-  process_subdirs(SUBDIRS, "make.rb", "install")
-end
-
-def print_usage()
-  print <<END
-Usage: Makefile.rb [target]
-target can be none, install or clean.
-END
-end
-
-if (ARGV.size == 0)
-  default()
-else
-  case ARGV[0]
-  when "install"
-    install()
-  when "clean"
-    clean()
-  else
-    print_usage();
-    exit(1);
-  end
-end
+doit()
 
 ### Copyright Notice:
 

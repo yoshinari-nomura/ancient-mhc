@@ -7,7 +7,7 @@
 require 'kconv'
 
 module MhcKconv
-  DISP_CODE = @mhc_default_kcode@
+  DISP_CODE = Kconv::@@MHC_KCODE@@
   def todisp(string)
     Kconv::kconv(string, DISP_CODE, Kconv::AUTO)
   end

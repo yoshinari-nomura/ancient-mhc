@@ -1,11 +1,11 @@
-#!@mhc_ruby_path@ -Ke
+#!@@MHC_RUBY_PATH@@ -Ke
 
 ## today
 ##
 ## Author:  Yoshinari Nomura <nom@quickhack.net>
 ##
 ## Created: 1999/11/11
-## Revised: $Date: 2000/07/12 15:59:07 $
+## Revised: $Date: 2000/07/13 17:32:03 $
 ##
 ## today was originally written in perl.
 ## This  is a ruby version of it. Original authors were
