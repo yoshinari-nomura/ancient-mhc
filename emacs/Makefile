@@ -1,6 +1,6 @@
 # -*- Makefile -*-
 
-MEW_OPTS  = --with-mew
+# MEW_OPTS  = --with-mew
 # WL_OPTS   = --with-wl
 # GNUS_OPTS = --with-gnus
 
