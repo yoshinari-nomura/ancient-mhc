@@ -5,7 +5,7 @@
 ;;          MIYOSHI Masanori <miyoshi@quickhack.net>
 ;;
 ;; Created: 05/12/2000
-;; Reviesd: $Date: 2002/09/25 03:41:01 $
+;; Reviesd: $Date: 2002/10/03 03:53:41 $
 
 ;;; Configration Variables:
 
@@ -899,7 +899,12 @@ The keys that are defined for mhc-calendar-mode are:
 	(error "No mark set in this buffer")
       (setq date (mhc-date++ (mhc-date- (max mark date) (min mark date))))
       (kill-new (int-to-string date))
-      (message "%d days in region." date))))
+      (if (< date 7)
+          (message "%d days in region." date)
+        (if (= (% date 7) 0)
+            (message "%d days (%d weeks) in region." date (/ date 7))
+          (message "%d days (%d weeks + %d days) in region."
+                   date (/ date 7) (% date 7)))))))
 
 ;; selector
 (defvar mhc-calendar/select-alist nil)
