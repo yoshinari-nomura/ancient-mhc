@@ -48,6 +48,17 @@
   :group 'mhc
   :type 'file)
 
+(defcustom mhc-start-day-of-week 0
+  "*Day of the week as the start of the week."
+  :group 'mhc
+  :type '(choice (const :tag "Sunday" 0)
+		 (const :tag "Monday" 1)
+		 (const :tag "Tuesday" 2)
+		 (const :tag "Wednesday" 3)
+		 (const :tag "Thursday" 4)
+		 (const :tag "Friday" 5)
+		 (const :tag "Saturday" 6)))
+
 (defcustom mhc-insert-calendar t
   "*If non nil value, display vertical calender."
   :group 'mhc

@@ -1,12 +1,21 @@
 2002-09-19  Hideyuki SHIRAI  <shirai@quickhack.net>
 
-	* emacs/mhc-calendar.el (mhc-calendar-start-day-of-week): New
-	user variable.
-	(mhc-calendar-start-day-of-week): Set default value to bring with
-	`mhc-calendar-start-day-of-week'.
+	* emacs/mhc.el (mhc-scan-month): Use `mhc-end-day-of-week'.
+
+	* emacs/mhc-vars.el (mhc-start-day-of-week): New user variable.
+
+	* emacs/mhc-summary.el (mhc-use-week-separator): Chage semantics
+	of variable.
+	(mhc-summary-make-contents): Use `mhc-end-day-of-week'.
+
+	* emacs/mhc-date.el (mhc-end-day-of-week): New macro.
+
+	* emacs/mhc-calendar.el (mhc-calendar-language): New user
+	variable.
+	(mhc-calendar-day-strings, mhc-calendar-header-function)
+	(mhc-calendar-use-duration-show): Change default variable.
 	(mhc-calendar-make-header): More colorful.
-	(mhc-calendar/make-rectangle): Use
-	`mhc-calendar-start-day-of-week'.
+	(mhc-calendar/make-rectangle): Treat `mhc-start-day-of-week'.
 
 2002-09-17  Yuuichi Teranishi  <teranisi@quickhack.net>
 

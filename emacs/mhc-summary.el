@@ -73,10 +73,10 @@
 
 ;;; Global Variables:
 
-(defcustom mhc-use-week-separator 6
-  "*If number 0 .. 6, insert separator in summary buffer."
+(defcustom mhc-use-week-separator t
+  "*If non-nil insert separator in summary buffer."
   :group 'mhc
-  :type 'integer)
+  :type 'boolean)
 
 (defcustom mhc-summary-separator ?-
   "*Character of the separator as 'mhc-use-week-separator'."
@@ -565,7 +565,9 @@ If optional argument FOR-DRAFT is non-nil, Hilight message as draft message."
        (car dayinfo-list) mailer
        (or category-predicate mhc-default-category-predicate-sexp)
        secret)
-      (and (eq (mhc-day-day-of-week (car dayinfo-list)) mhc-use-week-separator)
+      (and mhc-use-week-separator
+	   (eq (mhc-day-day-of-week (car dayinfo-list))
+	       (mhc-end-day-of-week))
 	   (> (length dayinfo-list) 1)
 	   (mhc-summary/insert-separator))
       (setq dayinfo-list (cdr dayinfo-list)))))

@@ -5,7 +5,7 @@
 ;;          MIYOSHI Masanori <miyoshi@quickhack.net>
 ;;
 ;; Created: 05/12/2000
-;; Reviesd: $Date: 2002/09/19 03:26:56 $
+;; Reviesd: $Date: 2002/09/19 09:05:48 $
 
 ;;; Configration Variables:
 
@@ -14,42 +14,54 @@
   :group 'mhc
   :type 'character)
 
-(defcustom mhc-calendar-start-day-of-week 0
-  "*Day of the week as the start of the week."
+(defcustom mhc-calendar-language 'english
+  "*Language of calendar."
   :group 'mhc
-  :type '(choice (const :tag "Sunday" 0)
-		 (const :tag "Monday" 1)
-		 (const :tag "Tuesday" 2)
-		 (const :tag "Wednesday" 3)
-		 (const :tag "Thursday" 4)
-		 (const :tag "Friday" 5)
-		 (const :tag "Saturday" 6)))
+  :type '(choice (const :tag "English" english)
+		 (const :tag "Japanese" japanese)))
 
 (defcustom mhc-calendar-day-strings
-  (cond
-   ((= mhc-calendar-start-day-of-week 0)
-    ["Su" "Mo" "Tu" "We" "Th" "Fr" "Sa"])
-   ((= mhc-calendar-start-day-of-week 1)
-    ["Mo" "Tu" "We" "Th" "Fr" "Sa" "Su"])
-   ((= mhc-calendar-start-day-of-week 2)
-    ["Tu" "We" "Th" "Fr" "Sa" "Su" "Mo"])
-   ((= mhc-calendar-start-day-of-week 3)
-    ["We" "Th" "Fr" "Sa" "Su" "Mo" "Tu"])
-   ((= mhc-calendar-start-day-of-week 4)
-    ["Th" "Fr" "Sa" "Su" "Mo" "Tu" "We"])
-   ((= mhc-calendar-start-day-of-week 5)
-    ["Fr" "Sa" "Su" "Mo" "Tu" "We" "Th"])
-   (t
-    ["Sa" "Su" "Mo" "Tu" "We" "Th" "Fr"]))
+  (if (eq mhc-calendar-language 'japanese)
+      (cond
+       ((= mhc-start-day-of-week 0)
+	["日" "月" "火" "水" "木" "金" "土"])
+       ((= mhc-start-day-of-week 1)
+	["月" "火" "水" "木" "金" "土" "日"])
+       ((= mhc-start-day-of-week 2)
+	["火" "水" "木" "金" "土" "日" "月"])
+       ((= mhc-start-day-of-week 3)
+	["水" "木" "金" "土" "日" "月" "火"])
+       ((= mhc-start-day-of-week 4)
+	["木" "金" "土" "日" "月" "火" "水"])
+       ((= mhc-start-day-of-week 5)
+	["金" "土" "日" "月" "火" "水" "木"])
+       ((= mhc-start-day-of-week 6)
+	["土" "日" "月" "火" "水" "木" "金"]))
+    (cond
+     ((= mhc-start-day-of-week 0)
+      ["Su" "Mo" "Tu" "We" "Th" "Fr" "Sa"])
+     ((= mhc-start-day-of-week 1)
+      ["Mo" "Tu" "We" "Th" "Fr" "Sa" "Su"])
+     ((= mhc-start-day-of-week 2)
+      ["Tu" "We" "Th" "Fr" "Sa" "Su" "Mo"])
+     ((= mhc-start-day-of-week 3)
+      ["We" "Th" "Fr" "Sa" "Su" "Mo" "Tu"])
+     ((= mhc-start-day-of-week 4)
+      ["Th" "Fr" "Sa" "Su" "Mo" "Tu" "We"])
+     ((= mhc-start-day-of-week 5)
+      ["Fr" "Sa" "Su" "Mo" "Tu" "We" "Th"])
+     (t
+      ["Sa" "Su" "Mo" "Tu" "We" "Th" "Fr"])))
   "*Vector of \"day of week\" for 3-month calendar header.
 This vector must have seven elements
-and each element must have \"strings of two columns\".
-Ex: [\"Su\" \"Mo\" \"Tu\" \"We\" \"Th\" \"Fr\" \"Sa\"]
- or [\"日\" \"月\" \"火\" \"水\" \"木\" \"金\" \"土\"]"
+and each element must have \"strings of two columns\"."
   :group 'mhc
   :type '(vector string string string string string string string))
 
-(defcustom mhc-calendar-header-function 'mhc-calendar-make-header
+(defcustom mhc-calendar-header-function
+    (if (eq mhc-calendar-language 'japanese)
+	'mhc-calendar-make-header-ja
+      'mhc-calendar-make-header)
   "*Function of \"make calendar header\" for 3-month calendar.
 Assigned function must have one option \"date\"
 and must return string like \"   December 2000\"."
@@ -146,7 +158,7 @@ ww-japanese-long => \"土曜日\"
   :group 'mhc
   :type 'boolean)
 
-(defcustom mhc-calendar-use-duration-show nil
+(defcustom mhc-calendar-use-duration-show (if window-system 'mixed 'modeline)
   "*Show 'duration' mode."
   :group 'mhc
   :type '(choice
@@ -347,9 +359,9 @@ ww-japanese-long => \"土曜日\"
     (while (< i 7)
       (setq day (aref mhc-calendar-day-strings i))
       (cond
-       ((= i 0)
+       ((= (% (+ i mhc-start-day-of-week) 7) 0)
 	(mhc-face-put day 'mhc-calendar-face-sunday))
-       ((= i 6)
+       ((= (% (+ i mhc-start-day-of-week) 7) 6)
 	(mhc-face-put day 'mhc-calendar-face-saturday))
        (t (mhc-face-put day 'mhc-calendar-face-default)))
       (setq mhc-calendar/week-header
@@ -408,10 +420,9 @@ ww-japanese-long => \"土曜日\"
 		      (concat separator " "
 			      (funcall mhc-calendar-header-function
 				       (or date today)))))
-	 (endday (nth mhc-calendar-start-day-of-week '(6 0 1 2 3 4 5)))
 	 (start (mhc-day-day-of-week (car days)))
 	 (i 0) week color)
-    (unless (= endday 6)
+    (unless (= (mhc-end-day-of-week) 6)
       (setq start (+ start 6))
       (when (> start 6)
 	(setq start (- start 7))))
@@ -434,7 +445,7 @@ ww-japanese-long => \"土曜日\"
 	(setq color (mhc-face-get-busy-face color)))
       (setq week (cons (format "%2d" (mhc-day-day-of-month (car days))) week))
       (when color (mhc-face-put (car week) color))
-      (when (= endday (mhc-day-day-of-week (car days)))
+      (when (= (mhc-end-day-of-week) (mhc-day-day-of-week (car days)))
 	(setq month (cons (mapconcat
 			   (function identity)
 			   (cons separator (nreverse week))

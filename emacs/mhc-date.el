@@ -4,7 +4,7 @@
 ;;          TSUCHIYA Masatoshi <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 ;;
 ;; Created: 2000/06/14
-;; Revised: $Date: 2000/12/14 10:39:55 $
+;; Revised: $Date: 2002/09/19 09:05:48 $
 
 ;;;
 ;;; Commentary:
@@ -400,7 +400,6 @@
 (defmacro mhc-date-oo (date)
   `(/ (1- (mhc-date-dd ,date)) 7))
 
-
 ;;
 ;; compare.
 ;;
@@ -495,6 +494,13 @@
 
 (defalias 'mhc-date-p 'integerp)
 
+
+;;
+;; miscellaneous.
+;;
+
+(defmacro mhc-end-day-of-week ()
+  `(nth mhc-start-day-of-week '(6 0 1 2 3 4 5)))
 
 ;;
 ;; to string.

@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1994/07/04
-;; Revised: $Date: 2002/09/17 08:08:19 $
+;; Revised: $Date: 2002/09/19 09:05:47 $
 
 ;;;
 ;;; Commentay:
@@ -445,7 +445,7 @@ If HIDE-PRIVATE, private schedules are suppressed."
 	(mhc-summary-generate-buffer date mailer))
     (when mhc-use-wide-scope
       (if (and mhc-use-week-separator
-	       (not (eq mhc-use-week-separator 0)))
+	       (not (eq (mhc-end-day-of-week) 0)))
 	  (setq wweek0 0 wweek1 6 wweek2 7)
 	(setq wweek0 1 wweek1 0 wweek2 8))
       (cond
@@ -503,7 +503,7 @@ If HIDE-PRIVATE, private schedules are suppressed."
       (when mhc-insert-calendar
 	(mhc-calendar-insert-rectangle-at
 	 date
-	 (- (window-width) 24) ;; xxx
+	 (- (window-width) mhc-calendar-next-offset)
 	 mhc-vertical-calendar-length))
       (mhc-summary-mode-setup date mailer)
       (mhc-mode 1)
