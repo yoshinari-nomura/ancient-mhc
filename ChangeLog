@@ -1,3 +1,12 @@
+2002-10-28  HASHI Hiroaki  <bridge@st.rim.or.jp> / nom
+
+	* ruby-ext/lib/mhc-schedule.rb (priority_as_string):
+	accept zero as null string.
+
+2002-10-28  Yoshinari NOMURA  <nom@quickhack.net>
+
+	* ruby-ext/lib/mhc-palm.rb: add methods for address book.
+
 2002-10-16  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 
 	* emacs/mhc-gnus.el (toplevel): Set `eword-decode-string' for
