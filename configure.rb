@@ -4,7 +4,7 @@
 ## Author:  MIYOSHI Masanori <miyoshi@quickhack.net>
 ##          Yoshinari Nomura <nom@quickhack.net>
 ## Created: 2000/7/12
-## Revised: $Date: 2001/10/28 01:20:35 $
+## Revised: $Date: 2002/11/21 00:04:11 $
 
 $LOAD_PATH .unshift('.')
 require 'mhc-make'
@@ -69,9 +69,11 @@ conf .search_command('make',         '@@MHC_MAKE_PATH@@',       false, true)
 ################################################################
 ## lib check
 
-lib_search_path = ['/usr/local/lib', '/usr/local/pilot/lib', '/usr/lib']
+lib_search_path = ['/usr/local/lib', '/usr/local/pilot/lib',
+  '/usr/lib', '/usr/pkg/lib']
+
 inc_search_path = ['/usr/local/include', '/usr/local/pilot/include', 
-		   '/usr/include/libpisock', '/usr/include']
+  '/usr/include/libpisock', '/usr/include', '/usr/pkg/include']
 
 if conf['@@MHC_DISABLE_PALM@@'] == ''
   conf .search_library(lib_search_path, 
