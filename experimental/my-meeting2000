@@ -188,7 +188,9 @@ Thread .new{
     client_sock = waiting_sock .accept
     client_address = client_sock .peeraddr[3]
 
-    if (client_address .to_s == "127.0.0.1")
+    if (client_address .to_s == "127.0.0.1") or 
+       (client_address .to_s == "::ffff:127.0.0.1") or
+       (client_address .to_s == "::1")
       print client_sock, " is accepted from #{client_address}\n" if $DEBUG
       proxy(client_sock)
     else
