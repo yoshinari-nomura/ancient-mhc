@@ -1,3 +1,21 @@
+2000-07-13  Yoshinari Nomura  <nom@quickhack.net>
+
+	* configure-nom.rb, configure.rb:
+	almost contents of configure.rb was moved into mhc-make.rb.
+
+	* mhc-make.rb: add Revised: hader.
+
+	* ruby-ext/lib/mhc-kconv.rb.in, adb2mhc.in, gemcal.in, make.rb.in,
+	  mhc-sync.in, mhc2palm.in, palm2mhc.in, today.in:
+	change cinfig variable names fitting to mhc-make.rb.
+
+	* ruby-ext/make.rb.in, ruby-ext/lib/make.RB.in: combined into
+		  mhc-make.rb.
+	* ruby-ext/extconf.rb: Removed. replaced by  .in file.
+	* ruby-ext/lib/mhc-gtk.rb: Ditto.
+	* ruby-ext/extconf.rb.in:  New file.
+	* ruby-ext/lib/mhc-gtk.rb.in, mhc-make.rb: New files.
+
 2000-07-13  MIYOSHI Masanori  <miyoshi@ask.ne.jp>
 
 	* ruby-ext/lib/make.RB.in: Install scripts only when DISABLE_EXT
