@@ -91,9 +91,11 @@
 
 
 (defun mhc-wl-summary-exit ()
-  (kill-buffer (current-buffer))
-  (if mhc-wl-exit-buffer
-      (switch-to-buffer mhc-wl-exit-buffer)))
+  (let ((buffer mhc-wl-exit-buffer))
+    (kill-buffer (current-buffer))
+    (if (and buffer
+	     (buffer-live-p buffer))
+	(switch-to-buffer buffer))))
 
 
 (defun mhc-wl-summary-mode-setup (date)
@@ -114,12 +116,15 @@
 
 (defun mhc-wl-generate-summary-buffer (date)
   (wl-summary-toggle-disp-msg 'off)
-  (let ((original (or mhc-wl-exit-buffer (current-buffer))))
+  (let ((original (and (or (eq major-mode 'wl-summary-mode)
+			   (eq major-mode 'wl-folder-mode))
+		       (or mhc-wl-exit-buffer (current-buffer)))))
     (switch-to-buffer
      (set-buffer
       (mhc-get-buffer-create
        (mhc-date-format date "%s/%02d/%02d" mhc-base-folder yy mm))))
-    (setq mhc-wl-exit-buffer original)
+    (and original
+	 (setq mhc-wl-exit-buffer original))
     (setq inhibit-read-only t
 	  buffer-read-only nil
 	  selective-display t
