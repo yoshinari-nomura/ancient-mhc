@@ -3,7 +3,7 @@
 ## Author:  Yoshinari Nomura <nom@quickhack.net>
 ##
 ## Created: 1999/07/16
-## Revised: $Date: 2003/11/03 01:33:32 $
+## Revised: $Date: 2004/01/12 10:24:38 $
 ##
 
 require 'mhc-kconv'
@@ -201,7 +201,7 @@ class MhcDate
   ## week
   def w_this(week_str_or_num = self .w)
     if week_str_or_num .kind_of?(String)
-      week_number = W_LABEL .index (week_str_or_num[0,3] .capitalize)
+      week_number = W_LABEL .index(week_str_or_num[0,3] .capitalize)
     else
       week_number = week_str_or_num
     end

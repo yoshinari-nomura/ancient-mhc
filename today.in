@@ -6,7 +6,7 @@
 ## Author:  Yoshinari Nomura <nom@quickhack.net>
 ##
 ## Created: 1999/11/11
-## Revised: $Date: 2000/12/20 12:08:36 $
+## Revised: $Date: 2004/01/12 10:24:37 $
 ##
 ## today was originally written in perl.
 ## This  is a ruby version of it. Original authors were
@@ -113,7 +113,7 @@ end
 
 formatter_normal = Proc .new{|date, items|
   ret = ''
-  heading = format ("%02d/%02d %s ", date .m, date .d, date .w_s)
+  heading = format("%02d/%02d %s ", date .m, date .d, date .w_s)
 
   first = true
   items .each{|sch|
