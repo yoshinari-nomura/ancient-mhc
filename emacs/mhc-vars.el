@@ -65,8 +65,8 @@
   :group 'mhc
   :type 'boolean)
 
-(defcustom mhc-insert-zombi-list nil
-  "*If non nil value, display ZOMBI list."
+(defcustom mhc-insert-memo-list t
+  "*If non nil value, display MEMO list."
   :group 'mhc
   :type 'boolean)
 

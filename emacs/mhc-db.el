@@ -159,8 +159,8 @@ FROM, TO は 1970/01/01 からの経過日数を用いて指定"
 			  nil
 			(> (car a) (car b)))))))))
 
-(defun mhc-db-scan-zombi (day)
-  "ゾンビの取得"
+(defun mhc-db-scan-memo (day)
+  "行方不明の schedule の取得"
   (let ((schedules (mapcar
 		    (lambda (f) (car (mhc-record-schedules f)))
 		    (apply (function nconc)
@@ -170,14 +170,26 @@ FROM, TO は 1970/01/01 からの経過日数を用いて指定"
 						(setq x (mhc-slot-records x))
 						(copy-sequence x)))
 					 (list (mhc-slot-get-intersect-schedule)))))))
-	schedule zombis)
+	schedule memos)
     (while (setq schedule (car schedules))
-      (unless (or (delq nil (append (mhc-schedule-condition schedule) nil))
+      (unless (or (mhc-logic/day (mhc-schedule-condition schedule))
+		  (mhc-logic/and (mhc-schedule-condition schedule))
 		  (and mhc-insert-todo-list
 		       (mhc-schedule-in-category-p schedule "todo")))
-	(setq zombis (cons schedule zombis)))
+	(setq memos (cons schedule memos)))
       (setq schedules (cdr schedules)))
-    zombis))
+    (mapcar 'cdr
+	    (sort (mapcar (lambda (x)
+			    (cons (mhc-schedule-priority x) x))
+			  memos)
+		  (lambda (a b)
+		    (if (and (null (car a)) (car b))
+			nil
+		      (if (and (null (car b)) (car a))
+			  t
+			(if (and (null (car b)) (null (car a)))
+			    nil
+			  (> (car a) (car b))))))))))
 
 
 (defun mhc-db-add-record-from-buffer (record buffer &optional force-refile)

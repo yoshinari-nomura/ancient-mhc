@@ -216,6 +216,24 @@ third one is replaced with day of month."
   :group 'mhc
   :type 'boolean)
 
+(defcustom mhc-memo-line-format "   %p %i%s %l"
+  "*A format string for summary memo line of MHC.
+It may include any of the following format specifications
+which are replaced by the given information:
+
+%i The icon for the schedule.
+%s The subject of the schedule.
+%l The location of the schedule.
+%p The priority of the schedule.
+"
+  :group 'mhc
+  :type 'string)
+
+(defcustom mhc-memo-string-heading "MEMO(s)"
+  "*String which is displayed as heading of MEMO."
+  :group 'mhc
+  :type 'string)
+
 ;;; Internal Variable:
 
 (defconst mhc-summary-major-mode-alist
@@ -244,6 +262,8 @@ third one is replaced with day of month."
 (defvar mhc-summary/line-inserter nil)
 
 (defvar mhc-todo/line-inserter nil)
+
+(defvar mhc-memo/line-inserter nil)
 
 (defvar mhc-summary-line-format-alist
   '((?Y (mhc-summary/line-year-string)
@@ -341,6 +361,35 @@ PROP-VALUE is the property value correspond to PROP-TYPE.
 	  (mhc-todo/line-deadline-string))
 	'face (mhc-todo/line-deadline-face)))
   "An alist of format specifications that can appear in todo lines.
+Each element is a list of following:
+\(SPEC STRING-EXP PROP-TYPE PROP-VALUE\)
+SPEC is a character for format specification.
+STRING is an expression to get string to insert.
+PROP-TYPE is an expression to get one of the two symbols `face' or `icon'.
+It indicates a type of the property to put on the inserted string.
+PROP-VALUE is the property value correspond to PROP-TYPE.
+")
+
+(defvar mhc-memo-line-format-alist
+  '((?i (not mhc-tmp-private) 'icon
+	(if (mhc-schedule-in-category-p mhc-tmp-schedule "done")
+	    (delete "todo"
+		    (copy-sequence (mhc-schedule-categories mhc-tmp-schedule)))
+	  (mhc-schedule-categories mhc-tmp-schedule)))
+    (?s (mhc-summary/line-subject-string)
+	'face
+	(mhc-face-category-to-face 
+	 (car (mhc-schedule-categories mhc-tmp-schedule))))
+    (?l (mhc-summary/line-location-string)
+	'face 'mhc-summary-face-location)
+    (?p (if mhc-tmp-priority
+	    (format "%5s" (format "[%d]" mhc-tmp-priority))
+	  "     ")
+	'face (cond 
+	       ((null mhc-tmp-priority) nil)
+	       ((>= mhc-tmp-priority 80) 'mhc-summary-face-sunday)
+	       ((>= mhc-tmp-priority 50) 'mhc-summary-face-saturday))))
+  "An alist of format specifications that can appear in memo lines.
 Each element is a list of following:
 \(SPEC STRING-EXP PROP-TYPE PROP-VALUE\)
 SPEC is a character for format specification.
@@ -522,6 +571,13 @@ If optional argument FOR-DRAFT is non-nil, Hilight message as draft message."
       (setq dayinfo-list (cdr dayinfo-list)))))
 
 
+(defun mhc-summary-make-todo-memo (today mailer category-predicate secret)
+  (when mhc-insert-todo-list
+    (mhc-summary-make-todo-list today mailer category-predicate secret))
+  (when mhc-insert-memo-list
+    (mhc-summary-make-memo-list today mailer category-predicate secret)))
+
+
 (defun mhc-summary-make-todo-list
   (day mailer &optional category-predicate secret)
   (let ((schedules (mhc-db-scan-todo day))
@@ -545,21 +601,20 @@ If optional argument FOR-DRAFT is non-nil, Hilight message as draft message."
 	    (setq schedules (cdr schedules)))))))
 
 
-(defun mhc-summary-make-zombi-list
+(defun mhc-summary-make-memo-list
   (day mailer &optional category-predicate secret)
-  (let ((schedules (mhc-db-scan-zombi day))
+  (let ((schedules (mhc-db-scan-memo day))
 	(mhc-tmp-day day))
-    (if schedules
-	(progn
-	  (insert "ZOMBI(s)\n")
-	  (while schedules
-	    (mhc-summary-insert-contents
-	     (car schedules)
-	     (and secret
-		  (mhc-schedule-in-category-p (car schedules) "private"))
-	     'mhc-todo-line-insert
-	     mailer)
-	    (setq schedules (cdr schedules)))))))
+    (when schedules
+      (insert (format "%s\n" mhc-memo-string-heading))
+      (while schedules
+	(mhc-summary-insert-contents
+	 (car schedules)
+	 (and secret
+	      (mhc-schedule-in-category-p (car schedules) "private"))
+	 'mhc-memo-line-insert
+	 mailer)
+	(setq schedules (cdr schedules))))))
 
 
 (defun mhc-summary/line-year-string ()
@@ -687,7 +742,11 @@ If optional argument FOR-DRAFT is non-nil, Hilight message as draft message."
   (mhc-line-inserter-setup
    mhc-todo/line-inserter
    mhc-todo-line-format
-   mhc-todo-line-format-alist))
+   mhc-todo-line-format-alist)
+  (mhc-line-inserter-setup
+   mhc-memo/line-inserter
+   mhc-memo-line-format
+   mhc-memo-line-format-alist))
   
 
 (defun mhc-summary-line-insert ()
@@ -714,6 +773,11 @@ If optional argument FOR-DRAFT is non-nil, Hilight message as draft message."
   (let ((mhc-tmp-deadline (mhc-schedule-todo-deadline mhc-tmp-schedule))
 	(mhc-tmp-priority (mhc-schedule-priority mhc-tmp-schedule)))
     (funcall mhc-todo/line-inserter)))
+
+(defun mhc-memo-line-insert ()
+  "Insert memo line."
+  (let ((mhc-tmp-priority (mhc-schedule-priority mhc-tmp-schedule)))
+    (funcall mhc-memo/line-inserter)))
 
 
 (provide 'mhc-summary)

@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1994/07/04
-;; Revised: $Date: 2002/09/10 12:05:39 $
+;; Revised: $Date: 2002/09/11 07:25:02 $
 
 ;;;
 ;;; Commentay:
@@ -479,15 +479,10 @@ If HIDE-PRIVATE, private schedules are suppressed."
     (message (mhc-date-format date "Scanning %04d/%02d ..." yy mm))
     (unless (eq 'direct mailer)
       (when (and (eq mhc-todo-position 'top)
-		 mhc-insert-todo-list)
-	(mhc-summary-make-todo-list
-	 today mailer category-predicate secret)
+		 (or mhc-insert-todo-list mhc-insert-memo-list))
+	(mhc-summary-make-todo-memo today mailer category-predicate secret)
 	(insert (make-string mhc-todo-mergin ?\n))
-	(when mhc-insert-zombi-list
-	  (mhc-summary-make-zombi-list
-	   today mailer category-predicate secret))
-	(mhc-summary/insert-separator)))
-    (unless (eq 'direct mailer)
+	(mhc-summary/insert-separator))
       (setq mhc-summary-buffer-current-date-month
 	    (mhc-date-mm-first date)))
     (when (and bfrom bto)
@@ -501,20 +496,15 @@ If HIDE-PRIVATE, private schedules are suppressed."
       (mhc-summary-make-contents afrom ato mailer category-predicate secret))
     (unless (eq 'direct mailer)
       (when (and (eq mhc-todo-position 'bottom)
-		 mhc-insert-todo-list)
-	(mhc-summary/insert-separator)
+		 (or mhc-insert-todo-list mhc-insert-memo-list))
+	(mhc-summary/insert-separator))
 	(insert (make-string mhc-todo-mergin ?\n))
-	(mhc-summary-make-todo-list
-	 today mailer category-predicate secret)
-	(when mhc-insert-zombi-list
-	  (mhc-summary-make-zombi-list
-	   today mailer category-predicate secret)))
-      (if mhc-insert-calendar
-	  (mhc-calendar-insert-rectangle-at
-	   date
-	   (- (window-width) 24) ;; xxx
-	   mhc-vertical-calendar-length
-	   ))
+	(mhc-summary-make-todo-memo today mailer category-predicate secret)
+      (when mhc-insert-calendar
+	(mhc-calendar-insert-rectangle-at
+	 date
+	 (- (window-width) 24) ;; xxx
+	 mhc-vertical-calendar-length))
       (mhc-summary-mode-setup date mailer)
       (mhc-mode 1)
       (setq inhibit-read-only nil)

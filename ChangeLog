@@ -1,3 +1,23 @@
+2002-09-11  Hideyuki SHIRAI  <shirai@quickhack.net>
+
+	* emacs/mhc.el (mhc-scan-month): Call
+	`mhc-summary-make-todo-memo' when insert Todo and Memo.
+
+	* emacs/mhc-vars.el (mhc-insert-memo-list): New user variable.
+	(mhc-insert-zombi-list): Remove.
+
+	* emacs/mhc-summary.el (mhc-memo-line-format) 
+	(mhc-memo-string-heading): New user variable.
+	(mhc-memo/line-inserter, mhc-memo-line-format-alist): New
+	variable.
+	(mhc-summary-make-todo-memo, mhc-summary-make-memo-list)
+	(mhc-memo-line-insert): New function.
+	(mhc-summary-make-zombi-list): Remove.
+	(mhc-summary-line-inserter-setup): Add mode line setup.
+
+	* emacs/mhc-db.el (mhc-db-scan-memo): New function.
+	(mhc-db-scan-zombi): Remove.
+
 2002-09-10  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* emacs/mhc.el (mhc-scan-month): Insert zombi schedule if
