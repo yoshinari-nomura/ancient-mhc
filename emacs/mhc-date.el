@@ -4,7 +4,7 @@
 ;;          TSUCHIYA Masatoshi <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 ;;
 ;; Created: 2000/06/14
-;; Revised: $Date: 2000/07/28 05:52:02 $
+;; Revised: $Date: 2000/08/05 19:53:06 $
 
 ;;;
 ;;; Commentary:
@@ -93,7 +93,8 @@
   (list (mhc-time-HH time)
 	(mhc-time-MM time)))
 
-
+(defalias 'mhc-time+  '+)
+(defalias 'mhc-time-  '-)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; mhc-date
