@@ -39,6 +39,9 @@
 ;;     (mhc-foo-insert-summary-contents SCHEDULE CONTENTS)
 ;;         Insert string CONTENTS to the current buffer as SCHEDULE.
 ;;
+;;     (mhc-foo-summary-search-day YY MM DD)
+;;         Search day in the current buffer.
+;;
 ;;     (mhc-foo-summary-mode-setup DDATE)
 ;;         Setup buffer as summary of mailer.  This function will be
 ;;         called at the end of mhc-scan-month.
@@ -51,6 +54,7 @@
 ;;    (put 'mhc-foo 'get-import-buffer       'mhc-foo-get-import-buffer)
 ;;    (put 'mhc-foo 'generate-summary-buffer 'mhc-foo-generate-summary-buffer)
 ;;    (put 'mhc-foo 'insert-summary-contents 'mhc-foo-insert-summary-contents)
+;;    (put 'mhc-foo 'summary-search-day      'mhc-foo-summary-search-day)
 ;;    (put 'mhc-foo 'summary-mode-setup      'mhc-foo-summary-mode-setup)
 
 
@@ -127,6 +131,10 @@
       (insert contents "\n") ; don't put icon.
     (funcall (mhc-summary-get-function 'insert-summary-contents mailer)
 	     schedule contents icon)))
+
+(defsubst mhc-summary-search-day (yy mm dd)
+  "Search day in the current buffer."
+  (funcall (mhc-summary-get-function 'summary-search-day) yy mm dd))
 
 (defsubst mhc-summary-mode-setup (ddate &optional mailer)
   "Setup buffer as summary mode of MAILER."

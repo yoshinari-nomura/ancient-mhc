@@ -82,6 +82,11 @@
 	(mhc-put-icon icon (+ pos mhc-summary-icon-position)))))
 
 
+(defun mhc-wl-summary-search-day (yy mm dd)
+  (re-search-forward
+   (format "^\\([0-9]+ | \\)?%02d/%02d" mm dd) nil t))
+
+
 (defsubst mhc-wl/date-to-folder (date)
   (mhc-date-format date
 		   "*%s/intersect,%s/%04d/%02"
@@ -118,6 +123,7 @@
 (put 'mhc-wl 'get-import-buffer 'mhc-wl-get-import-buffer)
 (put 'mhc-wl 'generate-summary-buffer 'mhc-wl-generate-summary-buffer)
 (put 'mhc-wl 'insert-summary-contents 'mhc-wl-insert-summary-contents)
+(put 'mhc-wl 'summary-search-day 'mhc-wl-summary-search-day)
 (put 'mhc-wl 'summary-mode-setup 'mhc-wl-summary-mode-setup)
 
 ;;; Copyright Notice:

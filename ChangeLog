@@ -1,3 +1,13 @@
+2000-06-19  Hideyuki SHIRAI  <shirai@rdmg.mgcs.mei.co.jp>
+
+	* emacs/mhc.el (mhc-goto-today): Use mhc-summary-search-day().
+	* emacs/mhc-summary.el (mhc-summary-search-day): New function, for search YY MM DD in summary-buffer.
+	* emacs/mhc-wl.el (mhc-wl-summary-search-day): Ditto.
+	* emacs/mhc-gnus.el (mhc-gnus-summary-search-day): Ditto.
+	* emacs/mhc-mew.el (mhc-mew-summary-search-day): Ditto.
+	(mhc-mew/header-string-review): New constant, header-string when schedule exist.
+	(mhc-mew-insert-summary-contents): If shedule exist, put review mark.
+	
 2000-06-19  Yoshinari Nomura  <nom@quickhack.net>
 
 	* emacs/mhc.el (mhc-goto-today): Fix typo.

@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1994/07/04
-;; Revised: $Date: 2000/06/19 02:57:51 $
+;; Revised: $Date: 2000/06/19 04:06:13 $
 
 ;;;
 ;;; Commentay:
@@ -230,8 +230,7 @@ Unless NO-DISPLAY, display it."
       (and 
        (= yy (mhc-date-yy buf-date))
        (= mm (mhc-date-mm buf-date))
-       (re-search-forward
-	(format "^\\([0-9]+ | \\)?%02d/%02d" mm dd) nil t)
+       (mhc-summary-search-day yy mm dd)
        (progn 
 	 (forward-line 0)
 	 (or (pos-visible-in-window-p (point))
