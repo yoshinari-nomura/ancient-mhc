@@ -525,8 +525,11 @@ PROP-VALUE is the property value correspond to PROP-TYPE.
 				 mhc-tmp-dayinfo) 0)
 			    'mhc-summary-face-sunday)
 			   ((eq (mhc-day-day-of-week mhc-tmp-dayinfo) 6)
-			    'mhc-summary-face-saturday)))
+			    'mhc-summary-face-saturday)
+			   (t 'default)))
 	(pos (point)))
+    (if (mhc-date= (mhc-day-date mhc-tmp-dayinfo) (mhc-date-now))
+	(setq mhc-tmp-day-face (mhc-face-get-gray-face mhc-tmp-day-face)))
     (funcall mhc-summary/line-inserter)
     (put-text-property pos (point) 'mhc-dayinfo mhc-tmp-dayinfo)))
 

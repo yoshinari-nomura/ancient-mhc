@@ -8,6 +8,7 @@
 
 	* emacs/mhc-summary.el (mhc-summary-insert-contents): If mailer eq 'direct,
 	disable icon and insert \n.
+	(mhc-summary-line-insert): Set background color, if today.
 
 	* emacs/mhc-calendar.el (mhc-calendar-insert-summary-contents): Follow up new method.
 
