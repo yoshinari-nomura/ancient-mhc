@@ -1,0 +1,103 @@
+#!/usr/local/bin/ruby
+
+##
+## gp2mhc -- Giga Pocket to MHC
+## 
+## 一部の人には有名な TV ガイドの番組表で、VAIO の
+## ハードディスク録画予約(Giga Pocket) 対応ページってのがあるようです。
+## 例えば、福岡版だと
+## 
+##   http://210.152.244.34/fukuoka/table/
+## 
+##  この番組表で、目当ての番組の [予約] という所をクリックすると、
+##  ----------------------------------------------------------------
+##  Content-type: application/x-tv-program-info; charset=shift_jis
+##  version: 1
+##  station: ＲＫＢ
+##  year: 1999
+##  month: 09
+##  date: 02
+##  start: 13:30
+##  end: 14:00
+##  program-title: キッズ・ウォー
+##  
+##  生稲晃子　川野太郎　井上真央ほか
+##  ----------------------------------------------------------------
+##  
+##  みたいなのを送ってくるようです。こいつをパーズして MHC に入れ
+##  るスクリプトを書いてみました。例えばこのファイルを
+##  /u/nom/bin/gp2mhc とすると、
+##
+##  Navigator の [編集] -> [設定] -> [Navigator] -> [アプリケーション]
+##  から、
+##  
+##    MIMEタイプ:        application/x-tv-program-info
+##    アプリケーション:  /u/nom/bin/gp2mhc %s
+##
+##  としておくといいみたいです。
+##
+##  '/prj/mhc/ruby-lib' は mhc-schedule.rb のある場所を指定しますが、
+##  もともと ruby のライブラリとしてインストールされていれば、なくても
+##  大丈夫です。
+
+$LOAD_PATH .unshift(ENV['HOME'] + '/prj/mhc/ruby-lib')
+DEBUG = true
+
+require 'kconv'
+require 'mhc-schedule'
+
+# if DEBUG
+#   $tv_file = File .open("/tmp/gp2mhc", "w")
+#   def conv_print(str)
+#     $tv_file .print Kconv::tojis(str)
+#   end
+# else
+#   def conv_print(str)
+#   end
+# end
+
+is_body, body = false, ''
+
+while line = gets
+  line .sub!(/\r?\n$/np, '')
+  if (!is_body && line == '')
+    is_body = true
+    next
+  end
+
+  if is_body
+    body += line + "\n"
+  else
+    case line
+    when /^station:(.*)/n
+      station = $1 .strip
+    when /^year:(.*)/n
+      year = $1 .to_i
+    when /^month:(.*)/n
+      month = $1 .to_i
+    when /^date:(.*)/n
+      date = $1 .to_i
+    when /^start:(.*)/n
+      s = $1 .strip
+    when /^end:(.*)/n
+      e = $1 .strip
+    when /^program-title:(.*)/n
+      title = $1 .strip
+    when /^program-subtitle:(.*)/n
+      subtitle = $1 .strip
+    end
+  end
+end
+
+xhdr = "X-SC-TV-Station: #{station}\n" + "X-SC-TV-Sub-Title: #{subtitle}\n"
+body = Kconv::tojis(xhdr) + "\n" + Kconv::tojis(body)
+
+sch = MhcScheduleItem .new                     \
+  .set_subject(Kconv::tojis(title))            \
+  .add_category('Mytv')                        \
+  .add_day(MhcDate .new(year, month, date))    \
+  .set_time(MhcTime .new(s), MhcTime .new(e))  \
+  .set_description(body)
+
+db  = MhcScheduleDB .new .add_sch(sch)
+exit 0

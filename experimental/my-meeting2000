@@ -1,0 +1,238 @@
+#!/usr/local/bin/ruby
+
+##
+## my-meeting2000
+##
+## Meeting2000 って知ってますか?
+## ruby で書かれた meeting の時間調整サーバです。
+##
+## イベントでときどき使うのですが、
+## 自分の予定表と付き合わせながら、これに入力するは
+## 意外と疲れます。
+##
+## そこで、Meeting200 が吐く入力フォームに、自分の予定を
+## 並べて見せるプロキシをでっちあげてみました。
+##
+## ruby/gtk が必要です。
+##
+## 認証は localhost からかどうかのチェックのみですので、
+## 他人からつながれると、自分のスケジュール丸見えです。
+## localhost には自分しかいないような環境で使ってください。
+##
+## 以下 Navigator での設定。
+##
+## 1. 適当な proxy.pac を書いて、これを Navigator の proxy 設定
+##    に指定します。file:/home/nom/proxy.pac とでも。
+##
+## function FindProxyForURL(url, host)
+## {
+##     // 例えば、*:8080 へのアクセス時のみ、
+##     // localhost:33333 で動いている my-meeting2000 を通す
+##     // を手抜き表現すると、以下のようになる。
+##     //
+##     if (shExpMatch(url, "*:8080/*"))
+##         return "PROXY localhost:33333; DIRECT"
+##
+##     // ここからは普段使っている Proxy があれば、それ用の設定
+##     // にしておく。この例では、普段の Proxy なし。
+##     return "DIRECT";
+## }
+##
+##  2. この script を localhost で動かします。toggle button の Conversion
+##     を on にしておきます。
+##
+##  3. Meeting2000 にアクセスしてみます。予定入力一覧の脇に自分の予定が
+##     並んで表示されるので、入力がしやすいでしょ?
+##
+
+require 'socket'
+require 'mhc-schedule'
+require 'kconv'
+
+$DEBUG = false
+$ZOOM  = false
+$PROXY = false
+Thread .abort_on_exception = true
+
+################################################################
+## proxy
+
+def proxy(client_sock)
+  server_sock         = nil
+  th_client_to_server = nil
+  filter              = false
+
+  th_server_to_client = Thread .start {
+    Thread .stop if !server_sock
+
+    while line = server_sock .gets
+      print "S> #{line}"  if $DEBUG
+      case (line)
+
+      when /<BODY>/i
+	line += '<H1>' if $ZOOM
+	line += '<!-- My Meeting 2K is ONH -->'
+      when /Content-Length:/i
+	next
+      when  /Server:\s*Meeting2000/
+	filter = true
+      end
+
+      line = filter_proc(line) if $PROXY && filter
+
+      begin
+	client_sock .write(line)
+      rescue
+      end
+    end
+    th_client_to_server .exit
+    client_sock .close
+  }
+
+  th_client_to_server = Thread .start {
+    buf   = ''
+
+    while line = client_sock .gets
+      print "C> #{line}"  if $DEBUG
+
+      if line =~ /^(get|post)\s*http:\/\/(.*)\s*(HTTP.*)/i
+	command, http_ver = $1, $3
+	host, trail       = $2 .split('/', 2)
+	host, port        = host .split(':', 2)
+	trail             = '/' + trail
+	port              = 80 if !port
+
+	print "server_sock => open(#{host}, #{port})\n"  if $DEBUG
+	begin
+	  server_sock = TCPSocket .open(host, port)
+	  line = "#{command} #{trail} #{http_ver}\r\n"
+	  th_server_to_client .run
+	rescue
+	  ## some error message should be sent to a client.
+	  client_sock .close
+	  th_client_to_server .exit
+	  th_server_to_client .exit
+	end
+      end
+      buf += line
+
+      if server_sock
+	print "> #{buf}"  if $DEBUG && buf =~ /^get/i
+	begin
+	  server_sock .write(buf)
+	rescue
+	end
+	buf = ''
+      end
+    end
+    th_server_to_client .exit
+    server_sock .close
+  }
+end
+
+################################################################
+## filters 
+
+W_TO_COLOR = ['red', nil, nil, nil, nil, nil, 'blue']
+
+def c_str(c, *arg)
+  if c .is_a?(String)
+    color = c
+  elsif c .is_a?(Integer)
+    color = W_TO_COLOR[c]
+  else
+    color = nil
+  end
+  if color
+    return "<font color=#{color}>" +  arg .join + "</font>"
+  else
+    return arg .join
+  end
+end
+
+def filter_proc(line)
+  ret = ''
+  if line =~ /type\s*=\s*checkbox.*(\d{4})-(\d\d)-(\d\d)-check/i
+    date = MhcDate .new($1 .to_i, $2 .to_i, $3 .to_i)
+    ret += c_str(date .w, line)
+
+    $mhc_db .search1(date) .each{|sch|
+      if sch .in_category?('Holiday')
+	c = 'red'
+      else
+	c = 'green'
+      end
+
+      link = "<a href=file:#{sch .path}>*</a>" if sch .path
+      ret += c_str(c, Kconv::toeuc("<dd>#{link}#{sch .time_as_string} #{sch .subject}</dd>"))
+    }
+  else
+    ret = line
+  end
+  return ret
+end
+
+################################################################
+## accepting server thread
+
+$mhc_db      = MhcScheduleDB .new
+waiting_sock = TCPserver .open(33333)
+
+addr = waiting_sock .addr
+addr .shift
+
+printf("server is on %d\n", addr .join(":")) if $DEBUG
+
+Thread .new{
+  while true
+    client_sock = waiting_sock .accept
+    client_address = client_sock .peeraddr[3]
+
+    if (client_address .to_s == "127.0.0.1")
+      print client_sock, " is accepted from #{client_address}\n" if $DEBUG
+      proxy(client_sock)
+    else
+      print "connection refused from  #{client_address}\n" if $DEBUG
+      client_sock .close
+    end
+  end
+}
+
+################################################################
+## GUI
+
+## if you don't have ruby/gtk lib or your ruby/gtk is older than
+## version 0.21, you should elable these comment lines.
+##
+## $PROXY = true
+## sleep
+
+require 'gtk'
+
+top = Gtk::Window .new(Gtk::WINDOW_TOPLEVEL)
+button_s = Gtk::CheckButton .new('Insert Schedules')
+button_z = Gtk::CheckButton .new('Zoom')
+vbx = Gtk::VBox .new()
+
+button_s .signal_connect('toggled'){|w|
+  if w .active?
+    $PROXY = true
+  else
+    $PROXY = false
+  end
+}
+
+button_z .signal_connect('toggled'){|w|
+  if w .active?
+    $ZOOM = true
+  else
+    $ZOOM = false
+  end
+}
+vbx .pack_start(button_s)
+vbx .pack_start(button_z)
+top .add(vbx) .show_all
+top .set_title('MyMeeting2000')
+top .set_usize(175, 0)
+
+Gtk .main

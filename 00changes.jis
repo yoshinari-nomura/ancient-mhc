@@ -1,0 +1,685 @@
+################################################################
+ 00changes.jis
+################################################################
+
+Created: 1999/04/07
+Revised: 2000/05/23 04:35:30
+
+* mhc-snap20000523 (2000-05-23)
+
+・ mhc-sync の引数に username が使えないのを修正
+・ palm 側で 90分前と設定した Alarm を palm2mhc で吸うと
+   1 hour になってしまうのを修正
+
+* mhc-snap20000522 (2000-05-22)
+
+・ MHC が何の略かを少し変えた。
+・ 00reame* に Gnus/mhc-sync の記述を追加
+・ mhc-sync のオプションを大幅に変更 (気を付けて下さい), 
+   安全に。(usage も出るよ)
+・ mhc.el のバージョンを変更 (0.25pre1)
+・ emacs/00usage.jis にカスタマイズ可能な変数の記述を追加。
+
+* mhc-snap20000514 (2000-05-14)
+
+・ mhc*.el
+
+   + mhc-inport の Date: 入力時 [yyyy/mm/]dd-[yyyy/mm/]dd のような
+     `-' による範囲の記述を可能に
+
+   + mhc-mode の docstring を修正
+     Hideyuki SHIRAI (白井秀行) <shirai@rdmg.mgcs.mei.co.jp>
+
+   + Gnus 環境で (mhc-goto-today) が動作するように修正
+     TSUCHIYA Masatoshi <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+
+* mhc-snap20000509-2 (2000-05-09)
+
+・ mhc*.el
+
+   + mhc-date.el のバグ修正その 2
+     Hideyuki SHIRAI (白井秀行) <shirai@rdmg.mgcs.mei.co.jp>
+
+   + gnus で、スケジュールを抜けるとき発生するエラーを回避
+     MIYOSHI Masanori <miyoshi@ask.ne.jp>
+
+   + Nana-gnus 6.13.9 で mhc-goto-{next,pref}-month が効かないバグを修正
+     MIYOSHI Masanori <miyoshi@hrl.hitachi.co.jp>
+     (ごめんなさい、乃村のパッチ宛て忘れ)
+
+* mhc-snap20000509 (2000-05-09)
+
+・ mhc*.el
+
+   + gnus で、スケジュールが存在しない場合に、C-. でスケジュールを開こ
+     うとすると、既存のバッファを壊すバグを修正
+     MIYOSHI Masanori <miyoshi@hrl.hitachi.co.jp>
+
+   + typo と、Nana7 で文字化けする問題の修正
+     MIYOSHI Masanori <miyoshi@hrl.hitachi.co.jp>
+
+   + gnus で、C-c{n,p} が効かなくなっているのを修正
+     MIYOSHI Masanori <miyoshi@hrl.hitachi.co.jp>
+
+   + mhc-mode() の docstring の修正
+     MIYOSHI Masanori <miyoshi@hrl.hitachi.co.jp>
+
+   + mhc-date.el のバグ修正  x 2
+     Hideyuki SHIRAI (白井秀行) <shirai@rdmg.mgcs.mei.co.jp>
+
+・ ruby staff:
+
+   + mhc-sync で、サーバ側で Add 直後に Del した場合に、
+     手元に存在しないアーティクルを消そうとして失敗するのを修正。
+
+   + mhc-sync が $KCODE を見るようにした
+
+   + Win のために mhc-schedule.rb が開いた File を明示的に 
+     close するように変更
+
+* mhc-snap20000427 (2000-04-27)
+
+・ mhc*.el
+   + minor-mode convention に違反しているキーバインド 
+     C-c> と C-c< を C-cn と C-cp に変更。
+   + mew 対応でヘッダデコード等の強化
+     (add-hook 'mew-message-hook      'mhc-misc-hdr-decode)
+     が .emacs に必要に (mhc.el 中のコメント参照)
+
+     Hideyuki SHIRAI (白井秀行) <shirai@rdmg.mgcs.mei.co.jp>
+     (And thanks to Mr. Shun-ichi Goto <gotoh@taiyo.co.jp>)
+
+   + Gnus サポートの強化
+     TSUCHIYA Masatoshi <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+     MIYOSHI Masanori <miyoshi@ask.ne.jp>
+   + 一部変数の defcustom 化
+     TSUCHIYA Masatoshi <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+   + mhc-import の MUA との連携強化
+     teranisi@gohome.org (Yuuichi Teranishi/寺西裕一)
+   + mew 向けのの設定方法を少し変更 
+
+・ データベースのトランザクションログを取るようにした。
+・ Ruby 側のライブラリを mhc 相当に (Record-Id 等の整備)
+・ Note PC と sync を行うための mhc-sync を実験的に追加
+・ palm2mhc に interactive option -i を追加
+
+* mhc-snap20000309 (2000-03-09)
+
+・ mhc*.el
+    + mhc-gnus-ddate-to-folder 変更に伴なうバグの修正
+    + Gnus が作成する余計なバッファの削除
+    + member -> memq に変更
+    + C-uC-c| で見たままでなく、元記事を丸ごと import (Gnus 対応)
+    + unless/when/with-temp-buffer の追放
+	以上 5つ (三好 雅則 MIYOSHI Masanori <miyoshi@ask.ne.jp>)
+    + C-uC-c| で見たままでなく、元記事を丸ごと import (wl 対応)
+	 Yuuichi Teranishi <teranisi@gohome.org>
+
+・ 全般
+    + 00todo.jis を追加
+
+* mhc-snap20000308 (2000-03-08)
+
+・ mhc*.el
+    + 閏年でないのに 2/29 を guess したときにエラーになるバグを修正
+    + guess で 300日以上先だと判定した場合は 1年戻すように変更
+    + setup を load 時でなく、最初のスキャン時に戻した
+    + Gnus サポートの強化
+	(三好 雅則 MIYOSHI Masanori <miyoshi@ask.ne.jp>)
+        Daiki Ueno <ueno@kiss.kake.info.waseda.ac.jp>
+    + C-uC-c| で見たままでなく、元記事を丸ごと import (まだ Mew のみ)
+    + equal -> eq, assoc -> assq にできるだけ変更
+
+* mhc-snap20000301 (2000-03-01)
+
+・ mhc*.el
+
+    + face のユーザ設定が効かないバグを修正
+	(Hideyuki SHIRAI (白井秀行) <shirai@rdmg.mgcs.mei.co.jp>)
+
+* mhc-snap20000229 (2000-02-29)
+
+・ mhc*.el
+
+    + Gnus に実験的に対応
+	(三好 雅則 MIYOSHI Masanori <miyoshi@ask.ne.jp>)
+    + face の設定 mhc-category-face-alist, mhc-symbol-face-alist 書式を変更
+    + 19.28 の macro 書式に戻す。
+	(Hideyuki SHIRAI (白井秀行) <shirai@rdmg.mgcs.mei.co.jp>)
+    + path の区切を '/' に決め打ちしていたのを修正。
+	(Hideyuki SHIRAI (白井秀行) <shirai@rdmg.mgcs.mei.co.jp>)
+    + 変更時 dir を touch し忘れによる chache check 問題の修正
+	(Hideyuki SHIRAI (白井秀行) <shirai@rdmg.mgcs.mei.co.jp>)
+    + 3ヶ月表示で、予定のある日に下線を引いてみた (うるさい?)
+    + 00usage.jis を現状に合わせて更新
+      
+・ ruby-ext/
+
+    + mhc-schedule.rb が X-SC-Location への対応
+        Hanada OPTIMIZER Yasunori <yasunori@swlab.csce.kyushu-u.ac.jp>
+    + 時間表示 mm:ss-mm:ss '-' 挿入位置を間違うバグを修正
+        Hanada OPTIMIZER Yasunori <yasunori@swlab.csce.kyushu-u.ac.jp>
+
+* mhc-snap20000209 (2000-02-09)
+
+・ mhc*.el
+
+    + 3ヶ月カレンダーの今日にマークを付けるようにした。
+    + mhc-face.el の追加。各種 face の設定用変数の追加。
+	mhc-category-face-alist, mhc-symbol-face-alist
+    + Menu の追加。
+    + デフォルトで付く色を変更。
+    + MHC に既に登録された記事を C-c| で import すると元の値を
+      デフォルトとして引き継ぐようにした。
+    + typo の修正。
+	(Tomohiko KAWANO <kawano@swlab.csce.kyushu-u.ac.jp>)
+    + サマリ表示が 3ヶ月カレンダーに被ったときの対処を修正。
+
+・ ruby-ext/
+
+    + 00readme を追加
+
+
+* mhc-snap20000205 (2000-02-05)
+
+・ mhc*.el
+    + mew 1.95 で、元になるメールを読めない不具合を修正
+	(Hideyuki SHIRAI (白井秀行) <shirai@rdmg.mgcs.mei.co.jp>)
+    + emacs 19.28 で 3ヶ月表示の画面が崩れるのを修正
+    + xemacs の場合は明示的に (require 'overlay) するように修正
+
+* mhc-snap20000204 (2000-02-04)
+
+・ mhc*.el
+    + xemacs で rescan が失敗するのを修正
+	(what-line)
+	(Hideyuki SHIRAI (白井秀行) <shirai@rdmg.mgcs.mei.co.jp>)
+    + 新規入力で mhc-location is unbound のエラーが出るのを修正
+    + xemacs で 3ヶ月表示の画面が崩れるのを修正
+    + DOS のディレクトリタイムスタンプ問題を修正。
+      (dir に touch する代わりに dir/.mhc-mtime を touch)
+      ruby 側もそのように修正
+    + ~/Mail や +schedule を自由に設定できるようにした
+       (Akihiro MOTOKI <motoki@ptl.abk.nec.co.jp>)
+       (defvar mhc-base-folder "+schedule")
+       (defvar mhc-mail-path   (expand-file-name "~/Mail"))
+       (defvar mhc-schedule-file (expand-file-name "~/.schedule"))
+
+・ today
+    + today 内の help の typo 修正
+      (OHARA Shigeki <os@iij.ad.jp>)
+
+・gemcal, mhc*.rb
+    + Windows で、一応起動するようになった (今度こそ)
+    + DOS のディレクトリタイムスタンプ問題を修正。
+      (dir に touch する代わりに dir/.mhc-mtime を touch)
+
+* mhc-snap20000112 (2000-01-12)
+
+・ mhc*.el
+    + 今日の日付を反転すると、空白部分まで反転するバグを FIX
+	 (Akihiro MOTOKI <motoki@ptl.abk.nec.co.jp>)
+    + 今日の日付反転が曜日部分まで反転させてしまうバグを FIX
+    + サマリの週区切り線のデフォルトを日曜日の前に変更
+    + 縦に出る clendar の位置を (window-width) から算出するように変更
+
+・gemcal, mhc*.rb
+    + Windows で、一応起動するようになった (はず)
+
+* mhc-snap20000107 (2000-01-07)
+
+・ mhc*.el
+
+    + C-ct の度にカーソルが動くのを修正
+
+    + X-SC-Location: nil と表示されることがあるバグを fix
+    + 週の区切りを入れるようにした (mhc-use-week-separator)
+    + 「今日」 の日付部分を反転させるようにした
+    + Mew のカーソル行に現れる underline を抑制するようにした
+       (以上 4つ Hideyuki SHIRAI <shirai@rdmg.mgcs.mei.co.jp>)
+
+・ mhc*.rb
+    + gemcal 立ち上げ時のデバッグ表示を削除
+
+* mhc-snap20000104 (2000-01-04)
+
+・ mhc*.el
+
+    + emacs 19.28 に再び対応
+        Hideyuki SHIRAI <shirai@rdmg.mgcs.mei.co.jp>
+
+    + 時間入力に `none' を入力しないでいいようにした。
+
+    + X-SC-Location: に場所を指定可能 (gemcal はまだ)
+
+    + History を別々に。
+	sen_ml@eccosys.com
+
+    + X-SC-Time: に 24:00 以降の時間を許容
+
+    + 来年の今月で mhc-goto-today を実行しても間違わないように。
+
+    + C-ct で縦に出しているカレンダーを toggle.
+
+・ mhc-date.rb, mhc-schedule.rb (gemcal)
+
+    + 24:00 以降の時間を許容
+
+* mhc-snap19991224 (1999-12-24)
+
+・ mhc*.el
+     + summary に 3ヶ月カレンダーを縦に入れてみた
+     + mhc-input-time のデフォルトを none に
+
+* 0.24 (1999-12-16)
+
+  mhc-snap19991211 を単に格上げ。
+  0.23.1 移行のバグフィックス以外の変更は以下の通り:
+
+    + Wanderlust 2.2.10 以降への対応
+
+    + 土日の色(赤青)と Category の色の優先順位を指定できるようにした。
+       mhc-face-week-color-paint-thick
+
+    + 時間推測に日付推測の結果を反映させるように変更。
+
+    + mhc-import の日時入力中、C-nC-p で前後の候補を選択できるようにした。
+
+    + mew-virtual-mode を呼ぶときは hook を nil にして
+      かわりに mhc-mode-hook を追加 
+
+    + mode-line の " Schedule" を " mhc" に変更
+
+* mhc-snap19991211 (1999-12-11)
+
+・ mhc*.el
+
+    + Wanderlust 2.2.10 以降への対応
+	 Yuuichi Teranishi <teranisi@gohome.org>
+
+    + 土日の色(赤青)と Category の色の優先順位を指定できるようにした。
+
+    + 時間推測に日付推測の結果を反映させるように変更。
+
+    + mhc-import の日時入力中、C-nC-p で前後の候補を選択できるようにした。
+
+    + X-SC-Time: に始時刻しかない場合に、桁がずれてしまうのを Fix
+	 Akihiro MOTOKI <motoki@ptl.abk.nec.co.jp>
+
+    + Subject が存在しないメールの登録時エラーが出るのを Fix
+	 Akihiro MOTOKI <motoki@ptl.abk.nec.co.jp>
+
+    + Wanderlut で mhc-goto-today が効かないバグを Fix
+	 Akihiro MOTOKI <motoki@ptl.abk.nec.co.jp>
+
+    + X-SC-Cond: 1st 3rd Tue のような 第1, 3 火曜日といった表記が
+      正しく表示されないバグを Fix
+
+* snap19991130 (1999-11-30)
+
+・ mhc.el 
+
+    + mew-virtual-mode を呼ぶときは hook を nil にして
+      かわりに mhc-mode-hook を追加 
+        Hideyuki SHIRAI <shirai@rdmg.mgcs.mei.co.jp>
+
+    + Mew を "Q" したときに、 mhc の folder も消えるように変更 
+        Hideyuki SHIRAI <shirai@rdmg.mgcs.mei.co.jp>
+
+    + mode-line の " Schedule" を " mhc" に変更
+
+    + make-face 回りのバグを Fix 
+
+    + mhc-summary-message-alist に wl 用の設定追加 
+        Akihiro MOTOKI <motoki@ptl.abk.nec.co.jp>
+
+    + スケジュール表示するとバッファが modified になってしまうのを Fix 
+        Yuuichi Teranishi <teranisi@gohome.org>
+
+* snap19991129 (1999-11-29)
+
+・ gemcal 
+    + DayBook を WindowManager から delete した後に
+      もう一度開くと落ちるバグを Fix. 
+
+・ mhc.el 
+    + scan 周りのコードを少し(だけ) 整理 
+    + Wanderlust に対応 (したつもり)
+
+* 0.23.1 (1999-11-25)
+
+・ gemcal 
+
+   Daybook を WindowManager から殺して、再び開こうとすると、
+   gemcal ごと終了してしまうバグを Fix.
+
+・ mhc*.el
+
+   現在の日付以前の予定を入力しようとすると、
+   強制的に次の年になってしまうバグを Fix。
+
+・ サマリバッファで行頭の `0 |' を隠してみた。
+
+・ samples/DOT.schedule.sample.jp に 2031年までの休日を
+   追加。(Hideyuki SHIRAI <shirai@rdmg.mgcs.mei.co.jp>)
+
+* 0.23 (1999-11-19)
+
+・ mhc.el 
+
+    + mscan2 を使わず elisp だけで完結したことにより、
+      ほとんどの人にとって、かなり高速化された
+
+    + emacs 19.28 に対応
+
+    + コンフリクトしている項目をマークで警告するように
+
+    + スケジュールの登録 (C-cC-c) 段階で事前に
+      コンフリクトの警告をするように
+
+    + Private なサブジェクト部分を [SECRET] のように
+      別な文字列に変えて表示できるようになった
+
+    + カテゴリと face の関係を書く alist の追加。カラフルに。
+
+    + 任意のバッファにスケジュール一覧を挿入する
+      mhc-insert-schedule の追加
+
+    + カテゴリの扱いを case-insensitive に
+
+    + スケジュールの登録 (C-cC-c) のフォーマットのチェック強化
+
+    + メールからの取り込みの際、日付推測にひっかかった部分を
+      ハイライト表示してみせるようになった
+
+    + minibuffer 入力のチェック強化
+
+    + X-SC-Duration: のフォーマットで 20000101- や -19991231 を許すように。
+
+・ Palm/WorkPad との転送コマンド (palm2mhc, mhc2palm) の追加
+   (pilot-link の libpisock が必要)
+
+・ today を ruby で書換え。以前の物は today.pl に改名。
+
+   オプションの指定で柔軟な出力が可能に。
+   詳しくは today --help を参照。
+
+・ ruby/gtk による GUI gemcal の安定化
+
+・ 宴会サーバ Meeting2000 に自分のスケジュールを
+   重ねて見せて、入力を支援する my-meeting2000 を experimental に追加
+
+   ruby/gtk 0.21 以降必須です。(それ以前の ruby/gtk は thread との相性
+   が悪いらしく、めちゃくちゃ遅くなります。)
+
+   詳しくは my-meeting2000 中のコメントを参照。
+
+・ TV ガイドのページから番組を取り込む gp2mhc (GigaPocket to MHC) を 
+   experimental に追加。
+
+・ HP200LX の appt.adb を MHC に変換して、移行を助けるためのツール
+   adb2mhc を追加
+   (細かくチェックできていません)
+
+
+* 0.23pre1 (1999-11-18)
+
+・ today が imput を使用しないで ruby で完結した。
+	(thanks to os@iij.ad.jp)
+
+・ mhc2palm で、1月第2月曜日のようなイベントを変換できるようにした。
+
+・ X-SC-Record-Id: を新設。全てのメッセージに Uniq になるように付け
+   ることにした。(機能拡張のための準備)
+
+・ mhc.el コンフリクトしている項目に全部 [C] 付くようになった。
+
+
+* 0.23 beta (snap19991112) (1999-11-12)
+
+・ mhc での category の扱いを case-insensitive に
+
+・ mhc-schedule.rb 
+
+   (スーパー忘備録自動生成に必要な) メソッドを追加。
+   mhc と同等に 19991111- や -20000331 の書式を使えるように。
+
+・ my-meeting2000 を experimental に追加
+
+   my-meeting2000 は ruby/gtk を使うようにしてみました。(主にデ
+   モ用のため。) ruby/gtk 0.20 以前のものは、thread との相性が
+   悪いらしく、めちゃくちゃ遅くなります。
+
+・ gp2mhc (GigaPocket to MHC == vaio-tv のこと) を experimental に追加
+
+・today を ruby で書換え。以前の物は today.pl に改名。
+
+  imput を使います。できれば ruby で完結させたい所。
+
+  today --date=sun+6 --form=html で西さん作のスーパー忘備録。
+  today --date=today+1 で大原さん作の --tilltomorrow と同じに。
+  詳しくは today --help を参照して下さい。
+
+・ adb2mhc を追加
+
+  HP200LX の appt.adb を MHC に変換して、移行を助けるためのツールです。
+
+    adb2mhc --mhc-dir=/tmp/schedule appt.adb
+
+  のように使います。その後、
+
+    gemcal -r /tmp/schedule
+
+  とすると、ruby/gtk による美しいインターフェイスを堪能できるか
+  もしれません。
+
+
+* 0.23 alpha snap 19991110  (1999-11-10)
+
+・ mhc-guess-{date,time} の返す値が大きく変化
+
+・ C-c. で、1日から今日までが一画面に収まらない時に、
+   mhc-summary-goto-today がちゃんと動作しないのに対処
+
+・ X-SC-Duration: に 20000101- や -19991231 と書けるように。
+
+・ mhc-guess.el の文字コードがなぜか JIS-ROMAN になっていて、
+   XEmacs 21.2 系だと load できないのを修正。
+
+・ guess で日付時間候補が見付からないときにエラーになるのを修正
+
+・ C-m して C-cC-c するときに、自分自身とコンフリクトしてる
+   という警告が出るのを修正
+
+
+* 0.23 alpha (1999-10-28)
+
+・ gemcal の安定化
+・ Palm/WorkPad との転送コマンド (palm2mhc, mhc2palm) の追加
+・ mhc.el -- mscan2 を使わないバージョン。
+	+ スケジュールの登録 (C-cC-c) 段階で事前に
+	  コンフリクトの警告をするようになった。
+	+ カテゴリと face の関係を書く alist の追加。
+	+ 任意のバッファにスケジュール一覧を挿入する
+	   mhc-insert-schedule の追加。
+	+ スケジュールの登録 (C-cC-c) のフォーマットのチェック強化
+	+ Private なスケジュールのサブジェクト部分を [SECRET] のように
+          別な文字列に変えて表示できるようになった。
+	+ メールからの取り込みの際、日付推測にひっかかった部分を
+	  ハイライト表示してみせる。
+        + minibuffer 入力のチェック強化
+        + minibuffer 入力のフォーマット変更により一時的に入力が不便に。
+
+
+* 0.22 (1999-8-23)
+
+・ mscan2 で、conflict を detect できるようになった。
+   (summary に [OVER_BOOKING] とかいう表示がでます。)
+・ summary に開始時間だけではなく、終了時間も入れるようにした。
+・ summary の前に付いている無意味な数字を 0 で統一した。
+・ minibuffer からの日付入力で、時間指定なし (none)
+   終了時間の入力 (例: 12:00-13:00) が可能になった。
+・ 繰り返スケジュールのその日だけを消すのを簡単にした。
+・ summary の見えない部分に、X-SC-Category: を出すようにした。
+
+(if (not window-system)
+    ()
+  (require 'hilit19)
+  (add-hook 'mew-summary-scan-sentinel-hook 'hilit-rehighlight-buffer-quietly)
+  (hilit-translate saturday 'blue
+		   sunday   'red
+		   ob       'purple-bold)
+  (hilit-set-mode-patterns 
+   '(mew-virtual-mode)
+   '(
+     (".*OVER_BOOKING.*" nil ob)
+     (".*Holiday.*" nil sunday)
+     (".* (Sun) .*"   nil sunday)
+     (".* Sat .*"   nil saturday)
+     )))
+
+ の要領で、Holiday 以外の自分で付けているカテゴリに色を付けられる。
+
+・ruby/gtk ベースの tkcalendar.rb 相当 (gtkcalendar というベタな名前)
+  を入れた。(誰かいい名前考えて。。)
+  # tkcalenar.rb は discon.
+  一応、新規登録と、修正ができるようになっています。
+ 一本立ちまでもう一歩??
+
+・ mhc-default-category を新設した。C-cc でデフォルトで表示する/しない
+   カテゴリを設定可能。(00usage.jis 参照)
+
+* 0.21b2 (1999-7-8)
+
+・ tkcalendar.rb を ruby 1.3 系に、もっと対応。
+・ 日付予測のパラメータチューニング
+・ DOT.schedule.sample の typo 修正
+・ mscan2 が header の継続行を処理できなかったのを修正
+・ today を win95 に対応 (OHARA Shigeki <os@iij.ad.jp>)
+
+* 0.20 (1999-6-22)
+
+・ tkcalendar.rb を ruby 1.3 系に対応。
+・ 0.19 で mscan2 が .schedule を読まなくなっていたのを修正。
+
+* 0.19 (1999-6-7)
+
+・ mew 1.94b31 に追従
+・ palm/WorkPad へ schedule を push する実験的なコードを追加
+    (00usage.jis 参照)
+
+・ mhc-summary-mode の description, モードラインを追加, 
+	"Katsura S. Yoshio" <shishamo@osk2.3web.ne.jp>
+
+* 0.18 (1999-5-25)
+
+・ tkcalendar.rb で、TkAfter でなくて Thread を使うようにして、
+   プロセスが太らないようにした。(今度こそ)
+・ DOT.schedule.sample の漢字コードを EUC から JIS に変更。
+・ mscan2/today が nkf を使わなくなった。perl + IM だけを必要とする。
+・ mscan2 --(category|grep)=xxx で、category を指定できるようにした。
+・ C-cs C-c. C-cg を C-u 付きで呼ぶと category を指定できるようになった。
+	(00usage.jis 参照)
+・ +schedule/\d+/\d+ 以外のフォルダに rescan/goto できないようにした。
+・ C-cm ... C-cC-c で、rescan するようになった。
+	(Hanada Yasunori <yasunori@swlab.csce.kyushu-u.ac.jp>)
+・ today を更新 (OHARA Shigeki <os@iij.ad.jp>)
+	(Tomorrow の見ためその他)
+
+* 0.17 (1999-5-24)
+
+・ gdate を書換えて、推測をかなり賢くした。(つもり)
+・ mscan2 の起動に失敗して、何も吐かなかったときに、mhc.el がコケない
+   ように修正。
+・ emacs 20.2 と 20.3 では write-region の仕様が違うのに対応。
+・ mscan2 を windows に対応。
+	Thanks to Toru Ito <ito@temac.toyota-shokki.co.jp>
+・ mscan2 に --tomorrow を追加それを使う
+・ today に --tilltomorrow を追加
+	 OHARA Shigeki <os@iij.ad.jp>
+・ tkcalendar.rb で、Tk.After ではなくて、TkAfter を使うようにして、
+   プロセスが太らないようにした。(つもり)
+
+* 0.16 (1999-05-17)
+
+・ 0.15 でエンバグした、新規の格納先フォルダがないとき動作しないのを修正。
+	(0.15 は捨てて下さい。)
+・ emacs 20 以上 20.2 以前のバージョンでうまく動かないことへの対処。
+
+* 0.15 (1999-05-17)
+
+・ MH の mhpath, refile を使わないようにして、MH 依存をなくした。
+	(mscan2, mhc.el)
+
+* 0.14.1 (1999-05-14)
+
+・tkcalendar.rb をちょっと更新
+・mscan2 に --nonum/squeeze/today を復活。
+    mew から +schedule/trash を普通のフォルダとして見えるようにした。
+・today を追加 today --mail=me@foo.bar とかを cron に仕掛けると幸せ。
+
+* 0.14 (1999-05-13)
+
+・ emacs 20.x の write-region の使い方を間違っていたのを fix.
+・ tkcalendar.rb をおまけに添付。
+
+* 0.13 (1999-04-13)
+
+・ 0.09 以前と同等の guess 機能を入れました。 (gdate.el を追加)
+・ ddate.el に便利な関数を追加
+
+* 0.12 (1999-04-12)
+
+・ mscan2 の 余計な debug 出力を削りました。
+・ C-cC-c で登録するときの、フォルダ選択が、だいたい正しくなりました。
+・ X-SC-* のヘッダが、複数行に渡っているときの bugfix
+・ C-cs でリスキャンしたときに、前のカーソル位置を復元するようになりました。
+・ C-cd (delete) を実装しました。(cf. 00usage.jis)
+
+* 0.11 (1999-04-11)
+
+・ mhc, mscan2 は mew の virtual mode を使うようになりました
+	command line から mscan を使ってる人ごめんなさい
+	従来のモードで動くようにするオプションを付けます。。
+・ s (rescan) の代わりに -> C-cs を使って下さい
+・ g (goto)   の代わりに -> C-cg  を使って下さい
+・ d (delete) が使えない。。。早急に何とかします。
+・ 月にまたがる繰り返しをサポートするようになりました !!
+
+  繰り返し
+
+        繰り返しのスケジュールを +schedule/yyyy/mm に入れてしま
+        うと、他のをスキャンしたときに見えなくなってしまうので、
+        月をまたがるようなスケジュールは、+schedule/intersect と
+        いうフォルダに全部入れることにしました。したがって、
+
+          ~/.schedule
+          +schedule/yyyy/mm
+          +schedule/intersect
+
+        の 3箇所からデータを引っ張ってくるようになりました。
+        +schedule/yyyy/mm と +schedule/intersect のどっちに入れ
+        るかは、C-cC-c したときに X-SC-Date: や X-SC-Cond: をパー
+        ズして決定してやらなければいけないのですが、今は不十分で
+        す。ユーザが指定してやるようにして下さい。
+
+        C-uC-cC-c       +schedule/intersect
+           C-cC-c       +schedule/yyyy/mm
+
+* 0.10 
+
+  1. 何が新しくなったか
+
+    ・ lisp コードをほとんど 書き直した (ので、危険です)
+    ・ lisp が 2つのファイル (mhc.el, ddate.el) に分かれた
+    ・ 日付を推測するコードを一時的に外した
+    ・ 2000年問題にやっと対応した
+	mv ~/Mail/schedule/{xx,19xx} して下さい。
+    ・ 不十分ながら、数の日付を入力できるようになった
+    ・ 不十分ながら、繰り返しを記述できるようになった
+    ・ X-SC-* ヘッダのフォーマットを全面的に変更
+    ・ 今月を scan 後、今日の日付にカーソルが飛ぶようになった
+        (要 patch to mew)
+    ・ +schedule/* 以外の mew のフォルダからの C-c> でも、来月の予定が見える
+    ・ C-c> C-c< で月を移動するときに、引数を受け付けるようになった
+       (たとえば C-uC-c> で 4ヶ月先)

@@ -1,0 +1,104 @@
+
+       MHC -- Message Harmonized Calendaring system.
+
+                        Yoshinari Nomura
+
+Created: 1999/09/01
+Revised: 2000/05/22 10:00:48
+
+** DESCRIPTION:
+
+MHC is designed to help those who receive most appointments via email.
+Using MHC, you can easily import schedule articles from emails.
+
+You can get the latest version from:
+ http://www.swlab.csce.kyushu-u.ac.jp/~nom/prj/mhc/
+
+MHC has following features:
+
++ Simple data structure allows you to manipulate stored data in many ways.
++ Both UNIX and Windows9x support.
++ Appointments can be made to repeat in flexible ways.
++ powerful but simple expression of appointments.
+  Each appointment can have following attributes:
+
+    date, subject, start/end time (not mandatory),
+    advance time of alarm,
+    multiple categories,
+    repetition rules,
+    duration of the repetition,
+    list of exception dates,
+    list of extra dates
+    description and email which originated the appointment.
+
++ Multiple User Interface such as commandline/emacs/GUI/Web.
+  MHC currently has following interfaces:
+
+    + Elisp package cooperative with  Mew, Wanderlust or Gnus
+        (popular MUA in the Emacs world)
+        (emacs/mhc.el)
+    + GUI (Ruby/Gtk based) desktop calendar application. (gemcal)
+    + CGI based Web interface 
+        (not in this package please see http://mhc.hauN.org/web-mhc/)
+    + Command line schedule lister like the scan of MH. (mscan)
+
+MHC stores schedule articles in the same form of MH; you can manipulate
+these messages not only by above tools but also by many other MUAs,
+editors, UNIX commandline tools or your own scripts.
+
+** SYSTEM REQUIREMENTS
+
+MHC is supposed to work on systems which has
+
+gemcal        -- Ruby 1.4.2 + ruby-gtk 0.22
+mhc-sync      -- Ruby 1.4.2 + ssh
+palm2mhc      -- Ruby 1.4.2 + pilot-link library (libpisock)
+mhc2palm      -- Ruby 1.4.2 + pilot-link library (libpisock)
+today, mscan  -- Perl 5.004
+mhc.el        -- Environments which Mew (1.94 or later)
+                 or Wanderlust (ver 2.2.10 or later) supports.
+
+All tools are supposed to work on UNIX and Windows9x.
+(I've never tested under Win9x. mscan, today, mhc.el were reported to work.)
+
+** MANIFEST:
+
+mscan         -- commandline schedule lister like scan of MH.
+today         -- display/sendmail today's schedule to you.
+gemcal        -- desktop scheduler. (written in ruby/gtk)
+mhc-sync      -- Data synchronization tool between 2 PCs.
+mhc2palm      -- data transfer from MHC to Palm/WrokPad.
+palm2mhc      -- data transfer from Palm/WrokPad to MHC.
+emacs/        -- mhc.el changes Mew/Wanderlust to a nifty scheduler.
+samples/      -- sample anniversary list.
+ruby-ext/     -- ruby/gtk libs required by gemcal, palm2mhc, mhc2palm, mhc-sync
+xpm/          -- small button designs required by gemcal
+experimental/ -- experimental codes.
+00readme      -- this file.
+00copyright   -- copyright noticement.
+00changes     -- change log
+
+** INSTALL:
+
+Sorry I've not written documents yet.
+Each manpage may be included in sub directory or embedded the tool itself.
+
+** FOR MORE INFORMATION:
+
+Please send me any comments or  bug reports:
+  nom@mew.org
+
+You can get the latest version from:
+  http://www.swlab.csce.kyushu-u.ac.jp/~nom/prj/mhc/
+
+I also opened mailing list, ``mhc@swlab.csce.kyushu-u.ac.jp''.
+Almost subscribers are Japanese. If you read Japanese, I recommend you
+to subscribe it. Please send a mail to following address,
+
+  mhc-ctl@swlab.csce.kyushu-u.ac.jp
+
+with such content:
+
+  subscribe Your Name (ex: subscribe Yoshinari Nomura)
+
+-- 00readme ends here.

@@ -1,0 +1,673 @@
+#!/usr/local/bin/perl
+
+## mscan
+##
+## Author:  Yoshinari Nomura <nom@mew.org>
+##
+## Created: 1999/04/07
+## Revised: 2000/02/09 08:43:13
+##
+## X-SC-* Header Spec:
+## 
+## {Month}   : (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)
+## {Order}   : (1st|2nd|3rd|4th|Last)
+## {Week}    : (Sun|Mon|Tue|Wed|Thu|Fri|Sat)
+## {DayNo}   : 1-31
+## {Date}    : !?yyyymmdd
+## {Duration}: yyyymmdd-yyyymmdd
+## {Time}    : (none|HH:MM-HH:MM|HH:MM)
+## {Keyword} : \S+
+##
+## X-SC-Subject:  English Exam      #         {String}
+## X-SC-Category: Todo Holiday      # list of {Keyword}
+## X-SC-Location: S114              #         {Keyword}
+## X-SC-Day: 19960508 !19960509     # list of {Date}
+## X-SC-Time: 11:00-12:00           #         {Time}
+## X-SC-Cond: 2nd Wed               # list of {Month}|{Order}|{Week}|{DayNo}
+## X-SC-Duration: 19960501-19970331 #         {Duration}
+##
+## X-SC-Date: 5 Apr 99 18:00        # for backward compatibility.
+##
+##
+##
+
+################################################################
+### Global variables.
+###
+
+#$NKF          = "/usr/local/bin/nkf";
+$SCAN         = "imls";
+$PERL         = "perl";  ## Only Win95 needs this.
+
+$HOME         = $ENV{'HOME'};
+$HOME         =~ s!\\!/!g;  ## for Win95
+
+$MailDir      = "$HOME/Mail";
+$dot_schedule = "$HOME/.schedule";
+$rootFolder   = "schedule";
+$intersect    = "intersect";
+$palm         = "palm";
+
+$palm_queue   = "$palm/queue";
+$ScheduleDir  = "$MailDir/$rootFolder";
+$virtualFLG   = 1;
+
+if ($^O =~ /win/i){
+    ## for WIN95.
+    @SCAN  = ("$PERL", "-S", $SCAN);
+} else {
+    ## for other OS.
+    @SCAN  = ($SCAN);
+}
+
+$OVER_BOOKING = '[OVER_BOOKING] ';
+
+################################################################
+### SET options.
+###
+
+## --src=+              (+inbox)
+## --squeeze=on/off         (off)
+## --today=on/off           (off)
+## --nonum=on/off           (off)
+## --virtual=on/off         (on)
+## --schedule=on/off        (off)
+
+foreach (@ARGV){
+    if (/^--squeeze=(.*)$/){
+	$squeezeFLG = on_off($1);
+	$scheduleFLG = 1;
+
+    }elsif (/^--today=(.*)$/){
+	$dateFLG     = on_off($1);
+	$dateString  = get_date_string('today');
+	$scheduleFLG = 1;
+
+    }elsif (/^--date=(today|tomorrow|\d{8})$/){
+	$dateFLG     = 1;
+	$dateString  = get_date_string($1);
+	$scheduleFLG = 1;
+
+    }elsif (/^--nonum=(.*)$/){
+	$nonumFLG = on_off($1);
+	$scheduleFLG = 1;
+
+    }elsif (/^\+$rootFolder\/\d\d\d\d\/\d\d/){
+	$scFolder = $_;
+	$scheduleFLG = 1;
+
+    }elsif (/^--src=(\+$rootFolder\/\d\d\d\d\/\d\d)$/){
+	$scFolder = $1;
+	$scheduleFLG = 1;
+
+    }elsif (/^--(category|grep)=(.+)$/){
+	$categoryFLG = $2;
+	$categoryREGEX = join('|', (split(/\s+/, $categoryFLG)));
+	$categoryInvertFLG = 1 if $categoryREGEX =~ s/^!\s*//
+
+    }elsif (/^--palm=(.*)$/){
+	$palmFLG = on_off($1);
+	$scheduleFLG = 1;
+
+    }else {
+    }
+}
+
+$squeezeFLG =  ($squeezeFLG | $dateFLG | $palmFLG);
+$nonumFLG   =  ($nonumFLG | $squeezeFLG | $dateFLG | $palmFLG);
+$virtualFLG = !$nonumFLG;
+
+##
+## convert a datekeyword to corresponding 'yyyy/mm/dd'
+## datekeyword: today, tomorrow, yyyymmdd
+##
+sub get_date_string
+{
+    my $str = shift;
+    my ($sec, $min, $hour, $day, $mon, $year) = localtime(time);
+    $mon++; $year += 1900;
+
+    if ($str eq 'today'){
+	
+    } elsif ($str eq 'tomorrow'){
+	($sec, $min, $hour, $day, $mon, $year) = localtime(time + 60*60*24);
+	$mon++; $year += 1900;
+    } elsif ($str =~ /^(\d\d\d\d)(\d\d)(\d\d)$/){
+	($year, $mon, $day) = ($1||$year, $2||$mon, $3);
+    } else {
+	return undef;
+    }
+    return sprintf("%04d/%02d/%02d", $year, $mon, $day);
+}
+
+sub on_off
+{
+    my $p = shift;
+    return $p =~ /^(on|yes)$/i ? 1 : 0;
+}
+
+################################################################
+### main
+###
+if (!$scFolder && !$dateString){
+    ($sec, $min, $hour, $day, $mon, $year) = localtime(time);
+    $mon++; $year += 1900;
+    $scFolder = sprintf("+$rootFolder/%04d/%02d", $year, $mon);
+} elsif (!$scFolder && $dateString){
+    $scFolder = "+$rootFolder/" . substr($dateString, 0, -3);
+
+} elsif ($scFolder && !$dateString){
+    ## nothing is done
+
+} elsif ($scFolder && $dateString){
+    if (substr($scFolder, -7) ne substr($dateString, 0, -3)){
+	die("--src=+xxx and --date=yyyymmdd is incompatible.\n");
+    }
+}
+
+# make source dir -- strip first '+' char from $scFolder, and
+# concatinate with $MailDir.
+$scDir = sprintf("%s/%s", $MailDir, substr($scFolder, 1));
+($year, $mon) = ($scDir =~ m!/(\d\d\d\d)/(\d\d)$!);
+
+## if argument doesn't have '+schddule/...' nor '-month', scan normally.
+if (!$scheduleFLG){
+    exec (@SCAN, @ARGV) || die "Can't exec $SCAN.\n";
+}
+
+#open(STDOUT, "| $NKF -j");
+binmode(STDOUT) if ($virtualFLG);
+new();
+
+@nth = ('1st', '2nd', '3rd', '4th', 'last');
+@week = ('sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat');
+@week2 = ('(Sun)', ' Mon ', ' Tue ', ' Wed ', ' Thu ', ' Fri ', ' Sat ');
+@month = ('jan', 'feb', 'mar', 'apr', 
+	  'may', 'jun', 'jul', 'aug',
+	  'sep', 'oct', 'nov', 'dec',
+	 );
+
+if ($palmFLG) {
+    scanAll();
+} else {
+    scanMonth($mon, $year);
+}
+close(STDOUT);
+
+exit 0;
+
+################################################################
+### Scan function
+###
+sub scanMonth # ($mon, $year)
+{
+    my ($mon, $year) = @_;
+    my $ob;
+    my $i;
+    my $dDate = $year * 10000 + $mon * 100 + 1;
+    my $daysOfMonth = daysOfMonth($mon, $year);
+    my $week = dayOfWeek($mon, 1, $year);
+    my $M = $month[$mon - 1];
+
+    for ($day = 1; $day <= $daysOfMonth; $day++, $dDate++, $week++){
+	my $W  = $week[$week % 7];
+	my @TMP = ScheduleItem::search($dDate, $M, $daysOfMonth, $W, $day);
+
+	next if ($dateFLG && $day != substr($dateString, -2));
+
+	if (@TMP){
+	    @TMP = sort { $a->{'startTime'} cmp $b->{'startTime'};} @TMP;
+	    my $first = 1;
+  	    for ($i = 0; $i <= $#TMP; $i++){
+		$ob = check_overbooking(\@TMP, $i);
+		scan($TMP[$i], $ob, $first, $year, $mon, $day, $week);
+  		$first = 0;
+  	    }
+	} else {
+	    # call scan only for headings.
+	    scan(undef, undef, 1, $year, $mon, $day, $week);
+	}
+    }
+}
+
+sub check_overbooking
+{
+    my ($hash, $s) = @_;
+    my $s_start = $hash->[$s]->{'startTime'};
+    my $i_end;
+    my $i;
+    return undef if ($s_start eq '');
+
+    for ($i = 0; $i < $s; $i++){
+ 	$i_end = $hash->[$i]->{'endTime'};
+ 	return 1 if ($i_end ne '') && ($i_end > $s_start);
+    }
+    return undef;
+}
+
+sub scan
+{
+    my ($i, $ob, $heading, $year, $mon, $day, $week) = @_;
+    my $TZ = $ENV{'TZNAME'} || $ENV{'TZ'};
+
+    ## if item is empty, simply printout headings.
+    if (!defined($i) &&  $heading){
+	my $num;
+	return if ($squeezeFLG);
+
+	if ($nonumFLG){
+	    $num = '';
+	} elsif ($virtualFLG){
+	    $num = '0 |  ';
+	} else {
+	    $num = sprintf("%4d | ", 0);
+	}
+	printf($num . "%02d/%02d %4s \r $scFolder 0\n", 
+	       $mon, $day, $week2[$week % 7]) if $virtualFLG;
+	printf($num . "%02d/%02d %4s\n", 
+	       $mon, $day, $week2[$week % 7]) if !$virtualFLG;
+	return;
+    }
+
+    my $num  = sprintf("%4d | ", $i->{'fileno'});
+    my $date = sprintf("%02d/%02d %4s ", $mon, $day, $week2[$week % 7]);
+    my $sep  = defined $i->{'endTime'} ? '-' : ' ';
+    my $time = sprintf("%5s$sep%5s ", $i->{'startTime'}, $i->{'endTime'});
+    my $edate = '';
+    my $etime = '';
+    my $tab  = '';
+    my $anno = $OVER_BOOKING if $ob;
+    my $cat  = '';
+    my $subj = $i->{'subject'};
+    my $vnum = '';
+
+    $num   = ""                   if ($nonumFLG);
+    $num   = "0 |  "              if ($virtualFLG);
+    $date  = "            "       if (!$heading);
+    $cat   = "\r$i->{'category'}" if ($virtualFLG);
+    $vnum  = "\r $i->{'folder'} ". ($i->{'fileno'} || 0) if ($virtualFLG);
+
+    if ($palmFLG){
+	## next if (defined $i->{'cond'} && 
+	##         $i->{'category'} !~ /holiday|birthday/i);
+	$tab   = "\t";
+	$num   = '';
+	$date  = sprintf("%04d/%02d/%02d ", $year, $mon, $day);
+	$time  = sprintf("%5s $TZ", $i->{'startTime'} || '00:00');
+
+	if (defined $i->{'endTime'}){
+	    $edate = $date;
+	    $etime = sprintf("%5s $TZ", $i->{'endTime'});
+	} elsif (defined $i->{'startTime'}){
+	    $edate = $date;
+	    $etime = $time;
+	}
+    }
+    print "$num$date$time$tab$edate$etime$tab$tab$anno$subj$cat$vnum\n";
+}
+
+sub scanAll
+{
+    my ($year, $mon, $day);
+
+    foreach (@ScheduleItem::ALL){
+	if ($_->{'day'} =~ /(\d{4})(\d{2})(\d{2})/){
+	    ($year, $mon, $day) = ($1, $2, $3);
+	    scan($_, 0, 0, $year, $mon, $day, 0);
+	}
+    }
+}
+
+################################################################
+### Read all schedule files, Create schedule item objects.
+###
+sub new
+{
+    my %header;
+    my $folder;
+    my $tag;
+    my $no = 0;
+    my @Schedule;
+    my @files;
+
+    if (!$palmFLG){
+	open(SCHEDULE, "$dot_schedule");
+	while (<SCHEDULE>) {
+	    if (/^$/) {
+		$Schedule[$no++] = ScheduleItem->new(%header);
+		undef %header;
+	    } elsif (/^x-sc-([^:]+):\s*(\S.*)/i) {
+		$tag = $1;
+		$tag =~ tr [A-Z] [a-z];
+		$header{$tag} = $2;
+	    } elsif (/^\s+(.*)/){
+		$header{$tag} .= " $1";
+	    }
+	}
+	close(SCHEDULE);
+    }
+
+    if ($palmFLG){
+	@files = (<$ScheduleDir/$palm_queue/*>);
+    } else {
+	$scDir_old = $scDir;
+	$scDir_old =~ s/\d\d(\d\d\/\d\d)$/$1/;
+	@files = (<$scDir_old/*>, <$scDir/*>, <$ScheduleDir/$intersect/*>);
+    }
+    foreach (@files){
+	next if (! /\/\d+$/);
+	last if (! -f $_);
+	open(FILE, $_) || die;
+	($filename) = m|([^/]+)$|;
+        ($folder)   = m|^$MailDir/(.*)/\d+$|;
+	$folder = '+' . $folder;
+	# print "OPEN $_ ($folder $filename)\n";
+	while (<FILE>){
+	    if (/^$/) {
+		correct_header(\%header);
+		$header{'fileno'} = $filename;
+		$header{'folder'} = $folder;
+		$Schedule[$no++] = ScheduleItem->new(%header);
+		undef %header;
+		close(FILE);
+		next;
+	    } elsif (/^x-sc-([^:]+):\s*(\S.*)/i) {
+		$tag = lc($1);
+		$header{$tag} = $2;
+	    } elsif ($tag && /^\s+(.*)/){
+		$header{$tag} .= " $1" if ($tag);
+	    } else {
+		undef $tag;
+	    }
+	}
+    }
+    if (defined %header){
+	$Schedule[$no++] = ScheduleItem->new(%header);
+    }
+    return bless \@Schedule;
+}
+
+##
+## For backward compatibility.
+##
+sub correct_header
+{
+    my $header = shift;
+    my ($day, $mon, $year, $time);
+
+    if (
+	#!defined $header->{'day'} &&
+	$header->{'date'} =~ /(\d+)\s+([A-Z][a-z][a-z])\s+(\d+)\s(\d\d:\d\d)/
+       ){
+
+	($day, $mon, $year, $time) = ($1, $2, $3, $4);
+	$mon = index("JanFebMarAprMayJunJulAugSepOctNovDec", $mon) / 3 + 1;
+	$year += 1900 if ($year < 100);
+
+#	print "X-SC-Date: $header->{'date'}\n";
+	$header->{'day'}  = sprintf("%04d%02d%02d", $year, $mon, $day);
+	$header->{'startTime'} = $time if ($time ne "00:00");
+#	print "X-SC-Day: $header->{'day'}\n";
+#	print "X-SC-Time: $header->{'time'}\n";
+    }
+}
+
+######################################
+package ScheduleItem;
+######################################
+
+################################################################
+### Schedule Item Object Mangement.
+###
+
+## structure of the hash tree.
+## 
+## ROOT -> YYYYMMDD                  -> PointerToEventList
+## ROOT -> Month   -> DayNo          -> PointerToEventList
+## ROOT -> Month   -> Order  -> Week -> PointerToEventList
+## ROOT -> !YYYYMMDD                 -> PointerToEventList
+##
+
+$TREE = {};
+@ALL  = ();
+
+sub new
+{
+    shift;
+    my %headers = @_;
+    my (@cond, @month, @order, @week, @dayno);
+    my (       $month, $order, $week, $dayno);
+    my $DEBUG = 0;
+    my $fourthFlag;
+    my $lastFlag;
+
+    push(@ALL, \%headers);
+
+    if ($headers{'time'}){
+	($headers{'startTime'}, $headers{'endTime'}) 
+	    = split(/-/, $headers{'time'});
+    }
+
+    if  ($headers{'day'}) {
+	@date = split(/\s+/,  $headers{'day'});
+	foreach (@date) {
+	    push(@{$TREE->{$_}}, \%headers);
+	    print "$_ is $headers{'subject'}\n" if $DEBUG;
+	}
+    }
+
+    if  ($headers{'cond'}) {
+	@cond = split(/\s+/, $headers{'cond'});
+
+	foreach (@cond) {
+	    if (/(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)/i) {
+		push(@month, lc($1));
+	    } elsif (/(sun|mon|tue|wed|thu|fri|sat)/i) {
+		push(@week, lc($1));
+	    } elsif (/(1st|2nd|3rd)/){
+		push(@order, lc($1));
+	    } elsif (/4th/) {
+		$fourthFlag = 1;
+	    } elsif (/last/i) {
+		$lastFlag = 1;
+	    } elsif (/(\d+)/) {
+		push(@dayno, $1);
+	    }
+	}
+	if ($fourthFlag && $lastFlag){
+	    push(@order, '4thlast');
+	} elsif ($fourthFlag) {
+	    push(@order, '4th');
+	} elsif ($lastFlag) {
+	    push(@order, 'last');
+	}
+	@month = ('All') if (!@month);
+	@order = ('All') if (!@order);
+
+	foreach $month (@month) {
+	    foreach $order (@order) {
+		foreach $week (@week) {
+		    push(@{$TREE->{$month}->{$order}->{$week}}, \%headers);
+		    print "$month $order $week is $headers{'subject'}\n"
+			if $DEBUG;
+		}
+	    }
+	    foreach $dayno (@dayno) {
+		push(@{$TREE->{$month}->{$dayno}}, \%headers);
+		print "$month $dayno is $headers{'subject'}\n"
+		    if $DEBUG;
+	    }
+	}
+    }
+
+    if ($headers{'duration'}){
+	($headers{'startDate'}, $headers{'endDate'}) 
+	    = split(/-/, $headers{'duration'});
+    }
+}
+
+sub search # (yyyymmdd, mon, daysOfMonth, week, dayno)
+{
+    my @nth = ('1st', '2nd', '3rd', '4th', 'last');
+    my ($yymmdd, $month, $daysOfMonth, $week, $dayno) = @_;
+    my @ret;
+    my $x;
+    my $order = $nth[($dayno - 1) / 7];
+    my @items;
+
+    if ($dayno + 7 > $daysOfMonth && $dayno < 29) {
+	# This is 4th and Last.
+	@items = 
+	    (
+	     @{$TREE->{$yymmdd}},
+	     @{$TREE->{$month}->{$order}->{$week}},
+	     @{$TREE->{$month}->{'last'}->{$week}},
+	     @{$TREE->{$month}->{'All' }->{$week}},
+	     @{$TREE->{'All' }->{$order}->{$week}},
+	     @{$TREE->{'All' }->{'last'}->{$week}},
+	     @{$TREE->{'All' }->{'All'}->{$week}},
+	     @{$TREE->{$month}->{$dayno}},
+	     @{$TREE->{'All' }->{$dayno}},
+	    );
+    } else {
+	@items = 
+	    (
+	     @{$TREE->{$yymmdd}},
+	     @{$TREE->{$month}->{$order}->{$week}},
+	     @{$TREE->{$month}->{'All'}->{$week}},
+	     @{$TREE->{'All'}->{$order}->{$week}},
+	     @{$TREE->{'All'}->{'All'}->{$week}},
+	     @{$TREE->{$month}->{$dayno}},
+	     @{$TREE->{'All'}->{$dayno}},
+	    );
+    }
+
+    foreach $x (@items){
+	if (defined($main::categoryFLG)){
+	    if ($main::categoryInvertFLG) {
+		next if ($x->{'category'} =~ /\b($main::categoryREGEX)\b/io);
+	    } else {
+		next if ($x->{'category'} !~ /\b($main::categoryREGEX)\b/io);
+	    }
+	}
+	push(@ret, $x) if ((!defined $TREE->{"!$yymmdd"} ||
+			    !grep($x eq $_, @{$TREE->{"!$yymmdd"}}))
+			   &&
+			   (!defined($x->{'duration'}) ||
+			    ($yymmdd >= $x->{'startDate'} &&
+			     $yymmdd <= $x->{'endDate'})));
+    }
+    return @ret;
+}
+
+
+################################################################
+### Date calculation routines.
+###
+
+######################################
+package main;
+######################################
+
+# isLeapYear(int year) -- check if leap year
+#
+# year:
+#    ex. 1994
+# return: 
+#    1 ... leap year
+#    0 ... not leap year
+#
+sub isLeapYear
+{
+    my ($year) = @_;
+
+    return 1 if ($year % 4 == 0 && $year % 100 != 0) || $year % 400 == 0;
+    return 0;
+}
+
+# dayOfYear(int mon, int day, int year) -- Nth day of the year.
+#
+# mon, day, year:
+#    ex. 7, 1, 1994
+# return:
+#    182 ... 7, 1, 1994 is the 182nd day of the year.
+#
+sub dayOfYear
+{
+    my ($mon, $day, $year) = @_;
+    my $a;
+
+    if (&isLeapYear($year) && $mon > 2) {
+	$a = 1;
+    } else {
+	$a = 0;
+    }
+
+    ($day + ($mon - 1) * 31
+     - (0, 0, 3, 3, 4, 4, 5, 5, 5, 6, 6, 7)[$mon - 1]
+     + $a);
+}
+
+# int daysOfMonth(int mon, int year) -- days of the month.
+#
+# mon, year:
+#    ex. 2, 1992
+# return:
+#    29 ... 1992 is leap year.
+sub daysOfMonth
+{
+    my ($mon, $year) = @_;
+
+    (31, 28 + &isLeapYear($year), 31, 30, 31, 30,
+     31, 31, 30, 31, 30, 31)[$mon - 1];
+}
+
+# int dayOfWeek(int mon, int day, int year) -- day of week as a number.
+#
+# mon, day, year:
+#    ex. 7, 1, 1994
+# return:
+#    5 (Fri) ... 7, 1, 1994 is Friday (0:Sun, 1:Mon, ... , 6:Sat)
+#
+sub dayOfWeek
+{
+    my ($mon, $day, $year) = @_;
+
+    (&dayOfYear($mon, $day, $year) + ($year -1) * 365 
+     + int(($year - 1) / 4)
+     - int(($year - 1) / 100)
+     + int(($year - 1) / 400)) % 7;
+}
+
+### Copyright Notice:
+
+## Copyright (C) 1999, 2000 Yoshinari Nomura.
+## All rights reserved.
+
+## Redistribution and use in source and binary forms, with or without
+## modification, are permitted provided that the following conditions
+## are met:
+## 
+## 1. Redistributions of source code must retain the above copyright
+##    notice, this list of conditions and the following disclaimer.
+## 2. Redistributions in binary form must reproduce the above copyright
+##    notice, this list of conditions and the following disclaimer in the
+##    documentation and/or other materials provided with the distribution.
+## 3. Neither the name of the team nor the names of its contributors
+##    may be used to endorse or promote products derived from this software
+##    without specific prior written permission.
+## 
+## THIS SOFTWARE IS PROVIDED BY Yoshinari Nomura AND CONTRIBUTORS ``AS IS''
+## AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+## LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+## FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL
+## Yoshinari Nomura OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+## INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+## (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+## SERVICES# LOSS OF USE, DATA, OR PROFITS# OR BUSINESS INTERRUPTION)
+## HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+## STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+## ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+## OF THE POSSIBILITY OF SUCH DAMAGE.
+
+### mscan ends here

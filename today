@@ -1,0 +1,231 @@
+#!/usr/local/bin/ruby
+
+## today
+##
+## Author:  Yoshinari Nomura <nom@mew.org>
+##
+## Created: 1999/11/11
+## Revised: 2000/02/09 08:43:13
+##
+## today was originally written in perl.
+## This  is a ruby version of it. Original authors were
+##
+##    Yoshinari Nomura <nom@mew.org>
+##    OHARA Shigeki <os@iij.ad.jp>
+##
+
+$DEBUG2       = false
+$KANJI_KCODE  = $KCODE
+
+MailServer    = 'localhost'  ## for --mail option
+MyHostName    = 'localhost'  ## for --mail option
+
+require 'mhc-schedule'
+require 'kconv'
+require 'net/smtp'
+
+class String
+  def kconv(code = 'JIS')
+    case code
+    when 'JIS'
+      return Kconv::tojis(self)
+    when 'SJIS'
+      return Kconv::tosjis(self)
+    when 'EUC'
+      return Kconv::toeuc(self)
+    else
+      return self
+    end
+  end
+
+  # digest a string upto max size.
+  # when the bound is unsafe for muti-bytes, replace the character with '$'
+  def digest (max, tail_adjust = '$', fill_up = nil)
+    euc = (Kconv .toeuc self)[0..max-1]
+
+    if fill_up and euc .size < max
+      return euc + fill_up * (max - euc .size)
+    end
+
+    is2byte = false
+    euc .each_byte do |char|
+      is2byte = ! is2byte if char & 0x80 == 0x80
+    end
+
+    if is2byte
+      euc[max-1] = tail_adjust
+    end
+    return euc
+  end
+end
+
+def usage(do_exit = true)
+  STDERR .print "usage: today [options]
+  Show your today's schedules.
+  --help               show this message.
+  --format             change output format 'html' currently only is allowed.
+  --category=CATEGORY  pick only in CATEGORY. 
+                       '!' and space separated multiple values are allowed.
+  --date=strig[+n]     set a period of date.
+                       string is one of these:
+                         today, tomorrow, sun ... sat, yyyymmdd
+                       list n+1 days of schedules if +n is given.
+                       default value is 'today+0'
+  --mail=ADDRESS       send a e-mail to ADDRESS instead of listing to stdout.\n"
+  exit if do_exit
+end
+
+def string_to_date(string)
+  case (string .downcase)
+  when 'today'
+    return MhcDate .new
+
+  when 'tomorrow'
+    return MhcDate .new .succ
+
+  when /^(sun|mon|tue|wed|thu|fri|sat)/
+    return MhcDate .new .w_this(string .downcase)
+
+  when /\d{8}/
+    return MhcDate .new(string)
+
+  else
+    return nil
+  end
+end
+
+def get_schedule(db, from, to, category, formatter)
+  ret = ''
+
+  db .search(from, to, category) .each{|date, items|
+    ret += formatter .call(date, items)
+  }
+  return ret
+end
+
+################################################################
+## formatter
+
+formatter_normal = Proc .new{|date, items|
+  ret = ''
+  heading = format ("%02d/%02d %s ", date .m, date .d, date .w_s)
+
+  first = true
+  items .each{|sch|
+    heading = heading .gsub(/./, ' ') if !first
+    ret += heading + format("%-11s %s\n", sch .time_as_string, sch .subject)
+    first = false
+  }
+  ret
+}
+
+formatter_html = Proc .new{|date, items|
+  buffer_max, buffer = 30, ''
+
+  week = %w(Sun Mon Tue Wed Thu Fri Sat)[date .w]
+
+  items2 = []
+  items .each do |schedule|
+    time = schedule .time_b
+    time &&= "#{time} "
+    items2 .push Kconv .toeuc("#{time}#{schedule .subject}")
+  end
+
+  if (string = items2 .join(", ")) .size > buffer_max
+    string = items2 .collect {|item| item[0,10]} .join(", ")
+  end
+
+  buffer += format("%02d/%02d(%s)", date .m, date .d, week) + " "
+  buffer += string .digest(buffer_max) + "<BR>\n"
+}
+
+################################################################
+## main
+
+date_from = date_to = MhcDate .new
+formatter = formatter_normal
+
+while option = ARGV .shift
+  case (option)
+  when /^--category=(.+)/
+    category = $1
+
+  when /^--format=(.+)/
+    case $1
+    when 'html'
+      formatter = formatter_html
+    else
+      formatter = formatter_normal
+    end
+
+  when /^--date=([^+]+)(\+(-?[\d]+))?/
+    date_from = string_to_date($1) || usage()
+    date_to   = date_from .succ(($3 || '0') .to_i)
+
+  when /^--mail=(.+)/
+    mail_address = $1
+
+  else
+    usage()
+  end
+end  
+
+user_name = ENV['USERNAME'] || ENV['USER'] || ENV['LOGNAME'] || mail_address
+
+print "date_from: #{date_from .to_s}\n" if $DEBUG2
+print "date_to:   #{date_to   .to_s}\n" if $DEBUG2
+print "e-mail:    #{mail_address}\n"    if $DEBUG2
+
+db = MhcScheduleDB .new
+
+if mail_address
+  header    = "To: #{mail_address}\n"
+  header   += "From: secretary-of-#{mail_address}\n"
+  header   += "Subject: Today's schedule (#{date_from .to_s})\n"
+  header   += "\n"
+  header   += "#{user_name}'s schedule: \n\n"
+  contents  = get_schedule(db, date_from, date_to, category, formatter)
+
+  if contents && contents != ''
+    message = (header + contents) .kconv('JIS')
+    Net::SMTPSession .start(MailServer, 25, MyHostName) {|server|
+      server .sendmail(message, mail_address, [mail_address])
+    }
+  end
+else
+  print get_schedule(db, date_from, date_to, category, formatter) \
+        .kconv($KANJI_KCODE)
+end
+
+### Copyright Notice:
+
+## Copyright (C) 1999, 2000 Yoshinari Nomura.
+## All rights reserved.
+
+## Redistribution and use in source and binary forms, with or without
+## modification, are permitted provided that the following conditions
+## are met:
+## 
+## 1. Redistributions of source code must retain the above copyright
+##    notice, this list of conditions and the following disclaimer.
+## 2. Redistributions in binary form must reproduce the above copyright
+##    notice, this list of conditions and the following disclaimer in the
+##    documentation and/or other materials provided with the distribution.
+## 3. Neither the name of the team nor the names of its contributors
+##    may be used to endorse or promote products derived from this software
+##    without specific prior written permission.
+## 
+## THIS SOFTWARE IS PROVIDED BY Yoshinari Nomura AND CONTRIBUTORS ``AS IS''
+## AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+## LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+## FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL
+## Yoshinari Nomura OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+## INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+## (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+## SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+## HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+## STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+## ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+## OF THE POSSIBILITY OF SUCH DAMAGE.
+
+### today ends here
