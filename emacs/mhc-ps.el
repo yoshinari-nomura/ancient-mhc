@@ -2,7 +2,7 @@
 
 ;; Author:  TSUCHIYA Masatoshi <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 ;; Created: 2000/06/18
-;; Revised: $Date: 2000/06/19 01:03:51 $
+;; Revised: $Date: 2000/06/19 01:07:52 $
 
 
 ;;; Commentary:
@@ -53,22 +53,22 @@
 ;;; Customize variables:
 
 (defcustom mhc-ps-title-font "Times-Bold"
-  "*PoscScript Font used for title."
+  "*PostScript Font used for title."
   :group 'mhc
   :type 'string)
 
 (defcustom mhc-ps-day-font "Helvetica-Bold"
-  "*PoscScript Font used for days."
+  "*PostScript Font used for days."
   :group 'mhc
   :type 'string)
 
 (defcustom mhc-ps-event-font "Times-Roman"
-  "*PoscScript Font used for events."
+  "*PostScript Font used for events."
   :group 'mhc
   :type 'string)
 
 (defcustom mhc-ps-japanese-font "Ryumin-Light-EUC-H"
-  "*PoscScript Font used for Japanese charcters."
+  "*PostScript Font used for Japanese characters."
   :group 'mhc
   :type 'string)
 
@@ -79,7 +79,7 @@
 		(const :tag "Portrait" nil)))
 
 (defcustom mhc-ps-preview-command "gv"
-  "*Command to preview PoscScript calendar."
+  "*Command to preview PostScript calendar."
   :group 'mhc
   :type 'string)
 
@@ -89,7 +89,7 @@
   :type '(repeat string))
 
 (defcustom mhc-ps-print-command "lp"
-  "*Command to print PoscScript calendar."
+  "*Command to print PostScript calendar."
   :group 'mhc
   :type 'string)
 
