@@ -1,3 +1,7 @@
+2002-10-02  MIYOSHI Masanori  <miyoshi@boreas.dti.ne.jp>
+
+	* emacs/mhc.el: Make use of the image feature of Meadow2.
+
 2002-09-26  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* emacs/mhc-summary.el (mhc-summary-line-format): Change default

@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1994/07/04
-;; Revised: $Date: 2002/09/25 03:41:01 $
+;; Revised: $Date: 2002/10/02 09:42:17 $
 
 ;;;
 ;;; Commentay:
@@ -49,9 +49,14 @@
 (require 'mhc-draft)
 
 (cond
- ((eval-when-compile (and (not (featurep 'xemacs))
-			  (not (eq system-type 'windows-nt))
-			  (>= emacs-major-version 21)))
+ ((eval-when-compile  (and (not (featurep 'xemacs))
+			   (>= emacs-major-version 21)
+			   (if (eq system-type 'windows-nt)
+			       ;; Meadow2 or NTEmacs21.3(and the later
+			       ;; version) supports the image feature.
+			       (or (featurep 'meadow)
+				   (>= emacs-minor-version 3))
+			     t)))
   (require 'mhc-e21))
  ((eval-when-compile
     (condition-case nil
