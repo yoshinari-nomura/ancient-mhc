@@ -227,7 +227,8 @@
 	 (save-restriction
 	   (narrow-to-region (point-min) (point))
 	   (goto-char (point-min))
-	   (let ((mew-field-spec nil))
+	   (let ((mew-field-spec nil)
+		 (mew-decode-broken nil))
 	     (mew-decode-rfc822-header t)))))
   (mhc-header-narrowing
     (mhc-header-delete-header "x-mew"))
