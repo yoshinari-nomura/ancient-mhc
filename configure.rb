@@ -4,7 +4,7 @@
 ## Author:  MIYOSHI Masanori <miyoshi@quickhack.net>
 ##          Yoshinari Nomura <nom@quickhack.net>
 ## Created: 2000/7/12
-## Revised: $Date: 2000/08/05 19:47:46 $
+## Revised: $Date: 2001/05/10 14:02:13 $
 
 $LOAD_PATH .unshift('.')
 require 'mhc-make'
@@ -43,12 +43,19 @@ local_config_table = [
 
   ['--with-cmail', '@@MHC_WITH_CMAIL@@', GetoptLong::NO_ARGUMENT,
     "use mhc with cmail.",
+    ''],
+
+  ['--with-icondir', '@@MHC_XPM_PATH@@', GetoptLong::REQUIRED_ARGUMENT,
+    "=DIR  mhc icon directory.",
     '']
 ]
 
 conf = MhcConfigure .new(local_config_table) .parse_argv
 
-conf['@@MHC_XPM_PATH@@'] = conf['@@MHC_LIBDIR@@'] + '/xpm'
+# XXX: ukai
+if conf['@@MHC_XPM_PATH@@'] == ''
+  conf['@@MHC_XPM_PATH@@'] = conf['@@MHC_LIBDIR@@'] + '/xpm'
+end
 
 ################################################################
 ## command check
@@ -62,8 +69,9 @@ conf .search_command('make',         '@@MHC_MAKE_PATH@@',       false, true)
 ################################################################
 ## lib check
 
-lib_search_path = ['/usr/local/lib', '/usr/local/pilot/lib']
-inc_search_path = ['/usr/local/include', '/usr/local/pilot/include']
+lib_search_path = ['/usr/local/lib', '/usr/local/pilot/lib', '/usr/lib']
+inc_search_path = ['/usr/local/include', '/usr/local/pilot/include', 
+		   '/usr/include/libpisock', '/usr/include']
 
 if conf['@@MHC_DISABLE_PALM@@'] == ''
   conf .search_library(lib_search_path, 
