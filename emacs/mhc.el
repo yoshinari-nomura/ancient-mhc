@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1994/07/04
-;; Revised: $Date: 2000/07/18 08:42:47 $
+;; Revised: $Date: 2000/07/18 09:18:43 $
 
 ;;;
 ;;; Commentay:
@@ -724,9 +724,9 @@ C-c ?    mhc-draft-insert-calendar
 	      'mhc-calendar-face-saturday)
 	     (t 'default)))
       (if (mhc-date= today (mhc-day-date (car days)))
-	  (setq color (mhc-face-get-gray-face color)))
+	  (setq color (mhc-face-get-today-face color)))
       (if (mhc-day-busy-p (car days))
-	  (setq color (mhc-face-get-underline-face color)))
+	  (setq color (mhc-face-get-busy-face color)))
       (setq week (cons (format "%2d" (mhc-day-day-of-month (car days)))
 		       week))
       (if color
