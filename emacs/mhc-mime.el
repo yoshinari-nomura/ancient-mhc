@@ -3,7 +3,7 @@
 ;; Author:  Yuuichi Teranishi <teranisi@quickhack.net>
 ;;
 ;; Created: 2000/07/26
-;; Revised: $Date: 2000/07/31 01:09:07 $
+;; Revised: $Date: 2000/07/31 11:35:54 $
 
 ;;; Commentary:
 
@@ -96,7 +96,7 @@
 
 (defun mhc-mime-draft-reedit-file (file)
   (erase-buffer)
-  (insert-file-contents-as-binary file)
+  (insert-file-contents-as-raw-text-CRLF file)
   (mhc-mime/draft-reedit))
 
 
