@@ -73,6 +73,18 @@
 
 ;;; Global Variables:
 
+(defcustom mhc-summary-language 'english
+  "*Language of the summary."
+  :group 'mhc
+  :type '(choice (const :tag "English" english)
+		 (const :tag "Japanese" japanese)))
+
+(defcustom mhc-summary-use-cw nil
+  "*If non-nil, insert `Calendar week number' instead of `Monday'."
+  :group 'mhc
+  :type '(choice (const :tag "Use" t)
+		 (const :tag "No" nil)))
+
 (defcustom mhc-use-week-separator t
   "*If non-nil insert separator in summary buffer."
   :group 'mhc
@@ -124,7 +136,10 @@
   :group 'mhc
   :type 'boolean)
 
-(defcustom mhc-summary-line-format "%M%/%D %W %b%e %c%i%s %p%l"
+(defcustom mhc-summary-line-format
+  (if (eq mhc-summary-language 'japanese)
+      "%M%月%D%日%(%曜%) %b%e %c%i%s %p%l"
+    "%M%/%D %W %b%e %c%i%s %p%l")
   "*A format string for summary line of MHC.
 It may include any of the following format specifications
 which are replaced by the given information:
@@ -142,6 +157,13 @@ which are replaced by the given information:
 %l The location of the schedule.
 
 %/ A slash character if first line of the day.
+%( A left parenthesis character if first line of the day.
+%) A right parenthesis character if first line of the day.
+
+%年 The '年' of the line if first line of the day.
+%月 The '月' of the line if first line of the day.
+%日 The '日' of the line if first line of the day.
+%曜 The japaneses weekday name of the line if first line of the day.
 "
   :group 'mhc
   :type 'string)
@@ -171,24 +193,30 @@ which are replaced by the given information:
 ;;		(const :tag "Below of vertical calender" 'below))
   )
 
-(defcustom mhc-todo-string-remaining-day "(あと %d 日)"
+(defcustom mhc-todo-string-remaining-day
+  (if (eq mhc-summary-language 'japanese) "(あと %d 日)" "(%d days to go)")
   "*String format which is displayed in TODO entry.
 '%d' is replaced with remaining days."
   :group 'mhc
   :type 'string)
 
-(defcustom mhc-todo-string-deadline-day "(〆切日)"
+(defcustom mhc-todo-string-deadline-day
+    (if (eq mhc-summary-language 'japanese) "(〆切日)" "(due this date)")
   "*String which indicates deadline day in TODO."
   :group 'mhc
   :type 'string)
 
-(defcustom mhc-todo-string-excess-day "(%d 日超過)"
+(defcustom mhc-todo-string-excess-day
+    (if (eq mhc-summary-language 'japanese) "(%d 日超過)" "(%d days overdue )")
   "*String format which is displayed in TODO entry.
 '%d' is replaced with excess days."
   :group 'mhc
   :type 'string)
 
-(defcustom mhc-todo-string-heading "TODO(s) at %04d/%02d/%02d"
+(defcustom mhc-todo-string-heading
+      (if (eq mhc-summary-language 'japanese) 
+	  "TODO(s) at %04d年%02d月%02d日"
+	"TODO(s) at %04d/%02d/%02d")
   "*String which is displayed as heading of TODO.
 First %d is replaced with year, second one is replaced with month,
 third one is replaced with day of month."
@@ -201,12 +229,14 @@ third one is replaced with day of month."
   :type 'integer)
 
 
-(defcustom mhc-todo-string-done "■"
+(defcustom mhc-todo-string-done
+  (if (eq mhc-summary-language 'japanese) "■" "[X]")
   "*String which indicates done TODO."
   :group 'mhc
   :type 'string)
 
-(defcustom mhc-todo-string-not-done "□"
+(defcustom mhc-todo-string-not-done
+  (if (eq mhc-summary-language 'japanese) "□" "[ ]")
   "*String which indicates not-done TODO."
   :group 'mhc
   :type 'string)
@@ -309,7 +339,19 @@ which are replaced by the given information:
 	  (mhc-face-category-to-face 
 	   (car (mhc-schedule-categories mhc-tmp-schedule)))))
     (?l (mhc-summary/line-location-string)
-	'face 'mhc-summary-face-location))
+	'face 'mhc-summary-face-location)
+    (?\( (if mhc-tmp-first "(" " ")
+	 'face mhc-tmp-day-face)
+    (?\) (if mhc-tmp-first ")" " ")
+	 'face mhc-tmp-day-face)
+    (?年 (if mhc-tmp-first "年" (make-string 2 ? ))
+	 'face mhc-tmp-day-face)
+    (?月 (if mhc-tmp-first "月" (make-string 2 ? ))
+	 'face mhc-tmp-day-face)
+    (?日 (if mhc-tmp-first "日" (make-string 2 ? ))
+	 'face mhc-tmp-day-face)
+    (?曜 (mhc-summary/line-day-of-week-ja-string)
+	 'face mhc-tmp-day-face))
   "An alist of format specifications that can appear in summary lines.
 Each element is a list of following:
 \(SPEC STRING-EXP PROP-TYPE PROP-VALUE\)
@@ -501,7 +543,8 @@ If optional argument FOR-DRAFT is non-nil, Hilight message as draft message."
 		    (- (window-width) 2) mhc-summary-month-separator))
 	  (mhc-face-put hr 'mhc-summary-face-month-separator))
       (setq hr (make-string
-		(- (window-width) 24) mhc-summary-separator))
+		(- (window-width) mhc-calendar-width)
+		mhc-summary-separator))
       (mhc-face-put hr 'mhc-summary-face-separator))
     (insert hr "\n")))
 
@@ -639,8 +682,20 @@ If optional argument FOR-DRAFT is non-nil, Hilight message as draft message."
 
 (defun mhc-summary/line-day-of-week-string ()
   (if mhc-tmp-first
-      (format "%s" (mhc-day-day-of-week-as-string mhc-tmp-dayinfo))
+      (let ((week (mhc-day-day-of-week mhc-tmp-dayinfo)))
+	(if (and mhc-summary-use-cw (= week 1) )
+	    (format "%3s"
+		    (format "w%d" (mhc-date-cw (mhc-day-date mhc-tmp-dayinfo))))
+	  (aref ["Sun" "Mon" "Tue" "Wed" "Thu" "Fri" "Sat"] week)))
     (make-string 3 ? )))
+
+(defun mhc-summary/line-day-of-week-ja-string ()
+  (if mhc-tmp-first
+      (let ((week (mhc-day-day-of-week mhc-tmp-dayinfo)))
+	(if (and mhc-summary-use-cw (= week 1) )
+	    (format "%2d" (mhc-date-cw (mhc-day-date mhc-tmp-dayinfo)))
+	  (aref ["日" "月" "火" "水" "木" "金" "土"] week)))
+    (make-string 2 ? )))
 
 
 (defun mhc-summary/line-subject-string ()

@@ -4,7 +4,7 @@
 ;;          TSUCHIYA Masatoshi <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 ;;
 ;; Created: 2000/06/14
-;; Revised: $Date: 2002/09/19 09:05:48 $
+;; Revised: $Date: 2002/09/23 04:08:58 $
 
 ;;;
 ;;; Commentary:
@@ -189,6 +189,9 @@
        (/ xx -100)
        (/ xx  400)
        -719163)))
+
+(defsubst mhc-date/iso-week-days (yday wday)
+  (- yday -3 (% (- yday wday -382) 7)))
 
 (defmacro mhc-date/substring-to-int (str pos)
   `(string-to-int
@@ -399,6 +402,19 @@
 
 (defmacro mhc-date-oo (date)
   `(/ (1- (mhc-date-dd ,date)) 7))
+
+(defsubst mhc-date-cw (date)
+  (mhc-date-let date
+    (let* ((yday (mhc-date/day-number yy mm dd))
+	   (days (mhc-date/iso-week-days yday ww))
+	   (d))
+      (if (< days 0)
+	  (setq days (mhc-date/iso-week-days 
+		      (+ yday 365 (if (mhc-date/leap-year-p (1- yy)) 1 0)) ww))
+	(setq d (mhc-date/iso-week-days
+		 (- yday 365 (if (mhc-date/leap-year-p yy) 1 0)) ww))
+	(if (<= 0 d) (setq days d)))
+      (1+ (/ days 7)))))
 
 ;;
 ;; compare.

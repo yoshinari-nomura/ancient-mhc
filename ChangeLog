@@ -1,10 +1,51 @@
+2002-09-23  Hideyuki SHIRAI  <shirai@quickhack.net>
+
+	* emacs/mhc.el (mhc-scan-month): Use `mhc-calendar-width'.
+
+	* emacs/mhc-summary.el (mhc-summary-language): New user variable.
+	(mhc-summary-use-cw): Ditto.
+	(mhc-summary-line-format): Support `mhc-summary-language'.
+	(mhc-todo-string-remaining-day): Ditto.
+	(mhc-todo-string-deadline-day): Ditto.
+	(mhc-todo-string-excess-day): Ditto.
+	(mhc-todo-string-heading): Ditto.
+	(mhc-todo-string-done): Ditto.
+	(mhc-todo-string-not-done): Ditto.
+	(mhc-summary-line-format-alist): Add japanese support.
+	(mhc-summary/insert-separator): Use `mhc-calendar-width'.
+	(mhc-summary/line-day-of-week-string): Support `Calendar week
+	number'.
+	(mhc-summary/line-day-of-week-ja-string): New function.
+
+	* emacs/mhc-face.el (mhc-symbol-face-alist-internal): Add
+	`mhc-calendar-face-cw'.
+
+	* emacs/mhc-calendar.el (mhc-calendar-use-cw): New user variable.
+	(mhc-calendar-cw-indicator): Ditto.
+	(mhc-calendar-next-offset): Ditto.
+	(mhc-calendar-day-strings): Chage default value.
+	(mhc-calendar-start-column): Dito.
+	(mhc-calendar-width): New variable.
+	(mhc-calendar/cw-week): New macro.
+	(mhc-calendar/cw-string): Ditto.
+	(mhc-calendar-setup): Support `Calendar week number'. Modify
+	`mhc-calendar-day-strings' handling.
+	(mhc-calendar-make-header): Support `Calendar week number'.
+	(mhc-calendar-make-header-ja): Ditto.
+	(mhc-calendar/make-rectangle): Support `Calendar week number'.
+
+2002-09-23  Yoshinari Nomura  <nom@quickhack.net>
+
+	* emacs/mhc-date.el (mhc-date/iso-week-days): New inline function.
+	(mhc-date-cw): Ditto.
+
 2002-09-19  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* emacs/mhc.el (mhc-scan-month): Use `mhc-end-day-of-week'.
 
 	* emacs/mhc-vars.el (mhc-start-day-of-week): New user variable.
 
-	* emacs/mhc-summary.el (mhc-use-week-separator): Chage semantics
+	* emacs/mhc-summary.el (mhc-use-week-separator): Change semantics
 	of variable.
 	(mhc-summary-make-contents): Use `mhc-end-day-of-week'.
 
