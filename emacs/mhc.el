@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1994/07/04
-;; Revised: $Date: 2000/07/28 00:28:07 $
+;; Revised: $Date: 2000/07/28 00:50:18 $
 
 ;;;
 ;;; Commentay:
@@ -309,7 +309,6 @@ If HIDE-PRIVATE, private schedules are suppressed."
 (defun mhc/buffer-message-p ()
   "Return non-nil if current buffer looks like message."
   (mhc-header-narrowing
-    (goto-char (point-min))
     (mhc-header-get-value "from")))
 
 (defun mhc-edit (&optional import-buffer)
