@@ -1,3 +1,7 @@
+2000-07-04  MIYOSHI Masanori  <miyoshi@hrl.hitachi.co.jp>
+
+	* emacs/00usage.jis: Fix a typo.
+
 2000-06-26  MIYOSHI Masanori  <miyoshi@ask.ne.jp>
 
 	* emacs/Makefile (GNUS_OPT): Load gnus-sum.el for
