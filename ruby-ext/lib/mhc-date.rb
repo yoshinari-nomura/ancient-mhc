@@ -3,7 +3,7 @@
 ## Author:  Yoshinari Nomura <nom@quickhack.net>
 ##
 ## Created: 1999/07/16
-## Revised: $Date: 2001/01/22 09:06:25 $
+## Revised: $Date: 2003/11/03 01:33:32 $
 ##
 
 require 'mhc-kconv'
@@ -27,7 +27,11 @@ class MhcTime
   def mm;  (@sec % 3600) / 60  ;end
 
   def <=>(o)
-    return @sec <=> o .to_i
+    if o .kind_of?(MhcTime)
+      return @sec <=> o .to_i
+    else
+      return nil
+    end
   end
 
   def to_s
@@ -276,7 +280,11 @@ class MhcDate
   end
 
   def <=>(other)
-    return days <=> other .days
+    if other .kind_of?(MhcDate)
+      return days <=> other .days
+    else
+      return nil
+    end
   end
 
   def eql?(other)
