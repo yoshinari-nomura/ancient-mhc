@@ -1,5 +1,8 @@
 2000-06-23  Yoshinari Nomura  <nom@quickhack.net>
 
+	* emacs/mhc-guess.el (gdate-gather-time-list2):
+	Fix for Japanese ``Han'' (= 30 minutes).
+
 	* experimental/gp2mhc, experimental/my-meeting2000:
 	Add -Ke option to #!/usr/local/bin/ruby line.
 
