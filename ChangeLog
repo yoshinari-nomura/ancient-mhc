@@ -1,3 +1,8 @@
+2000-11-07  Hideyuki SHIRAI  <shirai@quickhack.net>
+
+	* emacs/mhc-mew.el (mhc-mew-draft-translate): Fix, multipart message
+	does not have 'cte' when imported.
+
 2000-11-02  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* emacs/mhc-cvs.el (mhc-cvs/add): Use write-region() instead of

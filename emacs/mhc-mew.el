@@ -271,8 +271,8 @@
       ;; Multipart
       (mhc-header-narrowing
 	(mhc-header-put-value "Mime-Version" "1.0")
-	(mhc-header-put-value "Content-Type" ct)
-	(mhc-header-put-value "Content-Transfer-Encoding" cte))
+	(mhc-header-put-value "Content-Type" (or ct mew-ct-txt))
+	(mhc-header-put-value "Content-Transfer-Encoding" (or cte mew-7bit)))
       (when (and (re-search-forward (concat "^--" boundary "$") nil t)
 		 (forward-line)
 		 (setq beg (point))
