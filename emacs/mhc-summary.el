@@ -171,68 +171,68 @@ third one is replaced with day of month."
 
 (defvar mhc-summary-line-format-alist
   '((?Y (mhc-summary/line-year-string)
-	face mhc-tmp-day-face)
+	'face mhc-tmp-day-face)
     (?/ (if mhc-tmp-first "/" " ")
-	face mhc-tmp-day-face)
+	'face mhc-tmp-day-face)
     (?M (mhc-summary/line-month-string)
-	face mhc-tmp-day-face)
+	'face mhc-tmp-day-face)
     (?D (mhc-summary/line-day-string)
-	face mhc-tmp-day-face)
+	'face mhc-tmp-day-face)
     (?W (mhc-summary/line-day-of-week-string)
-	face mhc-tmp-day-face)
+	'face mhc-tmp-day-face)
     (?b (if (or (and mhc-tmp-private
 		     (string= (car (mhc-schedule-categories mhc-tmp-schedule))
 			      "private"))
 		(null mhc-tmp-begin))
 	    (make-string 5 ? )
 	  (format "%02d:%02d" (/ mhc-tmp-begin 60) (% mhc-tmp-begin 60)))
-	face (quote mhc-summary-face-time))
+	'face 'mhc-summary-face-time)
     (?e (if (or (and mhc-tmp-private
 		     (string= (car (mhc-schedule-categories mhc-tmp-schedule))
 			      "private"))
 		(null mhc-tmp-end))
 	    (make-string 6 ? )
 	  (format "-%02d:%02d" (/ mhc-tmp-end 60) (% mhc-tmp-end 60)))
-	face (quote mhc-summary-face-time))
-    (?c (if mhc-tmp-conflict
-	    mhc-summary-string-conflict
-	  "")
-	face (quote mhc-summary-face-conflict))
-    (?i nil icon (mhc-schedule-categories mhc-tmp-schedule))
+	'face 'mhc-summary-face-time)
+    (?c (if mhc-tmp-conflict (or (mhc-use-icon-p) mhc-summary-string-conflict))
+	(if (mhc-use-icon-p) 'icon 'face)
+	(if (mhc-use-icon-p) (list "Conflict")
+	  'mhc-summary-face-conflict))
+    (?i t 'icon (mhc-schedule-categories mhc-tmp-schedule))
     (?s (mhc-summary/line-subject-string)
-	face (mhc-face-category-to-face 
-	      (car (mhc-schedule-categories mhc-tmp-schedule))))
+	'face (mhc-face-category-to-face 
+	       (car (mhc-schedule-categories mhc-tmp-schedule))))
     (?l (mhc-summary/line-location-string)
-	face (quote mhc-summary-face-location)))
+	'face 'mhc-summary-face-location))
   "An alist of format specifications that can appear in summary lines.
 Each element is a list of following:
 \(SPEC STRING-EXP PROP-TYPE PROP-VALUE\)
 SPEC is a character for format specification.
 STRING is an expression to get string to insert.
-PROP-TYPE is one of the two symbols `face' or `icon'.
+PROP-TYPE is an expression to get one of the two symbols `face' or `icon'.
 It indicates a type of the property to put on the inserted string.
 PROP-VALUE is the property value correspond to PROP-TYPE.
 ")
 
 (defvar mhc-summary-todo-line-format-alist
-  '((?  " ")
-    (?i nil icon (mhc-schedule-categories mhc-tmp-schedule))
+  '((?i t 'icon (mhc-schedule-categories mhc-tmp-schedule))
     (?s (mhc-summary/line-subject-string)
-	face (mhc-face-category-to-face 
-	      (car (mhc-schedule-categories mhc-tmp-schedule))))
+	'face
+	(mhc-face-category-to-face 
+	 (car (mhc-schedule-categories mhc-tmp-schedule))))
     (?l (mhc-summary/line-location-string)
-	face (quote mhc-summary-face-location))
+	'face 'mhc-summary-face-location)
     (?L (format "%5s" (format "[%d]" mhc-tmp-lank))
-	face (cond ((>= mhc-tmp-lank 80) (quote mhc-summary-face-sunday))
-		   ((>= mhc-tmp-lank 50) (quote mhc-summary-face-saturday))))
+	'face (cond ((>= mhc-tmp-lank 80) 'mhc-summary-face-sunday)
+		    ((>= mhc-tmp-lank 50) 'mhc-summary-face-saturday)))
     (?d (mhc-summary-todo/line-deadline-string)
-	face (mhc-summary-todo/line-deadline-face)))
+	'face (mhc-summary-todo/line-deadline-face)))
   "An alist of format specifications that can appear in todo lines.
 Each element is a list of following:
 \(SPEC STRING-EXP PROP-TYPE PROP-VALUE\)
 SPEC is a character for format specification.
 STRING is an expression to get string to insert.
-PROP-TYPE is one of the two symbols `face' or `icon'.
+PROP-TYPE is an expression to get one of the two symbols `face' or `icon'.
 It indicates a type of the property to put on the inserted string.
 PROP-VALUE is the property value correspond to PROP-TYPE.
 ")
@@ -397,7 +397,7 @@ PROP-VALUE is the property value correspond to PROP-TYPE.
 
 
 (defmacro mhc-summary/line-insert (string)
-  (` (and (, string) (insert (, string)))))
+  (` (and (stringp (, string)) (insert (, string)))))
 
 
 (defun mhc-summary/line-year-string ()
@@ -476,15 +476,19 @@ PROP-VALUE is the property value correspond to PROP-TYPE.
 			     (nth 2 entry)
 			     (list
 			      (append (cond
-				       ((eq (nth 2 entry) 'face)
+				       ((eq (eval (nth 2 entry)) 'face)
 					(list 'put-text-property
 					      'pos (list 'point)
 					      (list 'quote 'face)
 					      (nth 3 entry)))
-				       ((eq (nth 2 entry) 'icon)
-					(list 'and (list 'mhc-use-icon-p)
-					      (list 'mhc-put-icon
-						    (nth 3 entry))))))))))))
+				       ((eq (eval (nth 2 entry)) 'icon)
+					(list 'if
+					      (nth 1 entry)
+					      (list
+					       'and
+					       (list 'mhc-use-icon-p)
+					       (list 'mhc-put-icon
+						     (nth 3 entry)))))))))))))
 	(setq inserter (append inserter (list (list 'insert (car f))))))
       (setq f (cdr f)))
     inserter))

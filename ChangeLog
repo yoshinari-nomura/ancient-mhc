@@ -1,3 +1,23 @@
+2000-07-03  Yuuichi Teranishi  <teranisi@quickhack.net>
+
+	* emacs/mhc-bm.el (mhc-bm-icon-alist): New variable.
+	(Renamed from mhc-bm-category-icon-alist.)
+	All other related portions are changed.
+	(toplevel): Put $Date: 2000/07/03 00:50:16 $ field.
+
+	* emacs/mhc-xmas.el (mhc-xmas-icon-alist): New variable.
+	(Renamed from mhc-xmas-category-icon-alist.)
+	All other related portions are changed.
+	(toplevel): Put $Date: 2000/07/03 00:50:16 $ field.
+
+	* emacs/mhc-summary.el (mhc-summary-line-format-alist):	Quote
+	PROP-TYPE.
+	(mhc-summary-todo-line-format-alist): Ditto.
+	(mhc-summary-line-format-alist): Insert conflict icon.
+	(mhc-summary/line-insert): Insert only if argument is string.
+
+	* icons/Conflict.xbm, icons/Conflict.xpm: New files.
+
 2000-06-30  Hideyuki SHIRAI  <shirai@rdmg.mgcs.mei.co.jp>
 
 	* emacs/mhc.el (mhc-current-date): Get dayinfo property safe. (thanks to Teranishi-san)

@@ -3,17 +3,16 @@
 ;; Author:  Yuuichi Teranishi <teranisi@gohome.org>
 ;;
 ;; Created: 2000/05/27
-;; Time-stamp: <00/06/27 09:42:56 teranisi>
+;; Revised: $Date: 2000/07/03 00:50:17 $
 
 (require 'bitmap)
 (require 'mhc-face)
 
-(defcustom mhc-bm-category-icon-alist nil
-  "*Alist to rule the category-to-icon conversion.
+(defcustom mhc-bm-icon-alist nil
+  "*Alist to define icons.
 Each element should have the form
- (CATEGORY-STRING . (ICON-FILE FG BG))
-MHC puts an icon with FG and BG color created from ICON-FILE
-on the schedule which have category of CATEGORY-STRING.
+ (NAME . (ICON-FILE FG BG))
+It defines icon named NAME with FG and BG color created from ICON-FILE.
 FG and BG can be omitted (default color is used).
 Example:
   '((\"Holiday\"     . (\"Holiday.xbm\" \"OrangeRed\" \"White\"))
@@ -25,7 +24,7 @@ Example:
   :group 'mhc
   :type '(repeat
 	  :inline t
-	  (cons (string :tag "Category Name")
+	  (cons (string :tag "Icon Name")
 		(list (string :tag "XBM File Name")
 		      (choice (string :tag "Set FG Color")
 			      (const :tag "Default FG Color" nil))
@@ -33,7 +32,7 @@ Example:
 			      (const :tag "Default BG Color" nil))))))
 
 ;; internal variable.
-(defvar mhc-bm/category-bmstr-alist nil)
+(defvar mhc-bm/bmstr-alist nil)
 
 (defun mhc-bm/create-rectangle (file)
   (with-temp-buffer
@@ -48,7 +47,7 @@ Example:
       (nreverse bitmap))))
 
 (defsubst mhc-bm/setup-icons ()
-  (let ((alist mhc-bm-category-icon-alist)
+  (let ((alist mhc-bm-icon-alist)
 	bmstr)
     (while alist
       ;; Only the first element of the rectangle is used.
@@ -58,18 +57,18 @@ Example:
       (put-text-property 0 (length bmstr)
 			 'face 
 			 (mhc-face-make-face-from-string
-			  (concat "mhc-bm-category-icon-"
+			  (concat "mhc-bm-icon-"
 				  (downcase (car (car alist)))
 				  "-face")
 			  (list nil
 				(nth 0 (cdr (cdr (car alist))))
 				(nth 1 (cdr (cdr (car alist))))))
 			 bmstr)
-      (setq mhc-bm/category-bmstr-alist
+      (setq mhc-bm/bmstr-alist
 	    (cons
 	     (cons (downcase (car (car alist)))
 		   bmstr)
-	     mhc-bm/category-bmstr-alist))
+	     mhc-bm/bmstr-alist))
       (setq alist (cdr alist)))))
        
 ;; Icon interface
@@ -77,8 +76,8 @@ Example:
   "Initialize MHC icons."
   (interactive)
   (if (interactive-p)
-      (setq mhc-bm/category-bmstr-alist nil))
-  (or mhc-bm/category-bmstr-alist
+      (setq mhc-bm/bmstr-alist nil))
+  (or mhc-bm/bmstr-alist
       (progn
 	(message "Initializing MHC icons...")
 	(mhc-bm/setup-icons)
@@ -88,15 +87,15 @@ Example:
   "Returns t if MHC displays icon."
   (and window-system mhc-use-icon))
 
-(defun mhc-put-icon (categories)
-  "Put icons on current buffer.
-Icon is decided by CATEGORIES and `mhc-bm-category-icon-alist'."  
+(defun mhc-put-icon (icons)
+  "Put ICONS on current buffer.
+Icon is defined by `mhc-bm-icon-alist'."  
   (let (icon)
-    (while categories
-      (setq icon (cdr (assoc (car categories)
-			     mhc-bm/category-bmstr-alist)))
+    (while icons
+      (setq icon (cdr (assoc (downcase (car icons))
+			     mhc-bm/bmstr-alist)))
       (and icon (insert icon))
-      (setq categories (cdr categories)))))
+      (setq icons (cdr icons)))))
 
 (provide 'mhc-bm)
 

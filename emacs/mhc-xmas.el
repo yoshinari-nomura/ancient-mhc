@@ -3,13 +3,13 @@
 ;; Author:  Yuuichi Teranishi <teranisi@gohome.org>
 ;;
 ;; Created: 1999/12/02
-;; Time-stamp: <00/06/27 09:42:29 teranisi>
+;; Revised: $Date: 2000/07/03 00:50:18 $
 
-(defcustom mhc-xmas-category-icon-alist nil
-  "*Alist to rule the category-to-icon conversion.
+(defcustom mhc-xmas-icon-alist nil
+  "*Alist to define icons.
 Each element should have the form
- (CATEGORY-STRING . ICON)
-mhc puts ICON on the schedule which have category of CATEGORY-STRING.
+ (NAME . ICON-FILE)
+It defines icon named NAME created from ICON-FILE.
 Example:
   '((\"Holiday\"     . \"Holiday.xpm\")
     (\"Work\"        . \"Business.xpm\")
@@ -20,17 +20,17 @@ Example:
   :group 'mhc
   :type '(repeat 
 	  :inline t
-	  (cons (string :tag "Category Name")
+	  (cons (string :tag "Icon Name")
 		(string :tag "XPM File Name"))))
 
 ;; internal variable.
-(defvar mhc-xmas/category-glyph-alist nil)
+(defvar mhc-xmas/glyph-alist nil)
 
 (defsubst mhc-xmas/setup-icons ()
-  (let ((alist mhc-xmas-category-icon-alist))
-    (setq mhc-xmas/category-glyph-alist nil)
+  (let ((alist mhc-xmas-icon-alist))
+    (setq mhc-xmas/glyph-alist nil)
     (while alist
-      (setq mhc-xmas/category-glyph-alist
+      (setq mhc-xmas/glyph-alist
 	    (cons
 	     (cons (downcase (car (car alist)))
 		   (make-glyph 
@@ -39,15 +39,15 @@ Example:
 			     (expand-file-name (cdr (car alist))
 					       mhc-icon-path))
 		     nil nil 'no-error)))
-	     mhc-xmas/category-glyph-alist))
+	     mhc-xmas/glyph-alist))
       (setq alist (cdr alist)))))
 
 ;; Icon interface
 (defun mhc-icon-setup ()
   "Initialize MHC icons."
   (if (interactive-p)
-      (setq mhc-xmas/category-glyph-alist nil))
-  (or mhc-xmas/category-glyph-alist
+      (setq mhc-xmas/glyph-alist nil))
+  (or mhc-xmas/glyph-alist
       (progn
 	(message "Initializing MHC icons...")
 	(mhc-xmas/setup-icons)
@@ -59,23 +59,23 @@ Example:
        (featurep 'xpm)
        mhc-use-icon))
 
-(defun mhc-put-icon (categories)
-  "Put an icon on current buffer.
-Icon is decided by CATEGORIES and `mhc-xmas-category-icon-alist'."
+(defun mhc-put-icon (icons)
+  "Put ICONS on current buffer.
+Icon is decided by `mhc-xmas-icon-alist'."
   (let (start space)
-    (setq categories
+    (setq icons
 	  (delq nil
-		(mapcar (lambda (category)
-			  (cdr (assoc category mhc-xmas/category-glyph-alist)))
-			categories)))
-    (when categories
-      (setq space (make-string (length categories) ? ))
+		(mapcar (lambda (icon)
+			  (cdr (assoc (downcase icon) mhc-xmas/glyph-alist)))
+			icons)))
+    (when icons
+      (setq space (make-string (length icons) ? ))
       (setq start (point))
       (insert space space) ; Icon is 2 character width.
       (put-text-property start (point) 'invisible t)
-      (while categories
-	(set-extent-begin-glyph (make-extent (point) (point)) (car categories))
-	(setq categories (cdr categories))))))
+      (while icons
+	(set-extent-begin-glyph (make-extent (point) (point)) (car icons))
+	(setq icons (cdr icons))))))
 
 (provide 'mhc-xmas)
 
