@@ -1,5 +1,8 @@
 2000-10-30  Yoshinari Nomura  <nom@quickhack.net>
 
+	* mhc-sync.in (MhcScheduleDB#scan_all):
+	don't use regexp option `p' for Ruby 1.6x.
+
 	* emacs/mhc-summary.el (mhc-summary-make-contents):
 	  Fix duplication of week separator
 	  at the end of mont. (TNX, Mr. KOIE Hidetaka <hide@koie.org>)
