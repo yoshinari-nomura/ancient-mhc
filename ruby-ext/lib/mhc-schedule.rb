@@ -3,7 +3,7 @@
 ## Author:  Yoshinari Nomura <nom@quickhack.net>
 ##
 ## Created: 1999/07/16
-## Revised: $Date: 2000/06/26 04:14:33 $
+## Revised: $Date: 2000/06/26 07:34:32 $
 ##
 
 ################################################################
@@ -824,12 +824,13 @@ class MhcScheduleItem
       pi_rec .add_exception(date)
     }
 
+    datebk3_icon = nil
     category .each{|cat|
       datebk3_icon = cat if cat =~ /^\#\#@@@.@@@$/
     }
     contents = dump_without_xsc_header
     contents = '' if contents =~ /^\s+$/np   ## \s includes \n
-    contents += datebk3_icon + "\n" if datebk3_icon
+    contents = datebk3_icon + "\n" + contents if datebk3_icon
     pi_rec .set_note(contents)
 
     pi_rec .set_description(subject)
