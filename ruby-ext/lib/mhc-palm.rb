@@ -3,7 +3,7 @@
 ## Author:  Yoshinari Nomura <nom@quickhack.net>
 ##
 ## Created: 1999/09/01
-## Revised: $Date: 2001/01/22 09:06:25 $
+## Revised: $Date: 2001/02/06 13:36:01 $
 ##
 
 require 'mhc-date'
@@ -645,7 +645,7 @@ class PilotApptRecord < PilotRecord
 
   ## Palm のノート -> mhc の body と X-SC-* 以外のヘッダ部分に変換
   def conv_note(string)
-    if string =~ /^(\#\#@@@.@@@)\n(.*)/nm
+    if string =~ /\A(\#\#@@@.@@@)\n([^\z]*)\z/n
       datebk3_icon, string = $1, $2
     end
 
