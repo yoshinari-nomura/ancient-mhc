@@ -3,7 +3,7 @@
 ## Author:  MIYOSHI Masanori <miyoshi@quickhack.net>
 ##          Yoshinari Nomura <nom@quickhack.net>
 ## Created: 2000/7/12
-## Revised: $Date: 2001/01/30 06:28:40 $
+## Revised: $Date: 2001/03/13 06:59:30 $
 
 require 'rbconfig'
 require 'mkmf'
@@ -110,6 +110,7 @@ module MhcMake
     else
       INSTALL_FILES .each{|filename_mode_dir|
 	filename, mode, dir = filename_mode_dir .split(':')
+	File .makedirs(dir) if ! File .directory?(dir)
 	File .install(filename, dir, mode .oct, true)
       }
     end
