@@ -153,6 +153,8 @@
   (make-local-variable 'mew-use-highlight-cursor-line)
   (setq mew-use-cursor-mark nil)
   (setq mew-use-highlight-cursor-line nil)
+  (when (fboundp 'mew-vinfo-set-flds)
+    (mew-vinfo-set-flds mew-inbox-folders))
   (let ((mew-virtual-mode-hook nil))
     (mew-virtual-mode))
   (mew-buffers-setup (buffer-name))

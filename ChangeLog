@@ -1,3 +1,8 @@
+2003-01-08  Hideyuki SHIRAI  <shirai@quickhack.net>
+
+	* emacs/mhc-mew.el (mhc-mew-summary-mode-setup): Set `vinfo-flds'
+	for Mew 3.1.50 or later.
+
 2002-12-03  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* emacs/mhc-mew.el (mhc-mew-redisplay-import): New user variable.
