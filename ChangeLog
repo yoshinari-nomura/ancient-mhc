@@ -1,3 +1,12 @@
+2000-08-21  Yoshinari Nomura  <nom@quickhack.net>
+
+	* mhc-make.rb (search_library): pass all args in a correct way.
+
+	* emacs/mhc-guess.el (toplevel  mhc-guess-date-regexp-list):
+	modify regexp.
+
+	* ruby-ext/extconf.rb.in: add have_library('socket') for solaris.
+
 2000-08-10  Yuuichi Teranishi  <teranisi@quickhack.net>
 
 	* emacs/mhc-wl.el (mhc-wl-summary-exit): Don't switch to original
