@@ -1,4 +1,4 @@
-2001-01-22  OHARA Shigeki <os@iij.ad.jp>
+2001-01-30  OHARA Shigeki <os@iij.ad.jp>
 
 	* mhc-make.rb: Fixed $? bug.
 
