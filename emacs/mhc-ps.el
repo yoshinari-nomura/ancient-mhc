@@ -3,7 +3,7 @@
 ;; Author:  TSUCHIYA Masatoshi <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 ;;          Hideyuki SHIRAI <shirai@quickhack.net>
 ;; Created: 2000/06/18
-;; Revised: $Date: 2000/07/18 08:42:47 $
+;; Revised: $Date: 2000/07/19 00:00:06 $
 
 
 ;;; Commentary:
@@ -58,7 +58,7 @@
   :group 'mhc
   :type 'string)
 
-(defcustom mhc-ps-preview-command-arguments '("-")
+(defcustom mhc-ps-preview-command-arguments '()
   "*Argument of previewer"
   :group 'mhc
   :type '(repeat string))
@@ -78,6 +78,11 @@
   :group 'mhc
   :type '(radio (const :tag "Landscape" t)
 		(const :tag "Portrait" nil)))
+
+(defcustom mhc-ps-paper-fill-print nil
+  "*Fill printing just in Landscape paper size."
+  :group 'mhc
+  :type 'boolean)
 
 (defcustom mhc-ps-truncate-lines nil
   "*Truncate line."
@@ -678,12 +683,18 @@ showpage
 	("@RFOOT@"     . "")
 	("@CFOOT@"     . "")
 	("@SCALE@"     . (cond
-			  ((and mhc-ps-paper-type (eq weeks 6)) "0.85 0.85")
+			  ((and mhc-ps-paper-type
+				(or (not mhc-ps-paper-fill-print)
+				    (eq weeks 6)))
+			   "0.85 0.85")
 			  (mhc-ps-paper-type "1.0 1.0")
 			  (t "0.75 0.75")))
 	("@ROTATE@"    . (if mhc-ps-paper-type "90" "0"))
 	("@TRANSLATE@" . (cond
-			  ((and mhc-ps-paper-type (eq weeks 6)) "120 -120")
+			  ((and mhc-ps-paper-type
+				(or (not mhc-ps-paper-fill-print)
+				    (eq weeks 6)))
+			   "120 -120")
 			  (mhc-ps-paper-type "50 -120")
 			  (t "50 900")))))
 
@@ -856,7 +867,7 @@ showpage
 	   process mhc-ps-coding-system mhc-ps-coding-system)
 	  (set-process-sentinel process 'mhc-ps/process-sentinel)
 	  (setq mhc-ps/process-file-alist
-		(cons (cons process file) mhc-ps/process-file-alist))
+		(cons (cons process (expand-file-name file)) mhc-ps/process-file-alist))
 	  (message "PostScript creating ... done.")))
        ((eq command 'save)
 	(message "PostScript saving ... (%s) done." file))

@@ -1,3 +1,11 @@
+2000-07-19  Hideyuki SHIRAI  <shirai@quickhack.net>
+
+	* emacs/mhc-ps.el (mhc-ps-preview-command-arguments): Change default value.
+	(mhc-ps-paper-fill-print): New variable.
+	(mhc-ps/replace-table): Use mhc-ps-paper-fill-print.
+	(mhc-ps/process): Use expand-file-name()
+	, when finename cons mhc-ps/process-file-alist.
+
 2000-07-18  Yoshinari Nomura  <nom@quickhack.net>
 
 	* mhc2palm.in: separate -v and -n.
