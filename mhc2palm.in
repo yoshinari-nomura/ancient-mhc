@@ -6,7 +6,7 @@
 ## Author:  Yoshinari Nomura <nom@quickhack.net>
 ##
 ## Created: 1999/10/08
-## Revised: $Date: 2000/07/18 12:30:34 $
+## Revised: $Date: 2001/09/13 05:15:17 $
 ##
 
 $DEBUG = false
@@ -131,23 +131,25 @@ end
 sch_count, sent = 0, 0
 
 mdb = MhcScheduleDB .new($flag_dir)
-mdb .each_sch($flag_from, $flag_to){|sch|
+mdb .each_sch($flag_from, $flag_to){
   sch_count += 1
+}
+mdb .each_sch($flag_from, $flag_to){|sch|
 
   print "adding ", MhcKconv::todisp(sch .subject), "\n" if $flag_verbose
 
   if p_rec_array = sch .to_palm
     if $flag_verbose
-      print "    converted into #{p_rec_array .length} palm article(s)."
+      print "    converted into #{p_rec_array .length} palm article#{p_rec_array .length == 1 ? '' : 's'}."
     end
 
     if !$flag_noharm
       print " sending to palm ...\n    " if $flag_verbose
       if (! (send_to_palm(pdb, p_rec_array) .nil?))
 	sent += 1
-	print "."
+	print "#{sent}/#{sch_count}\r"
       else
-	print MhcKconv::todisp("(#{sch .subject}) write_error\n")
+	print MhcKconv::todisp("\n(#{sch .subject}) write_error\n")
       end
     else
       print " not sent.\n" if $flag_verbose
@@ -160,7 +162,7 @@ mdb .each_sch($flag_from, $flag_to){|sch|
   end
   print "\n"  if $flag_verbose
 }
-print "\n#{sent}/#{sch_count} article(s) successfully sent.\n"
+print "#{sent}/#{sch_count} article#{sent == 1 ? '' : 's'} successfully sent.\n"
 
 ##
 ## close palm & exit
