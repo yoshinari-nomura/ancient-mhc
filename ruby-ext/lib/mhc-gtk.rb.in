@@ -5,7 +5,7 @@
 ## Author:  Yoshinari Nomura <nom@quickhack.net>
 ##
 ## Created: 1999/07/16
-## Revised: $Date: 2000/07/14 06:59:50 $
+## Revised: $Date: 2000/08/03 07:48:20 $
 ##
 
 #$DEBUG = true
@@ -15,6 +15,16 @@ require 'gtk'
 require 'mhc-kconv'
 require 'mhc-date'
 require 'mhc-signal'
+
+module MhcKconv
+  if RUBY_PLATFORM =~ /mswin32|cygwin|mingw/
+    require 'uconv'
+    def todisp(string)
+      Uconv::euctou8(Kconv::toeuc(string))
+    end
+    module_function :todisp
+  end
+end
 
 # xxx: from ruby-gtk 0.23, Gtk::CAN_* changed to Gtk::Widget::CAN_*
 #
