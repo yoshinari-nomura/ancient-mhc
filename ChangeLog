@@ -1,3 +1,7 @@
+2000-07-06  MIYOSHI Masanori  <miyoshi@ask.ne.jp>
+
+	* 00readme.w32.jis: New file for Windows users.
+
 2000-07-05  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* ChangeLog (toplevel): Change my email-address to "quickhack".
