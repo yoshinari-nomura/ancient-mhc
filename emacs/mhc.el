@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1994/07/04
-;; Revised: $Date: 2000/05/31 10:45:41 $
+;; Revised: $Date: 2000/05/31 12:02:24 $
 
 ;;;
 ;;; Commentay:
@@ -1306,6 +1306,9 @@ Returns t if the importation was succeeded."
 		(apply (function start-process)
 		       "mhc-sync" buf "mhc-sync"
 		       (list "-x" mhc-sync-id "-r" ldir mhc-sync-remote)))
+	  (if (string< "20" emacs-version)
+	      (set-process-coding-system mhc-sync-process 'undecided)
+	    (set-process-coding-system mhc-sync-process '*autoconv*))
 	  (set-process-filter mhc-sync-process 'mhc-sync-filter)
 	  (set-process-sentinel mhc-sync-process 'mhc-sync-sentinel)))
     (message "No remote server specified.")))

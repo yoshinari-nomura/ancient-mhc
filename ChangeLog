@@ -1,6 +1,7 @@
 2000-05-31  Hideyuki SHIRAI  <shirai@rdmg.mgcs.mei.co.jp>
 
 	* emacs/mhc.el (mhc-sync): New function.
+	Bind mhc-sync process coding-system.
 
 	* emacs/mhc-calendar.el: Display Hyper Nikki System's title in summary view.
 
