@@ -8,7 +8,7 @@
 ##          
 ##
 ## Created: 2001/09/15
-## Revised: $Date: 2002/11/09 08:01:15 $
+## Revised: $Date: 2003/02/26 12:05:58 $
 ##
 
 $DEBUG = false
@@ -26,46 +26,62 @@ end
 
 module RepeatPattern
   class Period
-    def initialize(start, finish)
-      @start = start
-      @finish = finish
+    def initialize(sdate, edate, stime, etime)
+      @sdate = sdate
+      @edate = edate
+      @stime = stime
+      @etime = etime
     end
 
     def get_period()
-      [@start, @finish]
+      [@sdate, @edate]
     end
 
     def get_duration()
-      (@finish - @start + 1) * 60 * 24 # min
+      (@edate - @sdate + 1) * 60 * 24 # min
     end
 
     def handle_recurrence(ol_appoint)
     end
+
+    def get_recurrence(ol_appoint)
+      rp = ol_appoint .GetRecurrencePattern()
+      rp .Interval = @interval if @interval
+      rp .PatternStartDate = Exporter .to_ol_date(@sdate) if @sdate
+      rp .PatternEndDate = Exporter .to_ol_date(@edate) if @edate
+      if @stime || @etime
+	rp .Duration = 0
+	rp .StartTime = @stime .to_s if @stime
+	rp .EndTime = @etime .to_s if @etime
+      else
+	rp .Duration = 60 * 24
+      end
+      return rp
+    end
   end
   
   class NonRepeat < Period
-    def initialize(start)
-      super(start, start)
+    def initialize(sdate, stime, etime)
+      super(sdate, sdate, stime, etime)
     end
   end
 
   class Daily < Period
-    def initialize(start, finish, interval)
-      super(start, finish)
+    def initialize(start, finish, stime, etime, interval)
+      super(start, finish, stime, etime)
       @interval = interval
     end
   end
 
   class Weekly < Period
-    def initialize(start, finish, interval, dow)
-      super(start, finish)
+    def initialize(start, finish, stime, etime, interval, dow)
+      super(start, finish, stime, etime)
       @interval = interval
       @dow = dow
     end
 
     def handle_recurrence(ol_appoint)
-      rp = ol_appoint .GetRecurrencePattern()
-      rp .Interval = @interval
+      rp = get_recurrence(ol_appoint)
       mask = 0
       for i in 0..6
 	mask += (1 << i) if @dow[i]
@@ -76,22 +92,22 @@ module RepeatPattern
   end
 
   class MonthlyByDate < Period
-    def initialize(start, finish, interval)
-      super(start, finish)
+    def initialize(start, finish, stime, etime, interval)
+      super(start, finish, stime, etime)
       @interval = interval
     end
 
     def handle_recurrence(ol_appoint)
       # DBI: multiple days should be supported.
-      rp = ol_appoint .GetRecurrencePattern()
+      rp = get_recurrence(ol_appoint)
       rp .RecurrenceType = OlConst::OlRecursMonthly
-      rp .DayOfMonth = @start .d()
+      rp .DayOfMonth = @sdate .d()
     end
   end
 
   class MonthlyByDow < Period
-    def initialize(start, finish, interval, wom, dow)
-      super(start, finish)
+    def initialize(start, finish, stime, etime, interval, wom, dow)
+      super(start, finish, stime, etime)
       @interval = interval
       @wom = wom
       @dow = dow
@@ -99,8 +115,7 @@ module RepeatPattern
 
     def handle_recurrence(ol_appoint)
       # DBI: multiple days should be supported.
-      rp = ol_appoint .GetRecurrencePattern()
-      rp .Interval = @interval
+      rp = get_recurrence(ol_appoint)
       rp .RecurrenceType = OlConst::OlRecursMonthNth
       rp .DayOfWeekMask = (1 << @dow)
       rp .Instance = @wom + 1 # Instance(week of month) begins with 1
@@ -108,35 +123,32 @@ module RepeatPattern
   end
 
   class Yearly < Period
-    def initialize(start, finish, interval)
-      super(start, finish)
+    def initialize(start, finish, stime, etime, interval)
+      super(start, finish, stime, etime)
       @interval = interval
     end
 
     def handle_recurrence(ol_appoint)
       # DBI: multiple months should be supported.
-      rp = ol_appoint .GetRecurrencePattern()
+      rp = get_recurrence(ol_appoint)
       rp .RecurrenceType = OlConst::OlRecursYearly
-      rp .Duration = 60 * 24
-      rp .Interval = @interval
-      rp .DayOfMonth = @start .d()
-      rp .MonthOfYear = @start .m()
+      rp .DayOfMonth = @sdate .d()
+      rp .MonthOfYear = @sdate .m()
     end
   end
 
   class YearlyNth < Period
-    def initialize(start, finish, wom, dow)
-      super(start, finish)
+    def initialize(start, finish, stime, etime, wom, dow)
+      super(start, finish, stime, etime)
       @wom = wom
       @dow = dow
     end
 
     def handle_recurrence(ol_appoint)
       # DBI: multiple months should be supported.
-      rp = ol_appoint .GetRecurrencePattern()
+      rp = get_recurrence(ol_appoint)
       rp .RecurrenceType = OlConst::OlRecursYearNth
-      rp .Duration = 60 * 24
-      rp .MonthOfYear = @start .m()
+      rp .MonthOfYear = @sdate .m()
       rp .DayOfWeekMask = (1 << @dow)
       rp .Instance = @wom + 1 # Instance(week of month) begins with 1
     end
@@ -187,10 +199,11 @@ class MhcScheduleItem
     while day_cp .length > 0
       if day_cp .length > 1 && day_cp .length == day_cp .max - day_cp .min + 1
 	## repeat in a series of days -- make up as a daily.
-	dates << RepeatPattern::Daily .new(day_cp .min, day_cp .max, 1)
+	dates << RepeatPattern::Daily .new(day_cp .min, day_cp .max,
+					   time_b, time_e, 1)
 	day_cp = []
       else
-	dates << RepeatPattern::NonRepeat .new(day_cp .shift)
+	dates << RepeatPattern::NonRepeat .new(day_cp .shift, time_b, time_e)
       end
     end
 
@@ -201,7 +214,7 @@ class MhcScheduleItem
       for w in 0 .. 6
 	weeks << cond_wek .include?(MhcDate::W_LABEL[w]) ? true : false
       end
-      dates << RepeatPattern::Weekly .new(beg, fin, 1, weeks)
+      dates << RepeatPattern::Weekly .new(beg, fin, time_b, time_e, 1, weeks)
 
     elsif  cond_ord .length >= 1  &&
 	  !cond_ord .include?('5th') &&
@@ -218,7 +231,9 @@ class MhcScheduleItem
 	  while !sch2 .occur_on?(beg2) ## xxx 多分これは不要?
 	    beg2 .succ!
 	  end
-	  dates << RepeatPattern::MonthlyByDow .new(beg2, fin, 1, ord, wek)
+	  dates << RepeatPattern::MonthlyByDow .new(beg2, fin,
+						    time_b, time_e, 1,
+						    ord, wek)
 	}
       }
     elsif cond_num .length == 1 &&
@@ -227,7 +242,7 @@ class MhcScheduleItem
       while !occur_on?(beg) ## xxx こっちは必要
 	beg .succ!
       end
-      dates << RepeatPattern::MonthlyByDate .new(beg, fin, 1)
+      dates << RepeatPattern::MonthlyByDate .new(beg, fin, time_b, time_e, 1)
 
     elsif cond_num .length == 1 &&
 	  cond_mon .length == 1 &&
@@ -242,7 +257,7 @@ class MhcScheduleItem
 	date .y_succ! 
       end
       ## 2/29 はどうする?
-      dates << RepeatPattern::Yearly .new(date, fin, 1)
+      dates << RepeatPattern::Yearly .new(date, fin, time_b, time_e, 1)
 
     elsif cond_ord .length == 1  &&
 	  cond_ord[0] != '5th'   &&
@@ -260,7 +275,8 @@ class MhcScheduleItem
       while !occur_on?(date)
 	date .succ!
       end
-      dates << RepeatPattern::YearlyNth .new(date, fin, ord, wek)
+      dates << RepeatPattern::YearlyNth .new(date, fin, time_b, time_e,
+					     ord, wek)
 
     elsif cond .empty?
       ## do nothing
@@ -378,6 +394,7 @@ class Exporter
       sdate, edate = period .get_period()
       sdate = Exporter .to_ol_date(sdate)
       edate = Exporter .to_ol_date(edate)
+      edate = sdate if !edate
 
       print "Subject:", MhcKconv::todisp(sch .subject()), "\n" if @@flag_verbose
       appoint .Subject = MhcKconv::todisp(sch .subject())
@@ -387,23 +404,18 @@ class Exporter
       print "Path: ", sch .path(), "\n" if @@flag_verbose
 	
       stime, etime = sch .time()
-      etime = stime if !etime
       sdate += " " + stime .to_s if sdate && stime
-      edate += " " + etime .to_s if edate && etime
+      etime_tmp = if etime then etime else stime end
+      edate += " " + etime_tmp .to_s if edate && etime_tmp
 
       print "Date: ", sdate, "-", edate, "\n" if @@flag_verbose
-      appoint .Start = sdate
+
+      appoint .Start = sdate if sdate
+      appoint .End = edate if edate
       # If any time is not specified, the appointment is a kind of AllDayEvent.
-      if !edate.nil?
-	if !stime && !etime
-	  appoint .AllDayEvent = true
-	  if sdate != edate
-	    appoint .End = edate
-	    appoint .Duration = period .get_duration() if sdate && edate
-	  end
-	else
-	  appoint .End = edate
-	end
+      if !stime && !etime
+	appoint .AllDayEvent = true
+	appoint .Duration = 60 * 24
       end
 
       appoint .Categories = sch .category_as_string()
