@@ -3,7 +3,7 @@
 ## Author:  MIYOSHI Masanori <miyoshi@quickhack.net>
 ##          Yoshinari Nomura <nom@quickhack.net>
 ## Created: 2000/7/12
-## Revised: $Date: 2001/01/22 09:06:25 $
+## Revised: $Date: 2001/01/30 06:28:40 $
 
 require 'rbconfig'
 require 'mkmf'
@@ -74,7 +74,9 @@ module MhcMake
 
     print commandline, "\n"  if echo_flag
 
-    if !(result = system(commandline)) and exit_flag
+    system(commandline)
+    result = $? >> 8
+    if result != 0 and exit_flag
       exit result
     end
   end
