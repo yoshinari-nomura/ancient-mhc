@@ -1,6 +1,11 @@
+2000-06-17  Yoshinari Nomura  <nom@quickhack.net>,
+            MIYOSHI Masanori  <miyoshi@ask.ne.jp>
+
+	* palm2mhc: call ad_sch() in non interactive mode.
+
 2000-06-17  Yoshinari Nomura  <nom@quickhack.net>
 
-	* /cvsroot/mhc/emacs/mhc-date2.el: Temporary file.
+	* emacs/mhc-date2.el: Temporary file.
 
 2000-06-17  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 
