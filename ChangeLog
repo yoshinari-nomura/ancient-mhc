@@ -1,3 +1,15 @@
+2000-06-23  Hideyuki SHIRAI  <shirai@rdmg.mgcs.mei.co.jp>
+
+	* emacs/mhc-compat.el (mhc-string-width): New function.
+	(mhc-char-width): Ditto.
+	(mhc-string-to-list): Ditto.
+
+	* emacs/mhc-ps.el (mhc-ps-truncate-lines): New variable.
+	(mhc-ps/substring): New function.
+	(mhc-ps/compose-subject): Subject handle as string. Effect mhc-ps-truncate-lines.
+	(mhc-ps-preview): Effect default month.
+	(mhc-ps-print): Ditto.
+
 2000-06-23  Yoshinari Nomura  <nom@quickhack.net>
 
 	* emacs/mhc-guess.el (mhc-guess/gather-time-list2):

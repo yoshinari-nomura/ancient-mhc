@@ -49,6 +49,29 @@ is enclosed by at least one regexp grouping construct."
       (concat open-paren (mapconcat 'regexp-quote strings "\\|") close-paren))))
 
 
+(if (fboundp 'string-width)
+    (defalias 'mhc-string-width 'string-width)
+  (defalias 'mhc-string-width 'length))
+
+
+(if (fboundp 'char-width)
+    (defalias 'mhc-char-width 'char-width)
+  (defmacro mhc-char-width (x) 1))
+
+
+(cond
+ ((fboundp 'string-to-char-list)
+  (defalias 'mhc-string-to-list 'string-to-char-list))
+ ((fboundp 'string-to-list)
+  (defalias 'mhc-string-to-list 'string-to-list))
+ (t
+  (defun mhc-string-to-list (str)
+    (let (ret)
+      (while (not (string= str ""))
+	(setq ret (cons (string-to-char str) ret))
+	(setq str (substring str 1)))
+      (nreverse ret)))))
+
 
 (provide 'mhc-compat)
 

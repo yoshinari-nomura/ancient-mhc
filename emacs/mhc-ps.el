@@ -2,7 +2,7 @@
 
 ;; Author:  TSUCHIYA Masatoshi <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 ;; Created: 2000/06/18
-;; Revised: $Date: 2000/06/19 09:39:18 $
+;; Revised: $Date: 2000/06/23 10:04:49 $
 
 
 ;;; Commentary:
@@ -52,6 +52,47 @@
 
 ;;; Customize variables:
 
+(defcustom mhc-ps-preview-command "gv"
+  "*Command to preview PostScript calendar."
+  :group 'mhc
+  :type 'string)
+
+(defcustom mhc-ps-preview-command-arguments '("-")
+  "*Argument of previewer"
+  :group 'mhc
+  :type '(repeat string))
+
+(defcustom mhc-ps-print-command "lp"
+  "*Command to print PostScript calendar."
+  :group 'mhc
+  :type 'string)
+
+(defcustom mhc-ps-print-command-arguments '()
+  "*Argument of print command."
+  :group 'mhc
+  :type '(repeat string))
+
+(defcustom mhc-ps-paper-type t
+  "*Calendar paper type."
+  :group 'mhc
+  :type '(radio (const :tag "Landscape" t)
+		(const :tag "Portrait" nil)))
+
+(defcustom mhc-ps-truncate-lines t
+  "*Truncate line."
+  :group 'mhc
+  :type 'boolean)
+
+(defcustom mhc-ps-left-margin 2
+  "*Left margin of the each schedule."
+  :group 'mhc
+  :type 'integer)
+
+(defcustom mhc-ps-string-width 20
+  "*Width of the each schedule."
+  :group 'mhc
+  :type 'integer)
+
 (defcustom mhc-ps-title-font "Times-Bold"
   "*PostScript Font used for title."
   :group 'mhc
@@ -71,42 +112,6 @@
   "*PostScript Font used for Japanese characters."
   :group 'mhc
   :type 'string)
-
-(defcustom mhc-ps-paper-type t
-  "*Calendar paper type."
-  :group 'mhc
-  :type '(radio (const :tag "Landscape" t)
-		(const :tag "Portrait" nil)))
-
-(defcustom mhc-ps-left-margin 2
-  "*Left margin of the each schedule."
-  :group 'mhc
-  :type 'integer)
-
-(defcustom mhc-ps-string-width 20
-  "*Width of the each schedule."
-  :group 'mhc
-  :type 'integer)
-
-(defcustom mhc-ps-preview-command "gv"
-  "*Command to preview PostScript calendar."
-  :group 'mhc
-  :type 'string)
-
-(defcustom mhc-ps-preview-command-arguments '("-")
-  "*Argument of previewer"
-  :group 'mhc
-  :type '(repeat string))
-
-(defcustom mhc-ps-print-command "lp"
-  "*Command to print PostScript calendar."
-  :group 'mhc
-  :type 'string)
-
-(defcustom mhc-ps-print-command-arguments nil
-  "*Argument of print command."
-  :group 'mhc
-  :type '(repeat string))
 
 (defcustom mhc-ps-coding-system
   (if (boundp 'MULE) '*euc-japan*unix 'euc-japan-unix)
@@ -709,29 +714,41 @@ showpage
     ("@TRANSLATE@" . (if mhc-ps-paper-type "50 -120" "50 900"))))
 
 
+(defun mhc-ps/substring (str width)
+  (let ((clist (mhc-string-to-list str))
+	cw (i 0) (w 0) (ow 0) (spc (string-to-char " ")))
+    (catch 'loop
+      (while clist
+	(setq w (+ w (mhc-char-width (car clist))))
+	(if (> w width) (throw 'loop nil))
+	(setq i (+ i (length (char-to-string (car clist)))))
+	(setq clist (cdr clist))))
+    (substring str 0 i)))
 
 (defun mhc-ps/compose-subject (subject margin)
-  (let (pos)
+  (let ((mstr (make-string margin (string-to-char " ")))
+	pos)
     ;; Delete characters to emphasize subject.
     (and (string-match "^\\*+[ \t\r\f\n]*" subject)
 	 (setq pos (match-end 0))
 	 (string-match "[ \t\r\f\n]*\\*+$" subject)
-	 (setq subject (substring subject pos (match-beginning 0)))))
-  (let (ret)
-    (with-temp-buffer
-      (let ((fill-column mhc-ps-string-width)
-	    (left-margin margin))
-	(insert subject)
-	;; FIXME: fill-region は Emacs のバージョンによって動作がかなり
-	;; 異なっているので、違いを吸収する何らかの処置が必要。
-	(fill-region (point-min) (point-max))
-	(goto-char (point-min))
-	(while (not (eobp))
-	  (setq ret (cons (buffer-substring
-			   (point) (progn (end-of-line) (point)))
-			  ret))
-	  (forward-line 1))))
-    (nreverse ret)))
+	 (setq subject (substring subject pos (match-beginning 0))))
+    (setq subject (concat mstr subject))
+    (cond
+     ((<= (mhc-string-width subject) mhc-ps-string-width)
+      (list subject))
+     (mhc-ps-truncate-lines
+      (list (concat (mhc-ps/substring subject mhc-ps-string-width) "$")))
+     (t
+      ;; folding, xxx FIX ME Kinsoku-syori?
+      (let (ret str)
+	(while (not (string= subject ""))
+	  (setq str (mhc-ps/substring subject mhc-ps-string-width))
+	  (setq ret (cons str ret))
+	  (if (string-match (concat "^" (regexp-quote str) "\\(.+\\)$") subject)
+	      (setq subject (concat mstr (substring subject (match-beginning 1))))
+	    (setq subject "")))
+	(nreverse ret))))))
 
 
 (defun mhc-ps/schedule-to-string (dayinfo schedule)
@@ -814,8 +831,9 @@ showpage
 (defun mhc-ps-preview (year month &optional category category-is-invert)
   "*Preview PostScript calendar."
   (interactive
-   (let ((date (mhc-input-month "Month: "))
-	 (category (mhc-category-convert mhc-default-category)))
+   (let* ((cdate (or (mhc-current-date) (mhc-calendar-get-date)))
+	  (date (mhc-input-month "Month: " cdate))
+	  (category (mhc-category-convert mhc-default-category)))
      (list
       (mhc-date-yy date)
       (mhc-date-mm date)
@@ -833,8 +851,9 @@ showpage
 (defun mhc-ps-print (year month &optional category category-is-invert)
   "*Print PostScript calendar."
   (interactive
-   (let ((date (mhc-input-month "Month: "))
-	 (category (mhc-category-convert mhc-default-category)))
+   (let* ((cdate (or (mhc-current-date) (mhc-calendar-get-date)))
+	  (date (mhc-input-month "Month: " cdate))
+	  (category (mhc-category-convert mhc-default-category)))
      (list
       (mhc-date-yy date)
       (mhc-date-mm date)
