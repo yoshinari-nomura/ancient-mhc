@@ -5,7 +5,7 @@
 ## Author:  Yoshinari Nomura <nom@mew.org>
 ##
 ## Created: 1999/10/08
-## Revised: $Date: 2000/06/26 07:39:26 $
+## Revised: $Date: 2003/02/25 02:18:56 $
 ##
 
 $DEBUG = false
@@ -36,7 +36,7 @@ palm2mhc -- Add palm articles to a mhc repository.
              default value is /dev/pilot
     -r dir : Set repository directory of mhc.
              if not exists, palm2mhc makes the directory.
-             default value is /tmp/mhc-schedule
+             default value is ~/Mail/mhc-schedule
 '
   exit 1
 end
@@ -49,7 +49,7 @@ $flag_interactive = false
 $flag_update  = false
 $flag_append  = false
 $flag_noharm  = false
-$flag_dir     = '/tmp/mhc-schedule'
+$flag_dir     = File .expand_path('~/Mail/schedule')
 $flag_device  = '/dev/pilot'
 
 while ARGV .length > 0

@@ -3,7 +3,7 @@
 ################################################################
 
 Created: 1999/04/07
-Revised: $Date: 2000/05/26 20:06:50 $
+Revised: $Date: 2003/02/25 02:18:55 $
 
 ・ ChangeLog, NEWS を追加。以降は、00changes.jis は更新しない。
 ・ emacs/mhc.el: menu fix for xemacs. (thanks to shirai san)
@@ -481,11 +481,11 @@ Revised: $Date: 2000/05/26 20:06:50 $
 
   HP200LX の appt.adb を MHC に変換して、移行を助けるためのツールです。
 
-    adb2mhc --mhc-dir=/tmp/schedule appt.adb
+    adb2mhc --mhc-dir=~/Mail/schedule appt.adb
 
   のように使います。その後、
 
-    gemcal -r /tmp/schedule
+    gemcal -r ~/Mail/schedule
 
   とすると、ruby/gtk による美しいインターフェイスを堪能できるか
   もしれません。

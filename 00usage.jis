@@ -4,7 +4,7 @@
 ################################################################
 
 Created: 2000/06/26
-Revised: $Date: 2000/06/26 10:46:29 $
+Revised: $Date: 2003/02/25 02:18:55 $
 
 将来ちゃんとしたドキュメントを用意する予定ですが、
 それまでは、このファイルと emacs/00usage.jis 及び、
@@ -23,9 +23,9 @@ samples/DOT.schedule.sample.jp は日本の祭日についてのデータを記述したファ
 adb2mhc は、HP200LX のスケジュールソフト用データ (adb ファイル) 
 を MHC にコンバートするプログラムです。
 
-  % adb2mhc --mhc-dir /tmp/schedule appt.adb
+  % adb2mhc --mhc-dir ~/Mail/schedule appt.adb
 
-のようにすると、/tmp/schedule 以下に MHC 形式のファイルが多数生成されます。
+のようにすると、~/Mail/schedule 以下に MHC 形式のファイルが多数生成されます。
 
 ** gemcal
 
@@ -203,7 +203,7 @@ Palm のデータを MHC に転送するコマンドです。
               (Cygwin ユーザは /dev/com1 等になるでしょう)
 
     -r dir    MHC のデータを保存するディレクトリを指定します。
-              デフォルトは /tmp/mhc-schedule です。
+              デフォルトは ~/Mail/mhc-schedule です。
 
 ** today
 

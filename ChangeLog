@@ -1,3 +1,7 @@
+2003-02-25  Yoshinari Nomura  <nom@quickhack.net>
+
+	* adb2mhc, palm2mhc, 00changes.jis, 00usage.jis: not to use /tmp.
+
 2000-07-18  Toshihiko SHIMOKAWA  <toshi@csce.kyushu-u.ac.jp>
 
 	* next_year.xpm: correct color information
