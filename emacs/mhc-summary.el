@@ -538,27 +538,28 @@ If optional argument FOR-DRAFT is non-nil, Hilight message as draft message."
 
 
 ;;; Codes:
+(defsubst mhc-summary/make-string (count character)
+  (make-string (max 4 count) character))	;; xxxx 4 ?
+
 (defun mhc-summary/insert-separator (&optional wide str)
   (let (hr)
     (if wide
 	(progn
-	  (setq hr (make-string
-		    (- (window-width) 2) mhc-summary-month-separator))
+	  (setq hr (mhc-summary/make-string
+		    (- (frame-width) 2) mhc-summary-month-separator))
 	  (mhc-face-put hr 'mhc-summary-face-month-separator))
       (if (stringp str)
 	  (let ((hr1 (make-string 4 mhc-summary-separator))
 		hr2)
 	    (mhc-face-put hr1 'mhc-summary-face-separator)
 	    (mhc-face-put str 'mhc-summary-face-cw)
-	    (setq hr2 (make-string
-			      (- (window-width) mhc-calendar-width
-				 (length hr1) (length str))
-			      mhc-summary-separator))
+	    (setq hr2 (mhc-summary/make-string (- (frame-width) mhc-calendar-width
+						  (length hr1) (length str))
+					       mhc-summary-separator))
 	    (mhc-face-put hr2 'mhc-summary-face-separator)
 	    (setq hr (concat hr1 str hr2)))
-	(setq hr (make-string
-		  (- (window-width) mhc-calendar-width)
-		  mhc-summary-separator))
+	(setq hr (mhc-summary/make-string (- (frame-width) mhc-calendar-width)
+					  mhc-summary-separator))
 	(mhc-face-put hr 'mhc-summary-face-separator)))
     (insert hr "\n")))
 
@@ -632,6 +633,7 @@ If optional argument FOR-DRAFT is non-nil, Hilight message as draft message."
 	      (format " CW %d " (mhc-date-cw
 				 (mhc-date++ (mhc-day-date (car dayinfo-list))))))))
       (setq dayinfo-list (cdr dayinfo-list)))))
+
 
 (defun mhc-summary-make-todo-memo (today mailer category-predicate secret)
   (when mhc-insert-todo-list

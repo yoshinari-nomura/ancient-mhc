@@ -1,5 +1,8 @@
 2002-09-24  Hideyuki SHIRAI  <shirai@quickhack.net>
 
+	* emacs/mhc.el (mhc-scan-month): Use `frame-width' instead of
+	`window-width'. Guard error of make-string with minus count.
+
 	* emacs/mhc-summary.el (mhc-summary/cw-separator) 
 	(mhc-summary/cw-week): New variables.
 	(mhc-summary/insert-separator, mhc-summary-make-contents):
@@ -7,6 +10,9 @@
 	(mhc-summary/line-day-of-week-string) 
 	(mhc-summary/line-day-of-week-ja-string): Use
 	`mhc-summary/cw-week' insted of 'mhc-summary-use-cw'.
+	(mhc-summary/make-string): New inline function.
+	(mhc-summary/insert-separator): Use `frame-width' instead of
+	`window-width'. Guard error of make-string with minus count.
 
 	* emacs/mhc-face.el (mhc-symbol-face-alist-internal): Add
 	`mhc-summary-face-cw'.

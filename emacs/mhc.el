@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1994/07/04
-;; Revised: $Date: 2002/09/23 04:08:59 $
+;; Revised: $Date: 2002/09/24 07:07:39 $
 
 ;;;
 ;;; Commentay:
@@ -503,7 +503,7 @@ If HIDE-PRIVATE, private schedules are suppressed."
       (when mhc-insert-calendar
 	(mhc-calendar-insert-rectangle-at
 	 date
-	 (- (window-width) mhc-calendar-width)
+	 (max (- (frame-width) mhc-calendar-width) 24) ;; xxxxx 24?
 	 mhc-vertical-calendar-length))
       (mhc-summary-mode-setup date mailer)
       (mhc-mode 1)
