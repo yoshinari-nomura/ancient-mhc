@@ -1,3 +1,9 @@
+2000-08-21  KOIE Hidetaka <hide@koie.org>,
+	TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+
+	* emacs/mhc-file.el (mhc-file-line-status-strings): New variable
+	to customze status string.
+
 2000-08-21  Yoshinari Nomura  <nom@quickhack.net>
 
 	* mhc-make.rb (search_library): pass all args in a correct way.

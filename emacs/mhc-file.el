@@ -120,11 +120,23 @@
 (defmacro mhc-file-remove (file)
   `(mhc-file/remove ,file mhc-file/offline))
 
+(defcustom mhc-file-line-status-strings
+  '(" mhc[offline]" . " mhc[ONLINE]")
+  "Strings to describe MHC network status."
+  :group 'mhc
+  :type '(choice
+	  (const :tag "Long format" (" mhc[offline]" . " mhc[ONLINE]"))
+	  (const :tag "Short format" (" Mhc" . " MHC"))
+	  (cons :tag "User definition"
+		(string :tag "String for offline")
+		(string :tag "String for online"))))
+
 (defun mhc-file-line-status ()
   "Return status string for mode line."
-  (format " mhc%s"
-	  (if mhc-show-network-status
-	      (if mhc-file/offline "[offline]" "[ONLINE]") "")))
+  (if mhc-show-network-status
+      (if mhc-file/offline
+	  (car mhc-file-line-status-strings)
+	(cdr mhc-file-line-status-strings))))
 
 (defun mhc-file-toggle-offline ()
   "*Toggle line status of file manipulation backend."
