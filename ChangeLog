@@ -1,3 +1,9 @@
+2001-01-22  Yoshinari Nomura  <nom@quickhack.net>
+
+	* mhc-make.rb, ruby-ext/lib/mhc-date.rb, ruby-ext/lib/mhc-palm.rb,
+	  ruby-ext/lib/mhc-schedule.rb:
+	  ruby 1.6.2 compliant.
+
 2001-01-22  Yukihiro Matsumoto <matz@zetabits.com> / nom@quickhack.net
 
 	* emacs/mhc-cmail.el: Fix C-c.|
