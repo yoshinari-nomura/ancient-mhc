@@ -133,6 +133,9 @@
        (get-buffer-window (mew-buffer-message))
        (window-live-p (get-buffer-window (mew-buffer-message)))
        (delete-window (get-buffer-window (mew-buffer-message))))
+  ;; Mew-1.95b104 or later, disable mark highlight
+  (when (boundp 'mew-summary-buffer-raw) 
+    (setq mew-summary-buffer-raw nil))
   (mew-summary-toggle-disp-msg 'off))
 
 
@@ -237,9 +240,12 @@
 
 (defun mhc-mew-highlight-message (for-draft)
     (mew-highlight-header)
-    (mew-highlight-url)
-    (mew-highlight-body))
-
+    ;; Mew-1.95b104 or later, not have functions.
+    (when (and (fboundp 'mew-highlight-url)
+	       (fboundp 'mew-highlight-body))
+      (mew-highlight-url)
+      (mew-highlight-body)))
+	
 
 (defun mhc-mew-draft-translate ()
   (let (ct cte boundary beg end)

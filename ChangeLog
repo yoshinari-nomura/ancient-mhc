@@ -1,6 +1,12 @@
+2001-02-16  Hideyuki SHIRAI  <shirai@quickhack.net>
+
+	* emacs/mhc-mew.el (mhc-mew-summary-mode-setup): Follow suit for
+	Mew-1.95b104 or later. Disable highlight summary metod.
+	(mhc-mew-highlight-message): Ditto. Check lost functions.
+
 2001-02-09  Hideyuki SHIRAI  <shirai@quickhack.net>
 
-	* emacs/mhc-cmail (mhc-cmail-setup): Set mhc-mailer-package value
+	* emacs/mhc-cmail.el (mhc-cmail-setup): Set mhc-mailer-package value
 	early mhc-setup() execution.
 
 	* emacs/mhc-gnus.el (mhc-gnus-setup): Ditto.
