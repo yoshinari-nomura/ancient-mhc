@@ -274,7 +274,9 @@ PROP-VALUE is the property value correspond to PROP-TYPE.
 				       inserter
 				       &optional mailer)
   (if (eq 'direct mailer)
-      (mhc-summary-line-insert)
+      (let ((mhc-use-icon nil))
+	(mhc-summary-line-insert)
+	(insert "\n"))
     (funcall (mhc-summary-get-function 'insert-summary-contents mailer)
 	     inserter)))
 

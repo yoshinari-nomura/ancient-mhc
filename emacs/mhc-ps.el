@@ -2,7 +2,7 @@
 
 ;; Author:  TSUCHIYA Masatoshi <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 ;; Created: 2000/06/18
-;; Revised: $Date: 2000/06/26 01:18:21 $
+;; Revised: $Date: 2000/06/28 03:32:07 $
 
 
 ;;; Commentary:
@@ -715,7 +715,7 @@ showpage
 
 
 (defun mhc-ps/substring (str width)
-  (let ((clist (string-to-list str))
+  (let ((clist (mhc-string-to-char-list str))
 	cw (i 0) (w 0) (ow 0) (spc (string-to-char " ")))
     (catch 'loop
       (while clist

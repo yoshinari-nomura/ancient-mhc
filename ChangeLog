@@ -1,3 +1,13 @@
+2000-06-28  Hideyuki SHIRAI  <shirai@rdmg.mgcs.mei.co.jp>
+
+	* emacs/mhc-summary.el (mhc-summary-insert-contents): If mailer eq 'direct,
+	disable icon and insert \n.
+
+	* emacs/mhc-calendar.el (mhc-calendar-insert-summary-contents): Follow up new method.
+
+	* emacs/mhc-ps.el (mhc-ps/substring): Use mhc-string-to-char-list
+	instead of string-to-list.
+
 2000-06-28  Yuuichi Teranishi  <teranisi@quickhack.net>
 
 	* emacs/mhc.el (mhc-scan-month): `set-buffer-modified-p' as nil.
