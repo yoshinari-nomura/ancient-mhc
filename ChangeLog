@@ -1,5 +1,18 @@
 2000-07-14  Yoshinari Nomura  <nom@quickhack.net>
 
+	* ruby-ext/extconf.rb.in:
+	add nasty hack to LIBS = -lpisock.
+
+	* mscan, today.pl: Removed.
+
+	* ruby-ext/lib/mhc-kconv.rb.in,
+		  adb2mhc.in, make.rb.in,
+		  mhc-sync.in, mhc2palm.in,
+		  palm2mhc.in,
+		  ruby-ext/lib/mhc-gtk.rb.in,
+		  today.in:
+	add helps emacs to find a correct mode.
+
 	* configure.rb, mhc-make.rb: more strict checks.
 
 2000-07-13  Yoshinari Nomura  <nom@quickhack.net>
