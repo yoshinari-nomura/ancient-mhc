@@ -211,7 +211,7 @@ FROM, TO は 1970/01/01 からの経過日数を用いて指定"
 	    (mhc-header-put-value
 	     "x-sc-day"
 	     (mapconcat 'identity
-			(cons (format "! %s" date-string)
+			(cons (format "!%s" date-string)
 			      (delete date-string
 				      (mhc-logic-day-as-string-list
 				       (mhc-schedule-condition schedule))))
