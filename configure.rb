@@ -4,28 +4,46 @@
 ## Author:  MIYOSHI Masanori <miyoshi@quickhack.net>
 ##          Yoshinari Nomura <nom@quickhack.net>
 ## Created: 2000/7/12
-## Revised: $Date: 2000/07/18 04:33:26 $
+## Revised: $Date: 2000/08/05 19:47:46 $
 
 $LOAD_PATH .unshift('.')
 require 'mhc-make'
+include MhcMake
 
 ################################################################a
+## local configuralbe flags.
 
 local_config_table = [
+  ['--disable-palm', '@@MHC_DISABLE_PALM@@',
+    GetoptLong::NO_ARGUMENT,
+    "do not require pilot-link",
+    ''],
+
   ['--pilot-link-lib', '@@MHC_PILOT_LINK_LIB@@',
     GetoptLong::REQUIRED_ARGUMENT,
-    "--pilot-link-lib=DIR    pilot-link lib in DIR",
-    nil],
+    "=DIR    pilot-link lib in DIR",
+    ''],
 
   ['--pilot-link-inc', '@@MHC_PILOT_LINK_INC@@',
     GetoptLong::REQUIRED_ARGUMENT,
-    "--pilot-link-inc=DIR    pilot-link header in DIR",
-    nil],
+    "=DIR    pilot-link header in DIR",
+    ''],
 
-  ['--disable-palm', '@@MHC_DISABLE_PALM@@',
-    GetoptLong::NO_ARGUMENT,
-    "--disable-palm          do not require pilot-link",
-    '0']
+  ['--with-mew', '@@MHC_WITH_MEW@@', GetoptLong::NO_ARGUMENT,
+    "use mhc with Mew.",
+    ''],
+
+  ['--with-wl', '@@MHC_WITH_WL@@', GetoptLong::NO_ARGUMENT,
+    "use mhc with Wanderlust.",
+    ''],
+
+  ['--with-gnus', '@@MHC_WITH_GNUS@@', GetoptLong::NO_ARGUMENT,
+    "use mhc with Gnus.",
+    ''],
+
+  ['--with-cmail', '@@MHC_WITH_CMAIL@@', GetoptLong::NO_ARGUMENT,
+    "use mhc with cmail.",
+    '']
 ]
 
 conf = MhcConfigure .new(local_config_table) .parse_argv
@@ -35,8 +53,11 @@ conf['@@MHC_XPM_PATH@@'] = conf['@@MHC_LIBDIR@@'] + '/xpm'
 ################################################################
 ## command check
 
-conf .search_command('ruby', '@@MHC_RUBY_PATH@@',   false, true)
-conf .search_command('emacs', '@@MHC_EMACS_PATH@@', false, true)
+conf .search_command('ruby',         '@@MHC_RUBY_PATH@@',       false, true)
+conf .search_command('emacs',        '@@MHC_EMACS_PATH@@',      false, false)
+conf .search_command('emacs',        '@@MHC_FSF_EMACS_PATH@@',  false, false)
+conf .search_command('xemacs',       '@@MHC_XEMACS_PATH@@',     false, false)
+conf .search_command('make',         '@@MHC_MAKE_PATH@@',       false, true)
 
 ################################################################
 ## lib check
@@ -44,7 +65,7 @@ conf .search_command('emacs', '@@MHC_EMACS_PATH@@', false, true)
 lib_search_path = ['/usr/local/lib', '/usr/local/pilot/lib']
 inc_search_path = ['/usr/local/include', '/usr/local/pilot/include']
 
-if conf['@@MHC_DISABLE_PALM@@'] == '0'
+if conf['@@MHC_DISABLE_PALM@@'] == ''
   conf .search_library(lib_search_path, 
 		       'pisock', 
 		       'pi_socket',
@@ -65,6 +86,7 @@ infile_list = [
   'gemcal.in:0755', 
   'make.rb.in:0755', 
   'today.in:0755',
+  'emacs/make.rb.in:0755',
   'ruby-ext/lib/mhc-kconv.rb.in:0644', 
   'ruby-ext/lib/mhc-gtk.rb.in:0644', 
   'ruby-ext/extconf.rb.in:0755'
@@ -72,13 +94,13 @@ infile_list = [
 
 file = File .open('configure.log', 'w')
 conf .each_macro{|key, val|
-  file .print "#{key} => #{val}\n"
+  file .print format("%-30s => %s\n", key, val)
 }
 
 conf .replace_keywords(infile_list)
 
 print "In ruby-ext/\n"
 Dir .chdir('ruby-ext')
-system('ruby', 'extconf.rb')
+make_system('ruby extconf.rb')
 
 exit 0

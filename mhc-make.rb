@@ -3,7 +3,7 @@
 ## Author:  MIYOSHI Masanori <miyoshi@quickhack.net>
 ##          Yoshinari Nomura <nom@quickhack.net>
 ## Created: 2000/7/12
-## Revised: $Date: 2000/07/14 07:26:45 $
+## Revised: $Date: 2000/08/05 19:47:46 $
 
 require 'rbconfig'
 require 'mkmf'
@@ -31,7 +31,7 @@ module MhcMake
 
   def default()
     if File .exists?('Makefile')
-      system("make")
+      make_system("make")
     else
       ## print "Nothing to do in #{Dir .pwd}.\n"
     end
@@ -40,7 +40,7 @@ module MhcMake
 
   def clean
     if File .exists?('Makefile')
-      system("make", "clean")
+      make_system("make clean")
     else
       Dir .foreach('.'){|src_file|
 	if src_file =~ /\.in$/ or src_file == 'Makefile' or 
@@ -57,6 +57,28 @@ module MhcMake
     process_subdirs()
   end
 
+
+  def make_system(*commandline)
+    commandline = commandline .join(' ')
+    echo_flag, exit_flag = true, true
+
+    if commandline =~ /^-(.*)/
+      commandline = $1
+      exit_flag = false
+    end
+
+    if commandline =~ /^@(.*)/
+      commandline = $1
+      echo_flag = false
+    end
+
+    print commandline, "\n"  if echo_flag
+
+    if !(result = system(commandline)) and exit_flag
+      exit result
+    end
+  end
+
   def process_subdirs()
     target = ARGV .join(' ')
 
@@ -66,14 +88,14 @@ module MhcMake
 	  print "Making #{target} in #{File .expand_path(entry)}\n"
 	  cd = Dir .pwd()
 	  Dir .chdir(File .expand_path(entry))
-	  system('ruby', 'make.rb', *ARGV)
+	  make_system('ruby', 'make.rb', *ARGV)
 	  Dir .chdir(cd)
 
 	elsif File .exists?("#{entry}/Makefile")
 	  print "Making #{target} in #{File .expand_path(entry)}\n"
 	  cd = Dir .pwd()
 	  Dir .chdir(File .expand_path(entry))
-	  system('make', *ARGV)
+	  make_system('make', *ARGV)
 	  Dir .chdir(cd)
         end
       end
@@ -82,7 +104,7 @@ module MhcMake
 
   def install
     if File .exists?('Makefile')
-      system("make", "install") 
+      make_system("make", "install") 
     else
       INSTALL_FILES .each{|filename_mode_dir|
 	filename, mode, dir = filename_mode_dir .split(':')
@@ -118,31 +140,45 @@ class MhcConfigTable
   # ['--kcode', '@@MHC_KCODE@@', GetoptLong::OPTIONAL_ARGUMENT, usage, default]
 
   DEFAULT_CONFIG_TABLE = [
+    ['--help', '@@MHC_HELP@@', GetoptLong::NO_ARGUMENT,
+      "print this message",
+      nil],
+
     ['--kcode', '@@MHC_KCODE@@', GetoptLong::REQUIRED_ARGUMENT,
-      "--kcode=FILE            kanji code (EUC, JIS, SJIS)",
+      "=CODE  kanji code (EUC, JIS, SJIS)",
       (/cygwin|mingw32|os2_emx|sharp-human/ =~ RUBY_PLATFORM) ? 'SJIS' : 'EUC'
     ],
 
     ['--bindir', '@@MHC_BINDIR@@', GetoptLong::REQUIRED_ARGUMENT,
-      "--bindir=DIR            user executables in DIR",
+      "=DIR   user executables go to  DIR",
       CONFIG["bindir"]],
 
+    ['--with-ruby', '@@MHC_RUBY_PATH@@', GetoptLong::REQUIRED_ARGUMENT, 
+      "=PATH  absolute path of ruby executable",
+      ''],
+
     ['--libdir', '@@MHC_LIBDIR@@', GetoptLong::REQUIRED_ARGUMENT,
-      "--libdir=DIR            script libraries in DIR",
+      "=DIR   Ruby script libraries go to DIR",
       File::join(CONFIG["libdir"], "ruby",
 		 CONFIG["MAJOR"] + "." + CONFIG["MINOR"])],
 
-    ['--with-ruby', '@@MHC_RUBY_PATH@@', GetoptLong::REQUIRED_ARGUMENT, 
-      "--with-ruby=PATH        absolute path of ruby executable",
-      nil],
-
     ['--with-emacs', '@@MHC_EMACS_PATH@@', GetoptLong::REQUIRED_ARGUMENT, 
-      "--with-emacs=PATH       absolute path of emacs/xemacs executable",
-      nil],
+      "=PATH  absolute path of emacs/xemacs executable",
+      ''],
 
-    ['--help', '@@MHC_HELP@@', GetoptLong::NO_ARGUMENT,
-      "--help                  print this message",
-      nil]
+    ['--with-lispdir', '@@MHC_LISPDIR@@', GetoptLong::REQUIRED_ARGUMENT,
+      "=DIR   emacs lisp files go to DIR.",
+      ''],
+
+    ['--with-xemacs-pkgdir', '@@MHC_XEMACS_PACKAGE_DIR@@',
+      GetoptLong::REQUIRED_ARGUMENT,
+      '=DIR   emacs lisp files as package go to DIR.',
+      ''],
+
+    ['--with-emacs-addpath', '@@MHC_EMACS_ADD_PATH@@', 
+      GetoptLong::REQUIRED_ARGUMENT,
+      '=PATH  add colon separated dirs list, to `load-path\'',
+      '']
   ]
 
   def initialize(config_table = [])
@@ -154,7 +190,25 @@ class MhcConfigTable
   end
 
   def usage_string
-    return @config_table .collect{|ary| ary[-2]} .join("\n    ")
+    opt_ary, ret, opt_name_max_length = [], '', 0
+
+    @config_table .each{|ary|
+      opt_name, opt_usage = ary[0], ary[-2]
+
+      if opt_usage =~ /^(=\S+)\s+(.*)/
+	opt_name  += $1
+	opt_usage  = $2
+      end
+
+      if (opt_name_max_length < opt_name .length)
+	opt_name_max_length = opt_name .length
+      end
+      opt_ary << [opt_name, opt_usage]
+    }
+    opt_ary .each{|opt|
+      ret += format("  %-#{opt_name_max_length}s  %s\n", opt[0], opt[1])
+    }
+    return ret
   end
 
   def macro_hash
@@ -199,7 +253,7 @@ class MhcConfigure
 
   def usage
     STDERR .print "usage: ruby configure.rb [options]\n"
-    STDERR .print "    ", @config_table .usage_string, "\n"
+    STDERR .print @config_table .usage_string
   end
 
   ## parse ARGV and set corresponding macros.
@@ -259,7 +313,9 @@ class MhcConfigure
   ## find header file, add to '@@MHC_CFLAGS@@', set macroname.
   def search_include(search_path, header_file, macroname, force, abort)
 
-    search_path = [@macros[macroname]] if @macros[macroname] and !force
+    if @macros[macroname] and @macros[macroname] != '' and !force
+      search_path = [@macros[macroname]]
+    end
 
     cflags, found_inc_path = $CFLAGS, nil
 
@@ -288,7 +344,9 @@ class MhcConfigure
   ## find library file, add to '@@MHC_LDFLAGS@@', set macroname.
   def search_library(search_path, libname, funcname, macroname, force, abort)
 
-    search_path = [@macros[macroname]] if @macros[macroname] and !force
+    if @macros[macroname] and @macros[macroname] != '' and !force
+      search_path = [@macros[macroname]]
+    end
 
     ldflags, found_lib_path = $LDFLAGS, nil
 
@@ -312,10 +370,12 @@ class MhcConfigure
   end
 
   ## find command and set macro name.
+  ## if force is true, overwrite the macro even if previously set.
+  ## if abort is true, stop and exit.
   def search_command(command, macroname, force, abort)
     path = @macros[macroname]
 
-    if (!path) or force
+    if (!path) or path == '' or force
       if path = File .which(command)
 	@macros[macroname] = path
       end
