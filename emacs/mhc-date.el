@@ -1,9 +1,9 @@
 ;;; mhc-date.el -- Digit style Date Calculation Lib.
 
-;; Author:  Yoshinari Nomura <nom@quickhack.net>
+;; Author:  Yoshinari Nomura <nom@mew.org>
 ;;
 ;; Created: 1999/04/07
-;; Revised: $Date: 2000/05/29 14:59:24 $
+;; Revised: 2000/05/09 09:14:20
 
 ;;;
 ;;; Commentary:
@@ -36,7 +36,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; dtime
 
-(defun dtime-now (&optional need-sec time)
+(defsubst dtime-now (&optional need-sec time)
   (let ((now (current-time-string time)) (match (match-data))
 	hour min sec)
     ;; current-time-string is "Thu Jun 30 01:58:16 1994"
@@ -50,12 +50,12 @@
 	(list  hour min sec)
       (list  hour min))))
 
-(defun dtime-new (HH &optional MM noerror)
+(defsubst dtime-new (HH &optional MM noerror)
   (if (stringp HH)
       (dtime-new-from-string HH noerror)
     (dtime-new-from-digit HH MM noerror)))
 
-(defun dtime-new-from-string (str &optional noerror regex)
+(defsubst dtime-new-from-string (str &optional noerror regex)
   (let (HH MM (match (match-data)))
     (if (string-match (or regex dtime-regex) str)
 	(setq HH (ddate-substring-to-int str 1)
@@ -65,13 +65,13 @@
 	(dtime-new-from-digit HH MM noerror)
       (if noerror nil (error "Time format error (%s)" str)))))
 
-(defun dtime-new-from-digit (HH MM &optional noerror)
+(defsubst dtime-new-from-digit (HH MM &optional noerror)
   (let ((dtime (list HH MM)))
     (if (dtime-parse dtime)
 	dtime
       (if noerror nil (error "Time format error (%s %s)" HH MM)))))
 
-(defun dtime-parse (dtime)
+(defsubst dtime-parse (dtime)
   (let (HH MM)
     (if (not (and dtime (listp dtime)))
 	nil
@@ -80,34 +80,31 @@
 	   (integerp MM) (>= MM 0) (<= MM 59)
 	   (format "%02d:%02d" HH MM)))))
 
-(defun dtime-HH (dtime)
-  (nth 0 dtime))
+(defmacro dtime-HH (dtime) (` (nth 0 (, dtime))))
+(defmacro dtime-MM (dtime) (` (nth 1 (, dtime))))
 
-(defun dtime-MM (dtime)
-  (nth 1 dtime))
-
-(defun dtime-max (t1 t2)
+(defsubst dtime-max (t1 t2)
   (if (dtime< t1 t2) t2 t1))
 
-(defun dtime-min (t1 t2)
+(defsubst dtime-min (t1 t2)
   (if (dtime< t1 t2) t1 t2))
 
-(defun dtime< (t1 t2)
-  (string<
-   (apply 'format "%02d%02d" (or t1 '(-1 -1)))
-   (apply 'format "%02d%02d" (or t2 '(-1 -1)))))
+(defmacro dtime< (t1 t2)
+  (` (string<
+      (apply (quote format) "%02d%02d" (or (, t1) (quote (-1 -1))))
+      (apply (quote format) "%02d%02d" (or (, t2) (quote (-1 -1)))))))
 
 (fset 'dtime= (symbol-function 'equal))
 
-(defun dtime<= (t1 t2)
+(defsubst dtime<= (t1 t2)
   (or
    (dtime< t1 t2)
    (dtime= t1 t2)))
 
-(defun dtime-to-s (dtime &optional need-sec)
-  (if need-sec
-      (apply 'format "%02d:%02d:%02d" dtime)
-    (apply 'format "%02d:%02d" dtime)))
+(defmacro dtime-to-s (dtime &optional need-sec)
+  (` (if (, need-sec)
+	 (apply (quote format) "%02d:%02d:%02d" (, dtime))
+       (apply (quote format) "%02d:%02d" (, dtime)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; ddate
@@ -115,12 +112,12 @@
 ;;
 ;; create new object, access method to each element.
 ;;
-(defun ddate-new (yy &optional mm dd noerror)
+(defsubst ddate-new (yy &optional mm dd noerror)
   (if (stringp yy)
       (ddate-new-from-string yy noerror)
     (ddate-new-from-digit yy mm dd noerror)))
 
-(defun ddate-new-from-string (str &optional noerror regex)
+(defsubst ddate-new-from-string (str &optional noerror regex)
   (let (yy mm dd (match (match-data)))
     (if (string-match (or regex ddate-regex) str)
 	(setq yy (ddate-substring-to-int str 1)
@@ -131,7 +128,7 @@
 	(ddate-new-from-digit yy mm dd noerror)
       (if  noerror nil (error "Date format error (%s)" str)))))
 
-(defun ddate-new-from-string2 (str &optional base-date noerror)
+(defsubst ddate-new-from-string2 (str &optional base-date noerror)
   (let* ((now (or base-date (ddate-now)))
 	 (yy (ddate-yy now)) (mm (ddate-mm now)) ret)
     (setq ret
@@ -153,7 +150,7 @@
     ;; (ddate-yy-inc ret)
     ret))
   
-(defun ddate-new-from-digit (yy mm dd &optional noerror)
+(defsubst ddate-new-from-digit (yy mm dd &optional noerror)
   (let ((ddate (list yy mm dd)))
     (if (ddate-parse ddate)
 	ddate
@@ -175,7 +172,7 @@
 ;;    (list yy mm dd HH MM )))
 ;;
 
-(defun ddate-now (&optional date)
+(defsubst ddate-now (&optional date)
   (let ((now (current-time-string date)) (match (match-data))
 	week mon day hour min year)
     ;; current-time-string is "Thu Jun 30 01:58:16 1994"
@@ -197,10 +194,10 @@
     (store-match-data match)
     (list  year mon (string-to-int day))))
 
-(defun ddate-yy (ddate) (nth 0 ddate))
-(defun ddate-mm (ddate) (nth 1 ddate))
-(defun ddate-dd (ddate) (nth 2 ddate))
-(defun ddate-ww (ddate)
+(defmacro ddate-yy (ddate) (` (nth 0 (, ddate))))
+(defmacro ddate-mm (ddate) (` (nth 1 (, ddate))))
+(defmacro ddate-dd (ddate) (` (nth 2 (, ddate))))
+(defsubst ddate-ww (ddate)
   ;;  (0:Sun, 2:Mon, ... , 6:Sat)
   (let ((xx (1- (ddate-yy ddate))))
     (% (+ (ddate-day-of-yy ddate)
@@ -210,9 +207,7 @@
 	  (/ xx  400))
        7)))
 
-(defun ddate-oo (ddate)
-  (/ (1- (ddate-dd ddate)) 7))
-
+(defmacro ddate-oo (ddate) (` (/ (1- (ddate-dd (, ddate))) 7)))
 
 ;;
 ;; to-string
@@ -220,30 +215,29 @@
 
 ;; for X-SC-*
 
-(defun ddate-to-s (ddate)
-  (apply 'format "%04d%02d%02d" ddate))
+(defmacro ddate-to-s (ddate)
+  (` (apply (quote format) "%04d%02d%02d" (, ddate))))
 
-(defun ddate-yymm-s (ddate)
-  (apply 'format "%04d%02d" ddate))
+(defmacro ddate-yymm-s (ddate)
+  (` (apply (quote format) "%04d%02d" (, ddate))))
 
+(defmacro ddate-yy-s (date)
+  (format "%04d" (ddate-yy ,date)))
 
-(defun ddate-yy-s (date)
-  (format "%04d" (ddate-yy date)))
-
-(defun ddate-mm-s (date)
+(defsubst ddate-mm-s (date)
   (let ((from (* 3 (1- (ddate-mm date)))))
     (substring "JanFebMarAprMayJunJulAugSepOctNovDec"
 	       from (+ 3 from))))
 
-(defun ddate-dd-s (date)
-  (format "%02d" (ddate-dd date)))
+(defmacro ddate-dd-s (date)
+  (` (format "%02d" (ddate-dd (, date)))))
 
-(defun ddate-ww-s (date)
+(defsubst ddate-ww-s (date)
   (let ((from (* 3 (ddate-ww date))))
     (substring "SunMonTueWedThuFriSat"
 	       from (+ 3 from))))
 
-(defun ddate-oo-s (date)
+(defsubst ddate-oo-s (date)
   (let ((from (* 3 (ddate-oo date))))
     (substring "1st2nd3rd4th5th"
 	       from (+ 3 from))))
@@ -253,7 +247,7 @@
 ;; ex. 1999-10-12, 1999/10/12
 ;;
 
-(defun ddate-to-s1 (ddate &optional d)
+(defsubst ddate-to-s1 (ddate &optional d)
   (format "%04d%s%02d%s%02d"
 	  (ddate-yy ddate)
 	  (or d "")
@@ -263,17 +257,15 @@
 
 (fset 'ddate-yy-s1 (symbol-function 'ddate-yy-s))
 
-(defun ddate-mm-s1 (ddate)
-  (format "%02d" (ddate-mm ddate)))
+(defmacro ddate-mm-s1 (ddate) (` (format "%02d" (ddate-mm (, ddate)))))
 
-(defun ddate-dd-s1 (ddate)
-  (format "%02d" (ddate-dd ddate)))
+(defmacro ddate-dd-s1 (ddate) (` (format "%02d" (ddate-dd (, ddate)))))
 
-(defun ddate-yymm-s1 (ddate &optional d)
+(defsubst ddate-yymm-s1 (ddate &optional d)
   (format "%04d%s%02d"
 	  (ddate-yy ddate) (or d "") (ddate-mm ddate)))
 
-(defun ddate-mmdd-s1 (ddate &optional d)
+(defsubst ddate-mmdd-s1 (ddate &optional d)
   (format "%02d%s%02d" (ddate-mm ddate) (or d "") (ddate-dd ddate)))
 
 
@@ -282,10 +274,10 @@
 ;; ex. April 1999
 ;;
 
-(defun ddate-yymm-sj (ddate)
+(defsubst ddate-yymm-sj (ddate)
   (format "%s %04d" (ddate-mm-sj ddate) (ddate-yy ddate)))
 
-(defun ddate-mm-sj (ddate)
+(defsubst ddate-mm-sj (ddate)
   (aref 
    '["January" "February" "March"     "April"   "May"      "June"
      "July"    "August"   "September" "October" "November" "December"]
@@ -295,23 +287,22 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; compare, increment, decrement
 
-(defun ddate-sort (dlist)
-  (sort dlist (function ddate<)))
+(defmacro ddate-sort (dlist) (` (sort (, dlist) (function ddate<))))
 
-(defun ddate-max (d1 d2)
+(defsubst ddate-max (d1 d2)
   (if (ddate< d1 d2) d2 d1))
 
-(defun ddate-min (d1 d2)
+(defsubst ddate-min (d1 d2)
   (if (ddate< d1 d2) d1 d2))
 
 (fset 'ddate= (symbol-function 'equal))
 
-(defun ddate< (d1 d2)
+(defsubst ddate< (d1 d2)
   (string<
    (apply 'format "%04d%02d%02d" d1)
    (apply 'format "%04d%02d%02d" d2)))
 
-(defun ddate<= (d1 d2)
+(defsubst ddate<= (d1 d2)
   (or
    (string<
     (apply 'format "%04d%02d%02d" d1)
@@ -320,19 +311,18 @@
     (apply 'format "%04d%02d%02d" d1)
     (apply 'format "%04d%02d%02d" d2))))
 
-(defun ddate-yy< (d1 d2)
-  (< (ddate-yy d1) (ddate-yy d2)))
+(defmacro ddate-yy< (d1 d2)
+  `(< (ddate-yy ,d1) (ddate-yy ,d2)))
 
-(defun ddate-yymm< (d1 d2)
-  (string<
-   (apply 'format "%04d%02d" d1)
-   (apply 'format "%04d%02d" d2)))
+(defmacro ddate-yymm< (d1 d2) 
+  (` (string< (apply (quote format) "%04d%02d" (, d1))
+	      (apply (quote format) "%04d%02d" (, d2)))))
 
 ;;
 ;; succ and dec.
 ;;
 
-(defun ddate-yy-inc (ddate &optional c)
+(defsubst ddate-yy-inc (ddate &optional c)
   (let ((new-yy (+ (or c 1) (ddate-yy ddate)))
 	(mm (ddate-mm ddate))
 	(dd (ddate-dd ddate)))
@@ -342,10 +332,10 @@
 	(ddate-new new-yy 3 1)
       (ddate-new new-yy mm dd))))
 
-(defun ddate-yy-dec (ddate &optional c)
+(defsubst ddate-yy-dec (ddate &optional c)
   (ddate-yy-inc ddate (if c (- c) -1)))
 
-(defun ddate-mm-inc (ddate &optional c)
+(defsubst ddate-mm-inc (ddate &optional c)
   (let ((yy (ddate-yy ddate)) (mm (ddate-mm ddate)) (c (or c 1)) xx pp)
     (setq xx (+ mm c))
     (setq pp (if (< 0 xx ) (/ (- xx  1) 12) (/ (- xx 12) 12)))
@@ -354,10 +344,10 @@
 	(list yy mm (nth 2 ddate))
       (list yy mm (ddate-days-of-mm (list yy mm 1))))))
 
-(defun ddate-mm-dec (ddate &optional c)
+(defsubst ddate-mm-dec (ddate &optional c)
   (ddate-mm-inc ddate (if c (- c) -1)))
 
-(defun ddate-inc (date)
+(defsubst ddate-inc (date)
   (let ((yy (ddate-yy date)) (mm (ddate-mm date)) (dd (ddate-dd date)))
     (if (= dd (ddate-days-of-mm date))
 	(if (= mm 12) (setq yy (1+ yy) mm 1 dd 1)
@@ -365,7 +355,7 @@
       (setq dd (1+ dd)))
     (ddate-new yy mm dd)))
 
-(defun ddate-dec (date)
+(defsubst ddate-dec (date)
   (let ((yy (ddate-yy date)) (mm (ddate-mm date)) (dd (ddate-dd date)))
     (if (= dd 1)
 	(if (= mm 1)
@@ -375,10 +365,10 @@
       (setq dd (1- dd)))
     (ddate-new yy mm dd)))
 
-(defun ddate-mm-first-day (date)
+(defsubst ddate-mm-first-day (date)
   (ddate-new (ddate-yy date) (ddate-mm date) 1))
 
-(defun ddate-mm-last-day (date)
+(defsubst ddate-mm-last-day (date)
   (ddate-new (ddate-yy date) (ddate-mm date) (ddate-days-of-mm date)))
 
 
@@ -388,14 +378,14 @@
 ;;
 ;; days between d1 to d2
 ;;
-(defun ddate- (d1 d2)
+(defsubst ddate- (d1 d2)
   (- (ddate-days d1) (ddate-days d2)))
 
   
 ;;
 ;; days of the month.
 ;;
-(defun ddate-days-of-mm (ddate)
+(defsubst ddate-days-of-mm (ddate)
   (let ((yy (ddate-yy ddate)) (mm (ddate-mm ddate)))
     (if (ddate-leap-year-p yy)
 	(nth (1- mm) '(31 29 31 30 31 30 31 31 30 31 30 31))
@@ -404,7 +394,7 @@
 ;;
 ;; returns t if the the year is leapyear.
 ;;
-(defun ddate-leap-year-p (ddate-or-yy)
+(defsubst ddate-leap-year-p (ddate-or-yy)
   (let ((yy (if (listp ddate-or-yy) (ddate-yy ddate-or-yy) ddate-or-yy)))
     (or (= (% yy 400) 0)
 	(and (= (% yy 4) 0)
@@ -417,7 +407,7 @@
 ;;   (1994 7 1 xx xx xx) -> 182 
 ;;      ; 1994-7-1 is the 182nd day of the year.
 ;;
-(defun ddate-day-of-yy (ddate)
+(defsubst ddate-day-of-yy (ddate)
   (let (yy mm dd xx)
     (setq yy (ddate-yy ddate) mm (ddate-mm ddate) dd (ddate-dd ddate)
 	  xx (if (and (ddate-leap-year-p yy) (> mm 2)) 1 0))
@@ -428,7 +418,7 @@
 ;;
 ;; days from 1970-01-01
 ;;
-(defun ddate-days (ddate)
+(defsubst ddate-days (ddate)
   (let ((xx (1- (ddate-yy ddate))))
     (- (+ (ddate-day-of-yy ddate)
 	  (* xx  365)
@@ -440,7 +430,7 @@
 ;;
 ;; check if date is the last week of the month.
 ;;
-(defun ddate-oo-last-p (date)
+(defsubst ddate-oo-last-p (date)
   (< (- (ddate-days-of-mm date) 7) (ddate-dd date)))
 
 ;;
@@ -448,7 +438,7 @@
 ;;
 ;; returns "YYYYMMDD" if ddate is valid else nil.
 ;;
-(defun ddate-parse (ddate)
+(defsubst ddate-parse (ddate)
   (let (yy mm dd)
     (if (not (and ddate (listp ddate)))
 	nil
@@ -464,7 +454,7 @@
 ;; misc
 ;;
 
-(defun ddate-substring-to-int (str pos)
+(defsubst ddate-substring-to-int (str pos)
   (cond
    ((stringp str)
     (string-to-int
@@ -479,8 +469,8 @@
 
 ;;; Copyright Notice:
 
-;; Copyright (C) 1999, 2000 Yoshinari Nomura. All rights reserved.
-;; Copyright (C) 2000 MHC developing team. All rights reserved.
+;; Copyright (C) 1999, 2000 Yoshinari Nomura.
+;; All rights reserved.
 
 ;; Redistribution and use in source and binary forms, with or without
 ;; modification, are permitted provided that the following conditions
@@ -495,11 +485,11 @@
 ;;    may be used to endorse or promote products derived from this software
 ;;    without specific prior written permission.
 ;; 
-;; THIS SOFTWARE IS PROVIDED BY THE TEAM AND CONTRIBUTORS ``AS IS''
+;; THIS SOFTWARE IS PROVIDED BY Yoshinari Nomura AND CONTRIBUTORS ``AS IS''
 ;; AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 ;; LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
 ;; FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL
-;; THE TEAM OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+;; Yoshinari Nomura OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 ;; INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 ;; (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
 ;; SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
