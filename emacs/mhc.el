@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1994/07/04
-;; Revised: $Date: 2000/06/19 07:22:30 $
+;; Revised: $Date: 2000/06/20 06:16:38 $
 
 ;;;
 ;;; Commentay:
@@ -301,7 +301,8 @@ Returns t if the importation was succeeded."
        (list (get-buffer (read-buffer "Import buffer: "
 				      (current-buffer))))))
   (let ((draft-buffer (generate-new-buffer mhc-draft-buffer-name))
-	(current-date (if calendar (mhc-calendar-get-ddate) (mhc-current-date)))
+	(current-date 
+	 (if calendar (mhc-calendar-get-ddate) (mhc-current-date)))
 	(succeed t)
 	date time subject location category)
     (and (interactive-p)
@@ -311,10 +312,11 @@ Returns t if the importation was succeeded."
 	(progn
 	  (insert-buffer import-buffer)
 	  (mhc-header-narrowing
-	    (mhc-header-delete-header (concat "^\\("
-					      (mhc-regexp-opt mhc-draft-unuse-hdr-list)
-					      "\\)")
-				      'regexp))
+	    (mhc-header-delete-header
+	     (concat "^\\("
+		     (mhc-regexp-opt mhc-draft-unuse-hdr-list)
+		     "\\)")
+	     'regexp))
 	  (switch-to-buffer draft-buffer t)))
     (condition-case ()
 	(if import-buffer
@@ -329,35 +331,40 @@ Returns t if the importation was succeeded."
 		    (setq date
 			  (mhc-input-day "Date: "
 					 current-date
-					 (gdate-guess-date)))
+					 (mhc-guess-date)))
 		    ;; input time
 		    (setq time
 			  (mhc-input-time "Time: "
-					  (mhc-schedule-time-as-string schedule)
-					  (gdate-guess-time
+					  (mhc-schedule-time-as-string
+					   schedule)
+					  (mhc-guess-time
 					   (mhc-minibuf-candidate-nth-begin))))
 		    ;; input subject
 		    (setq subject
-			  (mhc-input-subject "Subject: "
-					     (mhc-misc-sub
-					      (or (mhc-record-subject original)
-						  (mhc-header-narrowing
-						    (mhc-header-get-value "subject")))
-					      "^\\(Re:\\)? *\\(\\[[^\]]+\\]\\)? *"
-					      "")))
+			  (mhc-input-subject 
+			   "Subject: "
+			   (mhc-misc-sub
+			    (or (mhc-record-subject original)
+				(mhc-header-narrowing
+				  (mhc-header-get-value "subject")))
+			    "^\\(Re:\\)? *\\(\\[[^\]]+\\]\\)? *"
+			    "")))
 		    ;; input location
 		    (setq location
-			  (mhc-input-location "Location: "
-					      (mhc-schedule-location schedule)))
+			  (mhc-input-location 
+			   "Location: "
+			   (mhc-schedule-location schedule)))
 		    ;; input category
 		    (setq category
-			  (mhc-input-category "Category: "
-					      (mhc-schedule-categories-as-string schedule)))
+			  (mhc-input-category 
+			   "Category: "
+			   (mhc-schedule-categories-as-string schedule)))
 		    (mhc-header-narrowing
-		      (mhc-header-delete-header (concat "^\\("
-							(mhc-regexp-opt (mhc-header-list))
-							"\\)")
-						'regexp)))
+		      (mhc-header-delete-header 
+		       (concat "^\\("
+			       (mhc-regexp-opt (mhc-header-list))
+			       "\\)")
+		       'regexp)))
 		;; Answer was no.
 		(message "") ; flush minibuffer.
 		(and (interactive-p)
@@ -382,17 +389,21 @@ Returns t if the importation was succeeded."
 	  (goto-char (point-min))
 	  (insert "X-SC-Subject: " subject
 		  "\nX-SC-Location: " location
-		  "\nX-SC-Day: " (mapconcat
-				  (lambda (day)
-				    (mhc-date-format day "%04d%02d%02d" yy mm dd))
-				  date " ")
-		  "\nX-SC-Time: " (if time
-				      (let ((begin (car time))
-					    (end (nth 1 time)))
-					(concat (if begin (mhc-time-to-string begin) "")
-						(if end (concat "-" (mhc-time-to-string end)) "")))
-				    "")
-		  "\nX-SC-Category: " (mapconcat (function capitalize) category " ")
+		  "\nX-SC-Day: "
+		  (mapconcat
+		   (lambda (day)
+		     (mhc-date-format day "%04d%02d%02d" yy mm dd))
+		   date " ")
+		  "\nX-SC-Time: " 
+		  (if time
+		      (let ((begin (car time))
+			    (end (nth 1 time)))
+			(concat 
+			 (if begin (mhc-time-to-string begin) "")
+			 (if end (concat "-" (mhc-time-to-string end)) "")))
+		    "")
+		  "\nX-SC-Category: "
+		  (mapconcat (function capitalize) category " ")
 		  "\nX-SC-Cond: "
 		  "\nX-SC-Duration: "
 		  "\nX-SC-Alarm: "
@@ -418,16 +429,20 @@ Returns t if the importation was succeeded."
   (interactive)
   (if (not (and record (file-exists-p (mhc-record-name record))))
       (message "File does not exist (%s)." (mhc-record-name record))
-    (if (not (y-or-n-p (format "Do you delete %s ?" (mhc-record-subject-as-string record))))
+    (if (not (y-or-n-p (format "Do you delete %s ?"
+			       (mhc-record-subject-as-string record))))
 	(message "Never mind..")
       (if (and
 	   (mhc-record-occur-multiple-p record)
-	   (not (y-or-n-p (format
-			   "%s has multiple occurrences. Delete all(=y) or one(=n) ?"
-			   (mhc-record-subject-as-string record)))))
-	  (mhc-db-add-exception-rule record (or (mhc-current-date)
-						(and (eq major-mode 'mhc-calendar-mode)
-						     mhc-calendar-view-ddate)))
+	   (not (y-or-n-p 
+		 (format
+		  "%s has multiple occurrences. Delete all(=y) or one(=n) ?"
+		  (mhc-record-subject-as-string record)))))
+	  (mhc-db-add-exception-rule 
+	   record 
+	   (or (mhc-current-date)
+	       (and (eq major-mode 'mhc-calendar-mode)
+		    mhc-calendar-view-ddate)))
 	(mhc-db-delete-file record))
       (or (and (mhc-summary-buffer-p)
 	       (mhc-rescan-month mhc-default-hide-private-schedules))
@@ -453,7 +468,9 @@ Returns t if the importation was succeeded."
 	      (switch-to-buffer-other-window buffer))
 	  (mhc-window-push)
 	  (set-buffer (setq buffer (get-buffer-create name)))
-	  (mhc-insert-file-contents-as-coding-system mhc-default-coding-system file)
+	  (mhc-insert-file-contents-as-coding-system 
+	   mhc-default-coding-system
+	   file)
 	  (set-buffer-modified-p nil)
 	  (switch-to-buffer-other-window buffer)
 	  (mhc-draft-mode)
@@ -529,7 +546,8 @@ C-c ?    mhc-draft-insert-calendar
 
 (defun mhc-draft-finish ()
   (interactive)
-  (let ((record (mhc-parse-buffer (mhc-record-new mhc-draft-buffer-file-name))))
+  (let ((record 
+	 (mhc-parse-buffer (mhc-record-new mhc-draft-buffer-file-name))))
     (setq mhc-calendar-separator nil)
     (setq mhc-calendar-call-buffer nil)
     (mhc-header-delete-separator)
@@ -665,7 +683,8 @@ C-c ?    mhc-draft-insert-calendar
 (defun mhc-cal-make-rectangle (&optional date)
   (interactive)
   (let* ((today (mhc-date-now))
-	 (days (mhc-db-scan-month (mhc-date-yy (or date today)) (mhc-date-mm (or date today)) t))
+	 (days (mhc-db-scan-month (mhc-date-yy (or date today))
+				  (mhc-date-mm (or date today)) t))
 	 (month (list mhc-cal-week-header
 		      (mhc-date-format (or date today)
 				       "|    %s %04d"
@@ -680,8 +699,10 @@ C-c ?    mhc-draft-insert-calendar
       (setq color
 	    (cond
 	     ((= 0 (mhc-day-day-of-week (car days))) 'mhc-calendar-face-sunday)
-	     ((mhc-day-holiday (car days)) (mhc-face-category-to-face "Holiday"))
-	     ((= 6 (mhc-day-day-of-week (car days))) 'mhc-calendar-face-saturday)
+	     ((mhc-day-holiday (car days)) 
+	      (mhc-face-category-to-face "Holiday"))
+	     ((= 6 (mhc-day-day-of-week (car days))) 
+	      'mhc-calendar-face-saturday)
 	     (t 'default)))
       (and (= (mhc-date-dd today) (mhc-day-day-of-month (car days)))
 	   (= (mhc-date-mm today) (mhc-day-month (car days)))
@@ -810,8 +831,10 @@ C-c ?    mhc-draft-insert-calendar
 	      (cons (cons 'mhc-mode mhc-mode-map)
 		    minor-mode-map-alist)))
     (mhc-face-setup)
-    (put-text-property 2 4 'face 'mhc-calendar-face-sunday  mhc-cal-week-header)
-    (put-text-property 20 22 'face 'mhc-calendar-face-saturday mhc-cal-week-header)
+    (put-text-property 2 4 'face 'mhc-calendar-face-sunday  
+		       mhc-cal-week-header)
+    (put-text-property 20 22 'face 
+		       'mhc-calendar-face-saturday mhc-cal-week-header)
     (mhc-file-setup)
     (and (mhc-use-icon-p) (mhc-icon-setup))
     (and mhc-calendar-link-hnf (mhc-calendar-hnf-face-setup))
