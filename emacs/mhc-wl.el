@@ -14,6 +14,7 @@
 
 (require 'wl-summary)
 (require 'elmo-localdir)
+(require 'mhc-mime)
 
 
 ;; Setup function:
@@ -43,18 +44,21 @@
      (elmo-localdir-get-folder-directory
       (elmo-folder-get-spec fld)))))
 
+
 (defun mhc-wl-summary-display-article ()
   "Display the article on the current."
   (wl-summary-redisplay))
 
-(defun mhc-wl-get-import-buffer (get-original)
-  (save-excursion
-    (if get-original
-	(wl-summary-redisplay-no-mime)
-      (let (wl-highlight-x-face-func)
-	(wl-summary-redisplay-all-header)))
-    (wl-summary-jump-to-current-message)
-    (current-buffer)))
+
+(defun mhc-wl-mime-get-raw-buffer ()
+  (wl-summary-set-message-buffer-or-redisplay)
+  (wl-message-get-original-buffer))
+
+
+(defun mhc-wl-highlight-message (for-draft)
+  (let ((wl-highlight-x-face-func (unless for-draft wl-highlight-x-face-func)))
+    (wl-highlight-message (point-min) (point-max) t)))
+
 
 ;; mhc-tmp-schedule is already bound.
 (defun mhc-wl-insert-summary-contents (inserter)
@@ -133,13 +137,21 @@
     (widen)
     (delete-region (point-min) (point-max))))
 
+
 (provide 'mhc-wl)
 (put 'mhc-wl 'summary-filename 'mhc-wl-summary-filename)
 (put 'mhc-wl 'summary-display-article 'mhc-wl-summary-display-article)
-(put 'mhc-wl 'get-import-buffer 'mhc-wl-get-import-buffer)
 (put 'mhc-wl 'generate-summary-buffer 'mhc-wl-generate-summary-buffer)
 (put 'mhc-wl 'insert-summary-contents 'mhc-wl-insert-summary-contents)
 (put 'mhc-wl 'summary-mode-setup 'mhc-wl-summary-mode-setup)
+(put 'mhc-wl 'get-import-buffer 'mhc-mime-get-import-buffer)
+(put 'mhc-wl 'mime-get-raw-buffer 'mhc-wl-mime-get-raw-buffer)
+(put 'mhc-wl 'highlight-message 'mhc-wl-highlight-message)
+(put 'mhc-wl 'draft-setup-new 'mhc-mime-draft-setup-new)
+(put 'mhc-wl 'draft-reedit-buffer 'mhc-mime-draft-reedit-buffer)
+(put 'mhc-wl 'draft-reedit-file 'mhc-mime-draft-reedit-file)
+(put 'mhc-wl 'draft-translate 'mhc-mime-draft-translate)
+(put 'mhc-wl 'eword-decode-string 'mhc-mime-eword-decode-string)
 
 ;;; Copyright Notice:
 

@@ -29,6 +29,7 @@
 
 (require 'mhc-summary)
 (require 'mhc-file)
+(require 'mhc-draft)
 
 
 ;; Global Variable:
@@ -113,6 +114,7 @@
   (let ((modify (file-exists-p (mhc-record-name record))))
     (save-excursion
       (set-buffer buffer)
+      (mhc-draft-translate)
       (mhc-write-region-as-coding-system mhc-default-coding-system
 					 (point-min)
 					 (point-max)

@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1994/07/04
-;; Revised: $Date: 2000/07/24 03:46:33 $
+;; Revised: $Date: 2000/07/28 00:28:07 $
 
 ;;;
 ;;; Commentay:
@@ -37,6 +37,7 @@
 (require 'mhc-minibuf)
 (require 'mhc-face)
 (require 'mhc-calendar)
+(require 'mhc-draft)
 
 (cond
  ((eval-when-compile
@@ -305,6 +306,11 @@ If HIDE-PRIVATE, private schedules are suppressed."
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; import, edit, delete, modify
+(defun mhc/buffer-message-p ()
+  "Return non-nil if current buffer looks like message."
+  (mhc-header-narrowing
+    (goto-char (point-min))
+    (mhc-header-get-value "from")))
 
 (defun mhc-edit (&optional import-buffer)
   "Edit a new schedule.
@@ -323,7 +329,9 @@ Returns t if the importation was succeeded."
     (set-buffer draft-buffer)
     (if import-buffer
 	(progn
-	  (insert-buffer import-buffer)
+	  (insert-buffer (if (consp import-buffer)
+			     (cdr import-buffer)
+			   import-buffer))
 	  (mhc-header-narrowing
 	    (mhc-header-delete-header
 	     (concat "^\\("
@@ -337,7 +345,10 @@ Returns t if the importation was succeeded."
 	      (delete-other-windows)
 	      (if (y-or-n-p "Do you want to import this article? ")
 		  (let* ((original (save-excursion
-				     (set-buffer import-buffer)
+				     (set-buffer
+				      (if (consp import-buffer)
+					  (cdr import-buffer)
+					import-buffer))
 				     (mhc-parse-buffer)))
 			 (schedule (car (mhc-record-schedules original))))
 		    ;; input date
@@ -399,6 +410,20 @@ Returns t if the importation was succeeded."
     (if succeed
 	(progn
 	  (switch-to-buffer draft-buffer t)
+	  (set-buffer draft-buffer)
+	  (if (and import-buffer
+		   (mhc/buffer-message-p))
+	      (if (consp import-buffer)
+		  (mhc-draft-reedit-buffer (car import-buffer) 'original)
+		;; Delete candidate overlay if exists.
+		(if mhc-minibuf-candidate-overlay
+		    (delete-overlay mhc-minibuf-candidate-overlay))
+		;; Already imported to current buffer.
+		(mhc-draft-reedit-buffer (current-buffer)))
+	    ;; Delete candidate overlay if exists.
+	    (if mhc-minibuf-candidate-overlay
+		(delete-overlay mhc-minibuf-candidate-overlay))
+	    (mhc-draft-setup-new))
 	  (goto-char (point-min))
 	  (insert "X-SC-Subject: " subject
 		  "\nX-SC-Location: " location
@@ -421,9 +446,8 @@ Returns t if the importation was succeeded."
 		  "\nX-SC-Duration: "
 		  "\nX-SC-Alarm: "
 		  "\nX-SC-Record-Id: " (mhc-record-create-id) "\n")
-	  (unless import-buffer
-	    (goto-char (point-max))
-	    (insert "----\n"))
+	  (mhc-highlight-message 'for-draft)
+	  (goto-char (point-min))
 	  (mhc-draft-mode)
 	  succeed))))
 
@@ -480,97 +504,13 @@ Returns t if the importation was succeeded."
 	      (switch-to-buffer-other-window buffer))
 	  (mhc-window-push)
 	  (set-buffer (setq buffer (get-buffer-create name)))
-	  (mhc-insert-file-contents-as-coding-system 
-	   mhc-default-coding-system
-	   file)
+	  (mhc-draft-reedit-file file)
 	  (set-buffer-modified-p nil)
 	  (switch-to-buffer-other-window buffer)
+	  (mhc-highlight-message)
 	  (mhc-draft-mode)
 	  (set (make-local-variable 'mhc-draft-buffer-file-name) file)))
     (message "Specified file(%s) does not exist." file)))
-
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; draft
-;;
-
-(defconst mhc-draft-buffer-name "*mhc draft*")
-
-(defcustom mhc-draft-unuse-hdr-list
-  '(">From " "From " "Delivered-To:" "Errors-To:" "Lines:"
-    "Posted:" "Precedence:" "Received:" "Replied:" "Return-Path:"
-    "Sender:" "User-Agent:" "X-Dispatcher:" "X-Filter:"
-    "X-Gnus-Mail-Source:" "X-Mailer:" "X-Received:" "X-Sender:"
-    "X-Seqno:" "Xref:")
-  "*These headers are removed when article is imported."
-  :group 'mhc
-  :type '(repeat string))
-
-(defcustom mhc-draft-mode-hook nil
-  "*Hook run in mhc draft mode buffers."
-  :group 'mhc
-  :type 'hook)
-
-;; Avoid warning of byte-compiler.
-(defvar mhc-draft-buffer-file-name nil)
-
-(defvar mhc-draft-mode-map)
-
-(define-derived-mode mhc-draft-mode
-  text-mode
-  "MHC-Draft"
-  "Major mode for editing schdule files of MHC.
-Like Text Mode but with these additional commands:
-C-c C-c  mhc-draft-finish
-C-c C-k  mhc-draft-kill
-C-c C-q  mhc-draft-kill
-C-c ?    mhc-draft-insert-calendar
-.
-"
-  (define-key mhc-draft-mode-map "\C-c\C-c" 'mhc-draft-finish)
-  (define-key mhc-draft-mode-map "\C-c\C-q" 'mhc-draft-kill)
-  (define-key mhc-draft-mode-map "\C-c\C-k" 'mhc-draft-kill)
-  (define-key mhc-draft-mode-map "\C-c?" 'mhc-draft-insert-calendar)
-  (make-local-variable 'adaptive-fill-regexp)
-  (setq adaptive-fill-regexp
-	(concat "[ \t]*[-a-z0-9A-Z]*\\(>[ \t]*\\)+[ \t]*\\|"
-		adaptive-fill-regexp))
-  (unless (boundp 'adaptive-fill-first-line-regexp)
-    (setq adaptive-fill-first-line-regexp nil))
-  (make-local-variable 'adaptive-fill-first-line-regexp)
-  (setq adaptive-fill-first-line-regexp
-	(concat "[ \t]*[-a-z0-9A-Z]*\\(>[ \t]*\\)+[ \t]*\\|"
-		adaptive-fill-first-line-regexp))
-  (set (make-local-variable 'indent-tabs-mode) nil))
-
-(defun mhc-draft-kill (&optional no-confirm)
-  (interactive "P")
-  (if (or no-confirm (y-or-n-p "Kill draft buffer ?"))
-      (progn
-	(setq mhc-calendar-date-separator nil)
-	(setq mhc-calendar-call-buffer nil)
-	(kill-buffer (current-buffer))
-	(mhc-window-pop))))
-
-(defvar mhc-draft-finish-hook nil
-  "Hook run after mhc-draft-finish.")
-
-(defun mhc-draft-finish ()
-  (interactive)
-  (let ((record 
-	 (mhc-parse-buffer (mhc-record-new mhc-draft-buffer-file-name))))
-    (setq mhc-calendar-date-separator nil)
-    (setq mhc-calendar-call-buffer nil)
-    (mhc-header-delete-separator)
-    (if (mhc-db-add-record-from-buffer record (current-buffer))
-	(progn
-	  (kill-buffer (current-buffer))
-	  (mhc-window-pop)
-	  (or (and (mhc-summary-buffer-p)
-		   (mhc-rescan-month mhc-default-hide-private-schedules))
-	      (and (mhc-calendar-p) (mhc-calendar-rescan)))
-	  (run-hooks 'mhc-draft-finish-hook)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; input x-sc- schedule data from minibuffer.

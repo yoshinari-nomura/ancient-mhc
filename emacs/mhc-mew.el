@@ -178,6 +178,42 @@
      (ding t)
      (message "mhc-message-decode-header: %s" (or (cdr e) "some error!")))))
 
+
+(defun mhc-mew-draft-setup-new ()
+  (make-local-variable 'mail-header-separator)
+  (setq mail-header-separator mew-header-separator)
+  (goto-char (point-min))
+  (insert mail-header-separator "\n"))
+
+
+(defun mhc-mew-draft-reedit-buffer (buffer original)
+  ;; If current buffer is specified as buffer, no need to replace.
+  (unless (eq (current-buffer) buffer)
+    (erase-buffer)
+    (insert-buffer buffer))
+  (make-local-variable 'mail-header-separator)
+  (setq mail-header-separator mew-header-separator)
+  (goto-char (point-min))
+  (and (re-search-forward "^$" nil t)
+       (insert mail-header-separator)))
+
+
+(defun mhc-mew-draft-reedit-file (file)
+  (erase-buffer)
+  (mhc-insert-file-contents-as-coding-system mhc-default-coding-system file)
+  (make-local-variable 'mail-header-separator)
+  (setq mail-header-separator mew-header-separator)
+  (goto-char (point-min))
+  (and (re-search-forward "^$" nil t)
+       (insert mail-header-separator)))
+
+
+(defalias 'mhc-mew-draft-translate 'mhc-header-delete-separator)
+
+
+(defalias 'mhc-mew-eword-decode-string 'identity)
+
+
 ;; For Backward Compatibility
 (defalias 'mhc-misc-hdr-decode 'mhc-mew-decode-header)
 
@@ -191,6 +227,11 @@
 (put 'mhc-mew 'insert-summary-contents 'mhc-mew-insert-summary-contents)
 (put 'mhc-mew 'summary-search-date 'mhc-mew-summary-search-date)
 (put 'mhc-mew 'summary-mode-setup 'mhc-mew-summary-mode-setup)
+(put 'mhc-mew 'draft-setup-new 'mhc-mew-draft-setup-new)
+(put 'mhc-mew 'draft-reedit-buffer 'mhc-mew-draft-reedit-buffer)
+(put 'mhc-mew 'draft-reedit-file 'mhc-mew-draft-reedit-file)
+(put 'mhc-mew 'draft-translate 'mhc-mew-draft-translate)
+(put 'mhc-mew 'eword-decode-string 'mhc-mew-eword-decode-string)
 
 ;;; Copyright Notice:
 

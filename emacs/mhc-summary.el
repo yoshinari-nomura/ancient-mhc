@@ -43,6 +43,13 @@
 ;;         Setup buffer as summary of mailer.  This function will be
 ;;         called at the end of mhc-scan-month.
 ;;
+;;     (mhc-foo-highlight-message FOR-DRAFT)
+;;         Hilight message in the current buffer.
+;;         If FOR-DRAFT is non-nil, Hilight message as draft message."
+;;
+;;     (mhc-foo-eword-decode-string STRING)
+;;         Decode encoded STRING.
+;;
 ;; Define these methods appropriately, and put definitions as follows:
 ;;
 ;;    (provide 'mhc-foo)
@@ -52,6 +59,8 @@
 ;;    (put 'mhc-foo 'generate-summary-buffer 'mhc-foo-generate-summary-buffer)
 ;;    (put 'mhc-foo 'insert-summary-contents 'mhc-foo-insert-summary-contents)
 ;;    (put 'mhc-foo 'summary-mode-setup      'mhc-foo-summary-mode-setup)
+;;    (put 'mhc-foo 'highlight-message       'mhc-foo-highlight-message)
+;;    (put 'mhc-foo 'eword-decode-string     'mhc-foo-eword-decode-string)
 
 (require 'mhc-day)
 (require 'mhc-compat)
@@ -262,6 +271,21 @@ PROP-VALUE is the property value correspond to PROP-TYPE.
   "Return appropriate function to do OPERATION for MAILER."
   (or (get (require (or mailer (mhc-summary-mailer-type))) operation)
       'mhc-summary/true))
+
+(defsubst mhc-get-function  (operation)
+  "Return appropriate function to do OPERATION."
+  (or (get (require (intern (concat "mhc-" (symbol-name mhc-mailer-package))))
+	   operation)
+      'mhc-summary/true))
+
+(defsubst mhc-highlight-message (&optional for-draft)
+  "Hilight message in the current buffer.
+If optional argument FOR-DRAFT is non-nil, Hilight message as draft message."
+  (funcall (mhc-get-function 'highlight-message) for-draft))
+
+(defsubst mhc-eword-decode-string (string)
+  "Decode encoded STRING."
+  (funcall (mhc-get-function 'eword-decode-string) string))
 
 (defsubst mhc-summary-filename (&optional mailer)
   "Return file name of article on current line."

@@ -28,6 +28,7 @@
 (if (string-match "SEMI" gnus-version)
     (progn
       (require 'eword-encode)
+      (require 'mhc-mime)
       (defalias 'mhc-gnus-encode-string 'eword-encode-string))
   (defun mhc-gnus-encode-string (string)
     "Alternative function of `eword-encode-string' for pure Gnus."
@@ -66,6 +67,11 @@
 (defun mhc-gnus-get-import-buffer (get-original)
   (gnus-summary-select-article)
   (gnus-copy-article-buffer))
+
+
+(defun mhc-gnus-mime-get-raw-buffer ()
+  (gnus-summary-select-article)
+  gnus-original-article-buffer)
 
 
 (defsubst mhc-gnus/date-to-group-name (date)
@@ -128,6 +134,11 @@
 	gnus-newsgroup-end (length nnmhc-article-list)))
 
 
+(defun mhc-gnus-highlight-message (for-draft)
+  (let ((gnus-article-buffer (current-buffer)))
+    (gnus-article-highlight)))
+
+
 ;; modify Gnus original functions for cursor control.
 (eval-after-load "gnus"
   '(defadvice gnus-summary-position-point
@@ -166,6 +177,16 @@
 (put 'mhc-gnus 'insert-summary-contents 'mhc-gnus-insert-summary-contents)
 (put 'mhc-gnus 'summary-search-date 'mhc-gnus-summary-search-date)
 (put 'mhc-gnus 'summary-mode-setup 'mhc-gnus-summary-mode-setup)
+(put 'mhc-gnus 'highlight-message 'mhc-gnus-highlight-message)
+
+(when (featurep 'mhc-mime)
+  (put 'mhc-gnus 'draft-setup-new 'mhc-mime-draft-setup-new)
+  (put 'mhc-gnus 'draft-reedit-buffer 'mhc-mime-draft-reedit-buffer)
+  (put 'mhc-gnus 'draft-reedit-file 'mhc-mime-draft-reedit-file)
+  (put 'mhc-gnus 'get-import-buffer 'mhc-mime-get-import-buffer)
+  (put 'mhc-gnus 'mime-get-raw-buffer 'mhc-gnus-mime-get-raw-buffer)
+  (put 'mhc-gnus 'draft-translate 'mhc-mime-draft-translate)
+  (put 'mhc-gnus 'eword-decode-string 'mhc-mime-eword-decode-string))
 
 ;;; Copyright Notice:
 

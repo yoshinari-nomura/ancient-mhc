@@ -3,7 +3,7 @@
 ;; Author:  TSUCHIYA Masatoshi <tsuchiya@pine.kuee.kyoto-u.ac.jp>,
 ;;          Yuuichi Teranishi <teranisi@quickhack.net>
 ;; Created: 2000/06/13
-;; Revised: $Date: 2000/06/22 09:42:41 $
+;; Revised: $Date: 2000/07/28 00:28:06 $
 
 ;;; Commentary:
 
@@ -71,11 +71,14 @@
     ("mhc-summary"  . t)
     ("mhc-sync"     . t)
     ("mhc-vars"     . t)
+    ("mhc-draft"    . t)
     ("mhc-bm"       . (locate-library "bitmap"))
     ("mhc-xmas"     . (featurep 'xemacs))
     ("mhc-mew"      . (and (locate-library "mew") make-mhc/with-mew))
     ("mhc-wl"       . (and (locate-library "wl") make-mhc/with-wl))
     ("mhc-gnus"     . (and (locate-library "gnus") make-mhc/with-gnus))
+    ("mhc-mime"     . (or (and (locate-library "gnus") make-mhc/with-gnus)
+			  (and (locate-library "wl") make-mhc/with-wl)))
     ("nnmhc"        . (and (locate-library "gnus") make-mhc/with-gnus))
     ))
 

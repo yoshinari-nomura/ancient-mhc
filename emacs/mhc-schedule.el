@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>,
 ;;          TSUCHIYA Masatoshi <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 ;; Created: 1997/10/12
-;; Revised: $Date: 2000/06/07 01:03:25 $
+;; Revised: $Date: 2000/07/28 00:28:06 $
 
 
 ;;; Commentary:
@@ -51,9 +51,11 @@
 (defsubst mhc-schedule-condition (schedule)
   (if schedule (aref schedule 1)))
 (defsubst mhc-schedule-subject (schedule)
-  (if schedule (aref schedule 2)))
+  (if (and schedule (aref schedule 2))
+      (mhc-eword-decode-string (aref schedule 2))))
 (defsubst mhc-schedule-location (schedule)
-  (if schedule (aref schedule 3)))
+  (if (and schedule (aref schedule 3))
+      (mhc-eword-decode-string (aref schedule 3))))
 (defsubst mhc-schedule-time (schedule)
   (if schedule (aref schedule 4)))
 (defsubst mhc-schedule-alarm (schedule)

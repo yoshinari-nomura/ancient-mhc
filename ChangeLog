@@ -1,3 +1,46 @@
+2000-07-28  Yuuichi Teranishi  <teranisi@quickhack.net>
+
+	* emacs/mhc.el (toplevel): Require 'mhc-draft.
+	Removed draft related functions (Moved to mhc-draft.el).
+	(mhc-edit): Changed for new draft.
+	Delete candidate overlay if it exists in the draft buffer.
+	(mhc-modify-file): Ditto.
+
+	* emacs/mhc-summary.el (mhc-summary-get-function): New defsubst.
+	(mhc-get-function): Ditto.
+	(mhc-eword-decode-string): Ditto.
+
+	* emacs/mhc-schedule.el (mhc-schedule-subject):
+	Call `mhc-eword-decode-string'.
+	(mhc-schedule-location): Ditto.
+
+	* emacs/mhc-record.el (toplevel): Require 'mhc-draft.
+	(mhc-record-write-buffer): Call `mhc-draft-translate'.
+
+	* emacs/mhc-mew.el (mhc-mew-draft-setup-new): New function.
+	(mhc-mew-draft-reedit-buffer): Ditto.
+	(mhc-mew-draft-reedit-file): Ditto.
+	(mhc-mew-draft-translate): New alias.
+	(mhc-mew-eword-decode-string): Ditto.
+	(toplevel): Record new backend functions.
+
+	* emacs/mhc-gnus.el (toplevel): require 'mhc-mime.
+	Record new backend functions.
+	(mhc-gnus-mime-get-raw-buffer): New function.
+	(mhc-gnus-highlight-message): Ditto.
+
+	* emacs/mhc-wl.el (toplevel): Require 'mhc-mime.
+	Record new backend functions.
+	(mhc-wl-mime-get-raw-buffer): New function.
+	(mhc-wl-highlight-message): Ditto.
+	(mhc-wl-get-import-buffer): Removed.
+
+	* emacs/MHC-MK (make-mhc/module-alist): Added mhc-draft and mhc-mime.
+
+	* emacs/mhc-draft.el: New file.
+
+	* emacs/mhc-mime.el: Ditto.
+
 2000-07-27  Yuuichi Teranishi  <teranisi@quickhack.net>
 
 	* emacs/mhc-summary.el (mhc-summary-line-format-alist): Changed
@@ -5,7 +48,7 @@
 	(mhc-summary-line-inserter-setup): Setup icon too.
 
 	* emacs/mhc-bm.el (mhc-bm-icon-alist): Added example of `Conflict'.
-	* emacs/mhc-bm.el (mhc-icon-exists-p): New function.
+	(mhc-icon-exists-p): New function.
 
 	* emacs/mhc-xmas.el: Likewise.
 
