@@ -4,7 +4,7 @@
 	* emacs/mhc.el (mhc-edit): Change interface to mhc-calender.el
 	(mhc-delete-file): Ditto.
 	(mhc-draft-finish): Ditto.
-	* emacs/mhc-minibuf.el (mhc-date-new-from-string3): Fix typo.
+	* emacs/mhc-date.el (mhc-date-new-from-string3): Fix typo.
 	* emacs/ddate.el: Remove file.
 
 2000-06-20  Yoshinari Nomura  <nom@quickhack.net>

@@ -4,7 +4,7 @@
 ;;          TSUCHIYA Masatoshi <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 ;;
 ;; Created: 2000/06/14
-;; Revised: $Date: 2000/06/20 06:50:01 $
+;; Revised: $Date: 2000/06/21 02:20:40 $
 
 ;;;
 ;;; Commentary:
@@ -349,16 +349,16 @@
       (let ((dd  (mhc-date/substring-to-int string 1))
 	    (mm  nil)
  	    (mon (substring string (match-beginning 2) (match-end 2)))
- 	    (yy  (mhc-date-substring-to-int string 3))
+ 	    (yy  (mhc-date/substring-to-int string 3))
  	    (MM  (+ (* 60 (mhc-date/substring-to-int string 4))
  		    (mhc-date/substring-to-int string 5)))
  	    (tz  (substring string (match-beginning 8) (match-end 8)))
  	    tz-offset)
  	(setq
  	 yy (cond
-	     ((< year 50)  (+ year 2000))
-	     ((< year 100) (+ year 1900))
-	     (t            year))
+	     ((< yy 50)  (+ yy 2000))
+	     ((< yy 100) (+ yy 1900))
+	     (t            yy))
  	 mm (1+ (/ (string-match mon
 				 "JanFebMarAprMayJunJulAugSepOctNovDec") 3))
  	 tz-offset (mhc-date/string-to-timezone-offset tz)
