@@ -3,7 +3,7 @@
 ## Author:  Yoshinari Nomura <nom@quickhack.net>
 ##
 ## Created: 1999/07/16
-## Revised: $Date: 2000/06/26 07:34:32 $
+## Revised: $Date: 2000/07/18 12:22:54 $
 ##
 
 ################################################################
@@ -717,19 +717,24 @@ class MhcScheduleItem
       end
       ret << mk_palm_skel .set_weekly(beg, fin, 1, weeks)
 
-    elsif cond_ord .length == 1  &&
-	  cond_ord[0] != '5th'   &&
-	  cond_wek .length == 1  &&
-	  cond_num .length == 0  && 
-	  cond_mon .length == 0
+    elsif  cond_ord .length >= 1  &&
+	  !cond_ord .include?('5th') &&
+	   cond_wek .length >= 1  &&
+	   cond_num .length == 0  && 
+	   cond_mon .length == 0
       ## monthly by day
-      ord = MhcDate::O_LABEL .index(cond_ord[0])
-      wek = MhcDate::W_LABEL .index(cond_wek[0])
-      while !occur_on?(beg) ## xxx 多分これは不要
-	beg .succ!
-      end
-      ret << mk_palm_skel .set_monthly_by_day(beg, fin, 1, ord, wek)
-
+      cond_ord .each{|ord_str|
+	cond_wek .each{|wek_str|
+	  ord = MhcDate::O_LABEL .index(ord_str)
+	  wek = MhcDate::W_LABEL .index(wek_str)
+	  sch2 = MhcScheduleItem .new .add_cond(ord_str) .add_cond(wek_str)
+	  beg2 = beg .dup
+	  while !sch2 .occur_on?(beg2) ## xxx 多分これは不要?
+	    beg2 .succ!
+	  end
+	  ret << mk_palm_skel .set_monthly_by_day(beg2, fin, 1, ord, wek)
+	}
+      }
     elsif cond_num .length == 1 &&
 	  cond_num .length == cond .length
       ## monthly by date
@@ -779,7 +784,7 @@ class MhcScheduleItem
     end
 
     if ret .empty?
-      STDERR .print "#{occur_min .to_js} : #{subject} unsupported. ignored..\n"
+      # STDERR .print "#{occur_min .to_js} : #{subject} unsupported. ignored..\n"
       return nil
     else
       return ret
