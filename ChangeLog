@@ -1,3 +1,7 @@
+2001-01-22  OHARA Shigeki <os@iij.ad.jp>
+
+	* mhc-make.rb: Fixed $? bug.
+
 2001-01-22  Yoshinari Nomura  <nom@quickhack.net>
 
 	* mhc-make.rb, ruby-ext/lib/mhc-date.rb, ruby-ext/lib/mhc-palm.rb,
