@@ -6,7 +6,7 @@
 ## Author:  Yoshinari Nomura <nom@quickhack.net>
 ##
 ## Created: 2000/04/26
-## Revised: $Date: 2000/10/30 07:05:36 $
+## Revised: $Date: 2000/10/30 16:43:25 $
 ##
 
 ## mhc-sync [-n] [-x exchange_id] [-r local_dir] [user@]remote.host[:dir]
@@ -77,9 +77,9 @@ class MhcScheduleDB
       header = file .gets("\n\n")
       file .close
       if header =~ /^X-SC-Record-Id:\s*(\S+)/i
-	@record_id_to_path_hash[$2] = filename
+	@record_id_to_path_hash[$1] = filename
+	STDERR .print "#{filename} -> #{$1}\n" if $DEBUG
       end
-      STDERR .print "#{filename} -> #{$2}\n" if $DEBUG
 
     }
     return self
