@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@mew.org>
 ;;
 ;; Created: 1994/07/04
-;; Revised: $Date: 2000/06/05 15:53:49 $
+;; Revised: $Date: 2000/06/06 04:12:36 $
 
 ;;;
 ;;; Commentay:
@@ -259,16 +259,18 @@
 (defvar mhc-face-week-color-paint-thick nil)
 (defvar mhc-header-string-mew  "0 | ")
 
-(if (and (boundp 'gnus-version) (string-match "SEMI" gnus-version))
-    (progn
-      (require 'eword-encode)
-      (defalias 'mhc-eword-encode-string 'eword-encode-string))
-  (defun mhc-eword-encode-string (string)
-    "Alternative function of `eword-encode-string' for pure Gnus."
-    (with-temp-buffer
-      (insert string)
-      (rfc2047-encode-region (point-min) (point-max))
-      (buffer-substring (point-min) (point-max)))))
+(eval-after-load "gnus"
+  '(progn
+     (if (string-match "SEMI" gnus-version)
+	 (progn
+	   (require 'eword-encode)
+	   (defalias 'mhc-eword-encode-string 'eword-encode-string))
+       (defun mhc-eword-encode-string (string)
+	 "Alternative function of `eword-encode-string' for pure Gnus."
+	 (with-temp-buffer
+	   (insert string)
+	   (rfc2047-encode-region (point-min) (point-max))
+	   (buffer-substring (point-min) (point-max)))))))
 
 (defun mhc-sch-scan1 (sch type &optional date conf secret first)
   (let ((subject  (mhc-sch-subject sch))
