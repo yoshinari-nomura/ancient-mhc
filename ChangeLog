@@ -1,3 +1,8 @@
+2002-01-16  Hideyuki SHIRAI  <shirai@quickhack.net>
+
+	* emacs/mhc-mew.el (mhc-mew-get-import-buffer): Support Mew 3.0 or
+	later.
+
 2002-01-11  Yuuichi Teranishi  <teranisi@gohome.org>
 
 	* emacs/mhc-wl.el (mhc-wl-summary-exit): Call

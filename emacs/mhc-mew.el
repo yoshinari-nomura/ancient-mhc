@@ -70,7 +70,10 @@
 
 
 (defun mhc-mew-get-import-buffer (get-original)
-  (if get-original (mew-summary-display-asis t))
+  (if get-original
+      (condition-case nil
+	  (mew-summary-display-asis t)
+	(error (mew-summary-display-asis))))
   (save-window-excursion
     (if (eq (cdr (assq major-mode mhc-mew/summary-message-alist))
 	    (progn (other-window 1) major-mode))
