@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1994/07/04
-;; Revised: $Date: 2000/05/31 00:46:50 $
+;; Revised: $Date: 2000/05/31 08:44:13 $
 
 ;;;
 ;;; Commentay:
@@ -536,6 +536,7 @@
 	(wl-summary-buffer-set-folder (mhc-wl-ddate-to-folder ddate))
 	(make-local-variable 'wl-summary-highlight)
 	(setq wl-summary-highlight nil)
+	(make-local-variable 'wl-summary-buffer-name)
 	(setq wl-summary-buffer-name (buffer-name))
 	(setq wl-summary-buffer-number-regexp "[0-9]+")
 	(setq wl-summary-buffer-msgdb '(nil)))
