@@ -3,7 +3,7 @@
 ## Author:  MIYOSHI Masanori <miyoshi@quickhack.net>
 ##          Yoshinari Nomura <nom@quickhack.net>
 ## Created: 2000/7/12
-## Revised: $Date: 2000/07/14 05:29:52 $
+## Revised: $Date: 2000/07/14 07:26:45 $
 
 require 'rbconfig'
 require 'mkmf'
@@ -118,25 +118,25 @@ class MhcConfigTable
   # ['--kcode', '@@MHC_KCODE@@', GetoptLong::OPTIONAL_ARGUMENT, usage, default]
 
   DEFAULT_CONFIG_TABLE = [
-    ['--kcode', '@@MHC_KCODE@@', GetoptLong::OPTIONAL_ARGUMENT,
+    ['--kcode', '@@MHC_KCODE@@', GetoptLong::REQUIRED_ARGUMENT,
       "--kcode=FILE            kanji code (EUC, JIS, SJIS)",
       (/cygwin|mingw32|os2_emx|sharp-human/ =~ RUBY_PLATFORM) ? 'SJIS' : 'EUC'
     ],
 
-    ['--bindir', '@@MHC_BINDIR@@', GetoptLong::OPTIONAL_ARGUMENT,
+    ['--bindir', '@@MHC_BINDIR@@', GetoptLong::REQUIRED_ARGUMENT,
       "--bindir=DIR            user executables in DIR",
       CONFIG["bindir"]],
 
-    ['--libdir', '@MHC_LIBDIR@@', GetoptLong::OPTIONAL_ARGUMENT,
+    ['--libdir', '@@MHC_LIBDIR@@', GetoptLong::REQUIRED_ARGUMENT,
       "--libdir=DIR            script libraries in DIR",
       File::join(CONFIG["libdir"], "ruby",
 		 CONFIG["MAJOR"] + "." + CONFIG["MINOR"])],
 
-    ['--with-ruby', '@@MHC_RUBY_PATH@@', GetoptLong::OPTIONAL_ARGUMENT, 
+    ['--with-ruby', '@@MHC_RUBY_PATH@@', GetoptLong::REQUIRED_ARGUMENT, 
       "--with-ruby=PATH        absolute path of ruby executable",
       nil],
 
-    ['--with-emacs', '@@MHC_EMACS_PATH@@', GetoptLong::OPTIONAL_ARGUMENT, 
+    ['--with-emacs', '@@MHC_EMACS_PATH@@', GetoptLong::REQUIRED_ARGUMENT, 
       "--with-emacs=PATH       absolute path of emacs/xemacs executable",
       nil],
 

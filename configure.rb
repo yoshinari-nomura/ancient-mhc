@@ -4,7 +4,7 @@
 ## Author:  MIYOSHI Masanori <miyoshi@quickhack.net>
 ##          Yoshinari Nomura <nom@quickhack.net>
 ## Created: 2000/7/12
-## Revised: $Date: 2000/07/14 05:29:52 $
+## Revised: $Date: 2000/07/14 07:26:44 $
 
 $LOAD_PATH .unshift('.')
 require 'mhc-make'
@@ -13,17 +13,17 @@ require 'mhc-make'
 
 local_config_table = [
   ['--pilot-link-lib', '@@MHC_PILOT_LINK_LIB@@',
-    GetoptLong::OPTIONAL_ARGUMENT,
+    GetoptLong::REQUIRED_ARGUMENT,
     "--pilot-link-lib=DIR    pilot-link lib in DIR",
     nil],
 
   ['--pilot-link-inc', '@@MHC_PILOT_LINK_INC@@',
-    GetoptLong::OPTIONAL_ARGUMENT,
+    GetoptLong::REQUIRED_ARGUMENT,
     "--pilot-link-inc=DIR    pilot-link header in DIR",
     nil],
 
   ['--disable-palm', '@@MHC_DISABLE_PALM@@',
-    GetoptLong::OPTIONAL_ARGUMENT,
+    GetoptLong::NO_ARGUMENT,
     "--disable-palm          do not require pilot-link",
     '0']
 ]
