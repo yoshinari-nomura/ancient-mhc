@@ -134,6 +134,7 @@
 
 (defun mhc-wl-summary-exit ()
   (let ((buffer mhc-wl-exit-buffer))
+    (wl-summary-toggle-disp-msg 'off)
     (kill-buffer (current-buffer))
     (when (and buffer
 	       (buffer-live-p buffer))
@@ -144,7 +145,6 @@
       (if (eq (with-current-buffer buffer major-mode)
 	      'wl-folder-mode)
 	  (delete-other-windows)))))
-
 
 (defun mhc-wl-summary-next-message (num direction hereto)
   (if (eq direction 'up)
