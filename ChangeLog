@@ -1,3 +1,11 @@
+2000-07-11  MIYOSHI Masanori  <miyoshi@ask.ne.jp>
+
+	* 00readme.w32.jis: Update info of the ruby binary release.
+	Remove pilot-link.0.9.3.cygwin1.1.diff from the file.
+
+	* ruby-ext/lib/mhc-kconv.rb: Assume default kanji code sjis when
+	the platform matches cygwin, mingw32, os2_emx or sharp-human.
+
 2000-07-10  Toshihiko SHIMOKAWA  <toshi@tea.forus.or.jp>
 
 	* today : Change help message of --format.

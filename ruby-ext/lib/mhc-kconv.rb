@@ -7,7 +7,9 @@
 require 'kconv'
 
 module MhcKconv
-  DISP_CODE = (RUBY_PLATFORM =~ 'cygwin') ? Kconv::SJIS : Kconv::EUC
+  SJIS_HOST_REGEXP = /cygwin|mingw32|os2_emx|sharp-human/
+  DISP_CODE = if SJIS_HOST_REGEXP =~ RUBY_PLATFORM
+		Kconv::SJIS else Kconv::EUC end
   def todisp(string)
     Kconv::kconv(string, DISP_CODE, Kconv::AUTO)
   end
