@@ -1,5 +1,7 @@
 2003-10-10  Yoshinari Nomura  <nom@quickhack.net>
 
+	* emacs/mhc-vars.el (mhc-version): add version string.
+
 	* emacs/mhc-guess.el, emacs/mhc-minibuf.el:
 	Experimental implementation of guess-location.
 
