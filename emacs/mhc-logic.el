@@ -474,17 +474,22 @@
 	  (setq sexp (cdr sexp)))))))
 
 
+; (defun mhc-logic-occur-multiple-p (logicinfo)
+;   "If LOGICINFO occurs multiple times, return t."
+;   (let (duration-begin duration-end day-list month-list require-duration)
+;     (mhc-logic/check-sexp-range-internal (mhc-logic/intermediate logicinfo))
+;     (if (or duration-begin
+; 	    duration-end
+; 	    month-list
+; 	    (> (length day-list) 1))
+; 	t)))
+
+;; rough (but safety) check  -- nom
 (defun mhc-logic-occur-multiple-p (logicinfo)
   "If LOGICINFO occurs multiple times, return t."
-  (let (duration-begin duration-end day-list month-list require-duration)
-    (mhc-logic/check-sexp-range-internal (mhc-logic/intermediate logicinfo))
-    (if (or duration-begin
-	    duration-end
-	    month-list
-	    (> (length day-list) 1))
-	t)))
-
-
+  (if (or (mhc-logic/and logicinfo)
+	  (> (length (mhc-logic/day logicinfo)) 1))
+      t))
 
 (provide 'mhc-logic)
 
