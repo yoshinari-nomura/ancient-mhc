@@ -2,7 +2,7 @@
 
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;; Created: 2000/07/18
-;; Revised: $Date: 2000/08/07 02:06:11 $
+;; Revised: $Date: 2000/08/07 02:13:17 $
 
 ;; (autoload 'mhc-cmail-setup "mhc-cmail")
 ;; (add-hook 'cmail-startup-hook 'mhc-cmail-setup)
@@ -146,6 +146,8 @@
        (buffer-substring (match-beginning 1) (match-end 1))))
      (no-err
       nil)
+     ((and (boundp 'mhc-mode) mhc-mode)
+      "/dev/null")
      (t
       (cmail-error-resource 'get-page-number-from-summary)))))
 
