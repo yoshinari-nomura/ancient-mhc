@@ -3,7 +3,7 @@
 ## Author:  Yoshinari Nomura <nom@quickhack.net>
 ##
 ## Created: 1999/09/01
-## Revised: $Date: 2002/10/28 05:49:41 $
+## Revised: $Date: 2003/10/29 12:48:13 $
 ##
 
 require 'mhc-date'
@@ -189,7 +189,7 @@ class PilotRecord
     attr_str << 'Busy'     if (@attr & 0x20 != 0)
     attr_str << 'Secret'   if (@attr & 0x10 != 0)
     attr_str << 'Archived' if (@attr & 0x08 != 0)
-    return attr_str .join (' ')
+    return attr_str .join(' ')
   end
 
   attr :category

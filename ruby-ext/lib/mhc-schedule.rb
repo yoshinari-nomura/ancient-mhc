@@ -3,7 +3,7 @@
 ## Author:  Yoshinari Nomura <nom@quickhack.net>
 ##
 ## Created: 1999/07/16
-## Revised: $Date: 2002/10/28 05:52:08 $
+## Revised: $Date: 2003/10/29 12:48:13 $
 ##
 
 ################################################################
@@ -916,7 +916,7 @@ class MhcScheduleItem
 
   def init_by_string(string)
     clear
-    all_headers, @description  = string .split("\n\n", 2)
+    all_headers, @description  = string .split(/\n\n/, 2)
     @description = nil if @description == '' 
     @non_xsc_header, xsc_header_hash = select_headers(all_headers)
     parse_xsc_headers(xsc_header_hash)

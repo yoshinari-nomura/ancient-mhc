@@ -1,3 +1,16 @@
+2003-10-29  MIYOSHI Masanori  <miyoshi@boreas.dti.ne.jp>
+
+	* ruby-ext/lib/mhc-schedule.rb (MhcScheduleItem::init_by_string):
+	Pass a regex as the first argment instead of a string.
+
+	* ruby-ext/lib/mhc-palm.rb (PilotRecord::attribute_string): Remove
+	a redundant space between method and a open brace.
+
+	* mhc2ol.in (Period::get_duration): Use `nil?' for ruby-1.8.
+	(Exporter::setup_ol_appointments): Don't use `$=' for ruby-1.8.
+	(Exporter::export):  Don't use `=~' for ruby-1.8.
+	($flag_category_regexp): Initialize with a Regexp object.
+
 2003-10-14  Hiroya Murata <lapis-lazuli@pop06.odn.ne.jp> / nom
 
 	* emacs/mhc-wl.el (mhc-wl-summary-mode-setup): Bind

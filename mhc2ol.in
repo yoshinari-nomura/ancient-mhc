@@ -8,7 +8,7 @@
 ##          
 ##
 ## Created: 2001/09/15
-## Revised: $Date: 2003/07/28 13:47:55 $
+## Revised: $Date: 2003/10/29 12:48:14 $
 ##
 
 $DEBUG = false
@@ -54,10 +54,10 @@ module RepeatPattern
     end
 
     def get_duration()
-      if @edate != nil && @sdate != nil
-	(@edate - @sdate + 1) * 60 * 24 # min
-      else
+      if @edate .nil? || @sdate .nil?
 	60 * 24
+      else
+	(@edate - @sdate + 1) * 60 * 24 # min
       end
     end
 
@@ -471,9 +471,7 @@ class Exporter
       period .handle_recurrence(appoint)
 
       # contents of appointment
-      old_sp = $=
-      $= = true
-      cats = sch .category_as_string() .split(' ')
+      cats = sch .category_as_string() .downcase .split(' ')
       todo_p = true if cats .delete('todo')
       done_p = true if cats .delete('done')
       appoint .Sensitivity = OlConst::OlPrivate if cats .include?('private')
@@ -482,7 +480,6 @@ class Exporter
 	cat_string = @@mhc_category_name + "," + cat_string
       end
       appoint .Categories = cat_string
-      $= = old_sp
       appoint .Body = MhcKconv::todisp(sch .dump())
       appoint .Save() if !$flag_separation  || !todo_p
 
@@ -612,7 +609,7 @@ class Exporter
     @sync_infos = []
     sch_count, sent = 0, 0
     @mhc_db .each_sch(from, to) {|sch|
-      next unless sch .category_as_string() =~ @category_regexp
+      next unless @category_regexp .match(sch .category_as_string())
       sch_count += 1
       print "adding ", MhcKconv::todisp(sch .subject), "\n" if @@flag_verbose
   
@@ -749,7 +746,7 @@ $flag_verbose = false
 $flag_noharm, $flag_append, $flag_install = false, false, false
 $flag_from, $flag_to = nil, nil
 $flag_timestamp = nil
-$flag_category_regexp = ""
+$flag_category_regexp = Regexp .new("")
 $flag_dir = File .expand_path("~/Mail/schedule")
 $flag_separation = false
 $flag_discreet = false
@@ -772,7 +769,7 @@ while ARGV .length > 0
     $flag_dir = ARGV[0]
   when '-c'
     ARGV .shift
-    $flag_category_regexp = ARGV[0]
+    $flag_category_regexp = Regexp .new(ARGV[0], true);
   when /^(\d{8})-(\d{8})$/
     $flag_from, $flag_to = MhcDate .new($1), MhcDate .new($2)
   when '-N'
