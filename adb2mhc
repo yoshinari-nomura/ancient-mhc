@@ -5,7 +5,7 @@
 ## Author:  Yoshinari Nomura <nom@quickhack.net>
 ##
 ## Created: 1999/11/12
-## Revised: $Date: 2000/05/29 14:59:24 $
+## Revised: $Date: 2000/06/21 08:46:05 $
 ##
 
 require 'mhc-date'
@@ -156,14 +156,22 @@ class Appt
       STDERR .print "Warn: Todo records are not supported... ignored.\n"
       return nil
     end
-    if @repeat_freqency && @repeat_freqency > 1
+    if (@repeat_status && @repeat_status != 'daily') and
+	(@repeat_freqency && @repeat_freqency > 1)
       STDERR .print "Warn: Records such as freqency > 1  are not supported... ignored.\n"
       return nil
     end
+
+    if @description =~ /\|/
+      STDERR .print "Warn: Cron job is not supported... ignored.\n"
+      return nil
+    end
+
     ## X-SC-Subject:   @description
     ## X-SC-Category:  @category
     ## X-SC-Location:  @location
-    ## X-SC-Day:       !@repeat_delete_date  + @start_date if @repeat_status = 'none'
+    ## X-SC-Day:       !@repeat_delete_date  +
+    ##                 @start_date if @repeat_status = 'none'
     ## X-SC-Time:      @appt_start_time - @appt_end_time or ''
     ## X-SC-Cond:      @repeat_month @repeat_week @repeat_day
     ## X-SC-Duration:  @repeat_start_date - @repeat_end_date or '' 
@@ -171,9 +179,20 @@ class Appt
     x_sc_subject  = Kconv::tojis(@description)
     x_sc_category = Kconv::tojis(@category)
     x_sc_alarm    = @appt_lead_time ? @appt_lead_time .to_s + ' minute' : ''
-    x_sc_day      = @repeat_delete_dates ? @repeat_delete_dates .collect{|date| '!' + date .to_s} .join(' ') : ''
-    x_sc_day     += ' ' + @start_date .to_s if @repeat_status == 'none'
     x_sc_time     = @appt_start_time ? [@appt_start_time, @appt_end_time] .join('-') : ''
+
+    x_sc_day = ''
+    if @repeat_status == 'daily' && @repeat_freqency
+      i = @repeat_start_date
+      while (i <= @repeat_end_date)
+	x_sc_day += "#{i} "
+	i = i .succ(@repeat_freqency)
+      end
+    elsif @repeat_status == 'none'
+      x_sc_day  = @start_date .to_s
+    end
+
+    x_sc_day     += ' ' + (@repeat_delete_dates ? @repeat_delete_dates .collect{|date| '!' + date .to_s} .join(' ') : '')
     x_sc_cond     = ((@repeat_month || []) + (@repeat_week || []) + (@repeat_day || [])) .join(' ')
     x_sc_duration = (@repeat_start_date || @repeat_end_date) ? "#{@repeat_start_date}-#{@repeat_end_date}" : ''
 
