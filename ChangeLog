@@ -1,3 +1,8 @@
+2000-10-04  Yoshinari Nomura  <nom@quickhack.net>
+
+	* emacs/mhc-summary.el (mhc-summary-make-contents):
+	add treats in case category-predicate nil.
+
 2000-10-04  Toshihiko SHIMOKAWA  <toshi@tea.forus.or.jp>
 
 	* emacs/00usage.jis: Untabified. Move some descriptions to
