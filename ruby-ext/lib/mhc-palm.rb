@@ -3,7 +3,7 @@
 ## Author:  Yoshinari Nomura <nom@quickhack.net>
 ##
 ## Created: 1999/09/01
-## Revised: $Date: 2001/09/12 03:44:56 $
+## Revised: $Date: 2002/10/28 05:49:41 $
 ##
 
 require 'mhc-date'
@@ -127,6 +127,10 @@ class PilotDB
   def reset_sync_flags
     PiLib .dlp_ResetSyncFlags(@sd, @db)
     return self
+  end
+
+  def get_app_info()
+    return PiLib .dlp_ReadAppBlock(@sd, @db)
   end
 end
 
@@ -779,7 +783,7 @@ class PilotAddressDB < PilotDB
     ## @phoneLabels[0..7] = 
     ##      [会社, 自宅, Fax, その他, E-mail, 代表, ポケベル, 携帯]
 
-    @recClass = PilotAddRec
+    @recClass = PilotAddRecord
   end
 end
 
