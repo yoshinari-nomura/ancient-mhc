@@ -1,3 +1,11 @@
+2000-06-14  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+
+	* emacs/mhc-calendar.el (mhc-calendar): Added autoload magic.
+
+	* emacs/MHC-MK (make-mhc/configure): Don't set make-mhc/lisp-directory.
+	(make-mhc/compile-package): Set make-mhc/lisp-directory.
+	(make-mhc/install-file): Print install paths when not debugged.
+
 2000-06-14  Yuuichi Teranishi  <teranisi@quickhack.net>
 
 	* emacs/mhc-wl.el (mhc-wl-setup): Added autoload magic.

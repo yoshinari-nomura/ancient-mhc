@@ -191,6 +191,7 @@ The keys that are defined for mhc-calendar-mode are:
   (if (featurep 'xemacs) (easy-menu-add mhc-calendar-mode-menu))
   (run-hooks 'mhc-calendar-mode-hook))
 
+;;;###autoload
 (defun mhc-calendar (&optional ddate)
   "MHC 3-month mini calender."
   (interactive)

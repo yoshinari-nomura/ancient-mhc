@@ -131,12 +131,7 @@
 		  (let ((flag (getenv "MAKEFLAGS"))
 			(case-fold-search nil))
 		    (if flag
-			(string-match "^\\(\\(--[^ ]+ \\)+-\\|[^ =-]\\)*n" flag)))))
-	(if (featurep 'xemacs)
-	    (setq make-mhc/lisp-directory
-		  (expand-file-name
-		   make-mhc/module-prefix
-		   (expand-file-name "lisp" make-mhc/package-directory)))))))
+			(string-match "^\\(\\(--[^ ]+ \\)+-\\|[^ =-]\\)*n" flag))))))))
 
 (defun make-mhc-compile ()
   (make-mhc/configure)
@@ -161,7 +156,9 @@
 		    (delete-file elc-file)
 		    t)))
 	  (if make-mhc/debug
-	      (princ (format "Byte compile: %s -> %s.\n" el-file elc-file))
+	      (princ (format "Byte compile: %s -> %s.\n"
+			     (file-name-nondirectory el-file)
+			     (file-name-nondirectory elc-file)))
 	    (byte-compile-file el-file)))))
   (delq nil
 	(mapcar (lambda (pair)
@@ -180,11 +177,15 @@
 
 (defun make-mhc/install-file (in-file out-file)
   (if (file-exists-p in-file)
-      (if make-mhc/debug
-	  (princ (format "%s -> %s\n" (file-name-nondirectory in-file) out-file))
-	(if (file-exists-p out-file)
-	    (delete-file out-file))
-	(copy-file in-file out-file t))))
+      (progn
+	(princ (format "%s%s -> %s\n"
+		       (if make-mhc/debug "Install: " "")
+		       (file-name-nondirectory in-file) out-file))
+	(or make-mhc/debug
+	    (progn
+	      (if (file-exists-p out-file)
+		  (delete-file out-file))
+	      (copy-file in-file out-file t))))))
 
 (defun make-mhc-install ()
   (make-mhc-compile)
@@ -203,6 +204,10 @@
 ;; For XEmacs package system.
 (defun make-mhc-compile-package ()
   (make-mhc/configure)
+  (setq make-mhc/lisp-directory
+	(expand-file-name
+	 make-mhc/module-prefix
+	 (expand-file-name "lisp" make-mhc/package-directory)))
   (make-mhc-compile))
 
 (defun make-mhc/update-package-files (package dir)
