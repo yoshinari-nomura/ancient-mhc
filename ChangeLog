@@ -1,3 +1,7 @@
+2000-07-14  Yoshinari Nomura  <nom@quickhack.net>
+
+	* configure.rb, mhc-make.rb: more strict checks.
+
 2000-07-13  Yoshinari Nomura  <nom@quickhack.net>
 
 	* configure-nom.rb, configure.rb:
