@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@mew.org>
 ;;
 ;; Created: 1994/07/04
-;; Revised: $Date: 2000/06/05 12:41:29 $
+;; Revised: $Date: 2000/06/05 15:53:49 $
 
 ;;;
 ;;; Commentay:
@@ -259,7 +259,7 @@
 (defvar mhc-face-week-color-paint-thick nil)
 (defvar mhc-header-string-mew  "0 | ")
 
-(if (string-match "SEMI" gnus-version)
+(if (and (boundp 'gnus-version) (string-match "SEMI" gnus-version))
     (progn
       (require 'eword-encode)
       (defalias 'mhc-eword-encode-string 'eword-encode-string))
