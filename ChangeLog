@@ -1,5 +1,8 @@
 2000-05-31  Yuuichi Teranishi  <teranisi@quickhack.net>
 
+	* emacs/mhc.el (mhc-scan-month): 
+	Set `wl-summary-buffer-name' as local variable.
+
 	* icons: New directory.
 
 	* icons/Anniversary.xbm, icons/Anniversary.xpm, icons/Birthday.xbm,
