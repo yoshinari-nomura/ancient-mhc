@@ -3,7 +3,7 @@
 ## Author:  MIYOSHI Masanori <miyoshi@quickhack.net>
 ##          Yoshinari Nomura <nom@quickhack.net>
 ## Created: 2000/7/12
-## Revised: $Date: 2001/03/13 06:59:30 $
+## Revised: $Date: 2001/04/10 01:16:21 $
 
 require 'rbconfig'
 require 'mkmf'
@@ -145,7 +145,7 @@ class MhcConfigTable
   DEFAULT_CONFIG_TABLE = [
     ['--help', '@@MHC_HELP@@', GetoptLong::NO_ARGUMENT,
       "print this message",
-      nil],
+      ''],
 
     ['--kcode', '@@MHC_KCODE@@', GetoptLong::REQUIRED_ARGUMENT,
       "=CODE  kanji code (EUC, JIS, SJIS)",
