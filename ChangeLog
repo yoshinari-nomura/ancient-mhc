@@ -1,3 +1,21 @@
+2000-06-14  Yuuichi Teranishi  <teranisi@quickhack.net>
+
+	* emacs/mhc-wl.el (mhc-wl-setup): Added autoload magic.
+
+	* emacs/mhc-gnus.el (mhc-gnus-setup): Ditto.
+
+	* emacs/mhc-mew.el (mhc-mew-setup): Ditto.
+
+	* emacs/mhc-summary.el (mhc-icon-path): Changed default
+	for XEmacs package.
+
+	* emacs/Makefile (clean): Delete "auto-autolads.el"
+	and "custom-load.el" too.
+
+	* emacs/MHC-MK (make-mhc/icon-source-directory): New variable.
+	(make-mhc-install-package): Install "auto-autoloads" and "custom-load".
+	Install icons.
+
 2000-06-13  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 
 	* emacs/Makefile: Make a change in using MHC-MK.
