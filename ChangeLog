@@ -1,3 +1,8 @@
+2000-10-10  Hideyuki SHIRAI  <shirai@quickhack.net>
+
+	* emacs/mhc.el (mhc-mode): Modify doc-string.
+	Tnx, Mr. Yoichi NAKAYAMA <yoichi@eken.phys.nagoya-u.ac.jp>.
+
 2000-10-06  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* emacs/mhc.el (mhc-mode-menu-spec): Change enable method of [mhc-file-sync].
@@ -42,7 +47,7 @@
 	(mhc-insert-schedule): change interface to select category.
 
 	* emacs/mhc-summary.el: (mhc-summary/insert-dayinfo),
-	(mhc-summary-make-contents),
+	(mhc-summary-make-conents),
 	(mhc-summary-make-todo-list): change interface to select categry.
 
 	* emacs/mhc-ps.el:

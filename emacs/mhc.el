@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1994/07/04
-;; Revised: $Date: 2000/10/06 05:14:24 $
+;; Revised: $Date: 2000/10/10 01:05:36 $
 
 ;;;
 ;;; Commentay:
@@ -143,6 +143,7 @@
 \\[mhc-import]	Register the reviewing mail to schdule
 \\[mhc-delete]	Delete the schdule on the cursor line
 \\[mhc-set-default-category]	Edit the schdule on the cursor line
+\\[mhc-modify]	Modify the schdule on the cursor line
 \\[mhc-edit]	Create new schdule file
 \\[mhc-set-default-category]	Change default category
 \\[mhc-calendar]	Display 3 months mini calendar
