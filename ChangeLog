@@ -1,3 +1,7 @@
+2002-10-03  MIYOSHI Masanori  <miyoshi@boreas.dti.ne.jp>
+
+	* icons/Vacation.xpm: Correct invalid data.
+
 2002-10-02  MIYOSHI Masanori  <miyoshi@boreas.dti.ne.jp>
 
 	* emacs/mhc.el: Make use of the image feature of Meadow2.
