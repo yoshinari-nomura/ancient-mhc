@@ -1,3 +1,11 @@
+2001-06-20  Yuuichi Teranishi  <teranisi@quickhack.net>
+
+	* emacs/mhc-wl.el (mhc-wl-highlight-message): Follow the changes
+	in Wanderlust 2.6.x and 2.7.x.
+	(mhc-wl-insert-summary-contents): Ditto.
+	(mhc-wl-summary-mode-setup): Ditto.
+	(mhc-wl-summary-next-message): New function.
+
 2001-06-15  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* samples/DOT.schedule.sample.jp: Fix 'UMI-NO-HI', 'KEIROU-NO-HI'

@@ -57,8 +57,10 @@
 
 
 (defun mhc-wl-mime-get-raw-buffer ()
-  (wl-summary-set-message-buffer-or-redisplay)
-  (wl-message-get-original-buffer))
+  (static-if (fboundp 'wl-summary-get-original-buffer)
+      (wl-summary-get-original-buffer)
+    (wl-summary-set-message-buffer-or-redisplay)
+    (wl-message-get-original-buffer)))
 
 
 (defun mhc-wl-mime-get-mime-structure ()
@@ -67,8 +69,13 @@
 
 
 (defun mhc-wl-highlight-message (for-draft)
-  (let ((wl-highlight-x-face-func (unless for-draft wl-highlight-x-face-func)))
-    (wl-highlight-message (point-min) (point-max) t)))
+  (static-if (boundp 'wl-highlight-x-face-function)
+      (let ((wl-highlight-x-face-function
+	     (unless for-draft wl-highlight-x-face-function)))
+	(wl-highlight-message (point-min) (point-max) t))
+    (let ((wl-highlight-x-face-func (unless for-draft
+				      wl-highlight-x-face-func)))
+      (wl-highlight-message (point-min) (point-max) t))))
 
 
 ;; mhc-tmp-schedule is already bound.
@@ -80,7 +87,9 @@
 	  head
 	  (cond
 	   ((or (not path) (equal path mhc-schedule-file))
-	    "100000")
+	    (if mhc-tmp-schedule
+		"100000"
+	      "------"))
 	   ((string-match "/intersect/" path)
 	    (format "1%05d"
 		    (string-to-number (file-name-nondirectory path))))
@@ -133,6 +142,17 @@
       (switch-to-buffer buffer))))
 
 
+(defun mhc-wl-summary-next-message (num direction hereto)
+  (if (eq direction 'up)
+      (progn
+	(beginning-of-line)
+	(and (re-search-backward "^ *[0-9]+" nil t)
+	     t))
+    (end-of-line)
+    (and (re-search-forward "^ *[0-9]+" nil t)
+	 t)))
+
+
 (defun mhc-wl-summary-mode-setup (date)
   (let ((original mhc-wl-exit-buffer))
     (wl-summary-mode) ; buffer local variables are killed.
@@ -140,12 +160,37 @@
     (wl-summary-buffer-set-folder (mhc-wl/date-to-folder date))
     (make-local-variable 'wl-summary-highlight)
     (setq wl-summary-highlight nil)
-    (setq wl-summary-buffer-next-folder-func
-	  (lambda () (mhc-goto-next-month 1)))
-    (setq wl-summary-buffer-prev-folder-func
-	  (lambda () (mhc-goto-prev-month 1)
-	    (goto-char (point-max))))
-    (setq wl-summary-buffer-exit-func 'mhc-wl-summary-exit)
+    (make-local-variable 'wl-message-buffer-prefetch-folder-type-list)
+    (setq wl-message-buffer-prefetch-folder-type-list nil)
+    (static-if (boundp 'wl-summary-buffer-next-folder-function)
+	(setq wl-summary-buffer-next-folder-function
+	      (lambda () (mhc-goto-next-month 1)
+		(goto-char (point-min))
+		(mhc-wl-summary-next-message nil 'down nil)))
+      (setq wl-summary-buffer-next-folder-func
+	    (lambda ()
+	      (mhc-goto-next-month 1)
+	      (goto-char (point-min))
+	      (mhc-wl-summary-next-message nil 'down nil))))
+    (static-if (boundp 'wl-summary-buffer-prev-folder-function)
+	(setq wl-summary-buffer-prev-folder-function
+	      (lambda ()
+		(mhc-goto-prev-month 1)
+		(goto-char (point-max))
+		(mhc-wl-summary-next-message nil 'up nil)))
+      (setq wl-summary-buffer-prev-folder-func
+	    (lambda ()
+	      (mhc-goto-prev-month 1)
+	      (goto-char (point-max))
+	      (mhc-wl-summary-next-message nil 'up nil))))
+    (static-if (boundp 'wl-summary-buffer-exit-function)
+	(setq wl-summary-buffer-exit-function 'mhc-wl-summary-exit)
+      (setq wl-summary-buffer-exit-func 'mhc-wl-summary-exit))
+    (static-if (boundp 'wl-summary-buffer-next-message-function)
+	(setq wl-summary-buffer-next-message-function
+	      'mhc-wl-summary-next-message)
+      (setq wl-summary-buffer-next-message-func 
+	    'mhc-wl-summary-next-message))
     (setq wl-summary-buffer-target-mark-list '(nil))
     (setq wl-summary-buffer-number-regexp "[0-9]+")
     (setq wl-summary-buffer-folder-indicator (buffer-name))
