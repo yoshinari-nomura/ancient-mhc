@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1994/07/04
-;; Revised: $Date: 2000/10/04 01:16:36 $
+;; Revised: $Date: 2000/10/06 05:14:24 $
 
 ;;;
 ;;; Commentay:
@@ -80,8 +80,10 @@
 	 ["Online" mhc-file-toggle-offline mhc-file/offline]
 	 ["Offline" mhc-file-toggle-offline (not mhc-file/offline)]
 	 ["Sync" mhc-file-sync (and (not mhc-file/offline)
-				    (stringp mhc-sync-remote)
-				    (stringp mhc-sync-id))])
+				    (if (eq mhc-file-method 'mhc-sync)
+					(and (stringp mhc-sync-remote)
+					     (stringp mhc-sync-id))
+				      mhc-file-method))])
 	"----"
 	("PostScript"
 	 ["Preview" mhc-ps-preview t]
@@ -303,12 +305,6 @@
   (mhc-expr-compile ""))
 
 (defvar mhc-default-category-hist nil)
-
-(defun mhc-input-subject (&optional prompt default)
-  (interactive)
-  (read-from-minibuffer  (or prompt "Subject: ")
-			 (or default "")
-			 nil nil 'mhc-subject-hist))
 
 (defun mhc-set-default-category ()
   (interactive)

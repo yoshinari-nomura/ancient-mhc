@@ -1,3 +1,7 @@
+2000-10-06  Hideyuki SHIRAI  <shirai@quickhack.net>
+
+	* emacs/mhc.el (mhc-mode-menu-spec): Change enable method of [mhc-file-sync].
+
 2000-10-04  Yoshinari Nomura  <nom@quickhack.net>
 
 	* emacs/mhc-summary.el (mhc-summary-make-contents):
