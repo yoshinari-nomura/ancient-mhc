@@ -1,6 +1,13 @@
 2000-06-23  Yoshinari Nomura  <nom@quickhack.net>
 
+	* experimental/gp2mhc, experimental/my-meeting2000:
+	Add -Ke option to #!/usr/local/bin/ruby line.
+
+	* today, adb2mhc, gemcal, mhc-sync, mhc2palm, palm2mhc: 
+	Add -Ke option to #!/usr/local/bin/ruby line.
+
 	* 00todo.jis: updated.
+
 	* 00readme.jis: change file kanji code euc to jis.
 
 2000-06-22  Hideyuki SHIRAI  <shirai@rdmg.mgcs.mei.co.jp>
