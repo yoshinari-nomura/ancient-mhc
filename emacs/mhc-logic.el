@@ -86,8 +86,8 @@
 (defun mhc-logic-day-as-string-list (logicinfo)
   (mapcar (lambda (day)
 	    (if (consp day)
-		(mhc-day-let (car day) (format "! %04d%02d%02d" year month day-of-month))
-	      (mhc-day-let day (format "%04d%02d%02d" year month day-of-month))))
+		(mhc-date-format (car day) "! %04d%02d%02d" yy mm dd)
+	      (mhc-date-format day "%04d%02d%02d" yy mm dd)))
 	  (mhc-logic/day logicinfo)))
 
 
@@ -166,7 +166,7 @@
 
 (defconst mhc-logic/month-alist
   '(("jan" . 1) ("feb" . 2) ("mar" . 3) ("apr" . 4) ("may" . 5) ("jun" . 6)
-    ("jul" . 7) ("aug" . 9) ("sep" . 9) ("oct" . 10) ("nov" . 11) ("dec" . 12)
+    ("jul" . 7) ("aug" . 8) ("sep" . 9) ("oct" . 10) ("nov" . 11) ("dec" . 12)
     ("january" . 1) ("february" . 2) ("march" . 3) ("april" . 4) ("june" . 6)
     ("july" . 7) ("august" . 8) ("september" . 9) ("october" .10) ("november" . 11)
     ("december" . 12))
