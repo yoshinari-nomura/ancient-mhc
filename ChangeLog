@@ -1,3 +1,8 @@
+2000-07-24  Yoshinari Nomura  <nom@quickhack.net>
+
+	* emacs/mhc-cmail.el (mhc-cmail-get-import-buffer):
+	more confidential. Thanks to Mr. Yukihiro Matsumoto.
+
 2000-07-24  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* emacs/mhc.el (mhc-cal-*):
