@@ -1,8 +1,46 @@
 ;;; MHC-MK --- installer for MHC. -*-Emacs-Lisp-*-
 
+;; Author:  TSUCHIYA Masatoshi <tsuchiya@pine.kuee.kyoto-u.ac.jp>,
+;;          Yuuichi Teranishi <teranisi@quickhack.net>
+;; Created: 2000/06/13
+;; Revised: $Date: 2000/06/16 06:35:28 $
+
 ;;; Commentary:
 
-;; DON'T EDIT THIS FILE; edit MHC-CFG instead.
+;; This is a installer for MHC.
+
+;; To install MHC with UNIX like system, edit Makefile appropriately
+;; and just type the following command:
+;;
+;;     make install
+;;
+;; In the case when `make' is unusable, try this command:
+;;
+;;     meadow -batch -q -no-site-file -l MHC-MK -f make-mhc-install
+;;
+;; It accepts some options, which are used to coordinate installation
+;; path and so on.
+
+;;; Options:
+
+;;    --with-lispdir=DIR
+;;        emacs lisp files go to DIR.
+;;
+;;    --with-packagedir=DIR
+;;        emacs lisp files as package go to DIR.
+;;
+;;    --with-addpath=PATH
+;;        add PATH, colon separated directories list, to `load-path'
+;;        to search additional emacs lisp libraries.
+;;
+;;    --with-mew
+;;        use MHC with Mew.
+;;
+;;    --with-wl
+;;        use MHC with Wanderlust.
+;;
+;;    --with-gnus
+;;        use MHC with Gnus.
 
 ;;; Code:
 
@@ -81,7 +119,8 @@
 	dir)))
 
 (defvar make-mhc/source-directory default-directory)
-(defvar make-mhc/icon-source-directory "../icons")
+(defvar make-mhc/icon-source-directory
+  (expand-file-name "../icons" make-mhc/source-directory))
 
 (defvar make-mhc/with-mew nil)
 (defvar make-mhc/with-wl nil)
@@ -272,5 +311,36 @@
 	(expand-file-name
 	 (file-name-nondirectory icon) icon-dir)))
      (directory-files make-mhc/icon-source-directory t "^.*\\.xpm$"))))
+
+
+;;; Copyright Notice:
+
+;; Copyright (C) 2000 MHC developing team. All rights reserved.
+
+;; Redistribution and use in source and binary forms, with or without
+;; modification, are permitted provided that the following conditions
+;; are met:
+;; 
+;; 1. Redistributions of source code must retain the above copyright
+;;    notice, this list of conditions and the following disclaimer.
+;; 2. Redistributions in binary form must reproduce the above copyright
+;;    notice, this list of conditions and the following disclaimer in the
+;;    documentation and/or other materials provided with the distribution.
+;; 3. Neither the name of the team nor the names of its contributors
+;;    may be used to endorse or promote products derived from this software
+;;    without specific prior written permission.
+;; 
+;; THIS SOFTWARE IS PROVIDED BY THE TEAM AND CONTRIBUTORS ``AS IS''
+;; AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+;; LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+;; FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL
+;; THE TEAM OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+;; INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+;; (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+;; SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+;; HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+;; STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+;; ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+;; OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ;;; MHC-MK ends here

@@ -1,3 +1,17 @@
+2000-06-16  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+
+	* emacs/mhc.el (mhc-goto-month): Refer `mhc-default-hide-private-schedules'
+	to decide which action is suitable as default, display private
+	schedules or not.
+	(mhc-goto-this-month): Ditto.
+	(mhc-goto-next-month): Ditto.
+	(mhc-rescan-month): Ditto.
+
+	* emacs/mhc-vars.el (mhc-default-hide-private-schedules): New
+	variables.
+
+	* emacs/MHC-MK: Add comments and copyright notices.
+
 2000-06-15  Hideyuki SHIRAI  <shirai@rdmg.mgcs.mei.co.jp>
 
 	* emacs/MHC-MK (make-mhc/lisp-directory): Meadow support.

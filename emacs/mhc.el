@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1994/07/04
-;; Revised: $Date: 2000/06/14 11:27:45 $
+;; Revised: $Date: 2000/06/16 06:35:28 $
 
 ;;;
 ;;; Commentay:
@@ -185,7 +185,12 @@
 (defun mhc-goto-month (&optional date hide-private)
   "*Show schedules of specified month.
 If HIDE-PRIVATE, priavate schedules are suppressed."
-  (interactive (list (mhc-input-month "Month ") current-prefix-arg))
+  (interactive
+   (list
+    (mhc-input-month "Month ")
+    (if mhc-default-hide-private-schedules
+	(not current-prefix-arg)
+      current-prefix-arg)))
   (let ((category (mhc-category-convert mhc-default-category)))
     (mhc-scan-month date
 		    (mhc-summary-mailer-type)
@@ -196,13 +201,18 @@ If HIDE-PRIVATE, priavate schedules are suppressed."
 (defun mhc-goto-this-month (&optional hide-private)
   "*Show schedules of this month.
 If HIDE-PRIVATE, private schedules are suppressed."
-  (interactive "P")
+  (interactive
+   (list
+    (if mhc-default-hide-private-schedules
+	(not current-prefix-arg)
+      current-prefix-arg)))
   (mhc-goto-month (ddate-now) hide-private))
 
 (defun mhc-goto-next-month (&optional arg)
   (interactive "p")
   (mhc-goto-month (ddate-mm-inc (or (mhc-current-ddate-month)
-				    (ddate-now)) arg)))
+				    (ddate-now)) arg)
+		  mhc-default-hide-private-schedules))
 
 (defun mhc-goto-prev-month (&optional arg)
   (interactive "p")
@@ -228,7 +238,11 @@ Unless NO-DISPLAY, display it."
 (defun mhc-rescan-month (&optional hide-private)
   "*Rescan schedules of this buffer.
 If HIDE-PRIVATE, private schedules are suppressed."
-  (interactive "P")
+  (interactive
+   (list
+    (if mhc-default-hide-private-schedules
+	(not current-prefix-arg)
+      current-prefix-arg)))
   (let ((category (mhc-category-convert mhc-default-category))
 	(line (+ (count-lines (point-min) (point))
 		 (if (= (current-column) 0) 1 0))))

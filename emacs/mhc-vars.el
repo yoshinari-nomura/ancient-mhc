@@ -64,6 +64,11 @@
   :group 'mhc
   :type 'symbol)
 
+(defcustom mhc-default-hide-private-schedules nil
+  "*If non-nil value, hide private schedules."
+  :group 'mhc
+  :type 'boolean)
+
 (defcustom mhc-default-network-status t
   "*Flag of the default network status."
   :group 'mhc
