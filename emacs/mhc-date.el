@@ -4,7 +4,7 @@
 ;;          TSUCHIYA Masatoshi <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 ;;
 ;; Created: 2000/06/14
-;; Revised: $Date: 2000/06/22 09:42:42 $
+;; Revised: $Date: 2000/07/28 05:52:02 $
 
 ;;;
 ;;; Commentary:
@@ -527,7 +527,7 @@
 	     "木曜日" "金曜日" "土曜日"] ww)
     (aref ["日" "月" "火" "水" "木" "金" "土"] ww)))
 
-(defun mhc-date-digit-to-oo-string (oo &optinal long)
+(defun mhc-date-digit-to-oo-string (oo &optional long)
   (aref  ["1st" "2nd" "3rd" "4th" "5th"] oo))
 
 ;; format-time-string subset (but has enough spec)
