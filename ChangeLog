@@ -1,3 +1,11 @@
+2001-03-13  Yoshinari Nomura  <nom@quickhack.net>
+
+	* ruby-ext/lib/mhc-signal.rb (signal_disconnect):
+	  use `delete' to remove items from a hash.
+
+	* mhc-make.rb (install): 
+	  dig destination directories before installation.
+
 2001-03-10  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 
 	* emacs/mhc-calendar.el (toplevel): Condition to define
