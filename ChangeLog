@@ -1,3 +1,7 @@
+2000-06-12  Yoshinari Nomura  <nom@quickhack.net>
+
+	* mhc-sync: mhc-sync deal with 'A' status.
+
 2000-06-07  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 
 	* emacs/mhc-parse.el (mhc-parse/old-style-date): New function to
