@@ -3,7 +3,7 @@
 ## Author:  Yoshinari Nomura <nom@quickhack.net>
 ##
 ## Created: 1999/07/16
-## Revised: $Date: 2004/06/15 13:34:39 $
+## Revised: $Date: 2004/06/22 10:06:04 $
 ##
 
 ################################################################
@@ -439,6 +439,10 @@ class MhcScheduleItem
   end
 
   def dump_without_xsc_header
+    #koie: if no descripton, dont convert non X-SC headers.
+    if description .to_s == ''
+      return ''
+    end
     hdrs = non_xsc_header .to_s .sub(/\n+\z/n, '')
     hdrs += "\n" if hdrs != ''
 
@@ -876,7 +880,10 @@ class MhcScheduleItem
     contents = dump_without_xsc_header
     contents = '' if contents =~ /\A\s+\z/n   ## \s includes \n
     contents = datebk3_icon + "\n" + contents if datebk3_icon
+    #koie: if contents is empty, dont set note.
+    if contents != ""
     pi_rec .set_note(contents)
+    end #koie
 
     if (location .to_s != '')
       pi_rec .set_description(subject + '[' + location .to_s + ']')
