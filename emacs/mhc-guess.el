@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1999/04/13
-;; Revised: $Date: 2003/11/05 01:12:43 $
+;; Revised: $Date: 2004/03/31 10:43:47 $
 ;;
 
 ;;;
@@ -58,6 +58,23 @@
 (require 'mhc-date)
 (provide 'mhc-guess)
 
+;;; Customize variables:
+
+(defcustom mhc-guess-ignore-english-date nil
+  "*Ignore English dates."
+  :group 'mhc
+  :type '(choice (const :tag "Ignore" t)
+		 (const :tag "Don't Ignore" nil)))
+
+(defcustom mhc-guess-english-date-format '(usa)
+  "*English date formats.
+You can specify following symbols as a list.
+    usa: Suppose the USA style date formats. (e.g. Feb 25, 2004)
+    british: Suppose British style date formats. (e.g. 25 Feb, 2004)"
+  :group 'mhc
+  :type '(repeat (choice (const :tag "USA" usa)
+			 (const :tag "British" british))))
+
 ;;
 ;; regexp for get date strings.
 ;;
@@ -88,11 +105,41 @@
 	      "\\)?")
      mhc-guess/make-date-from-mmdd 2 3 8 9 10)
     
+    ;; USA style date format
+    (,(concat "\\(Jan\\(uary\\)?\\|Feb\\(ruary\\)?\\|Mar\\(ch\\)?\\|"
+	      "Apr\\(il\\)?\\|May\\|June?\\|July?\\|Aug\\(ust\\)?\\|"
+	      "Sep\\(tember\\)?\\|Oct\\(ober\\)?\\|"
+	      "Nov\\(ember\\)?\\|Dec\\(ember\\)?\\)"
+	      "\.?,? +"
+	      "\\([0-9][0-9]?\\)\\(st\\|nd\\rd\\|th\\)?,?[ \n]+" ;; day
+	      "\\(\\('\\|[1-9][0-9]\\)?[0-9][0-9]\\)?") ;; year
+     mhc-guess/make-date-from-usa-style-date 1 11 13)
+
+    ;; British style date format
+    (,(concat "\\([0-9][0-9]?\\)\\(st\\|nd\\rd\\|th\\)?,? " ;; day
+	      "\\(Jan\\(uary\\)?\\|Feb\\(ruary\\)?\\|Mar\\(ch\\)?\\|"
+	      "Apr\\(il\\)?\\|May\\|June?\\|July?\\|Aug\\(ust\\)?\\|"
+	      "Sep\\(tember\\)?\\|Oct\\(ober\\)?\\|"
+	      "Nov\\(ember\\)?\\|Dec\\(ember\\)?\\)"
+	      "\.?,?[ \n]+"
+	      "\\(\\('\\|[1-9][0-9]\\)?[0-9][0-9]\\)?") ;; year
+     mhc-guess/make-date-from-british-style-date 1 3 13)
+
     throw
 
     (,(concat "\\(今度\\|[今来次]週\\|再来週\\)[\n 　]*の?[\n 　]*"
 	     "\\([月火水木金土日]\\)曜")
      mhc-guess/make-date-from-relative-week 1 2)
+
+    (,(concat "\\([Tt]his\\|[Nn]ext\\)[\n ]+"
+              "\\(Monday\\|Tuesday\\|Wednesday\\|Thursday\\|Friday\\|"
+	      "Saturday\\|Sunday\\)")
+     mhc-guess/make-date-from-english-relative-week 2 1 nil)
+
+    (,(concat "\\(Monday\\|Tuesday\\|Wednesday\\|Thursday\\|Friday\\|"
+	      "Saturday\\|Sunday\\)[\n ]+"
+	      "\\([Tt]his\\|[Nn]ext\\)[ \n]+\\([Ww]eek\\)")
+     mhc-guess/make-date-from-english-relative-week 1 2 3)
 
     throw
 
@@ -102,8 +149,16 @@
     ("[^\(（]\\([月火水木金土日]\\)\n?曜"
      mhc-guess/make-date-from-relative-week nil 1)
 
+    (,(concat "\\(Monday\\|Tuesday\\|Wednesday\\|Thursday\\|Friday\\|"
+	      "Saturday\\|Sunday\\)")
+     mhc-guess/make-date-from-english-relative-week 1 nil nil)
+
     ("\\(本日\\|今日\\|あす\\|あした\\|あさって\\|明日\\|明後日\\)"
      mhc-guess/make-date-from-relative-day 1)
+
+    (,(concat "\\([Tt]oday\\|[Tt]omorrow\\|"
+	      "[Tt]he[ \n]+[Dd]ay[ \n]+[Aa]fter[ \n]+[Tt]omorrow\\)")
+     mhc-guess/make-date-from-english-relative-day 1)
     ))
 
 (defvar mhc-guess-time-regexp-list
@@ -333,6 +388,34 @@
     (store-match-data data)
     date))
 
+(defun mhc-guess/make-date-from-usa-style-date (now month-str dd-str yy-str)
+  (if (and (null mhc-guess-ignore-english-date)
+	   (memq 'usa mhc-guess-english-date-format))
+      (mhc-guess/make-date-from-english-date now month-str dd-str yy-str)))
+
+(defun mhc-guess/make-date-from-british-style-date (now dd-str month-str yy-str)
+  (if (and (null mhc-guess-ignore-english-date)
+	   (memq 'british mhc-guess-english-date-format))
+      (mhc-guess/make-date-from-english-date now month-str dd-str yy-str)))
+
+(defun mhc-guess/make-date-from-english-date (now month-str dd-str yy-str)
+  (let* ((month-alist
+	  '(("Jan" . "1") ("Feb" . "2") ("Mar" . "3") ("Apr" . "4")
+	    ("May" . "5") ("Jun" . "6") ("Jul" . "7") ("Aug" . "8")
+	    ("Sep" . "9") ("Oct" . "10") ("Nov" . "11") ("Dec" . "12")))
+	 (mm-str (cdr (assoc (substring month-str 0 3) month-alist)))
+	 (yy-length (length yy-str)))
+    (cond ((= yy-length 4)		; "yyyy"
+	   (mhc-guess/make-date-from-yyyymmdd now yy-str mm-str dd-str))
+	  ((= yy-length 3)		; "'yy"
+	   (mhc-guess/make-date-from-yyyymmdd
+	    now
+	    (concat (substring (format-time-string "%Y") 0 2)
+		    (substring yy-str 1 3))
+	    mm-str dd-str))
+	  (t
+	   (mhc-guess/make-date-from-mmdd now mm-str dd-str)))))
+
 (defun mhc-guess/make-date-from-relative-day (now rel-word)
   (cond 
    ((null rel-word)
@@ -346,6 +429,19 @@
    ((or (string= rel-word "あさって")
  	(string= rel-word "明後日"))
     (cons (mhc-date+ now 2) nil))))
+
+(defun mhc-guess/make-date-from-english-relative-day (now rel-word)
+  (unless mhc-guess-ignore-english-date
+    (let ((rel (downcase rel-word)))
+      (cond 
+       ((null rel)
+	nil)
+       ((string= rel "today")
+	(cons now nil))
+       ((string= rel "tomorrow")
+	(cons (mhc-date++ now) nil))
+       (t ;; the day after tommorow.
+	(cons (mhc-date+ now 2) nil))))))
 
 (defun mhc-guess/make-date-from-relative-week (now rel-word week)
   (let ((data (match-data))
@@ -369,6 +465,29 @@
     (cons (mhc-date+ date off) nil)
     ))
 
+(defun mhc-guess/make-date-from-english-relative-week (now dow rel-word week)
+  (unless mhc-guess-ignore-english-date
+    (let ((dow-alist '(("Monday" . "月") ("Tuesday" . "火")
+		       ("Wednesday" . "水") ("Thursday" . "木")
+		       ("Friday" . "金") ("Saturday" . "土")
+		       ("Sunday" . "日")))
+	  (rel (downcase rel-word)))
+      (mhc-guess/make-date-from-relative-week
+       now
+       (if (null rel)
+	   nil
+	 (cond ((and (string= rel "this") (null week))
+		"今度")
+	       ((and (string= rel "this") week)
+		"今週")
+	       ((and (string= rel "next") (null week))
+		"今度")
+	       ((and (string= rel "next") week)
+		"来週")
+	       (t
+		nil)))
+       (cdr (assoc-ignore-case dow dow-alist))))))
+		
 ;;
 ;; make time from string.
 ;;
