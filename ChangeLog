@@ -2,7 +2,7 @@
 
 	* emacs/mhc.el (mhc-mode-menu-spec): 'Sync' enable safer.
 
-	* emacs/mhc-sync (toplevel): Add $Date: 2000/08/07 03:01:42 $.
+	* emacs/mhc-sync (toplevel): Add Date keyword.
 
 	* emacs/mhc-calendar.el (mhc-calendar-input-exit): New function.
 	(mhc-calendar-date-noduration): New variable.
