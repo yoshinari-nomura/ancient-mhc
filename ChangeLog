@@ -1,3 +1,8 @@
+2003-06-16  Hideyuki SHIRAI  <shirai@quickhack.net>
+
+	* emacs/mhc-file.el (mhc-file-make-directory): Remove trailing
+	slashes when `make-directory'.
+
 2003-06-06  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* emacs/mhc-mew.el (mhc-mew-draft-translate): When error occur,

@@ -178,7 +178,7 @@
     (if (mhc-file-make-directory
 	 (directory-file-name (file-name-directory (directory-file-name dirname))))
 	(progn
-	  (make-directory dirname)
+	  (make-directory (directory-file-name dirname))
 	  (mhc-file-add (file-name-as-directory dirname))
 	  t))))
 
