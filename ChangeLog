@@ -1,3 +1,7 @@
+2003-02-24  Yoshinari NOMURA  <nom@quickhack.net>
+
+	* adb2mhc.in: fix local security problem.
+
 2003-01-21  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* emacs/mhc-calendar.el (mhc-calendar/view-summary-insert): Don't
