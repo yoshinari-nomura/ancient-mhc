@@ -127,7 +127,7 @@
 
 (defun mhc-mew/schedule-foldermsg (schedule)
   (let ((path (mhc-record-name (mhc-schedule-record schedule))) fld-msg)
-    (if (and 
+    (if (and
 	 path
 	 (string-match
 	  (concat "^"
@@ -146,7 +146,7 @@
 
 
 (defun mhc-mew-insert-summary-contents (inserter)
-  (insert (if mhc-tmp-schedule 
+  (insert (if mhc-tmp-schedule
 	      mhc-mew/header-string-review mhc-mew/header-string))
   (funcall inserter)
   (insert (mhc-mew/schedule-foldermsg mhc-tmp-schedule)
@@ -180,7 +180,7 @@
   (mew-summary-toggle-disp-msg 'off))
 
 
-;; This function was orignally written by 
+;; This function was orignally written by
 ;; Shun-ichi Goto <gotoh@taiyo.co.jp> (cf. http://www.imasy.org/~gotoh/)
 ;; Arranged by Hideyuki SHIRAI <shirai@quickhack.net>.
 (defun mhc-mew-decode-header ()
@@ -212,13 +212,13 @@
 			(if (looking-at "[^:]+:? *")
 			    (goto-char (match-end 0)))
 			(if (and (not (looking-at "[\t\x20-\x7e]+$"))
-				 (equal (mew-find-cs-region 
+				 (equal (mew-find-cs-region
 					 (point)
 					 (save-excursion (end-of-line)
 							 (point)))
 					(list mhc-mew/lc-ascii)))
 			    ;; decode!
-			    (mew-cs-decode-region (point) 
+			    (mew-cs-decode-region (point)
 						  (save-excursion
 						    (end-of-line)
 						    (point))
@@ -255,7 +255,7 @@
   (or (= (current-column) 0) (insert "\n"))
   (mew-header-set mew-header-separator)
   (goto-char (point-min)))
-    
+
 
 (defun mhc-mew-draft-reedit-file (file)
   (erase-buffer)
@@ -287,7 +287,7 @@
 	       (fboundp 'mew-highlight-body))
       (mew-highlight-url)
       (mew-highlight-body)))
-	
+
 
 (defun mhc-mew-draft-translate ()
   (let ((bufstr (buffer-substring (point-min) (point-max)))
@@ -457,7 +457,7 @@
 ;; Redistribution and use in source and binary forms, with or without
 ;; modification, are permitted provided that the following conditions
 ;; are met:
-;; 
+;;
 ;; 1. Redistributions of source code must retain the above copyright
 ;;    notice, this list of conditions and the following disclaimer.
 ;; 2. Redistributions in binary form must reproduce the above copyright
@@ -466,7 +466,7 @@
 ;; 3. Neither the name of the team nor the names of its contributors
 ;;    may be used to endorse or promote products derived from this software
 ;;    without specific prior written permission.
-;; 
+;;
 ;; THIS SOFTWARE IS PROVIDED BY THE TEAM AND CONTRIBUTORS ``AS IS''
 ;; AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 ;; LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS

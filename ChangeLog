@@ -1,3 +1,8 @@
+2004-09-08  Hideyuki SHIRAI  <shirai@quickhack.net>
+
+	* emacs/mhc-mew.el (mhc-mew-summary-mode-setup): Support Mew
+	4.0.69 or later.
+
 2004-06-22  Yoshinari Nomura  <nom@quickhack.net> 
 
 	* ruby-ext/lib/mhc-palm.rb:
