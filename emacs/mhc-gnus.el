@@ -15,7 +15,9 @@
 
 ;;; Code:
 
-(eval-when-compile (require 'cl))
+(eval-when-compile
+  (require 'cl)
+  (require 'gnus-art))
 (require 'gnus-sum)
 (require 'nnmhc)
 
@@ -72,6 +74,11 @@
 (defun mhc-gnus-mime-get-raw-buffer ()
   (gnus-summary-select-article)
   gnus-original-article-buffer)
+
+
+(defun mhc-gnus-mime-get-mime-structure ()
+  (gnus-summary-select-article)
+  gnus-current-headers)
 
 
 (defsubst mhc-gnus/date-to-group-name (date)
@@ -185,6 +192,7 @@
   (put 'mhc-gnus 'draft-reedit-file 'mhc-mime-draft-reedit-file)
   (put 'mhc-gnus 'get-import-buffer 'mhc-mime-get-import-buffer)
   (put 'mhc-gnus 'mime-get-raw-buffer 'mhc-gnus-mime-get-raw-buffer)
+  (put 'mhc-gnus 'mime-get-mime-structure 'mhc-gnus-mime-get-mime-structure)
   (put 'mhc-gnus 'draft-translate 'mhc-mime-draft-translate)
   (put 'mhc-gnus 'eword-decode-string 'mhc-mime-eword-decode-string))
 

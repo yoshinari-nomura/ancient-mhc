@@ -3,7 +3,7 @@
 ;; Author:  Yuuichi Teranishi <teranisi@quickhack.net>
 ;;
 ;; Created: 2000/07/26
-;; Revised: $Date: 2000/08/04 02:19:02 $
+;; Revised: $Date: 2000/12/13 04:34:07 $
 
 ;;; Commentary:
 
@@ -20,12 +20,23 @@
   (funcall (mhc-get-function 'mime-get-raw-buffer)))
 
 
+(defsubst mhc-mime-get-mime-structure ()
+  "Get raw buffer of the current message for `mhc-mime-get-import-buffer'."
+  (let ((function (mhc-get-function 'mime-get-mime-structure)))
+    (when function
+      (funcall function))))
+
+
 (defvar mhc-mime-import-buffer " *MHC MIME import*")
 (defun mhc-mime-get-import-buffer (get-original)
-  (let ((raw-buffer (mhc-mime-get-raw-buffer))
-	mime-view-ignored-field-list)
+  (let* ((structure (mhc-mime-get-mime-structure))
+	 (raw-buffer (when (or get-original (not structure))
+		       (mhc-mime-get-raw-buffer)))
+	 mime-view-ignored-field-list)
     (with-current-buffer (get-buffer-create mhc-mime-import-buffer)
-      (mime-view-buffer raw-buffer (current-buffer))
+      (if structure
+	  (mime-display-message structure (current-buffer))
+	(mime-view-buffer raw-buffer (current-buffer)))
       (let (buffer-read-only)
 	(mhc-highlight-message))
       (if get-original
