@@ -54,6 +54,7 @@
 ;;    (put 'mhc-foo 'summary-mode-setup      'mhc-foo-summary-mode-setup)
 
 (require 'mhc-day)
+(require 'mhc-compat)
 (require 'mhc-schedule)
 (require 'bytecomp)
 
@@ -82,28 +83,28 @@
 
 (defcustom mhc-summary-line-format "%M%/%D %W %b%e %c%i%s %l"
   "*A format string for summary line of MHC.
-It may include any of the following characters,
+It may include any of the following format specifications
 which are replaced by the given information:
 
-%Y The year of the line.
-%M The month of the line.
-%D The day of the line.
-%W The weekday name of the line.
+%Y The year of the line if first line of the day.
+%M The month of the line if first line of the day.
+%D The day of the line if first line of the day.
+%W The weekday name of the line if first line of the day.
 %b Begin time.
-%e End time.
-%c Warning string for conflict.
+%e End time (includes '-').
+%c Warning string for conflict (See also `mhc-summary-string-conflict').
 %i The icon for the schedule.
 %s The subject of the schedule.
 %l The location of the schedule.
 
-%/ A slash character if first schedule of the day.
+%/ A slash character if first line of the day.
 "
   :group 'mhc
   :type 'string)
 
 (defcustom mhc-summary-todo-line-format "     %L %i%s %l%d"
   "*A format string for summary todo line of MHC.
-It may include any of the following characters,
+It may include any of the following format specifications
 which are replaced by the given information:
 
 %i The icon for the schedule.
@@ -111,6 +112,7 @@ which are replaced by the given information:
 %l The location of the schedule.
 %L The lank of the schedule.
 %d The deadline of the schedule.
+(`mhc-todo-string-remaining-day' or `mhc-todo-string-deadline-day' is used)
 "
   :group 'mhc
   :type 'string)
@@ -162,6 +164,11 @@ third one is replaced with day of month."
 (defvar mhc-tmp-lank     nil "a dayinfo for the day.")
 (defvar mhc-tmp-deadline nil "a schedule structure.")
 
+;; Inserter (internal variable)
+(defvar mhc-summary/line-inserter nil)
+
+(defvar mhc-summary-todo/line-inserter nil)
+
 (defvar mhc-summary-line-format-alist
   '((?Y (mhc-summary/line-year-string)
 	face mhc-tmp-day-face)
@@ -196,7 +203,16 @@ third one is replaced with day of month."
 	face (mhc-face-category-to-face 
 	      (car (mhc-schedule-categories mhc-tmp-schedule))))
     (?l (mhc-summary/line-location-string)
-	face (quote mhc-summary-face-location))))
+	face (quote mhc-summary-face-location)))
+  "An alist of format specifications that can appear in summary lines.
+Each element is a list of following:
+\(SPEC STRING-EXP PROP-TYPE PROP-VALUE\)
+SPEC is a character for format specification.
+STRING is an expression to get string to insert.
+PROP-TYPE is one of the two symbols `face' or `icon'.
+It indicates a type of the property to put on the inserted string.
+PROP-VALUE is the property value correspond to PROP-TYPE.
+")
 
 (defvar mhc-summary-todo-line-format-alist
   '((?  " ")
@@ -210,7 +226,16 @@ third one is replaced with day of month."
 	face (cond ((>= mhc-tmp-lank 80) (quote mhc-summary-face-sunday))
 		   ((>= mhc-tmp-lank 50) (quote mhc-summary-face-saturday))))
     (?d (mhc-summary-todo/line-deadline-string)
-	face (mhc-summary-todo/line-deadline-face))))
+	face (mhc-summary-todo/line-deadline-face)))
+  "An alist of format specifications that can appear in todo lines.
+Each element is a list of following:
+\(SPEC STRING-EXP PROP-TYPE PROP-VALUE\)
+SPEC is a character for format specification.
+STRING is an expression to get string to insert.
+PROP-TYPE is one of the two symbols `face' or `icon'.
+It indicates a type of the property to put on the inserted string.
+PROP-VALUE is the property value correspond to PROP-TYPE.
+")
 
 ;;; MUA Backend Functions:
 
@@ -428,7 +453,7 @@ third one is replaced with day of month."
 
 
 (defun mhc-summary/line-parse-format (format spec-alist)
-  (let ((f (string-to-list format))
+  (let ((f (mhc-string-to-char-list format))
 	inserter entry)
     (setq inserter (list 'let (list 'pos)))
     (while f
@@ -439,7 +464,7 @@ third one is replaced with day of month."
 		(setq inserter (append inserter (list (list 'insert ?%))))
 	      (setq entry (assq (car f) spec-alist))
 	      (unless entry
-		(error "Unknown format spec %c" (car f)))
+		(error "Unknown format spec %%%c" (car f)))
 	      (setq inserter
 		    (append inserter
 			    (list (list 'setq 'pos (list 'point)))
@@ -462,24 +487,31 @@ third one is replaced with day of month."
       (setq f (cdr f)))
     inserter))
 
-;; Internal variable.
-(defvar mhc-summary/line-inserter nil)
+
+(defmacro mhc-summary/line-inserter-setup-internal (inserter format alist)
+  (` (let (byte-compile-warnings)
+       (setq (, inserter)
+	     (byte-compile
+	      (list 'lambda ()
+		    (mhc-summary/line-parse-format (, format) (, alist)))))
+       (when (get-buffer "*Compile-Log*")
+	 (bury-buffer "*Compile-Log*"))
+       (when (get-buffer "*Compile-Log-Show*")
+	     (bury-buffer "*Compile-Log-Show*")))))
+
 
 (defun mhc-summary-line-inserter-setup ()
-  "Setup MHC summary line inserter."
+  "Setup MHC summary and todo line inserter."
   (interactive)
-  (let (byte-compile-warnings)
-    (setq mhc-summary/line-inserter
-	  (byte-compile
-	   (list 'lambda ()
-		 (mhc-summary/line-parse-format
-		  mhc-summary-line-format
-		  mhc-summary-line-format-alist))))
-    (when (get-buffer "*Compile-Log*")
-      (bury-buffer "*Compile-Log*"))
-    (when (get-buffer "*Compile-Log-Show*")
-      (bury-buffer "*Compile-Log-Show*"))))
-
+  (mhc-summary/line-inserter-setup-internal
+   mhc-summary/line-inserter
+   mhc-summary-line-format
+   mhc-summary-line-format-alist)
+  (mhc-summary/line-inserter-setup-internal
+   mhc-summary-todo/line-inserter
+   mhc-summary-todo-line-format
+   mhc-summary-todo-line-format-alist))
+  
 
 (defun mhc-summary-line-insert ()
   "Insert summary line."
@@ -495,24 +527,6 @@ third one is replaced with day of month."
 	(pos (point)))
     (funcall mhc-summary/line-inserter)
     (put-text-property pos (point) 'mhc-dayinfo mhc-tmp-dayinfo)))
-
-;; Internal variable.
-(defvar mhc-summary-todo/line-inserter nil)
-
-(defun mhc-summary-todo-line-inserter-setup ()
-  "Setup MHC summary line inserter."
-  (interactive)
-  (let (byte-compile-warnings)
-    (setq mhc-summary-todo/line-inserter
-	  (byte-compile
-	   (list 'lambda ()
-		 (mhc-summary/line-parse-format
-		  mhc-summary-todo-line-format
-		  mhc-summary-todo-line-format-alist))))
-    (when (get-buffer "*Compile-Log*")
-      (bury-buffer "*Compile-Log*"))
-    (when (get-buffer "*Compile-Log-Show*")
-      (bury-buffer "*Compile-Log-Show*"))))
 
 
 (defun mhc-summary-todo-line-insert ()

@@ -49,6 +49,11 @@ is enclosed by at least one regexp grouping construct."
       (concat open-paren (mapconcat 'regexp-quote strings "\\|") close-paren))))
 
 
+(if (fboundp 'string-to-char-list)
+    (defalias 'mhc-string-to-char-list 'string-to-char-list)
+  (defun mhc-string-to-char-list (string)
+    (string-to-list string)))
+
 (provide 'mhc-compat)
 
 ;;; Copyright Notice:

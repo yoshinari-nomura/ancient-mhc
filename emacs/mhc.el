@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1994/07/04
-;; Revised: $Date: 2000/06/27 13:07:02 $
+;; Revised: $Date: 2000/06/28 01:31:15 $
 
 ;;;
 ;;; Commentay:
@@ -823,7 +823,6 @@ C-c ?    mhc-draft-insert-calendar
     (and (mhc-use-icon-p) (mhc-icon-setup))
     (and mhc-calendar-link-hnf (mhc-calendar-hnf-face-setup))
     (mhc-summary-line-inserter-setup)
-    (mhc-summary-todo-line-inserter-setup)
     (autoload 'mhc-ps-preview "mhc-ps" "*Preview PostScript calendar." t)
     (autoload 'mhc-ps-print "mhc-ps" "*Print PostScript calendar." t)
     (setq mhc-setup-p t)
