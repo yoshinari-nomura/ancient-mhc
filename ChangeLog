@@ -1,14 +1,52 @@
+2000-06-06  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+
+	* emacs/mhc-calendar.el: Follow changes in main trunk.
+
+	* emacs/mhc-header.el (mhc-header-table): Add X-SC-Schedule.
+	(mhc-header-goto-end): New function.
+
+	* emacs/mhc-parse.el: Add fearture to parse X-SC-Schedule.
+
+2000-06-05  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+
+	* emacs/mhc-gnus.el (mhc-gnus-encode-string): New function.
+	(mhc-gnus-insert-summary-contents): Replace eword-encode-string
+	with mhc-gnus-encode-string.
+
 2000-06-05  Hideyuki SHIRAI  <shirai@rdmg.mgcs.mei.co.jp>
 
 	* emacs/mhc-calendar.el (mhc-calendar-hnf-summary-insert): 'SUB', 'LSUB' suport.
 	(mhc-calendar-hnf-search-title): New function.
 	(mhc-calendar-hnf-edit, mhc-calendar-hnf-view): Goto TITLE position.
 
-2000-06-05  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+2000-06-03  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 
-	* emacs/mhc.el (mhc-eword-encode-string): New function.
-	(mhc-sch-scan1): Replace eword-encode-string with
-	mhc-eword-encode-string.
+	* emacs/mhc-compat.el (mhc-defgroup): Removed.
+	(mhc-defcustom): Ditto.
+
+	* emacs/mhc.el, emacs/mhc-calendar.el, emacs/mhc-cvs.el,
+	emacs/mhc-file.el, emacs/mhc-record.el, emacs/mhc-summary.el,
+	emacs/mhc-vars.el: Replace mhc-defcustom with defcustom.
+
+2000-06-02  Yuuichi Teranishi  <teranisi@quickhack.net>
+
+	* emacs/mhc-compat.el (mhc-regexp-opt):
+	Don't define as alias for `regexp-opt' in XEmacs.
+
+	* emacs/mhc-bm.el (mhc-bm-category-icon-alist):
+	Define as mhc-defcustom.
+	(mhc-bm/category-bmstr-alist):
+	Renamed from `mhc-bm-category-bmstr-alist'.
+	(mhc-bm/create-rectangle): Renamed from `mhc-bm-create-rectangle'.
+	(mhc-bm/setup-icons): Renamed from `mhc-bm-setup-icons'.
+	All other related functions are changed.
+
+	* emacs/mhc-xmas.el (mhc-xmas-category-icon-alist):
+	Define as mhc-defcustom.
+	(mhc-xmas/category-glyph-alist):
+	Renamed from `mhc-xmas-category-glyph-alist'.
+	(mhc-xmas/setup-icons): Renamed from `mhc-xmas-setup-icons'.
+	All other related functions are changed.
 
 2000-06-02  Hideyuki SHIRAI  <shirai@rdmg.mgcs.mei.co.jp>
 
@@ -16,7 +54,8 @@
 
 2000-06-01  MIYOSHI Masanori  <miyoshi@ask.ne.jp>
 
-	* emacs/mhc-calendar.el (mhc-calendar-hnf-summary-insert): Avoid summary insertion when no heading is found.
+	* emacs/mhc-calendar.el (mhc-calendar-hnf-summary-insert): Avoid
+	summary insertion when no heading is found.
 
 2000-06-01  Hideyuki SHIRAI  <shirai@rdmg.mgcs.mei.co.jp>
 
@@ -25,6 +64,27 @@
 	(mhc-calendar-hnf-mark-diary-entries): Fatal bug fix ^^;
 	(mhc-calendar-hnf-summary-insert): More colorful, but i have no knowledge of hnf.
 	
+2000-06-01  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+
+	* emacs/mhc-logic.el (mhc-logic/week-of-month-alist): Key string
+	are modified in lower case.
+	(mhc-logic/day-of-week-alist): Ditto.
+	(mhc-logic/month-alist): Ditto.
+	(mhc-logic-parse-cond): Ignore case when parsing.
+
+2000-06-01  Yuuichi Teranishi  <teranisi@quickhack.net>
+
+	* emacs/mhc-schedule.el (mhc-schedule-todo-deadline): New defsubst.
+	Returns the deadline day of the TODO.
+
+	* emacs/mhc-summary.el (mhc-todo-string-heading): New user option.
+	(mhc-todo-string-remaining-day): Ditto.
+	(mhc-todo-string-deadline-day): Ditto.
+	(mhc-todo-mergin): Ditto.
+	(mhc-summary-make-todo-list): Put `mhc-todo-string-remaining-day'
+	or `mhc-todo-string-deadline-day' on TODO.
+	Use `mhc-schedule-todo-deadline' to get deadline day of TODO.
+
 2000-05-31  Hideyuki SHIRAI  <shirai@rdmg.mgcs.mei.co.jp>
 
 	* emacs/mhc.el (mhc-sync): New function.
@@ -34,7 +94,11 @@
 
 2000-05-31  Yuuichi Teranishi  <teranisi@quickhack.net>
 
-	* emacs/mhc.el (mhc-scan-month): 
+	* emacs/mhc-xmas.el (mhc-xmas-setup-icons): Downcase category name.
+
+	* emacs/mhc-bm.el (mhc-bm-setup-icons): Ditto.
+
+	* emacs/mhc-wl.el (mhc-wl-summary-mode-setup):
 	Set `wl-summary-buffer-name' as local variable.
 
 	* icons: New directory.
@@ -45,23 +109,77 @@
 	icons/Other.xpm, icons/Private.xbm, icons/Private.xpm,
 	icons/Vacation.xbm, icons/Vacation.xpm: New files (Sample icons).
 
-	* emacs/mhc-xmas.el: Added copyright notice.
+	* emacs/mhc-summary.el (mhc-summary-icon-position): New constant.
+	(mhc-summary/schedule-to-contents): Return a cons cell of xstring and
+	icon.
+	Space character is added to the xstring.
+	(mhc-summary/insert-dayinfo-internal):
+	Get icon from `mhc-summary/schedule-to-contents' and pass it to
+	`mhc-summary/insert-strings'.
+	(mhc-summary-make-todo-list): Get icon from
+	`mhc-summary/schedule-to-contents' and pass it to
+	`mhc-summary/insert-strings'.
+	(mhc-summary/insert-strings): Added argument `icon' and pass it to
+	`mhc-summary-insert-contents'.
+	Don't add space character for each concat.
+	(mhc-summary-insert-contents): Added argument `icon' and pass it to
+	the `insert-summary-contents' function.
 
-	* emacs/mhc-bm.el: Ditto.
+	* emacs/mhc-gnus.el (mhc-gnus-insert-summary-contents):
+	Added argument `icon' and call `mhc-put-icon'.
+
+	* emacs/mhc-wl.el (mhc-wl-insert-summary-contents):
+	Added argument `icon' and call `mhc-put-icon'.
+	(mhc-wl-summary-mode-setup): Set `wl-summary-buffer-name' to
+	avoid treating MHC buffer as sticky.
+
+	* emacs/mhc-mew.el (mhc-mew-insert-summary-contents):
+	Added argument `icon' and call `mhc-put-icon'.
 
 	* emacs/mhc.el (toplevel): Require 'mhc-xmas on XEmacs.
 	Require 'mhc-bm if bitmap is installed.
 	(mhc-use-icon-p): New function.
 	(mhc-use-icon): New user option.
-	(mhc-icon-path): New user option.
-	(mhc-scan-month): Call `mhc-icon-setup' if `mhc-use-icon-p' returns t.
-	(mhc-sch-scan1): Display icon (Use `mhc-put-icon' and `mhc-get-icon').
-	(mhc-scan-month): Set `wl-summary-buffer-name' to avoid treating MHC
-	buffer as sticky.
+	(mhc-icon-path): Ditto.
+	(mhc-setup): Call `mhc-icon-setup'.
 
 	* emacs/mhc-xmas.el: New module.
 
 	* emacs/mhc-bm.el: Ditto.
+
+	* emacs/mhc-logic.el (mhc-logic-compile-file):
+	Bind `byte-compile-warnings' as nil to silence byte-compiler of XEmacs.
+
+	* emacs/mhc-wl.el (toplevel): Don't require 'mhc-mew.
+	(mhc-wl-generate-summary-buffer): Define as function.
+
+2000-05-30  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+
+	* mhc-file.el (mhc-file/backup-and-remove): Change path for
+	removed schedule files.
+	* mhc-record.el (mhc-record-copy): New function.
+	* mhc-db.el (mhc-db-add-record-from-buffer): Replace copy-sequence
+	with mhc-record-copy.
+	* mhc.el (mhc-draft-finish): Change to preserve draft buffer when
+	mhc-db-add-record-from-buffer returns nil.
+
+2000-05-30  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+
+	* emacs/mhc-day.el (mhc-day-day-of-week-as-string): Fix typo.
+	* emacs/mhc-logic.el (mhc-logic/day-of-week-alist): Ditto.
+
+2000-05-30  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+
+	* emacs/CHANGES.ja, emacs/Makefile, emacs/mhc-compat.el,
+	emacs/mhc-cvs.el, emacs/mhc-day.el, emacs/mhc-db.el,
+	emacs/mhc-file.el, emacs/mhc-gnus.el, emacs/mhc-header.el,
+	emacs/mhc-logic.el, emacs/mhc-mew.el, emacs/mhc-parse.el,
+	emacs/mhc-record.el, emacs/mhc-slot.el, emacs/mhc-summary.el,
+	emacs/mhc-vars.el, emacs/mhc-wl.el, emacs/nnmhc.el: New files.
+
+	* emacs/00usage.jis, emacs/mhc-date.el, emacs/mhc-face.el,
+	emacs/mhc-guess.el, emacs/mhc-minibuf.el, emacs/mhc-misc.el,
+	emacs/mhc-schedule.el, emacs/mhc.el: Modified and improved.
 
 2000-05-31  Hideyuki SHIRAI  <shirai@rdmg.mgcs.mei.co.jp>
 

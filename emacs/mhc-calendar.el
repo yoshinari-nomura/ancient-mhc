@@ -7,8 +7,6 @@
 ;; Created: 05/12/2000
 ;; Revised: 06/05/2000
 
-(provide 'mhc-calendar)
-
 (condition-case nil
     (require 'hnf-mode)
   (error))
@@ -308,8 +306,10 @@ The keys that are defined for mhc-calendar-mode are:
 	(buffer-read-only nil))
     (goto-char (point-max))
     (insert "\n")
-    (mhc-insert-separator)
-    (mhc-sch-scan-date ddate 'calendar)
+    (mhc-summary/insert-separator)
+    (let ((day (ddate-days ddate))
+	  (mhc-use-week-separator))
+      (mhc-summary-make-contents day day 'mhc-calendar))
     (delete-char -1)
     (set-buffer-modified-p nil)))
 
@@ -967,6 +967,23 @@ The keys that are defined for mhc-calendar-mode are:
 	(progn
 	  (mhc-face-setup-internal mhc-calendar-hnf-face-alist ow)
 	  (mhc-face-setup-internal mhc-calendar-hnf-face-alist-internal nil)))))
+
+
+;;; Pseudo MUA Backend Methods:
+
+(defun mhc-calendar-insert-summary-contents (schedule contents icon)
+  (put-text-property 0 (length contents)
+		     'mhc-calendar-summary-prop
+		     (or (mhc-record-name
+			  (mhc-schedule-record schedule))
+			 "Dummy")
+		     contents)
+  (insert contents "\n"))
+
+
+(provide 'mhc-calendar)
+(put 'mhc-calendar 'insert-summary-contents 'mhc-calendar-insert-summary-contents)
+
 
 ;;; Copyright Notice:
 

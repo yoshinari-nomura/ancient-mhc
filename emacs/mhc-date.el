@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1999/04/07
-;; Revised: $Date: 2000/05/29 14:59:24 $
+;; Revised: $Date: 2000/06/07 01:03:24 $
 
 ;;;
 ;;; Commentary:
@@ -397,9 +397,9 @@
 ;;
 (defun ddate-days-of-mm (ddate)
   (let ((yy (ddate-yy ddate)) (mm (ddate-mm ddate)))
-    (if (ddate-leap-year-p yy)
-	(nth (1- mm) '(31 29 31 30 31 30 31 31 30 31 30 31))
-      (nth (1- mm) '(31 28 31 30 31 30 31 31 30 31 30 31)))))
+    (if (and (= mm 2) (ddate-leap-year-p yy))
+	29
+      (aref [31 28 31 30 31 30 31 31 30 31 30 31] (1- mm)))))
   
 ;;
 ;; returns t if the the year is leapyear.

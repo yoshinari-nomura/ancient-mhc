@@ -3,7 +3,7 @@
 ################################################################
 
 Created: 1999/04/07
-Revised: $Date: 2000/05/29 15:08:23 $
+Revised: $Date: 2000/06/07 01:03:23 $
 
 mhc の使いかた
 
@@ -29,22 +29,16 @@ mhc の使いかた
     3. .emacs に以下のように記述します。
 
       Mew (1.94以降) のユーザ:
-      (setq mhc-mailer-package 'mew)
-      (autoload 'mhc-mode "mhc" nil t)
-      (add-hook 'mew-summary-mode-hook 'mhc-mode)
-      (add-hook 'mew-virtual-mode-hook 'mhc-mode)
-      (add-hook 'mew-message-hook      'mhc-misc-hdr-decode)
+       (autoload 'mhc-mew-setup "mhc-mew")
+       (add-hook 'mew-init-hook 'mhc-mew-setup)
 
       Wanderlust (2.2.10以降) のユーザ:
-       (setq mhc-mailer-package 'wl)
-       (autoload 'mhc-mode "mhc" nil t)
-       (add-hook 'wl-summary-mode-hook 'mhc-mode)
-       (add-hook 'wl-folder-mode-hook 'mhc-mode)
+       (autoload 'mhc-wl-setup "mhc-wl")
+       (add-hook 'wl-init-hook 'mhc-wl-setup)
 
       Gnus のユーザ:
-       (setq mhc-mailer-package 'gnus)
-       (autoload 'mhc-mode "mhc" nil t)
-       (add-hook 'gnus-summary-mode-hook 'mhc-mode)
+       (autoload 'mhc-gnus-setup "mhc-gnus")
+       (add-hook 'gnus-startup-hook 'mhc-gnus-setup)
 
       を加えます。また、ディレクトリ構成に設定に応じて、必要であれば、
 

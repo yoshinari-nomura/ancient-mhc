@@ -3,11 +3,12 @@
 ;; Author:  Yuuichi Teranishi <teranisi@gohome.org>
 ;;
 ;; Created: 2000/05/27
-;; Time-stamp: <00/05/31 10:16:27 teranisi>
+;; Time-stamp: <2000-06-01 18:25:02 teranisi>
 
+(require 'bitmap)
 (require 'mhc-face)
 
-(defvar mhc-bm-category-icon-alist nil
+(defcustom mhc-bm-category-icon-alist nil
   "*Alist to rule the category-to-icon conversion.
 Each element should have the form
  (CATEGORY-STRING . (ICON-FILE FG BG))
@@ -20,12 +21,21 @@ Example:
     (\"Private\"     . (\"Private.xbm\" \"HotPink\"))
     (\"Anniversary\" . (\"Anniversary.xbm\" \"SkyBlue\"))
     (\"Birthday\"    . (\"Birthday.xbm\"))
-    (\"Other\"       . (\"Other.xbm\" \"Red\")))")
+    (\"Other\"       . (\"Other.xbm\" \"Red\")))"
+  :group 'mhc
+  :type '(repeat
+	  :inline t
+	  (cons (string :tag "Category Name")
+		(list (string :tag "XBM File Name")
+		      (choice (string :tag "Set FG Color")
+			      (const :tag "Default FG Color" nil))
+		      (choice (string :tag "Set BG Color")
+			      (const :tag "Default BG Color" nil))))))
 
 ;; internal variable.
-(defvar mhc-bm-category-bmstr-alist nil)
+(defvar mhc-bm/category-bmstr-alist nil)
 
-(defun mhc-bm-create-rectangle (file)
+(defun mhc-bm/create-rectangle (file)
   (with-temp-buffer
     (insert-file-contents file)
     (let* ((cmp (bitmap-decode-xbm (bitmap-read-xbm-buffer (current-buffer))))
@@ -37,12 +47,12 @@ Example:
 	(setq i (+ i 1)))
       (nreverse bitmap))))
 
-(defun mhc-bm-setup-icons ()
+(defsubst mhc-bm/setup-icons ()
   (let ((alist mhc-bm-category-icon-alist)
 	bmstr)
     (while alist
       ;; Only the first element of the rectangle is used.
-      (setq bmstr (car (mhc-bm-create-rectangle
+      (setq bmstr (car (mhc-bm/create-rectangle
 			(expand-file-name (car (cdr (car alist)))
 					  mhc-icon-path))))
       (put-text-property 0 (length bmstr)
@@ -55,11 +65,11 @@ Example:
 				(nth 0 (cdr (cdr (car alist))))
 				(nth 1 (cdr (cdr (car alist))))))
 			 bmstr)
-      (setq mhc-bm-category-bmstr-alist
+      (setq mhc-bm/category-bmstr-alist
 	    (cons
-	     (cons (car (car alist))
+	     (cons (downcase (car (car alist)))
 		   bmstr)
-	     mhc-bm-category-bmstr-alist))
+	     mhc-bm/category-bmstr-alist))
       (setq alist (cdr alist)))))
        
 ;; Icon interface
@@ -67,11 +77,11 @@ Example:
   "Initialize MHC icons."
   (interactive)
   (if (interactive-p)
-      (setq mhc-bm-category-bmstr-alist nil))
-  (or mhc-bm-category-bmstr-alist
+      (setq mhc-bm/category-bmstr-alist nil))
+  (or mhc-bm/category-bmstr-alist
       (progn
 	(message "Initializing MHC icons...")
-	(mhc-bm-setup-icons)
+	(mhc-bm/setup-icons)
 	(message "Initializing MHC icons...done."))))
 
 (defun mhc-use-icon-p ()
@@ -80,7 +90,7 @@ Example:
 
 (defun mhc-get-icon (category)
   "Get icon glyph for GATEGORY."
-  (cdr (assoc category mhc-bm-category-bmstr-alist)))
+  (cdr (assoc category mhc-bm/category-bmstr-alist)))
 
 (defun mhc-put-icon (icon position)
   "Put ICON at POSITION of the current buffer."

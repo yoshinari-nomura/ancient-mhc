@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1997/10/12
-;; Revised: $Date: 2000/05/29 14:59:25 $
+;; Revised: $Date: 2000/06/07 01:03:24 $
 
 ;;;
 ;;; Commentay:
@@ -14,143 +14,7 @@
 ;;;
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; header
-
-(defun mhc-misc-hdr-value (hdr)
-  (let ((ret nil))
-    (save-excursion
-      (goto-char (point-min))
-      (re-search-forward "^-*$" nil t)
-      (beginning-of-line)
-      (narrow-to-region (point-min) (point))
-      (goto-char (point-min))
-      (if (re-search-forward
-	   (format  
-	    "^%s[\t ]*\\([^\t \n][^\n]*\\(\n[ \t]+[^\n]*\\)*\\)" hdr) nil t)
-	  (setq ret 
-		(mhc-misc-strip
-		 (mhc-misc-gsub 
-		  (buffer-substring (match-beginning 1) (match-end 1))
-		  "\n[\t ]*" " "))))
-      (widen))
-    ret))
-
-(defun mhc-misc-hdr-delete-list(hdr-list)
-  (while hdr-list
-    (mhc-misc-hdr-delete (car hdr-list))
-    (setq hdr-list (cdr hdr-list))))
-
-
-(defun mhc-misc-hdr-delete (hdr)
-  (save-excursion
-    (goto-char (point-min))
-    (re-search-forward "^-*$" nil t)
-    (beginning-of-line)
-    (narrow-to-region (point-min) (point))
-    (goto-char (point-min))
-    (delete-matching-lines 
-     (format  "^%s[^\n]*\\(\n[ \t]+[^\n]*\\)*" hdr))
-    (widen)))
-
-(defun mhc-misc-hdr-delete-separator ()
-  (save-excursion
-    (goto-char (point-min))
-    (if (re-search-forward "^-*$" nil t)
-	(progn
-          (beginning-of-line)
-	  (if (not (looking-at "^--*$"))
-	      ()
-	    (kill-line 1)
-	    (insert "\n"))))))
-
-;; Add header and its value to a buffer, if already exists the header,
-;; erase it before the addtion.
-;;
-(defun mhc-misc-hdr-replace (hdr value)
-  (save-excursion
-    (mhc-misc-hdr-delete hdr)
-    (goto-char (point-min))
-    (re-search-forward "^-*$" nil t)
-    (beginning-of-line)
-    (insert (concat hdr " " value "\n"))))
-
-;; Add header and its value to a buffer, if already exists the header,
-;; add the value to it.
-;;
-(defun mhc-misc-hdr-add (hdr value)
-  (if (not (mhc-misc-hdr-value hdr))
-      (mhc-misc-hdr-replace hdr value)
-    ;(save-excursion
-      (goto-char (point-min))
-      (re-search-forward (format "^%s *" hdr) nil t)
-      (insert (concat value " "))
-      ;)
-    )
-  )
-
-
-;; 
-;; This function was orignally written by 
-;; Mr. Shun-ichi Goto <gotoh@taiyo.co.jp> (cf. http://www.imasy.org/~gotoh/)
-;; Arranged by  Mr. Hideyuki SHIRAI <shirai@rdmg.mgcs.mei.co.jp>
-;;
-(defun mhc-misc-hdr-decode ()
-  "mew-message-hook function to decode RAW JIS subject in header"
-  (condition-case e
-      (if (mew-current-get 'cache)
-	  (let* ((cache (mew-current-get 'cache))
-		 (part (mew-current-get 'part))
-		 (syntax (mew-cache-decode-syntax cache))
-		 (ent (mew-syntax-get-entry syntax part))
-		 (ct (mew-syntax-get-ct ent))
-		 (buffer-read-only nil))
-	    (if (not (equal "Message/Rfc822" (car ct)))
-		()			; nothing to do
-	      ;; do only Message/Rfc822 contents
-	      (save-excursion
-		(save-restriction
-		  (widen)
-		  (goto-char 1)
-		  (if (not (re-search-forward "\r?\n\r?\n" nil t))
-		      ()		; no header
-		    (narrow-to-region (point-min) (point))
-		    (goto-char (point-min))
-		    (if (not (re-search-forward "^X-SC-Subject:" nil t))
-			()
-		      (goto-char (point-min))
-		      ;; decode raw JIS string
-		      (while (< (point) (point-max))
-			(if (looking-at "[^:]+:? *")
-			    (goto-char (match-end 0)))
-			(if (and (not (looking-at "[\t\x20-\x7e]+$"))
-				 (equal (mew-find-cs-region 
-					 (point)
-					 (save-excursion (end-of-line)
-							 (point)))
-					(list mew-lc-ascii)))
-			    ;; decode!
-			    (mew-cs-decode-region (point) 
-						  (save-excursion
-						    (end-of-line)
-						    (point))
-						  mew-cs-scan))
-			(beginning-of-line)
-			(forward-line 1))
-		      ;; re-highlight
-		      (mew-highlight-header)
-		      (save-excursion
-			(mew-highlight-x-face (point-min) (point-max))))))))))
-    (error
-     (ding t)
-     (message "mhc-message-decode-header: %s" (or (cdr e) "some error!")))))
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; string
-
-(defun mhc-misc-join (lst &optional sep)
-  (mapconcat (function identity) lst sep))
-
 
 (defun mhc-misc-sub (str regex replace)
   (if (and (stringp str) (string-match regex str))
@@ -177,48 +41,20 @@
   (mhc-misc-sub 
    (mhc-misc-sub str "^[\t ]+" "") "[\t ]+$" ""))
 
-(defun mhc-misc-capitalize (str)
-  (capitalize str))
-
-(defun mhc-misc-uniq (lst)
-  (let ((tmp lst))
-    (while tmp (setq tmp (setcdr tmp (delete (car tmp) (cdr tmp))))))
-  lst)
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; file & path
 
-(defun mhc-misc-copy-buffer-to-file (buffer file &optional append)
-  (save-excursion
-    (set-buffer buffer)
-    (cond
-     ((string< "20.3" emacs-version) ;; emacs 20.3.x or higher
-      (let ((coding-system-for-write 'iso-2022-jp))
-	(write-region (point-min) (point-max) file append
-		      'silence nil nil)))
-     ((string< "20" emacs-version) ;; emacs 20.x
-      (let ((coding-system-for-write 'iso-2022-jp))
-	(write-region (point-min) (point-max) file append
-		      'silence nil )))
-     ((string< "19.3" emacs-version) ;; emacs 19.34
-      (write-region (point-min) (point-max) file append
-		    'silence nil *iso-2022-jp*))
-     (t ;; 19.28
-      (write-region (point-min) (point-max) file append
-		    'silence *iso-2022-jp*)))
-    (set-buffer-modified-p nil)))
-
-
 (defun mhc-misc-get-new-path (dir)
-  (let (dirent	(max 0) (num nil))
-    (mhc-misc-mkdir-or-higher dir)
-    (setq dirent (directory-files dir))
+  "Return name for new schedule file on DIR."
+  (let (dirent (max 0) (num nil))
+    (mhc-file-make-directory dir)
+    (setq dirent (directory-files dir nil nil t))
     (while dirent
-      (if (and (string-match "^[0-9]+$" (car dirent))
-	       (< max (setq num (string-to-int (car dirent)))))
-	  (setq max num))
+      (or (string-match "[^0-9]" (car dirent))
+	  (if (< max (setq num (string-to-number (car dirent))))
+	      (setq max num)))
       (setq dirent (cdr dirent)))
-    (expand-file-name (int-to-string (1+ max)) dir)))
+    (expand-file-name (number-to-string (1+ max)) dir)))
 
 ;;
 ;; touch directory and files.
@@ -244,20 +80,6 @@
 	;; (write-region (point-min) (point-min) mtime-file nil 'silence))
 	(write-region 1 2 mtime-file nil 'silence))
     ))
-
-;; almost same as (make-directory dir t)
-;;
-(defun mhc-misc-mkdir-or-higher (dir)
-  (let (parent)
-    (if (file-directory-p dir)
-	t ;; return value
-      (setq parent (directory-file-name 
-		    (file-name-directory 
-		     (directory-file-name dir))))
-      (if (not (mhc-misc-mkdir-or-higher parent))
-	  nil
-	(make-directory dir) t ;; return value
-	))))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

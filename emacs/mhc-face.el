@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 2000/02/08
-;; Revised: $Date: 2000/05/29 14:59:24 $
+;; Revised: $Date: 2000/06/07 01:03:24 $
 
 ;;;
 ;;; Commentay:
@@ -12,12 +12,6 @@
 ;;;
 ;;; Code:
 ;;;
-
-(defvar mhc-summary-string-conflict "[C]"
-  "*String which indicates conflicts in summary buffer.")
-
-(defvar mhc-summary-string-secret "[SECRET]"
-  "*String which hides private subjects in summary buffer.")
 
 (defvar mhc-symbol-face-alist nil
   "*Alist which is used in setup time to define required faces.
@@ -128,9 +122,6 @@ in setup time.")
     (mhc-face-setup-internal mhc-category-face-alist        ow)
     ;;
     (mhc-face-setup-internal mhc-symbol-face-alist-internal nil)
-    ;;
-    (mhc-face-put mhc-summary-string-secret   'mhc-summary-face-secret)
-    (mhc-face-put mhc-summary-string-conflict 'mhc-summary-face-conflict)
     ))
 
 (defun mhc-face-setup-internal (alist &optional overwrite)

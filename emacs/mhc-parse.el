@@ -1,0 +1,219 @@
+;;; -*- mode: Emacs-Lisp; coding: euc-japan -*-
+
+;; Author:  Yoshinari Nomura <nom@quickhack.net>,
+;;          TSUCHIYA Masatoshi <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+;; Created: 2000/04/30
+;; Revised: $Date$
+
+
+;;; Commentary:
+
+;; This file is a part of MHC, and includes functions to parse
+;; schedule headers.
+
+
+;;; Code:
+
+(require 'mhc-logic)
+(require 'mhc-record)
+(require 'mhc-header)
+
+
+(defun mhc-parse/continuous-lines ()
+  "ヘッダの継続行を処理して、内容のみを取り出す関数"
+  (let (list)
+    (skip-chars-forward " \t\n")
+    (while (not (eobp))
+      (setq list
+	    (cons (buffer-substring-no-properties
+		   (point)
+		   (progn (end-of-line) (skip-chars-backward " \t") (point)))
+		  list))
+      (end-of-line)
+      (skip-chars-forward " \t\n"))
+    (mapconcat 'identity (nreverse list) " ")))
+
+(defun mhc-parse/day (record schedule)
+  (mhc-logic-parse-day (mhc-schedule-condition schedule))
+  schedule)
+
+(defun mhc-parse/cond (record schedule)
+  (mhc-logic-parse-cond (mhc-schedule-condition schedule))
+  schedule)
+
+(defun mhc-parse/duration (record schedule)
+  (mhc-logic-parse-duration (mhc-schedule-condition schedule))
+  schedule)
+
+(defun mhc-parse/todo (record schedule)
+  (mhc-logic-parse-todo (mhc-schedule-condition schedule))
+  schedule)
+
+(defun mhc-parse/subject (record schedule)
+  (mhc-schedule/set-subject schedule (mhc-parse/continuous-lines))
+  schedule)
+
+(defun mhc-parse/location (record schedule)
+  (mhc-schedule/set-location schedule (mhc-parse/continuous-lines))
+  schedule)
+
+(defconst mhc-parse/time-regexp "\\([012][0-9]\\):\\([0-5][0-9]\\)")
+
+(defun mhc-parse/time (record schedule)
+  (let ((time (mhc-parse/continuous-lines)))
+    (let (begin end)
+      (cond
+       ((string-match (concat "^" mhc-parse/time-regexp "-" mhc-parse/time-regexp "$") time)
+	(setq begin (+ (* 60 (string-to-number (match-string 1 time)))
+		       (string-to-number (match-string 2 time)))
+	      end (+ (* 60 (string-to-number (match-string 3 time)))
+		     (string-to-number (match-string 4 time)))))
+       ((string-match (concat "^" mhc-parse/time-regexp "-?$") time)
+	(setq begin (+ (* 60 (string-to-number (match-string 1 time)))
+		       (string-to-number (match-string 2 time)))))
+       ((string-match (concat "^-" mhc-parse/time-regexp "$") time)
+	(setq end (+ (* 60 (string-to-number (match-string 1 time)))
+		     (string-to-number (match-string 2 time))))))
+      (mhc-schedule/set-time schedule begin end)))
+  schedule)
+
+(defun mhc-parse/alarm (record schedule)
+  (mhc-schedule/set-alarm schedule (mhc-parse/continuous-lines))
+  schedule)
+
+(defun mhc-parse/category (record schedule)
+  (let ((category (mhc-parse/continuous-lines)))
+    (mhc-schedule/set-categories
+     schedule
+     (nconc (delq nil (mapcar (lambda (s)
+				(if (stringp s) (downcase s)))
+			      (mhc-misc-split category "[ \t]+")))
+	    (mhc-schedule-categories schedule))))
+  schedule)
+
+;; FIXME: 要削除
+(defun mhc-parse/next (record schedule)
+  (let ((new (mhc-schedule-new record)))
+    (if schedule (mhc-schedule/set-region-end schedule (point-min)))
+    (mhc-schedule/set-region-start new (point-min))
+    new))
+
+;; FIXME: X-SC-Schedule の入れ子構造は、(mhc-db-add-exception-rule) の
+;; 実装の都合上受け入れられないので、top level 以外の X-SC-Schedule は
+;; 安全に無視される必要がある。
+(defun mhc-parse/schedule (record schedule)
+  (let ((buffer (current-buffer))
+	(start (point))
+	(end (point-max))
+	(schedule (mhc-schedule-new record)))
+    (mhc-schedule/set-region-start schedule start)
+    (mhc-schedule/set-region-start schedule end)
+    (with-temp-buffer
+      (insert-buffer-substring buffer start end)
+      (goto-char (point-min))
+      (while (not (eobp))
+	(let ((start (point)))
+	  (if (skip-chars-forward " \t\n")
+	      (delete-region start (point))))
+	(while (if (eobp)
+		   nil
+		 (eq ?\\ (progn (end-of-line) (preceding-char))))
+	  (delete-char -1)
+	  (forward-line))
+	(forward-line))
+      (goto-char (point-min))
+      (mhc-parse/internal-parser record schedule)))
+  schedule)
+
+;; FIXME: top level 以外の場所で記述された X-SC-Record-Id: は安全に無
+;; 視される必要があるが、現在の実装では何も考えずに上書きしてしまう。
+(defun mhc-parse/record-id (record schedule)
+  (mhc-record-set-id record (mhc-parse/continuous-lines))
+  schedule)
+
+(defun mhc-parse/internal-parser (record &optional schedule)
+  "Internal parseser of schedule headers in this narrowed buffer."
+  (let (func)
+    (while (not (eobp))
+      (setq func (if (looking-at "\\([^ \t:]+\\):")
+		     (mhc-header-parse-function (match-string 1))
+		   (error "Parse ERROR !!!")))
+      (mhc-header-goto-end)
+      (if (fboundp func)
+	  (save-restriction
+	    (narrow-to-region (match-beginning 0) (point))
+	    (goto-char (match-end 0))
+	    (setq schedule
+		  (funcall func
+			   record
+			   (or schedule
+			       (if (memq func '(mhc-parse/schedule mhc-parse/next))
+				   nil
+				 (mhc-parse/next record nil)))))
+	    (goto-char (point-max))))))
+  schedule)
+
+(defun mhc-parse-buffer (&optional record)
+  "Parse schedule headers in this buffer."
+  (unless record
+    (setq record (mhc-record-new (buffer-file-name))))
+  (mhc-header-narrowing
+    (let ((schedule (mhc-parse/internal-parser record)))
+      (if schedule (mhc-schedule/set-region-end schedule (point)))))
+  ;; 得られた構造を整理する
+  (let (schedules sexp)
+    ;; 現れた順序に直しておく
+    (mhc-record-set-schedules record (nreverse (mhc-record-schedules record)))
+    ;; 先頭のスケジュールをデフォルトとして参照して、欠けている要素を埋めておく
+    (setq schedules (cdr (mhc-record-schedules record)))
+    (while schedules
+      (mhc-schedule-append-default (car schedules) (car (mhc-record-schedules record)))
+      (setq schedules (cdr schedules)))
+    ;; 各スケジュールの条件式を生成する
+    (mhc-logic-compile-file record))
+  record)
+
+(defun mhc-parse-file (filename)
+  "Parse schedules headers in the file, FILENAME."
+  (save-excursion
+    (set-buffer (mhc-get-buffer-create " *mhc-parse-file*"))
+    (delete-region (point-min) (point-max))
+    (mhc-insert-file-contents-as-coding-system 'iso-2022-jp filename)
+    (mhc-parse-buffer (mhc-record-new filename))))
+
+
+
+(provide 'mhc-parse)
+
+;;; Copyright Notice:
+
+;; Copyright (C) 1999, 2000 Yoshinari Nomura. All rights reserved.
+;; Copyright (C) 2000 MHC developing team. All rights reserved.
+
+;; Redistribution and use in source and binary forms, with or without
+;; modification, are permitted provided that the following conditions
+;; are met:
+;; 
+;; 1. Redistributions of source code must retain the above copyright
+;;    notice, this list of conditions and the following disclaimer.
+;; 2. Redistributions in binary form must reproduce the above copyright
+;;    notice, this list of conditions and the following disclaimer in the
+;;    documentation and/or other materials provided with the distribution.
+;; 3. Neither the name of the team nor the names of its contributors
+;;    may be used to endorse or promote products derived from this software
+;;    without specific prior written permission.
+;; 
+;; THIS SOFTWARE IS PROVIDED BY THE TEAM AND CONTRIBUTORS ``AS IS''
+;; AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+;; LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+;; FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL
+;; THE TEAM OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+;; INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+;; (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+;; SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+;; HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+;; STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+;; ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+;; OF THE POSSIBILITY OF SUCH DAMAGE.
+
+;;; mhc-parse.el ends here.
