@@ -1,3 +1,18 @@
+2000-06-28  Yuuichi Teranishi  <teranisi@quickhack.net>
+
+	* emacs/mhc-compat.el (mhc-string-to-char-list): New function.
+
+	* emacs/mhc-summary.el (mhc-summary-line-format): Fixed docstring.
+	(mhc-summary-todo-line-format): Ditto.
+	(mhc-summary-line-format-alist): Ditto.
+	(mhc-summary-todo-line-format-alist): Ditto.
+	(mhc-summary/line-inserter-setup-internal): New function.
+	(mhc-summary-todo-line-inserter-setup): Eliminated.
+	(mhc-summary/line-parse-format): Use `mhc-string-to-char-list'.
+
+	* emacs/mhc.el (mhc-setup):
+	Delete `mhc-summary-todo-line-inserter-setup'.
+
 2000-06-27  Yuuichi Teranishi  <teranisi@quickhack.net>
 
 	* emacs/mhc.el (mhc-current-date): New implementation.
