@@ -2,7 +2,7 @@
 
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;; Created: 2000/07/18
-;; Revised: $Date: 2000/07/19 03:48:47 $
+;; Revised: $Date: 2000/07/24 10:38:28 $
 
 ;; (autoload 'mhc-cmail-setup "mhc-cmail")
 ;; (add-hook 'cmail-startup-hook 'mhc-cmail-setup)
@@ -53,10 +53,10 @@
 
 (defun mhc-cmail-get-import-buffer (get-original)
   ;; (if get-original (cmail-summary-display-asis)) ;; xxx
-  (save-window-excursion
-    (if (eq (cdr (assq major-mode mhc-cmail/summary-message-alist))
-	    (progn (other-window 1) major-mode))
-	(current-buffer))))
+  (save-excursion
+    (cmail-show-contents (cmail-get-page-number-from-summary))
+    (set-buffer *cmail-mail-buffer)
+    (current-buffer)))
 
 (defun mhc-cmail/date-to-buffer (date)
   "**cmail-summary**")
