@@ -90,13 +90,15 @@
        (t
 	(save-excursion
 	  (set-buffer nntp-server-buffer)
-	  (mhc-header-narrowing
-	    (mhc-header-delete-header "xref")
-	    (goto-char (point-max))
-	    (insert (format "Xref: %s %s\n" (system-name) path))
-	    (unless (mhc-header-get-value "subject")
-	      (goto-char (point-min))
-	      (insert "Subject: " (nnmhc-get-subject id) "\n"))))
+	  (goto-char (mhc-header-narrowing
+		       (unless (mhc-header-get-value "subject")
+			 (insert "Subject: " (nnmhc-get-subject id) "\n"))
+		       (mhc-header-delete-header "xref")
+		       (insert (format "Xref: %s %s\n" (system-name) path))
+		       (point-max)))
+	  ;; Hack for (gnus-bbdb/update-record), which doesn't accept
+	  ;; an article consisting of only headers.
+	  (if (eobp) (insert "\n")))
 	(nnheader-report 'nnmhc "Article %s retrieved" id)
 	(cons group id))))))
 

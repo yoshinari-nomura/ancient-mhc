@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1994/07/04
-;; Revised: $Date: 2000/06/16 19:46:23 $
+;; Revised: $Date: 2000/06/17 12:50:28 $
 
 ;;;
 ;;; Commentay:
@@ -300,7 +300,7 @@ Returns t if the importation was succeeded."
   (let ((draft-buffer (generate-new-buffer mhc-draft-buffer-name))
 	(current-date (if calendar (mhc-calendar-get-ddate) (mhc-current-ddate)))
 	(succeed t)
-	date time subject location category record-id)
+	date time subject location category)
     (and (interactive-p)
 	 (mhc-window-push))
     (set-buffer draft-buffer)
@@ -350,7 +350,6 @@ Returns t if the importation was succeeded."
 		    (setq category
 			  (mhc-input-category "Category: "
 					      (mhc-schedule-categories-as-string schedule)))
-		    (setq record-id (mhc-record-id original))
 		    (mhc-header-narrowing
 		      (mhc-header-delete-header (concat "^\\("
 							(mhc-regexp-opt (mhc-header-list))
@@ -367,8 +366,7 @@ Returns t if the importation was succeeded."
 		time (mhc-input-time "Time: ")
 		subject (mhc-input-subject "Subject: ")
 		location (mhc-input-location "Location: ")
-		category (mhc-input-category "Category: ")
-		record-id (mhc-record-create-id)))
+		category (mhc-input-category "Category: ")))
       ;; Quit.
       (quit 
        (and (interactive-p)
@@ -392,9 +390,8 @@ Returns t if the importation was succeeded."
 		  "\nX-SC-Cond: "
 		  "\nX-SC-Duration: "
 		  "\nX-SC-Alarm: "
-		  "\nX-SC-Record-Id: " record-id "\n")
-	  (if import-buffer
-	      ()
+		  "\nX-SC-Record-Id: " (mhc-record-create-id) "\n")
+	  (unless import-buffer
 	    (goto-char (point-max))
 	    (insert "----\n"))
 	  (mhc-draft-mode)
