@@ -108,7 +108,7 @@
 
 
 (defun mhc-gnus-summary-search-date (date)
-  (search-forward (mhc-date-format date "^%02d/%02d" mm dd) nil t))
+  (re-search-forward (mhc-date-format date "^%02d/%02d" mm dd) nil t))
 
 
 (defun mhc-gnus-summary-mode-setup (date)
