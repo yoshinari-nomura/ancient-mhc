@@ -22,8 +22,8 @@
 ;;;###autoload
 (defun mhc-wl-setup ()
   (require 'mhc)
-  (mhc-setup)
   (setq mhc-mailer-package 'wl)
+  (mhc-setup)
   (autoload 'mhc-mode "mhc" nil t)
   (add-hook 'wl-summary-mode-hook 'mhc-mode)
   (add-hook 'wl-folder-mode-hook 'mhc-mode)

@@ -45,8 +45,8 @@
 ;;;###autoload
 (defun mhc-gnus-setup ()
   (require 'mhc)
-  (mhc-setup)
   (setq mhc-mailer-package 'gnus)
+  (mhc-setup)
   (add-hook 'gnus-group-mode-hook 'mhc-mode)
   (add-hook 'gnus-summary-mode-hook 'mhc-mode)
   (add-hook 'gnus-exit-gnus-hook 'mhc-exit))

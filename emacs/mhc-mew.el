@@ -44,8 +44,8 @@
 ;;;###autoload
 (defun mhc-mew-setup ()
   (require 'mhc)
-  (mhc-setup)
   (setq mhc-mailer-package 'mew)
+  (mhc-setup)
   (add-hook 'mew-summary-mode-hook 'mhc-mode)
   (add-hook 'mew-virtual-mode-hook 'mhc-mode)
   (add-hook 'mew-quit-hook 'mhc-exit))

@@ -113,6 +113,12 @@ If REGEXP, HEADER is a regular expression."
     value))
 
 
+(defun mhc-header-valid-p (header &optional repeat)
+  "Valid HEADER in the narrowed buffer."
+  (let ((get (mhc-header-get-value header repeat)))
+    (and (stringp get) (not (string= "" get)))))
+
+
 (defun mhc-header-delete-separator ()
   "Delete separator between header and body in this buffer."
   (save-excursion

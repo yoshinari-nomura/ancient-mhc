@@ -2,7 +2,7 @@
 
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;; Created: 2000/07/18
-;; Revised: $Date: 2001/01/22 08:39:24 $
+;; Revised: $Date: 2001/02/09 11:48:20 $
 
 ;; (autoload 'mhc-cmail-setup "mhc-cmail")
 ;; (add-hook 'cmail-startup-hook 'mhc-cmail-setup)
@@ -55,8 +55,8 @@
 (defun mhc-cmail-setup ()
   (interactive)
   (require 'mhc)
-  (mhc-setup)
   (setq mhc-mailer-package 'cmail)
+  (mhc-setup)
   (add-hook 'cmail-summary-mode-hook 'mhc-mode)
   (add-hook 'cmail-folders-mode-hook 'mhc-mode)
   (add-hook 'cmail-quit-hook 'mhc-exit))

@@ -294,11 +294,6 @@ from 'month before last' to 'this month next year'."
   (mhc-slot-destruct-cache directory))
 
 
-(defun mhc-cvs/update-dirs-exist (dir)
-  "CVS 管理下の directory か否か判定する"
-  (and (file-directory-p dir)
-       (file-directory-p (expand-file-name "CVS" dir))))
-
 (defun mhc-cvs/update-dirs ()
   "mhc-cvs-default-update-duration で指定された範囲の directory を返す"
   (when mhc-cvs-default-update-duration
@@ -306,13 +301,13 @@ from 'month before last' to 'this month next year'."
 	  (i (- (cdr mhc-cvs-default-update-duration)
 		(car mhc-cvs-default-update-duration)))
 	  dirs schdir)
-      (when (mhc-cvs/update-dirs-exist
+      (when (file-directory-p
 	     (expand-file-name "intersect" mhc-cvs/default-directory))
 	(setq dirs (cons "intersect" dirs)))
       (setq cdate (mhc-date-mm+ cdate (car mhc-cvs-default-update-duration)))
       (while (>= i 0)
 	(setq schdir (mhc-date-format cdate "%04d/%02d" yy mm))
-	(when (mhc-cvs/update-dirs-exist
+	(when (file-directory-p
 	       (expand-file-name
 		schdir (mhc-summary-folder-to-path mhc-base-folder)))
 	  (setq dirs (cons schdir dirs)))
@@ -373,8 +368,9 @@ from 'month before last' to 'this month next year'."
 	(or (= 0 (mhc-cvs/backend (list "commit" "-m" "" (car modified-files))))
 	    (setq commit-fault-files (cons (car modified-files) commit-fault-files)))
 	(setq modified-files (cdr modified-files)))
-      ;; 手動で書いたと思われるファイルを扱う
-      (when unknown-files (mhc-cvs/unknown-file unknown-files))
+      ;; 手動で書いたと思われるファイルを扱う。MHC のデータとして完成していないといけない。
+      (when unknown-files
+	(mhc-cvs/unknown-file unknown-files))
       (if commit-fault-files
 	  (message "File(s) are fault to commit: %s"
 		   (mapconcat (lambda (s) s) commit-fault-files ",")))
@@ -388,15 +384,15 @@ from 'month before last' to 'this month next year'."
 
 (defun mhc-cvs-edit-conflict-file (&optional files)
   (if (setq files (or files (get 'mhc-cvs-edit-conflict-file 'conflict-files)))
-  (progn
-    (put 'mhc-cvs-edit-conflict-file 'conflict-files (cdr files))
-    (message "Conflict has been occured. file=%s" (car files))
-    (mhc-modify-file (car files)))
+      (progn
+	(put 'mhc-cvs-edit-conflict-file 'conflict-files (cdr files))
+	(message "Conflict has been occured. file=%s" (car files))
+	(mhc-modify-file (car files)))
     (put 'mhc-cvs-edit-conflict-file 'conflict-files nil)))
 
-;; この関数は完全ではない。
+
 (defun mhc-cvs/unknown-file (unknowns)
-  (let (dirs files dir file expf char loop)
+  (let (dirs files dir file expf char loop mhcp record)
     (while unknowns
       (setq expf (expand-file-name
 		  (car unknowns)
@@ -442,33 +438,45 @@ from 'month before last' to 'this month next year'."
     (while (setq file (car files))
       (setq expf (expand-file-name
 		  file (mhc-summary-folder-to-path mhc-base-folder)))
-      (setq loop t)
-      (while loop
-	(message
-	 (format "[file: %s] ? A)dd CVS repository, R)emove immediately, M)ove to trash"
-		 file))
-	(condition-case nil
-	    (setq char (read-char))
-	  (error (setq char ?Z)))	;; dummy set
- 	 (cond
- 	  ((memq char '(?a ?A))
- 	   (setq loop nil)
-	   (message (format "[file: %s]  Add CVS repository..." file))
-	   (and (= 0 (mhc-cvs/backend (list "add" file)))
-		(mhc-cvs/modify expf))
-	   (message (format "[file: %s]  Add CVS repository... done." file)))
-	  ((memq char '(?r ?R))
- 	   (setq loop nil)
-	   (message "")
- 	   (delete-file expf))
- 	  ((memq char '(?m ?M))
-	   (setq loop nil)
-	   (message "")
- 	   (rename-file
-	    expf
-	    (mhc-misc-get-new-path
- 	     (expand-file-name "trash"
-			       (mhc-summary-folder-to-path mhc-base-folder)))))))
+      (with-temp-buffer
+	(insert-file-contents expf)
+	(setq mhcp
+	      (mhc-header-narrowing
+		(and (mhc-header-valid-p "x-sc-subject")
+		     (mhc-header-valid-p "x-sc-record-id")
+		     (or (mhc-header-valid-p "x-sc-day")
+			 (mhc-header-valid-p "x-sc-cond")))))
+	(when mhcp
+	  (setq record (mhc-parse-buffer (mhc-record-new expf)))))
+      (when mhcp
+	(setq loop t)
+	(while loop
+	  (message
+	   (format "[file: %s] ? A)dd CVS repository, R)emove immediately, M)ove to trash"
+		   file))
+	  (condition-case nil
+	      (setq char (read-char))
+	    (error (setq char ?Z)))	;; dummy set
+	  (cond
+	   ((memq char '(?a ?A))
+	    (setq loop nil)
+	    (message (format "[file: %s]  Add CVS repository..." file))
+	    (mhc-record/append-log record 'add)
+	    (and (= 0 (mhc-cvs/backend (list "add" file)))
+		 (mhc-cvs/modify expf))
+	    (message (format "[file: %s]  Add CVS repository... done." file)))
+	   ((memq char '(?r ?R))
+	    (setq loop nil)
+	    (message "")
+	    (delete-file expf))
+	   ((memq char '(?m ?M))
+	    (setq loop nil)
+	    (message "")
+	    (rename-file
+	     expf
+	     (mhc-misc-get-new-path
+	      (expand-file-name "trash"
+				(mhc-summary-folder-to-path mhc-base-folder))))))))
       (setq files (cdr files)))))
 
 

@@ -1,3 +1,21 @@
+2001-02-09  Hideyuki SHIRAI  <shirai@quickhack.net>
+
+	* emacs/mhc-cmail (mhc-cmail-setup): Set mhc-mailer-package value
+	early mhc-setup() execution.
+
+	* emacs/mhc-gnus.el (mhc-gnus-setup): Ditto.
+
+	* emacs/mhc-mew.el (mhc-mew-setup): Ditto.
+
+	* emacs/mhc-wl.el (mhc-wl-setup): Ditto.
+
+	* emacs/mhc-header.el (mhc-header-valid-p): New function.
+
+	* emacs/mhc-cvs.el (mhc-cvs/update-dirs-exist): Remove function.
+	(mhc-cvs/update-dirs): Don't check 'CVS' directory.
+	(mhc-cvs/unknown-file): Check unknown file seem to MHC file. Add
+	mhc-log if file is commit.
+
 2001-02-09  INOUE Tomonori <inouetom@brain.is.kyushu-u.ac.jp>
 
 	* emacs/mhc-bm.el (mhc-bm-icon-alist): fix typo.
