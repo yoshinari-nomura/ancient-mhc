@@ -3,7 +3,7 @@
 ## Author:  Yoshinari Nomura <nom@quickhack.net>
 ##
 ## Created: 1999/07/16
-## Revised: $Date: 2001/05/22 02:02:43 $
+## Revised: $Date: 2001/09/12 03:44:56 $
 ##
 
 ################################################################
@@ -844,7 +844,12 @@ class MhcScheduleItem
     contents = datebk3_icon + "\n" + contents if datebk3_icon
     pi_rec .set_note(contents)
 
-    pi_rec .set_description(subject)
+    if (location .to_s != '')
+      pi_rec .set_description(subject + '[' + location .to_s + ']')
+    else
+      pi_rec .set_description(subject)
+    end
+      
     return pi_rec
   end
 

@@ -3,7 +3,7 @@
 ## Author:  Yoshinari Nomura <nom@quickhack.net>
 ##
 ## Created: 1999/09/01
-## Revised: $Date: 2001/02/06 13:36:01 $
+## Revised: $Date: 2001/09/12 03:44:56 $
 ##
 
 require 'mhc-date'
@@ -579,7 +579,8 @@ class PilotApptRecord < PilotRecord
     xsc["Record-Id"]  = create_message_id(@id .to_s) # xxx
     xsc["Pilot-Attr"] = attribute_string
     xsc["Pilot-Id"]   = @id
-    xsc["Subject"]    = Kconv::tojis(@description)
+    xsc["Subject"]    = Kconv::tojis(Kconv::toeuc(@description) .sub(/\[[^\]]*\]\s*$/, ''))
+    xsc["Location"]   = Kconv::tojis($1) if Kconv::toeuc(@description) =~ /\[([^\]]+)\]\s*$/
     xsc["Note"]       = Kconv::tojis(@note)
     xsc["Category"]   = @category  if category?
     xsc["Alarm"]      = alarm
