@@ -1,3 +1,7 @@
+2000-06-18  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+
+	* emacs/mhc-ps.el: New file.
+
 2000-06-18  Yoshinari Nomura  <nom@quickhack.net>
 
 	* emacs/mhc.el (mhc-input-month):
