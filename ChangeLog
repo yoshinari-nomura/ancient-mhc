@@ -1,3 +1,7 @@
+2000-06-08  Yoshinari Nomura  <nom@quickhack.net>
+
+	* emacs/mhc-date.el (ddate-yy-s): fix defmacro problem.
+
 2000-06-07  Yuuichi Teranishi  <teranisi@quickhack.net>
 
 	* emacs/mhc.el (mhc-scan-month):
@@ -6,7 +10,8 @@
 
 2000-06-06  Hideyuki SHIRAI  <shirai@rdmg.mgcs.mei.co.jp>
 
-	* emacs/mhc-date.el (ddate-yy<): NEW backquote style to OLD backquote style.
+	* emacs/mhc-date.el (ddate-yy<): NEW backquote style to OLD
+		  backquote style.
 
 	* emacs/mhc-guess.el: Type fix.
 
