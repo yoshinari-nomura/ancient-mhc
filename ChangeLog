@@ -6,6 +6,9 @@
 	(mhc-goto-this-month): Ditto.
 	(mhc-goto-next-month): Ditto.
 	(mhc-rescan-month): Ditto.
+	(mhc-delete-file): Ditto.
+	(mhc-draft-finish): Ditto.
+	(mhc-cal-toggle-insert-rectangle): Ditto.
 
 	* emacs/mhc-vars.el (mhc-default-hide-private-schedules): New
 	variables.

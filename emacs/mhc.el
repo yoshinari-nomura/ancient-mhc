@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1994/07/04
-;; Revised: $Date: 2000/06/16 06:35:28 $
+;; Revised: $Date: 2000/06/16 07:15:30 $
 
 ;;;
 ;;; Commentay:
@@ -428,7 +428,8 @@ Returns t if the importation was succeeded."
 						 (and (eq major-mode 'mhc-calendar-mode)
 						      mhc-calendar-view-ddate))))
 	(mhc-db-delete-file record))
-      (or (and (mhc-summary-buffer-p) (mhc-rescan-month))
+      (or (and (mhc-summary-buffer-p)
+	       (mhc-rescan-month mhc-default-hide-private-schedules))
 	  (and (eq major-mode 'mhc-calendar-mode) (mhc-calendar-rescan))))))
 
 (defun mhc-modify ()
@@ -515,7 +516,8 @@ C-c ?    mhc-draft-insert-calendar
 	(progn
 	  (kill-buffer (current-buffer))
 	  (mhc-window-pop)
-	  (or (and (mhc-summary-buffer-p) (mhc-rescan-month))
+	  (or (and (mhc-summary-buffer-p)
+		   (mhc-rescan-month mhc-default-hide-private-schedules))
 	      (and (eq major-mode 'mhc-calendar-mode) (mhc-calendar-rescan)))
 	  (run-hooks 'mhc-draft-finish-hook)))))
 
@@ -622,7 +624,8 @@ C-c ?    mhc-draft-insert-calendar
 (defun mhc-cal-toggle-insert-rectangle ()
   (interactive)
   (setq mhc-insert-calendar (not mhc-insert-calendar))
-  (mhc-rescan-month))
+  (when (mhc-summary-buffer-p)
+    (mhc-rescan-month mhc-default-hide-private-schedules)))
 
 (defconst mhc-cal-week-header "| Su Mo Tu We Th Fr Sa")
 
