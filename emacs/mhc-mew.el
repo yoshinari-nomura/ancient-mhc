@@ -168,11 +168,15 @@
        (window-live-p (get-buffer-window (mew-buffer-message)))
        (delete-window (get-buffer-window (mew-buffer-message))))
   ;; Mew-1.95b104 or later, disable mark highlight
-  (when (boundp 'mew-summary-buffer-raw) 
+  (when (boundp 'mew-summary-buffer-raw)
     (setq mew-summary-buffer-raw nil))
   ;; Mew 4.x or later
   (when (fboundp 'mew-summary-set-count-line)
     (mew-summary-set-count-line))
+  ;; Mew 4.0.69 or later, fake mew-pickable-p()
+  (when (fboundp 'mew-vinfo-set-flds)
+    (mew-vinfo-set-flds `(,(mhc-mew/date-to-buffer date)
+			  ,(format "%s/intersect" mhc-base-folder))))
   (mew-summary-toggle-disp-msg 'off))
 
 
