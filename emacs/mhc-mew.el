@@ -15,9 +15,13 @@
 (require 'mew)
 
 ;; Internal Variables:
+(defvar mhc-mew-new-virtual-type (boundp 'mew-regex-summary2)
+  "*Mew virtual format type. Non-nil means Mew 3.0.55 or later.")
 
-(defconst mhc-mew/summary-filename-regex 
-  ".*\r *\\+\\([^ \t]+\\)[ \t]+\\([^ \t\n]+\\)")
+(defconst mhc-mew/summary-filename-regex
+  (if mhc-mew-new-virtual-type
+      ".*[^\006\n]+\006 \\+\\([^ ]*\\) \\([0-9]+\\)$"
+    ".*\r *\\+\\([^ \t]+\\)[ \t]+\\([^ \t\n]+\\)"))
 
 (defconst mhc-mew/header-string
   (let ((str "0 | "))
@@ -110,6 +114,7 @@
 		(concat "+" (substring path (match-end 0))))
 	  (concat
 	   "\r "
+	   (if mhc-mew-new-virtual-type "<> <> \006 ")
 	   (directory-file-name (file-name-directory fld-msg))
 	   " "
 	   (file-name-nondirectory fld-msg)))
