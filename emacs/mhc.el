@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1994/07/04
-;; Revised: $Date: 2004/10/07 10:06:35 $
+;; Revised: $Date: 2004/10/07 10:38:00 $
 
 ;;;
 ;;; Commentay:
@@ -501,9 +501,10 @@ If HIDE-PRIVATE, private schedules are suppressed."
       (if mhc-use-month-separator
 	  (mhc-summary/insert-separator
 	   'wide
-	   (when (and mhc-summary/cw-separator
-		      (eq (mhc-end-day-of-week) (mhc-date-ww bto)))
-	     (format " CW %d " (mhc-date-cw (mhc-date++ bto)))))
+	   (when (eq (mhc-end-day-of-week) (mhc-date-ww bto))
+	     (if mhc-summary/cw-separator
+		 (format " CW %d " (mhc-date-cw (mhc-date++ bto)))
+	       (make-string (length " CW 00 ") mhc-summary-month-separator))))
 	(if (and mhc-use-week-separator
 		 (eq (mhc-end-day-of-week) (mhc-date-ww bto)))
 	    (mhc-summary/insert-separator
@@ -515,14 +516,15 @@ If HIDE-PRIVATE, private schedules are suppressed."
       (if mhc-use-month-separator
 	  (mhc-summary/insert-separator
 	   'wide
-	   (when (and mhc-summary/cw-separator
-		      (eq mhc-start-day-of-week (mhc-date-ww afrom)))
-	     (format " CW %d " (mhc-date-cw afrom))))
+	   (when (eq mhc-start-day-of-week (mhc-date-ww afrom))
+	     (if mhc-summary/cw-separator
+		 (format " CW %d " (mhc-date-cw afrom))
+	       (make-string (length " CW 00 ") mhc-summary-month-separator))))
 	(if (and mhc-use-week-separator
 		 (eq mhc-start-day-of-week (mhc-date-ww afrom)))
 	    (mhc-summary/insert-separator
 	     nil
-	     (when mhc-summary/cw-separator 
+	     (when mhc-summary/cw-separator
 		   (format " CW %d " (mhc-date-cw afrom))))))
       (mhc-summary-make-contents afrom ato mailer category-predicate secret))
     (unless (eq 'direct mailer)
