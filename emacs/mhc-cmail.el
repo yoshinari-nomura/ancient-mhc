@@ -2,7 +2,7 @@
 
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;; Created: 2000/07/18
-;; Revised: $Date: 2000/07/24 10:38:28 $
+;; Revised: $Date: 2000/08/02 05:43:55 $
 
 ;; (autoload 'mhc-cmail-setup "mhc-cmail")
 ;; (add-hook 'cmail-startup-hook 'mhc-cmail-setup)
@@ -14,6 +14,15 @@
 ;;; Code:
 
 (require 'cmail)
+
+(condition-case nil
+    (progn
+      (require 'mime-edit)
+      (require 'eword-decode))
+  (error))
+(if (and (featurep 'mime-edit)
+	 (featurep 'eword-decode))
+    (require 'mhc-mime))
 
 ;; Internal Variables:
 
@@ -211,6 +220,38 @@
 	(set-buffer *cmail-summary-buffer)))
     (cmail-fixcp)))
 
+(if (featurep 'mhc-mime)
+    (defalias 'mhc-cmail-eword-decode-string 'eword-decode-string)
+  (defalias 'mhc-cmail-eword-decode-string 'identity))
+
+(defun mhc-cmail-draft-setup-new ()
+  (goto-char (point-min))
+  (insert mail-header-separator "\n"))
+
+(defun mhc-cmail-draft-reedit-buffer (buffer original)
+  ;; If current buffer is specified as buffer, no need to replace.
+  (unless (eq (current-buffer) buffer)
+    (erase-buffer)
+    (insert-buffer buffer))
+  (goto-char (point-min))
+  (and (re-search-forward "^$" nil t)
+       (insert mail-header-separator)))
+
+(defun mhc-cmail-draft-reedit-file (file)
+  (erase-buffer)
+  (mhc-insert-file-contents-as-coding-system mhc-default-coding-system file)
+  (goto-char (point-min))
+  (and (re-search-forward "^$" nil t)
+       (insert mail-header-separator)))
+
+(defun mhc-cmail-draft-translate ()
+  (save-excursion
+    (goto-char (point-min))
+    (if (re-search-forward (concat "^"
+				   (regexp-quote mail-header-separator)
+				   "$") nil t)
+	(delete-region (match-beginning 0) (match-end 0)))))
+
 (provide 'mhc-cmail)
 (put 'mhc-cmail 'summary-filename 'mhc-cmail-summary-filename)
 (put 'mhc-cmail 'summary-display-article 'mhc-cmail-summary-display-article)
@@ -220,6 +261,12 @@
 (put 'mhc-cmail 'insert-summary-contents 'mhc-cmail-insert-summary-contents)
 (put 'mhc-cmail 'summary-search-date 'mhc-cmail-summary-search-date)
 (put 'mhc-cmail 'summary-mode-setup 'mhc-cmail-summary-mode-setup)
+(put 'mhc-cmail 'highlight-message   'mhc-summary/true)
+(put 'mhc-cmail 'draft-setup-new     'mhc-cmail-draft-setup-new)
+(put 'mhc-cmail 'draft-reedit-buffer 'mhc-cmail-draft-reedit-buffer)
+(put 'mhc-cmail 'draft-reedit-file   'mhc-cmail-draft-reedit-file)
+(put 'mhc-cmail 'draft-translate     'mhc-cmail-draft-translate)
+(put 'mhc-cmail 'eword-decode-string 'mhc-cmail-eword-decode-string)
 
 ;;; Copyright Notice:
 

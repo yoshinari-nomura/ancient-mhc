@@ -1,3 +1,12 @@
+2000-08-02  Yuuichi Teranishi  <teranisi@quickhack.net>
+
+	* emacs/mhc-cmail.el (toplevel): Require 'mime-edit and 'eword-decode.
+	(mhc-cmail-eword-decode-string): Implemented.
+	(mhc-cmail-draft-setup-new): Ditto.
+	(mhc-cmail-draft-reedit-buffer): Ditto.
+	(mhc-cmail-draft-reedit-file): Ditto.
+	(mhc-cmail-draft-translate): Ditto.
+
 2000-08-02  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* emacs/mhc-calendar.el (mhc-calendar-insert-summary-contents):
@@ -17,7 +26,7 @@
 	(mhc-mew-draft-translate): New function, make mime message.
 	(mhc-mew/make-message):  Ditto.
 	(mhc-mew-eword-decode-string): New function, decode encoded word.
-	
+
 2000-08-02  Yuuichi Teranishi  <teranisi@quickhack.net>
 
 	* icons/CheckBox.xpm: New file.
