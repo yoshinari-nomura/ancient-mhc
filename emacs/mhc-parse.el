@@ -183,7 +183,7 @@
   (save-excursion
     (set-buffer (mhc-get-buffer-create " *mhc-parse-file*"))
     (delete-region (point-min) (point-max))
-    (mhc-insert-file-contents-as-coding-system 'iso-2022-jp filename)
+    (mhc-insert-file-contents-as-coding-system mhc-default-coding-system filename)
     (mhc-parse-buffer (mhc-record-new filename))))
 
 

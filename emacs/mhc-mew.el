@@ -17,8 +17,7 @@
 
 ;;; Code:
 
-(require 'mew-vars)
-
+(require 'mew)
 
 ;; Internal Variables:
 
@@ -178,10 +177,8 @@
      (ding t)
      (message "mhc-message-decode-header: %s" (or (cdr e) "some error!")))))
 
-
 ;; For Backward Compatibility
 (defalias 'mhc-misc-hdr-decode 'mhc-mew-decode-header)
-
 
 
 (provide 'mhc-mew)

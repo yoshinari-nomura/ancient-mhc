@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1997/10/12
-;; Revised: $Date: 2000/06/07 01:03:24 $
+;; Revised: $Date: 2000/06/12 11:24:56 $
 
 ;;;
 ;;; Commentay:
@@ -136,6 +136,50 @@
 	  (delete-region (point) (match-end 0)))
       (insert (car lines))
       (setq lines (cdr lines)))))
+
+;; read-passwd
+
+(defun mhc-misc-read-passwd (prompt)
+  (let ((inhibit-input-event-recording t))
+    (if (fboundp 'read-passwd)
+	(condition-case nil
+	    (read-passwd prompt)
+	  ;; If read-passwd causes an error, let's return "" so that
+	  ;; the password process will safely fail.
+	  (error ""))
+      (let ((pass "")
+	    (c 0)
+	    (echo-keystrokes 0)
+	    (ociea cursor-in-echo-area))
+	(condition-case nil
+	    (progn
+	      (setq cursor-in-echo-area 1)
+	      (while (and (/= c ?\r) (/= c ?\n) (/= c ?\e) (/= c 7)) ;; ^G
+		(message "%s%s"
+			 prompt
+			 (make-string (length pass) ?.))
+		(setq c (read-char-exclusive))
+		(cond
+		 ((char-equal c ?\C-u)
+		  (setq pass ""))
+		 ((or (char-equal c ?\b) (char-equal c ?\177))  ;; BS DELL
+		  ;; delete one character in the end
+		  (if (not (equal pass ""))
+		      (setq pass (substring pass 0 -1))))
+		 ((< c 32) ()) ;; control, just ignore
+		 (t
+		  (setq pass (concat pass (char-to-string c))))))
+	      (setq cursor-in-echo-area -1))
+	  (quit
+	   (setq cursor-in-echo-area ociea)
+	   (signal 'quit nil))
+	  (error
+	   ;; Probably not happen. Just align to the code above.
+	   (setq pass "")))
+	(setq cursor-in-echo-area ociea)
+	(message "")
+	(sit-for 0)
+	pass))))
 
 (provide 'mhc-misc)
 

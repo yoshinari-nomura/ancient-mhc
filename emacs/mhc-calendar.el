@@ -5,72 +5,13 @@
 ;;          MIYOSHI Masanori <miyoshi@ask.ne.jp>
 ;;
 ;; Created: 05/12/2000
-;; Revised: 06/05/2000
+;; Revised: 06/09/2000
 
 (condition-case nil
     (require 'hnf-mode)
   (error))
 
-(defcustom mhc-calendar-mode-hook nil
-  "*Hook called in mhc-calendar-mode."
-  :group 'mhc
-  :type 'hook)
-
-(defcustom mhc-calendar-create-buffer-hook nil
-  "*Hook called in mhc-calendar-create-buffer."
-  :group 'mhc
-  :type 'hook)
-
-(defcustom mhc-calendar-start-column 4
-  "*Size of left margin."
-  :group 'mhc
-  :type 'integer)
-
-(defcustom mhc-calendar-next-offset 24
-  "*Offset of next month start column (greater or equal 23)."
-  :group 'mhc
-  :type 'integer)
-
-(defcustom mhc-calendar-height (if (and (featurep 'xemacs) window-system) 12 9)
-  "*Offset of next month start column (greater or equal 9)."
-  :group 'mhc
-  :type 'integer)
-
-(defcustom mhc-calendar-view-summary nil
-  "*View day's summary if *non-nil*."
-  :group 'mhc
-  :type 'boolean)
-
-(defcustom mhc-calendar-link-hnf nil
-  "*Support HNF(Hyper Nikki File) mode if *non-nil*."
-  :group 'mhc
-  :type 'boolean)
-
-(defcustom mhc-calendar-use-mouse-highlight t
-  "*Highlight mouse pointer."
-  :group 'mhc
-  :type 'boolean)
-
-(defcustom mhc-calendar-view-file-hook nil
-  "*Hook called in mhc-calendar-view-file."
-  :group 'mhc
-  :type 'hook)
-
-(defvar mhc-calendar-hnf-face-alist nil
-  "*Alist of HNS faces. Each element should have the form
-  (FACE-SYMBOL . (PARENT FG BG UNDERLINED FONT STIPPLE)).
-refer to mhc-calendar-hnf-face-alist-internal.")
-
 ;; internal variables
-(defconst mhc-calendar-hnf-face-alist-internal
-  '((mhc-calendar-hnf-face-mark . (nil    "MediumSeaGreen" nil))
-    (mhc-calendar-hnf-face-newtag  . (italic "red" "paleturquoise"))
-    (mhc-calendar-hnf-face-subtag  . (italic "blue" nil))
-    (mhc-calendar-hnf-face-cat  . (nil    "DarkGreen" nil))
-    (mhc-calendar-hnf-face-new  . (bold   "DarkGreen" nil))
-    (mhc-calendar-hnf-face-sub  . (nil   "DarkGreen" nil))
-    (mhc-calendar-hnf-face-uri  . (italic "blue" nil))))
-
 (defvar mhc-calendar-buffer "*mhc-calendar*")
 (defvar mhc-calendar-ddate '(1 1 1))
 (defvar mhc-calendar-view-ddate '(1 1 1))
@@ -81,15 +22,15 @@ refer to mhc-calendar-hnf-face-alist-internal.")
 
 ;; mhc-calendar functions
 ;; macros
-(defmacro mhc-calendar-in-day-p () ;; ddate
+(defmacro mhc-calendar-in-day-p () ;; return 'ddate'
   (` (get-text-property (point) 'mhc-calendar-day-prop)))
 
-(defmacro mhc-calendar-in-summary-p () ;; schedule filename
+(defmacro mhc-calendar-in-summary-p () ;; return 'schedule filename'
   (` (save-excursion
        (beginning-of-line)
        (get-text-property (point) 'mhc-calendar-summary-prop))))
 
-(defmacro mhc-calendar-in-summary-hnf-p () ;; title count
+(defmacro mhc-calendar-in-summary-hnf-p () ;; return 'title count'
   (` (save-excursion
        (beginning-of-line)
        (get-text-property (point) 'mhc-calendar-summary-hnf-prop))))
@@ -188,10 +129,6 @@ refer to mhc-calendar-hnf-face-alist-internal.")
 	   ["Kill" mhc-calendar-exit t]
 	   ["Help" describe-mode t]))))
 
-(easy-menu-define mhc-calendar-mode-menu
-		  mhc-calendar-mode-map
-		  "Menu used in mhc mode."
-		  mhc-calendar-mode-menu-spec)
 ;; function
 (defun mhc-calendar-mode ()
   "\\<mhc-calendar-mode-map>
@@ -257,8 +194,7 @@ The keys that are defined for mhc-calendar-mode are:
 (defun mhc-calendar (&optional ddate)
   "MHC 3-month mini calender."
   (interactive)
-  (and (mhc-use-icon-p) (mhc-icon-setup))
-  (and mhc-calendar-link-hnf (mhc-calendar-hnf-face-setup))
+  (or mhc-setup-p (mhc-setup))
   (mhc-calendar-goto-day (or ddate (mhc-current-ddate) (ddate-now))))
 
 (defun mhc-calendar-goto-day (ddate)
@@ -412,9 +348,13 @@ The keys that are defined for mhc-calendar-mode are:
 
 (defun mhc-calendar-delete ()
   (interactive)
-  (if (mhc-calendar-in-summary-p)
-      (mhc-delete-file (mhc-calendar-in-summary-p))
-    (message "Nothing to do in this point.")))
+  (let ((filename (mhc-calendar-in-summary-p)) key)
+    (if (null filename)
+	(message "Nothing to do in this point.")
+      (setq key (mhc-slot-directory-to-key 
+		 (directory-file-name (file-name-directory filename))))
+      (mhc-delete-file
+       (assoc filename (mhc-slot-records (mhc-slot-get-month-schedule key)))))))
 
 (defun mhc-calendar-modify ()
   (interactive)
@@ -544,7 +484,7 @@ The keys that are defined for mhc-calendar-mode are:
 	      (beginning-of-line)
 	      (if (not (pos-visible-in-window-p (point)))
 		  (recenter)))))
-    (message "'M-x %s' first." mhc-mailer-package)))
+    (message "MUA is not ready.")))
 
 (defun mhc-calendar-quit ()
   (interactive)
@@ -727,17 +667,6 @@ The keys that are defined for mhc-calendar-mode are:
 	    (ddate-new yy mm dd))
 	nil)
     (error nil)))
-
-(defun mhc-mua-ready-p ()
-  (cond
-   ((eq mhc-mailer-package 'mew)
-    (or (and (boundp 'mew-init-p) mew-init-p)
-	(and (boundp 'mew-mail-path) mew-mail-path)))
-   ((eq mhc-mailer-package 'wl)
-    (and (boundp 'wl-init) wl-init))
-   ((eq mhc-mailer-package 'gnus)
-    (and (fboundp 'gnus-alive-p) (gnus-alive-p)))
-   (t nil)))
 
 (defun mhc-calendar-get-buffer-alist ()
   (let ((bl (cdr (buffer-list)))
@@ -963,14 +892,22 @@ The keys that are defined for mhc-calendar-mode are:
 (defun mhc-calendar-hnf-face-setup ()
   (interactive)
   (let ((ow (interactive-p)))
-    (if (or ow (not (mhc-facep 'mhc-calendar-hnf-face-mark)))
-	(progn
-	  (mhc-face-setup-internal mhc-calendar-hnf-face-alist ow)
-	  (mhc-face-setup-internal mhc-calendar-hnf-face-alist-internal nil)))))
+    (mhc-face-setup-internal mhc-calendar-hnf-face-alist ow)
+    (mhc-face-setup-internal mhc-calendar-hnf-face-alist-internal nil)))
 
+;; MUA ready?
+(defun mhc-mua-ready-p ()
+  (cond
+   ((eq mhc-mailer-package 'mew)
+    (or (and (boundp 'mew-init-p) mew-init-p)
+	(and (boundp 'mew-mail-path) mew-mail-path)))
+   ((eq mhc-mailer-package 'wl)
+    (and (boundp 'wl-init) wl-init))
+   ((eq mhc-mailer-package 'gnus)
+    (and (fboundp 'gnus-alive-p) (gnus-alive-p)))
+   (t nil)))
 
 ;;; Pseudo MUA Backend Methods:
-
 (defun mhc-calendar-insert-summary-contents (schedule contents icon)
   (put-text-property 0 (length contents)
 		     'mhc-calendar-summary-prop

@@ -1,3 +1,31 @@
+2000-06-12  Hideyuki SHIRAI  <shirai@rdmg.mgcs.mei.co.jp>
+
+	* emacs/mhc.el (toplevel): Require mhc-calendar, mhc-sync.
+	(mhc-delete-file, mhc-modify-file): New functions to call from mhc and mhc-calendar.
+	(mhc-edit): Support mhc-calendar-mode.
+	(mhc-setup-p): New variable.
+	(mhc-setup): Add in mhc-calendar's setup funciton.
+
+	* emacs/mhc-vars.el (mhc-sync-*, mhc-calendar-*): New variables.
+
+	* emacs/mhc-parse.el (mhc-parse-file): mhc-default-coding-system use.
+
+	* emacs/mhc-misc.el (mhc-misc-read-passwd): New function.
+
+	* emacs/mhc-mew.el: (require 'mew) instead of mew-vars.
+
+	* emacs/mhc-logic.el: (require 'bytecomp) in top level, for byte-compile-wanings.
+	
+	* emacs/mhc-face.el (mhc-calendar-hnf-face-*): New variable form mhc-calendar.
+
+	* emacs/mhc-calendar.el: Sync up to main trunk.
+
+	* emacs/mhc-sync.el: New file for ruby sync script.
+
+	* emacs/Makefile: Include mhc-bm.el, mhc-xmas.el, mhc-calendar.el and mhc-sync.el.
+
+	* emacs/Makefile.w32: New file.
+
 2000-06-12  Yoshinari Nomura  <nom@quickhack.net>
 
 	* mhc-sync: mhc-sync deal with 'A' status.

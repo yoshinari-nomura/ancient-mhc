@@ -38,6 +38,7 @@
 
 ;;; Definition:
 (require 'mhc-date)
+(require 'bytecomp)
 
 ;;----------------------------------------------------------------------
 ;;		MHC-LOGIC ¹½Â¤ÂÎ

@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1994/07/04
-;; Revised: $Date: 2000/06/07 01:03:25 $
+;; Revised: $Date: 2000/06/12 11:24:56 $
 
 ;;;
 ;;; Commentay:
@@ -37,6 +37,7 @@
 (require 'mhc-minibuf)
 (require 'mhc-face)
 (require 'mhc-calendar)
+(require 'mhc-sync)
 
 (cond
  ((eval-when-compile
@@ -275,7 +276,7 @@ If HIDE-PRIVATE, private schedules are suppressed."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; import, edit, delete, modify
 
-(defun mhc-edit (&optional import-buffer)
+(defun mhc-edit (&optional import-buffer calendar)
   "Edit a new schedule.
 If optional argument IMPORT-BUFFER is specified, import its content.
 Returns t if the importation was succeeded."
@@ -284,7 +285,7 @@ Returns t if the importation was succeeded."
        (list (get-buffer (read-buffer "Import buffer: "
 				      (current-buffer))))))
   (let ((draft-buffer (generate-new-buffer mhc-draft-buffer-name))
-	(current-date (mhc-current-ddate))
+	(current-date (if calendar (mhc-calendar-get-ddate) (mhc-current-ddate)))
 	(succeed t)
 	date time subject location category record-id)
     (and (interactive-p)
@@ -391,31 +392,37 @@ Returns t if the importation was succeeded."
 
 (defun mhc-delete ()
   (interactive)
-  (let ((record (mhc-summary-record)))
-    (if (not (and record (file-exists-p (mhc-record-name record))))
-	(message "File does not exist (%s)." (mhc-record-name record))
-      (if (not (y-or-n-p (format "Do you delete %s ?" (mhc-record-subject-as-string record))))
-	  (message "Never mind..")
-	(if (and
-	     (mhc-record-occur-multiple-p record)
-	     (not (y-or-n-p (format
-			     "%s has multiple occurrences. Delete all(=y) or one(=n) ?"
-			     (mhc-record-subject-as-string record)))))
-	    (mhc-db-add-exception-rule record (ddate-days (mhc-current-ddate)))
-	  (mhc-db-delete-file record))
-	(mhc-rescan-month)))))
+  (mhc-delete-file (mhc-summary-record)))
+
+(defun mhc-delete-file (record)
+  (interactive)
+  (if (not (and record (file-exists-p (mhc-record-name record))))
+      (message "File does not exist (%s)." (mhc-record-name record))
+    (if (not (y-or-n-p (format "Do you delete %s ?" (mhc-record-subject-as-string record))))
+	(message "Never mind..")
+      (if (and
+	   (mhc-record-occur-multiple-p record)
+	   (not (y-or-n-p (format
+			   "%s has multiple occurrences. Delete all(=y) or one(=n) ?"
+			   (mhc-record-subject-as-string record)))))
+	  (mhc-db-add-exception-rule record (ddate-days
+					     (or (mhc-current-ddate)
+						 (and (eq major-mode 'mhc-calendar-mode)
+						      mhc-calendar-view-ddate))))
+	(mhc-db-delete-file record))
+      (or (and (mhc-summary-buffer-p) (mhc-rescan-month))
+	  (and (eq major-mode 'mhc-calendar-mode) (mhc-calendar-rescan))))))
 
 (defun mhc-modify ()
   (interactive)
   (mhc-modify-file (mhc-summary-filename)))
 
 (defun mhc-modify-file (filename)
-  (let (sch)
-    (if (not (and (stringp filename) (file-exists-p filename)))
-	(message "File does not exist (%s)." filename)
-      (mhc-window-push)
-      (find-file-other-window filename)
-      (mhc-draft-mode))))
+  (if (not (and (stringp filename) (file-exists-p filename)))
+      (message "File does not exist (%s)." filename)
+    (mhc-window-push)
+    (find-file-other-window filename)
+    (mhc-draft-mode)))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -448,11 +455,14 @@ Returns t if the importation was succeeded."
 Like Text Mode but with these additional commands:
 C-c C-c  mhc-draft-finish
 C-c C-k  mhc-draft-kill
-C-c C-q  mhc-draft-kill.
+C-c C-q  mhc-draft-kill
+C-c ?    mhc-draft-insert-calendar
+.
 "
   (define-key mhc-draft-mode-map "\C-c\C-c" 'mhc-draft-finish)
   (define-key mhc-draft-mode-map "\C-c\C-q" 'mhc-draft-kill)
   (define-key mhc-draft-mode-map "\C-c\C-k" 'mhc-draft-kill)
+  (define-key mhc-draft-mode-map "\C-c?" 'mhc-draft-insert-calendar)
   (make-local-variable 'adaptive-fill-regexp)
   (setq adaptive-fill-regexp
 	(concat "[ \t]*[-a-z0-9A-Z]*\\(>[ \t]*\\)+[ \t]*\\|"
@@ -469,6 +479,8 @@ C-c C-q  mhc-draft-kill.
   (interactive "P")
   (if (or no-confirm (y-or-n-p "Kill draft buffer ?"))
       (progn
+	(setq mhc-calendar-separator nil)
+	(setq mhc-calendar-call-buffer nil)
 	(kill-buffer (current-buffer))
 	(mhc-window-pop))))
 
@@ -478,13 +490,15 @@ C-c C-q  mhc-draft-kill.
 (defun mhc-draft-finish ()
   (interactive)
   (let ((record (mhc-parse-buffer)))
+    (setq mhc-calendar-separator nil)
+    (setq mhc-calendar-call-buffer nil)
     (mhc-header-delete-separator)
     (if (mhc-db-add-record-from-buffer record (current-buffer))
 	(progn
 	  (kill-buffer (current-buffer))
 	  (mhc-window-pop)
-	  (and (mhc-summary-buffer-p)
-	       (mhc-rescan-month))
+	  (or (and (mhc-summary-buffer-p) (mhc-rescan-month))
+	      (and (eq major-mode 'mhc-calendar-mode) (mhc-calendar-rescan)))
 	  (run-hooks 'mhc-draft-finish-hook)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -696,88 +710,6 @@ C-c C-q  mhc-draft-kill.
     (view-file-other-window path)))
 
 
-;;; mhc-sync (Ruby script)
-(defconst mhc-sync-passwd-regex "password:\\|passphrase:\\|Enter passphrase for RSA")
-(defvar mhc-sync-process nil)
-(defvar mhc-sync-read-passwd nil)
-(defvar mhc-sync-req-passwd nil)
-
-(defun mhc-sync ()
-  "Execute mhc-sync."
-  (interactive)
-  (if (and (stringp mhc-sync-remote) (stringp mhc-sync-id))
-      (if (processp mhc-sync-process)
-	  (message "another mhc-sync running.")
-	(let ((buf (get-buffer-create "*mhc-sync*"))
-	      (ldir (expand-file-name
-		     (if mhc-sync-localdir mhc-sync-localdir "~/Mail/schedule"))))
-	  (pop-to-buffer buf)
-	  (setq buffer-read-only nil)
-	  (erase-buffer)
-	  (setq buffer-read-only t)
-	  (message "mhc-sync ...")
-	  (setq mhc-sync-req-passwd t)
-	  (setq mhc-sync-process
-		(apply (function start-process)
-		       "mhc-sync" buf "mhc-sync"
-		       (list "-x" mhc-sync-id "-r" ldir mhc-sync-remote)))
-	  (if (string< "20" emacs-version)
-	      (set-process-coding-system mhc-sync-process 'undecided)
-	    (set-process-coding-system mhc-sync-process '*autoconv*))
-	  (set-process-filter mhc-sync-process 'mhc-sync-filter)
-	  (set-process-sentinel mhc-sync-process 'mhc-sync-sentinel)))
-    (message "No remote server specified.")))
-
-(defun mhc-sync-filter (process string)
-  (if (bufferp (process-buffer process))
-      (let ((obuf (buffer-name)))
-	(unwind-protect
-	    (progn
-	      (set-buffer (process-buffer process))
-	      (let ((buffer-read-only nil)
-		    passwd)
-		(goto-char (point-max))
-		(insert string)
-		(cond
-		 ((and mhc-sync-req-passwd
-		       (string-match mhc-sync-passwd-regex string))
-		  (setq passwd (mhc-sync-read-passwd string))
-		  (process-send-string process (concat passwd "\n")))
-		 ((string-match "---------------------" string)
-		  (setq mhc-sync-req-passwd nil)))))
-	  (if (get-buffer obuf)
-	      (set-buffer obuf))))))
-
-(defun mhc-sync-sentinel (process event)
-  (if (bufferp (process-buffer process))
-      (progn
-	(pop-to-buffer (process-buffer process))
-	(let ((buffer-read-only nil))
-	  (goto-char (point-max))
-	  (insert "<<<transfer finish>>>"))))
-  (setq mhc-sync-process nil)
-  (message "mhc-sync ... done."))
-
-(defun mhc-sync-read-passwd (string) ;; xxx
-  (if mhc-sync-read-passwd
-      ()
-    (cond
-     ((fboundp 'mew-read-passwd)
-      (setq mhc-sync-read-passwd 'mew-read-passwd))
-     ((fboundp 'elmo-read-passwd)
-      (setq mhc-sync-read-passwd 'elmo-read-passwd))
-     ((fboundp 'nnmail-read-passwd)
-      (setq mhc-sync-read-passwd 'nnmail-read-passwd))
-     ((fboundp 'pop3-read-passwd)
-      (setq mhc-sync-read-passwd 'pop3-read-passwd))
-     ((fboundp 'read-passwd)
-      (setq mhc-sync-read-passwd (lambda (string)
-				   (condition-case nil
-				       (read-passwd string)
-				     (error "")))))))
-  (funcall mhc-sync-read-passwd string))
-
- 
 ;;; Temporary buffers
 
 (defvar mhc-tmp-buffer-list nil)
@@ -808,32 +740,46 @@ C-c C-q  mhc-draft-kill.
   :group 'mhc
   :type 'hook)
 
-(defun mhc-setup ()
-  (easy-menu-define mhc-mode-menu
-		    mhc-mode-map
-		    "Menu used in mhc mode." 
-		    mhc-mode-menu-spec)
-  (or (assq 'mhc-mode minor-mode-alist)
-      (setq minor-mode-alist
-	    (cons (list 'mhc-mode (mhc-file-line-status))
-		  minor-mode-alist)))
-  (or (assq 'mhc-mode minor-mode-map-alist)
-      (setq minor-mode-map-alist 
-	    (cons (cons 'mhc-mode mhc-mode-map)
-		  minor-mode-map-alist)))
-  (mhc-face-setup)
-  (put-text-property 2 4 'face 'mhc-calendar-face-sunday  mhc-cal-week-header)
-  (put-text-property 20 22 'face 'mhc-calendar-face-saturday mhc-cal-week-header)
-  (mhc-file-setup)
-  (and (mhc-use-icon-p) (mhc-icon-setup))  
-  (run-hooks mhc-setup-hook))
+(defvar mhc-setup-p nil)
 
+(defun mhc-setup ()
+  (unless mhc-setup-p
+    (condition-case nil
+	(progn
+	  (or (featurep 'easymenu) (require 'easymenu))
+	  (easy-menu-define mhc-mode-menu
+			    mhc-mode-map
+			    "Menu used in mhc mode." 
+			    mhc-mode-menu-spec)
+	  (easy-menu-define mhc-calendar-mode-menu
+			    mhc-calendar-mode-map
+			    "Menu used in mhc calendar mode."
+			    mhc-calendar-mode-menu-spec))
+      (error nil))
+    (or (assq 'mhc-mode minor-mode-alist)
+	(setq minor-mode-alist
+	      (cons (list 'mhc-mode (mhc-file-line-status))
+		    minor-mode-alist)))
+    (or (assq 'mhc-mode minor-mode-map-alist)
+	(setq minor-mode-map-alist 
+	      (cons (cons 'mhc-mode mhc-mode-map)
+		    minor-mode-map-alist)))
+    (mhc-face-setup)
+    (put-text-property 2 4 'face 'mhc-calendar-face-sunday  mhc-cal-week-header)
+    (put-text-property 20 22 'face 'mhc-calendar-face-saturday mhc-cal-week-header)
+    (mhc-file-setup)
+    (and (mhc-use-icon-p) (mhc-icon-setup))
+    (and mhc-calendar-link-hnf (mhc-calendar-hnf-face-setup))
+    (setq mhc-setup-p t)
+    (run-hooks mhc-setup-hook)))
+  
 (defcustom mhc-exit-hook nil
   "Run hook after mhc-exit."
   :group 'mhc
   :type 'hook)
 
 (defun mhc-exit ()
+  (setq mhc-setup-p nil)
   (mhc-file-exit)
   (mhc-slot-clear-cache)
   (mhc-kill-all-buffers)

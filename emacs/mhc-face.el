@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 2000/02/08
-;; Revised: $Date: 2000/06/07 01:03:24 $
+;; Revised: $Date: 2000/06/12 11:24:56 $
 
 ;;;
 ;;; Commentay:
@@ -28,6 +28,11 @@ Each element should have the form
 mhc will define mhc-summary-category-face-(downcase CATEGORY-STRING)
 in setup time.")
 
+(defvar mhc-calendar-hnf-face-alist nil
+  "*Alist of HNS faces. Each element should have the form
+  (FACE-SYMBOL . (PARENT FG BG UNDERLINED FONT STIPPLE)).
+refer to mhc-calendar-hnf-face-alist-internal.")
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; for necessary faces.
 
@@ -48,6 +53,15 @@ in setup time.")
     (mhc-minibuf-face-candidate . (nil nil           "yellow"))
     ;;
     (mhc-category-face-holiday  . (nil "red"         nil))))
+
+(defconst mhc-calendar-hnf-face-alist-internal
+  '((mhc-calendar-hnf-face-mark . (nil    "MediumSeaGreen" nil))
+    (mhc-calendar-hnf-face-newtag  . (italic "red" "paleturquoise"))
+    (mhc-calendar-hnf-face-subtag  . (italic "blue" nil))
+    (mhc-calendar-hnf-face-cat  . (nil    "DarkGreen" nil))
+    (mhc-calendar-hnf-face-new  . (bold   "DarkGreen" nil))
+    (mhc-calendar-hnf-face-sub  . (nil   "DarkGreen" nil))
+    (mhc-calendar-hnf-face-uri  . (italic "blue" nil))))
 
 (defmacro mhc-face-put (symbol face)
   (` (put-text-property 0 (length (, symbol)) 'face (, face) (, symbol))))
