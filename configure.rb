@@ -1,133 +1,82 @@
 ## configure.rb -- Guess values for system-dependent variables.
 ##
 ## Author:  MIYOSHI Masanori <miyoshi@quickhack.net>
-##
+##          Yoshinari Nomura <nom@quickhack.net>
 ## Created: 2000/7/12
-##
+## Revised: $Date: 2000/07/13 17:43:00 $
 
-require 'ftools'
-require 'rbconfig'
-require 'getoptlong'
-require 'kconv'
+$LOAD_PATH .unshift('.')
+require 'mhc-make'
 
-include Config
+################################################################a
 
-#detect default kanji code
-sjis_host_regexp = /cygwin|mingw32|os2_emx|sharp-human/
-default_kcode = (sjis_host_regexp =~ RUBY_PLATFORM) ? 'SJIS' : 'EUC'
+local_config_table = [
+  ['--pilot-link-lib',
+    GetoptLong::OPTIONAL_ARGUMENT,
+    "--pilot-link-lib=DIR    pilot-link lib in DIR",
+    nil],
 
-bindir = CONFIG["bindir"]
-libdir = File::join(CONFIG["libdir"], "ruby",
-		    CONFIG["MAJOR"] + "." + CONFIG["MINOR"])
-rubyexec = bindir + "/ruby"
-disable_ext = false
+  ['--pilot-link-inc',
+    GetoptLong::OPTIONAL_ARGUMENT,
+    "--pilot-link-inc=DIR    pilot-link header in DIR",
+    nil],
 
-# print usage
-def print_usage()
-  print <<END
-Usage: configure.rb [options]
-Options: [defaults in brackets after descriptions]
-Configuration:
-  --kcode=FILE            kanji code (EUC, JIS, SJIS)
-  --bindir=DIR            user executables in DIR
-  --libdir=DIR            script libraries in DIR
-  --with-ruby=PATH        absolute path of ruby executable
-  --disable-ext           do not create ext
-  --help                  print this message
-END
-end
+  ['--disable-palm',
+    GetoptLong::OPTIONAL_ARGUMENT,
+    "--disable-palm          do not require pilot-link",
+    '0']
+]
 
-# parse arguments
-parser = GetoptLong::new()
-parser.set_options(['--kcode', GetoptLong::OPTIONAL_ARGUMENT],
-		   ['--bindir', GetoptLong::OPTIONAL_ARGUMENT],
-		   ['--libdir', GetoptLong::OPTIONAL_ARGUMENT],
-		   ['--with-ruby', GetoptLong::OPTIONAL_ARGUMENT],
-		   ['--disable-ext', GetoptLong::NO_ARGUMENT],
-		   ['--help', GetoptLong::NO_ARGUMENT])
+conf = MhcConfigure .new .set_user_config(ARGV, local_config_table)
 
-begin
-  parser.each_option do |name, arg|
-    case name
-    when "--kcode"
-      default_kcode = arg
-    when "--bindir"
-      bindir = File::expand_path(arg)
-    when "--libdir"
-      libdir = File::expand_path(arg)
-    when "--with-ruby"
-      rubyexec = File::expand_path(arg)
-    when "--disable-ext"
-      disable_ext = true
-    when "--help"
-      print_usage()
-      exit(1)
-    end
+conf .set_macro('@@MHC_XPM_PATH@@', 
+		conf .macro('@@MHC_LIBDIR@@') + '/xpm'
+		)
+
+################################################################
+## lib check
+
+lib_search_path = ['/usr/local/lib', '/usr/local/pilot/lib']
+inc_search_path = ['/usr/local/include', '/usr/local/pilot/include']
+
+if conf .macro('@@MHC_DISABLE_PALM@@') == '0'
+  if !(conf .search_library(lib_search_path, 
+			    'pisock', 
+			    'pi_socket',
+			    '@@MHC_PILOT_LINK_LIB@@') and
+       conf .search_include(inc_search_path,
+			    'pi-dlp.h', 
+			    '@@MHC_PILOT_LINK_INC@@'))
+    STDERR .print "#######################################################\n"
+    STDERR .print "Error: Could not find libpisock. "
+    STDERR .print "Error: check path and set\n"
+    STDERR .print "Error:   --pilot-link-lib=DIR and --pilot-link-inc=DIR.\n"
+    STDERR .print "Error: or\n"
+    STDERR .print "Error:  --disable-paml\n"
+    STDERR .print "ERror: if you don't need palm support.\n"
+    STDERR .print "#######################################################\n"
+    exit(1)
   end
-rescue
-  print_usage()
-  exit(1)
 end
 
-# check if kanji code is valid
-if not ["EUC", "JIS", "SJIS"].member?(default_kcode)
-  print "error: invalid kcode!\n"
-  print_usage()
-  exit(1)
-end
+################################################################
+## replace keywords.
 
-conversion_table = {
-  "@@mhc_default_kcode@@" => "Kconv::" + default_kcode,
-  "@@mhc_ruby_path@@" => rubyexec,
-  "@@mhc_bindir@@" => bindir,
-  "@@mhc_libdir@@" => libdir,
-  "@@mhc_disable_ext@@" => disable_ext,
-}
+infile_list = [
+  'mhc-sync.in:0755', 
+  'mhc2palm.in:0755', 
+  'palm2mhc.in:0755', 
+  'adb2mhc.in:0755', 
+  'gemcal.in:0755', 
+  'make.rb.in:0755', 
+  'today.in:0755',
+  'ruby-ext/lib/mhc-kconv.rb.in:0644', 
+  'ruby-ext/lib/mhc-gtk.rb.in:0644', 
+  'ruby-ext/extconf.rb.in:0755'
+]
 
-files = %w(make.rb ruby-ext/make.rb ruby-ext/lib/make.RB) 
-while filename = files.shift()
-  fin = File::open(filename + ".in")
-  fout = File::open(filename, "w")
-  fout.chmod(0755)
-  print "configuring: " + filename + "\n"
-  while line = fin.gets()
-    conversion_table.each { |key, value|
-      gsub!(key, value)
-    }
-    fout.puts(line)
-  end
-  fin.close()
-  fout.close()
-end
+conf .replace_keywords(infile_list)
 
-### Copyright Notice:
-
-## Copyright (C) 2000 MHC developing team. All rights reserved.
-
-## Redistribution and use in source and binary forms, with or without
-## modification, are permitted provided that the following conditions
-## are met:
-## 
-## 1. Redistributions of source code must retain the above copyright
-##    notice, this list of conditions and the following disclaimer.
-## 2. Redistributions in binary form must reproduce the above copyright
-##    notice, this list of conditions and the following disclaimer in the
-##    documentation and/or other materials provided with the distribution.
-## 3. Neither the name of the team nor the names of its contributors
-##    may be used to endorse or promote products derived from this software
-##    without specific prior written permission.
-## 
-## THIS SOFTWARE IS PROVIDED BY THE TEAM AND CONTRIBUTORS ``AS IS''
-## AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-## LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
-## FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL
-## THE TEAM OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
-## INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-## (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-## SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
-## HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
-## STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-## ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
-## OF THE POSSIBILITY OF SUCH DAMAGE.
-
-### configure.rb ends here
+print "In ruby-ext/\n"
+Dir .chdir('ruby-ext')
+system('ruby', 'extconf.rb')
