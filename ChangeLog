@@ -1,5 +1,9 @@
 2003-10-10  Yoshinari Nomura  <nom@quickhack.net>
 
+	* emacs/mhc-guess.el (mhc-guess-location-regexp-list): brushup regexp.
+
+	* emacs/mhc.el (mhc-version): New function.
+
 	* emacs/mhc-vars.el (mhc-version): add version string.
 
 	* emacs/mhc-guess.el, emacs/mhc-minibuf.el:
