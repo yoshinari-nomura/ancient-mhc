@@ -1,3 +1,17 @@
+2002-10-16  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+
+	* emacs/mhc-gnus.el (toplevel): Set `eword-decode-string' for
+	Oort-Gnus; Add autoloads for `gnus-copy-article-buffer',
+	`rfc2047-encode-string', `eword-encode-string', to suppress
+	byte-compile warning.
+	(mhc-gnus-encode-string): Simplified.
+	(mhc-gnus-insert-summary-contents): Adhoc fix to disable
+	byte-compile of `make-full-mail-header' to keep compatibity
+	between T-gnus and Oort-Gnus.
+	(mhc-gnus-highlight-message): Adhoc fix to avoid errors in
+	`gnus-article-add-buttons'.
+	(mhc-gnus-decode-string): New alias to `rfc2047-decode-string'.
+
 2002-10-15  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* emacs/mhc-minibuf.el (mhc-input-category): Use completing

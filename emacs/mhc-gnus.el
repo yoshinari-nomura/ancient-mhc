@@ -28,16 +28,7 @@
 
 
 (if (string-match "SEMI" gnus-version)
-    (progn
-      (require 'eword-encode)
-      (require 'mhc-mime)
-      (defalias 'mhc-gnus-encode-string 'eword-encode-string))
-  (defun mhc-gnus-encode-string (string)
-    "Alternative function of `eword-encode-string' for pure Gnus."
-    (with-temp-buffer
-      (insert string)
-      (rfc2047-encode-region (point-min) (point-max))
-      (buffer-substring (point-min) (point-max)))))
+    (require 'mhc-mime))
 
 
 ;; Setup function:
@@ -65,6 +56,9 @@
   (let ((num (get-text-property (point) 'gnus-number)))
     (if num (gnus-summary-display-article num))))
 
+
+;; To suppress byte compile warning.
+(autoload 'gnus-copy-article-buffer "gnus-msg")
 
 (defun mhc-gnus-get-import-buffer (get-original)
   (gnus-summary-select-article)
@@ -102,6 +96,12 @@
     (delete-region (point-min) (point-max))))
 
 
+(autoload 'eword-encode-string "eword-encode")
+(autoload 'rfc2047-encode-string "rfc2047")
+(eval-and-compile
+  (defalias 'mhc-gnus-encode-string
+    (if (featurep 'mhc-mime) 'eword-encode-string 'rfc2047-encode-string)))
+
 (defun mhc-gnus-insert-summary-contents (inserter)
   (let ((x (mhc-record-name (mhc-schedule-record mhc-tmp-schedule)))
 	(subject (mhc-gnus-encode-string
@@ -112,7 +112,7 @@
       (setq x (length nnmhc-article-list)))
     (funcall inserter)
     (if x
-	(let ((header (make-full-mail-header x subject)))
+	(let ((header (funcall (symbol-function 'make-full-mail-header) x subject)))
 	  (put-text-property pos (point) 'gnus-number x)
 	  (push (gnus-data-make x 0 0 header 0) gnus-newsgroup-data))
       (remove-text-properties pos (point) '(gnus-number nil)))
@@ -142,9 +142,15 @@
 
 
 (defun mhc-gnus-highlight-message (for-draft)
-  (let ((gnus-article-buffer (current-buffer)))
+  (let ((gnus-article-buffer (current-buffer))
+	;; Adhoc fix to avoid errors in gnus-article-add-buttons().
+	(gnus-button-marker-list))
     (gnus-article-highlight)))
 
+(autoload 'rfc2047-decode-string "rfc2047")
+(defalias 'mhc-gnus-decode-string 'rfc2047-decode-string)
+
+(autoload 'rfc2047-decode-region "rfc2047")
 (defun mhc-gnus-decode-header ()
   "Alternative function of `decode-header-in-buffer' for pure Gnus."
   (goto-char (point-min))
@@ -198,12 +204,14 @@
   (put 'mhc-gnus 'get-import-buffer 'mhc-mime-get-import-buffer)
   (put 'mhc-gnus 'mime-get-raw-buffer 'mhc-gnus-mime-get-raw-buffer)
   (put 'mhc-gnus 'mime-get-mime-structure 'mhc-gnus-mime-get-mime-structure)
-  (put 'mhc-gnus 'draft-translate 'mhc-mime-draft-translate)
-  (put 'mhc-gnus 'eword-decode-string 'mhc-mime-eword-decode-string))
+  (put 'mhc-gnus 'draft-translate 'mhc-mime-draft-translate))
 
 (if (featurep 'mhc-mime)
-    (put 'mhc-gnus 'decode-header 'mhc-mime-decode-header)
-  (put 'mhc-gnus 'decode-header 'mhc-gnus-decode-header))
+    (progn
+      (put 'mhc-gnus 'decode-header 'mhc-mime-decode-header)
+      (put 'mhc-gnus 'eword-decode-string 'mhc-mime-eword-decode-string))
+  (put 'mhc-gnus 'decode-header 'mhc-gnus-decode-header)
+  (put 'mhc-gnus 'eword-decode-string 'mhc-gnus-decode-string))
 
 ;;; Copyright Notice:
 
