@@ -53,6 +53,16 @@
 ;; のように設定しておくとよい。
 
 ;;; Customize Variables:
+(defcustom mhc-cvs-rsh
+  (and (getenv "CVS_RSH") "ssh")
+  "*The name of the remote shell command to use when starting a CVS server."
+  :group 'mhc
+  :type '(choice
+	  (const :tag "No specification" nil)
+	  (const :tag "Use SSH" "ssh")
+	  (const :tag "Use RSH" "rsh")
+	  (string :tag "Alternative program")))
+
 (defcustom mhc-cvs-global-options
   (if mhc-default-network-status '("-f" "-w") '("-f" "-w" "-z9"))
   "*Global options are used when calling CVS."
@@ -93,7 +103,9 @@
 	(progn
 	  (set-buffer buffer)
 	  (delete-region (point-min) (point-max))
-	  (let ((default-directory (file-name-as-directory mhc-cvs/default-directory)))
+	  (let ((default-directory (file-name-as-directory mhc-cvs/default-directory))
+		(process-environment process-environment))
+	    (setenv "CVS_RSH" mhc-cvs-rsh)
 	    (apply #'call-process "cvs" nil t nil
 		   (append mhc-cvs-global-options options))))
       (set-buffer current-buffer))))
@@ -135,15 +147,9 @@
 
 (defun mhc-cvs/shrink-file-name (file)
   "ファイル名の相対パスを得る関数"
-  (let ((base (concat
-	       "^"
-	       (regexp-quote
-		(file-name-as-directory
-		 (mhc-summary-folder-to-path mhc-base-folder))))))
-    (setq file (expand-file-name file))
-    (if (string-match base file)
-	(substring file (match-end 0))
-      file)))
+  (file-relative-name
+   (expand-file-name file)
+   (mhc-summary-folder-to-path mhc-base-folder)))
 
 (defun mhc-cvs/close (&optional offline)
   "ネットワークの状態に依存する終了処理関数"

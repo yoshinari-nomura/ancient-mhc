@@ -1,3 +1,10 @@
+2000-10-20  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+
+	* emacs/mhc-cvs.el (mhc-cvs-rsh): New variable.
+	(mhc-cvs/backend): Refer `mhc-cvs-rsh' to set a process
+	environment variable, `CVS_RSH'.
+	(mhc-cvs/shrink-file-name): Use `file-relative-name'.
+
 2000-10-19  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* emacs/mhc-cvs.el (mhc-cvs-repository-path, mhc-cvs-module-name):
