@@ -1,9 +1,24 @@
+2000-07-18  Yoshinari Nomura  <nom@quickhack.net>
+
+	* emacs/mhc.el:
+	Use (mhc-face-get-today-face) instead of (mhc-face-get-gray-face).
+	Use (mhc-face-get-busy-face)  instead of (mhc-face-get-underline-face).
+
+	* emacs/mhc-summary.el:
+	Use (mhc-face-get-busy-face) instead of (mhc-face-get-gray-face).
+
+	* emacs/mhc-face.el:
+	(mhc-face-get-gray-face), (mhc-face-get-underline-face): Deleted.
+	(mhc-face-get-busy-face), (mhc-face-get-today-face): New functions.
+	mhc-face-effect-alist: New variable.
+
 2000-07-18  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* emacs/mhc.el (mhc-mode-menu-spec): Add PostScript menu.
 	(mhc-setup): Autoload mhc-ps-save and mhc-ps-insert-buffer.
 
-	* emacs/mhc-ps.el (mhc-ps-string-column): New variable, but not used ^^;
+	* emacs/mhc-ps.el (mhc-ps-string-column): New variable, 
+	but not used ^^;
 	(mhc-ps/string): Fix 'Sixth week' problem.
 	(mhc-ps/replace-table): Ditto.
 	(mhc-ps/weeks): New function, return number of weeks.
