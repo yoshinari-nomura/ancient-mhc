@@ -1,11 +1,12 @@
 #!@@MHC_RUBY_PATH@@ -Ke
+# -*- ruby -*-
 
 ## adb2mhc -- Convert ADB DB of HP200LX into MHC format.
 ##
 ## Author:  Yoshinari Nomura <nom@quickhack.net>
 ##
 ## Created: 1999/11/12
-## Revised: $Date: 2000/07/13 17:32:03 $
+## Revised: $Date: 2000/07/14 06:59:50 $
 ##
 
 require 'mhc-date'

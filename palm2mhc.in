@@ -1,11 +1,12 @@
 #!@@MHC_RUBY_PATH@@ -Ke
+# -*- ruby -*-
 
 ### palm2mhc -- copy articles from palm to new mhc repository.
 ##
 ## Author:  Yoshinari Nomura <nom@quickhack.net>
 ##
 ## Created: 1999/10/08
-## Revised: $Date: 2000/07/13 17:32:03 $
+## Revised: $Date: 2000/07/14 06:59:50 $
 ##
 
 $DEBUG = false

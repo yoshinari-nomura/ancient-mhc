@@ -1,9 +1,11 @@
+# -*- ruby -*-
+
 ### mhc-gtk.rb
 ##
 ## Author:  Yoshinari Nomura <nom@quickhack.net>
 ##
 ## Created: 1999/07/16
-## Revised: $Date: 2000/07/13 17:15:52 $
+## Revised: $Date: 2000/07/14 06:59:50 $
 ##
 
 #$DEBUG = true

@@ -1,4 +1,5 @@
 #!@@MHC_RUBY_PATH@@ -Ke
+# -*- ruby -*-
 
 ## make.rb.in -- Installer for Ruby scripts.
 ##
