@@ -22,7 +22,7 @@ WL_OPT = -eval '(setq load-path (cons \"$(WL_DIR)\" load-path))'     -l wl
 
 ### For Gnus
 GNUS_DIR = c:/usr/Meadow/site-lisp/gnus
-GNUS_OPT = -eval '(setq load-path (cons \"$(GNUS_DIR)\" load-path))' -l gnus
+GNUS_OPT = -eval '(setq load-path (cons \"$(GNUS_DIR)\" load-path))' -l gnus -l gnus-sum
 
 MUA_OPT  = ${MEW_OPT}
 #MUA_OPT  = ${WL_OPT}

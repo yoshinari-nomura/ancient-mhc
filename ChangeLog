@@ -1,3 +1,10 @@
+2000-06-26  MIYOSHI Masanori  <miyoshi@ask.ne.jp>
+
+	* emacs/Makefile (GNUS_OPT): Load gnus-sum.el for
+	bytecompile. Thanks to Akihiro Arisawa (ari@nijino.com).
+
+	* emacs/Makefile.w32 (GNUS_OPT): Ditto.
+
 2000-06-26  Yoshinari Nomura  <nom@quickhack.net>
 
 	* 00usage.jis: New file.
