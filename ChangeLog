@@ -1,3 +1,13 @@
+2001-05-10  Yoshinari Nomura <nom@quickhack.net>
+
+	* configure.rb: xpm path is now configurable.
+	search /usr/include/libpisock in checking libpisock.
+	(Thanks to Fumitoshi UKAI <ukai@debian.or.jp>)
+	
+	* ruby-ext/extconf.rb.in:
+	remove embeded LD_RUN_PATH.
+	(Thanks to Fumitoshi UKAI <ukai@debian.or.jp>)
+
 2001-04-10  Yoshiaki Kasahara  <kasahara@nc.kyushu-u.ac.jp>
 
 	* mhc-make.rb (MhcConfigTable): 'default' fields should be a
