@@ -200,6 +200,8 @@
     (setq wl-summary-buffer-target-mark-list '(nil))
     (setq wl-summary-buffer-number-regexp "[0-9]+")
     (setq wl-summary-buffer-folder-indicator (buffer-name))
+    (setq wl-summary-buffer-mode-line-formatter (lambda () (buffer-name)))
+    (wl-summary-update-modeline)
     (static-if (fboundp 'elmo-folder-msgdb)
 	(elmo-folder-set-msgdb-internal wl-summary-buffer-elmo-folder
 					'(nil))

@@ -1,3 +1,8 @@
+2002-11-06  Yuuichi Teranishi  <teranisi@gohome.org>
+
+	* emacs/mhc-wl.el (mhc-wl-summary-mode-setup): Follow the recent
+	change on modeline format.
+
 2002-10-29  Yoichi NAKAYAMA <yoichi@eken.phys.nagoya-u.ac.jp> / shirai
 
 	* emacs/mhc-vars.el (mhc-use-wide-scope): Fix type.
