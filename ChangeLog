@@ -1,3 +1,8 @@
+2001-04-10  Yoshiaki Kasahara  <kasahara@nc.kyushu-u.ac.jp>
+
+	* mhc-make.rb (MhcConfigTable): 'default' fields should be a
+	string.
+
 2001-04-05  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 
 	* emacs/mhc-mime.el (mhc-mime-decode-header): Ad-hoc fix for
