@@ -1,3 +1,12 @@
+2000-08-03  Yoshinari NOMURA  <nom@quickhack.net>
+
+	* ruby-ext/lib/mhc-gtk.rb.in (toplevel):
+	if Win32 plathome, override MhcKconv::todisp using Uconv::euctou8
+        (Thanks to Mr. WATANABE Hirofumi)
+	
+	* ruby-ext/lib/mhc-palm.rb (toplevel): rescue LoadError of mhc_pilib.
+        (Thanks to Mr. WATANABE Hirofumi)
+
 2000-08-02  Yoshinari Nomura  <nom@quickhack.net>
 
 	* emacs/mhc-db.el (mhc-db/eval-for-duration):
