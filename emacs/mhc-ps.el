@@ -2,7 +2,7 @@
 
 ;; Author:  TSUCHIYA Masatoshi <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 ;; Created: 2000/06/18
-;; Revised: $Date: 2000/06/23 10:04:49 $
+;; Revised: $Date: 2000/06/24 09:09:36 $
 
 
 ;;; Commentary:
@@ -726,7 +726,7 @@ showpage
     (substring str 0 i)))
 
 (defun mhc-ps/compose-subject (subject margin)
-  (let ((mstr (make-string margin (string-to-char " ")))
+  (let ((mstr (make-string margin ?\ ))
 	pos)
     ;; Delete characters to emphasize subject.
     (and (string-match "^\\*+[ \t\r\f\n]*" subject)
@@ -751,19 +751,30 @@ showpage
 	(nreverse ret))))))
 
 
+(defun mhc-ps/escape-bracket (string)
+  (let ((start 0) buf)
+    (while (string-match "\\(\\((\\)\\|\\()\\)\\)" string start)
+      (setq buf (cons (if (match-beginning 2) "\\(" "\\)")
+		      (cons (substring string start (match-beginning 0)) buf))
+	    start (match-end 0)))
+    (eval (cons 'concat (nreverse (cons (substring string start) buf))))))
+
+
 (defun mhc-ps/schedule-to-string (dayinfo schedule)
   (let ((begin (mhc-schedule-time-begin schedule))
 	(end (mhc-schedule-time-end schedule))
 	(day (mhc-day-day-of-month dayinfo)))
     (if (or begin end)
-	(mapconcat (lambda (str) (format "%d ( %s)" day str))
+	(mapconcat (lambda (str)
+		     (format "%d ( %s)" day (mhc-ps/escape-bracket str)))
 		   (cons (concat
 			  (if begin (mhc-time-to-string begin) "")
 			  (if end (concat "-" (mhc-time-to-string end)) ""))
 			 (mhc-ps/compose-subject (mhc-schedule-subject-as-string schedule)
 						 mhc-ps-left-margin))
 		   " ")
-      (mapconcat (lambda (str) (format "%d ( %s)" day str))
+      (mapconcat (lambda (str)
+		   (format "%d ( %s)" day (mhc-ps/escape-bracket str)))
 		 (mhc-ps/compose-subject (mhc-schedule-subject-as-string schedule) 0)
 		 " "))))
 
