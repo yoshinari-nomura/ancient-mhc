@@ -42,24 +42,30 @@
 
 (defvar make-mhc/lisp-directory
   (expand-file-name
-   (concat (if (and (not (featurep 'xemacs))
-		    (or (>= emacs-major-version 20)
-			(and (= emacs-major-version 19)
-			     (> emacs-minor-version 28))))
-	       "share/"
-	     "lib/")
+   (concat (cond
+	    ((featurep 'meadow) "")
+	    ((and (not (featurep 'xemacs))
+		  (or (>= emacs-major-version 20)
+		      (and (= emacs-major-version 19)
+			   (> emacs-minor-version 28))))
+	     "share/")
+	    (t "lib/"))
 	   (cond
 	    ((featurep 'xemacs) (if (featurep 'mule) "xmule/" "xemacs/"))
 	    ((boundp 'MULE) "mule/")
+	    ((featurep 'meadow) "")
 	    (t "emacs/"))
 	   "site-lisp/"
 	   make-mhc/module-prefix)
-   (if (or (<= emacs-major-version 18)
-	   (featurep 'xemacs)
-	   (and (boundp 'system-configuration-options) ; 19.29 or later
-		(string= system-configuration-options "NT"))) ; for Meadow
-       (expand-file-name "../../.." exec-directory)
-     (expand-file-name "../../../.." data-directory))))
+   (cond
+    ((featurep 'meadow)
+     (expand-file-name "../.." exec-directory))
+    ((or (<= emacs-major-version 18)
+	 (featurep 'xemacs)
+	 (and (boundp 'system-configuration-options) ; 19.29 or later
+	      (string= system-configuration-options "NT"))) ; for NTEmacs
+     (expand-file-name "../../.." exec-directory))
+    (t (expand-file-name "../../../.." data-directory)))))
 
 (defvar make-mhc/package-directory
   (if (boundp 'early-packages)
@@ -94,7 +100,7 @@
     (nreverse (if (= start (length string)) list (cons (substring string start) list)))))
 
 (defun make-mhc/configure ()
-  (defvar command-line-args-left) ; Avoid 'free variable' warning
+  (defvar command-line-args-left)	; Avoid 'free variable' warning
   (or make-mhc/configured-p
       (let (str)
 	(setq make-mhc/configured-p t)
@@ -147,24 +153,24 @@
   ;; Byte compile all *.el files.
   (require 'mhc)
   (mapcar
-  (lambda (module)
-    (let ((el-file  (expand-file-name (concat module ".el") make-mhc/source-directory))
-	  (elc-file (expand-file-name (concat module ".elc") make-mhc/source-directory)))
-      (if (or (not (file-exists-p elc-file))
-	      (if (file-newer-than-file-p el-file elc-file)
-		  (progn
-		    (delete-file elc-file)
-		    t)))
-	  (if make-mhc/debug
-	      (princ (format "Byte compile: %s -> %s.\n"
-			     (file-name-nondirectory el-file)
-			     (file-name-nondirectory elc-file)))
-	    (byte-compile-file el-file)))))
-  (delq nil
-	(mapcar (lambda (pair)
-		  (if (eval (cdr pair))
-		      (car pair)))
-		make-mhc/module-alist))))
+   (lambda (module)
+     (let ((el-file  (expand-file-name (concat module ".el") make-mhc/source-directory))
+	   (elc-file (expand-file-name (concat module ".elc") make-mhc/source-directory)))
+       (if (or (not (file-exists-p elc-file))
+	       (if (file-newer-than-file-p el-file elc-file)
+		   (progn
+		     (delete-file elc-file)
+		     t)))
+	   (if make-mhc/debug
+	       (princ (format "Byte compile: %s -> %s.\n"
+			      (file-name-nondirectory el-file)
+			      (file-name-nondirectory elc-file)))
+	     (byte-compile-file el-file)))))
+   (delq nil
+	 (mapcar (lambda (pair)
+		   (if (eval (cdr pair))
+		       (car pair)))
+		 make-mhc/module-alist))))
 
 (defun make-mhc/make-directory (dirname)
   (if (file-directory-p dirname)
@@ -185,7 +191,7 @@
 	    (progn
 	      (if (file-exists-p out-file)
 		  (delete-file out-file))
-	      (copy-file in-file out-file t))))))
+	      (copy-file in-file out-file t t))))))
 
 (defun make-mhc-install ()
   (make-mhc-compile)
@@ -253,8 +259,10 @@
 	  "custom-load")))
   ;; Install icons.
   (let ((icon-dir (expand-file-name
-		   (concat make-mhc/package-directory
-			   "/etc/" make-mhc/module-prefix))))
+		   make-mhc/module-prefix
+		   (expand-file-name
+		    "etc"
+		    make-mhc/package-directory))))
     (or make-mhc/debug
 	(make-mhc/make-directory icon-dir))
     (mapcar
