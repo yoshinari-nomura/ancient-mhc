@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1999/12/10
-;; Revised: $Date: 2003/10/10 12:01:12 $
+;; Revised: $Date: 2004/09/08 09:12:10 $
 
 ;;;
 ;;; Commentay:
@@ -372,7 +372,8 @@
 ;; 			 nil nil 'mhc-location-hist))
 
 (defun mhc-input-location (&optional prompt default)
-  (mhc-minibuf-read "Location: " nil
+  (mhc-minibuf-read "Location: "
+		    default
 		    (current-buffer)
 		    (mhc-guess-location)
 		    0

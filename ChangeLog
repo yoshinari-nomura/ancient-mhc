@@ -1,9 +1,20 @@
+2004-09-08  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* emacs/mhc.el (mhc-edit): Remove schedule headers just before
+	inserting new schedule headers.
+
+	* emacs/mhc-db.el (mhc-db-add-exception-rule): Call
+	`mhc-draft-reedit-file' instead of `mhc-draft-reedit-buffer', in
+	order to avoid double-decoding problem in Gnus and SEMI-MUAs.
+
+	* emacs/mhc-minibuf.el (mhc-input-location): Use default value.
+
 2004-09-08  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* emacs/mhc-mew.el (mhc-mew-summary-mode-setup): Support Mew
 	4.0.69 or later.
 
-2004-06-22  Yoshinari Nomura  <nom@quickhack.net> 
+2004-06-22  Yoshinari Nomura  <nom@quickhack.net>
 
 	* ruby-ext/lib/mhc-palm.rb:
 	(PilotApptRecord#set_monthly_by_day): fix typo.

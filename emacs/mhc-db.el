@@ -243,15 +243,10 @@ FROM, TO は 1970/01/01 からの経過日数を用いて指定"
 ;; FIXME: X-SC-Schedule ヘッダによって指定された子スケジュールに対する
 ;; 例外規則の追加が動作しない。
 (defun mhc-db-add-exception-rule (original-record except-day)
-  (let ((buffer (mhc-get-buffer-create " *mhc-parse-file*"))
-	(date-string (mhc-day-let except-day
+  (let ((date-string (mhc-day-let except-day
 		       (format "%04d%02d%02d" year month day-of-month))))
-    (save-excursion
-      (set-buffer buffer)
-      (delete-region (point-min) (point-max))
-      (mhc-insert-file-contents-as-coding-system mhc-default-coding-system
-						 (mhc-record-name original-record))
-      (mhc-draft-reedit-buffer buffer buffer)
+    (with-temp-buffer
+      (mhc-draft-reedit-file (mhc-record-name original-record))
       (let (record dayinfo schedule)
 	(while (setq record (mhc-parse-buffer)
 		     dayinfo (mhc-logic-eval-for-date (list (mhc-record-sexp record)) except-day)

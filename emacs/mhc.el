@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1994/07/04
-;; Revised: $Date: 2004/05/04 13:48:31 $
+;; Revised: $Date: 2004/09/08 09:12:09 $
 
 ;;;
 ;;; Commentay:
@@ -609,13 +609,7 @@ Returns t if the importation was succeeded."
 			       "Alarm: "
 			       mhc-default-alarm)))
 		    ;;
-		    (setq priority (mhc-schedule-priority schedule))
-		    (mhc-header-narrowing
-		      (mhc-header-delete-header
-		       (concat "^\\("
-			       (mhc-regexp-opt (mhc-header-list))
-			       "\\)")
-		       'regexp)))
+		    (setq priority (mhc-schedule-priority schedule)))
 		;; Answer was no.
 		(message "") ; flush minibuffer.
 		(and (interactive-p)
@@ -652,6 +646,12 @@ Returns t if the importation was succeeded."
 	    (if mhc-minibuf-candidate-overlay
 		(delete-overlay mhc-minibuf-candidate-overlay))
 	    (mhc-draft-setup-new))
+	  (mhc-header-narrowing
+	    (mhc-header-delete-header
+	     (concat "^\\("
+		     (mhc-regexp-opt (mhc-header-list))
+		     "\\)")
+	     'regexp))
 	  (goto-char (point-min))
 	  (insert "X-SC-Subject: " subject
 		  "\nX-SC-Location: " location
