@@ -103,19 +103,21 @@
 
 
 (defun mhc-wl-summary-mode-setup (date)
-  (wl-summary-mode)
-  (wl-summary-buffer-set-folder (mhc-wl/date-to-folder date))
-  (make-local-variable 'wl-summary-highlight)
-  (setq wl-summary-highlight nil)
-  (setq wl-summary-buffer-next-folder-func
-	(lambda () (mhc-goto-next-month 1)))
-  (setq wl-summary-buffer-prev-folder-func
-	(lambda () (mhc-goto-prev-month 1)
-	  (goto-char (point-max))))
-  (setq wl-summary-buffer-exit-func 'mhc-wl-summary-exit)
-  (setq wl-summary-buffer-target-mark-list '(nil))
-  (setq wl-summary-buffer-number-regexp "[0-9]+")
-  (setq wl-summary-buffer-msgdb '(nil)))
+  (let ((original mhc-wl-exit-buffer))
+    (wl-summary-mode) ; buffer local variables are killed.
+    (setq mhc-wl-exit-buffer original)
+    (wl-summary-buffer-set-folder (mhc-wl/date-to-folder date))
+    (make-local-variable 'wl-summary-highlight)
+    (setq wl-summary-highlight nil)
+    (setq wl-summary-buffer-next-folder-func
+	  (lambda () (mhc-goto-next-month 1)))
+    (setq wl-summary-buffer-prev-folder-func
+	  (lambda () (mhc-goto-prev-month 1)
+	    (goto-char (point-max))))
+    (setq wl-summary-buffer-exit-func 'mhc-wl-summary-exit)
+    (setq wl-summary-buffer-target-mark-list '(nil))
+    (setq wl-summary-buffer-number-regexp "[0-9]+")
+    (setq wl-summary-buffer-msgdb '(nil))))
 
 
 (defun mhc-wl-generate-summary-buffer (date)

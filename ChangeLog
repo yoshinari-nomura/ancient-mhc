@@ -1,5 +1,8 @@
 2000-07-31  Yuuichi Teranishi  <teranisi@quickhack.net>
 
+	* emacs/mhc-wl.el (mhc-wl-summary-mode-setup): Recover value of
+	`mhc-wl-exit-buffer' after `wl-summary-mode'.
+
 	* emacs/mhc-db.el (mhc-db/eval-for-duration): Call `sexp' only if
 	it is non-nil.
 	(mhc-db-add-record-from-buffer): Display error if slot is nil.
