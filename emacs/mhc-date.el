@@ -222,8 +222,8 @@
 (defmacro ddate-yymm-s (ddate)
   (` (apply (quote format) "%04d%02d" (, ddate))))
 
-(defmacro ddate-yy-s (date)
-  (format "%04d" (ddate-yy ,date)))
+(defmacro ddate-yy-s (ddate)
+  (` (apply (quote format) "%04d" (, ddate))))
 
 (defsubst ddate-mm-s (date)
   (let ((from (* 3 (1- (ddate-mm date)))))
