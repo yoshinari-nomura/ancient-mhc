@@ -1,3 +1,19 @@
+2000-08-10  Yuuichi Teranishi  <teranisi@quickhack.net>
+
+	* emacs/mhc.el (mhc-browse-x-url-function): New user option.
+	(mhc-browse-x-url): New function.
+
+	* emacs/mhc-xmas.el (mhc-xmas-icon-alist): Added "Link" entry.
+	(mhc-icon-function-alist): Ditto.
+
+	* emacs/mhc-draft.el (mhc-draft-finish): Removed meaningless comment.
+
+	* emacs/mhc-bm.el (mhc-bm-icon-alist): Added "Link" entry.
+	(mhc-icon-function-alist): Ditto.
+	(mhc-put-icon): Put 'mouse-face overlay.
+
+	* icons/Link.xbm, icons/Link.xpm: New file.
+
 2000-08-08  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* emacs/mhc-mew.el (mhc-mew-eword-decode-string): Fix broken
