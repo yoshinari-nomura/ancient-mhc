@@ -4,7 +4,7 @@
 ;;          TSUCHIYA Masatoshi <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 ;;
 ;; Created: 2000/06/14
-;; Revised: $Date: 2000/06/18 06:57:51 $
+;; Revised: $Date: 2000/06/18 09:54:31 $
 
 ;;;
 ;;; Commentary:
@@ -216,16 +216,16 @@
 
 (defsubst mhc-date/to-list2 (date)
   (let (x b c d e w dom)
-    (setq w  (% (+ date 4) 7)
-	  date (+ date 2440588)
-	  x (floor (/ (- date 1867216.25) 36524.25))
-	  b (- (+ date 1525 x) (floor (/ x 4.0)))
-	  c (floor (/ (- b 122.1) 365.25))
-	  d (floor (* 365.25 c))
-	  e (floor (/ (- b d) 30.6001))
-	  dom (- b d (floor (* 30.6001 e))))
+    (setq w  (% (+ date 25568) 7)
+          date (+ date 2440588)
+          x (floor (/ (- date 1867216.25) 36524.25))
+          b (- (+ date 1525 x) (floor (/ x 4.0)))
+          c (floor (/ (- b 122.1) 365.25))
+          d (floor (* 365.25 c))
+          e (floor (/ (- b d) 30.6001))
+          dom (- b d (floor (* 30.6001 e))))
     (if (<= e 13)
-	(list (- c 4716) (1- e) dom w)
+        (list (- c 4716) (1- e) dom w)
       (list (- c 4715) (- e 13) dom w))))
 
 (defsubst mhc-date-to-list (date)
