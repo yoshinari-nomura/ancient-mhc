@@ -2,7 +2,7 @@
 
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;; Created: 2000/07/18
-;; Revised: $Date: 2000/08/02 05:43:55 $
+;; Revised: $Date: 2000/08/02 10:27:35 $
 
 ;; (autoload 'mhc-cmail-setup "mhc-cmail")
 ;; (add-hook 'cmail-startup-hook 'mhc-cmail-setup)
@@ -58,7 +58,7 @@
 
 (defun mhc-cmail-summary-display-article ()
   "Display the article on the current."
-  (cmail-read-contents))
+  (cmail-read-contents (cmail-get-page-number-from-summary)))
 
 (defun mhc-cmail-get-import-buffer (get-original)
   ;; (if get-original (cmail-summary-display-asis)) ;; xxx
@@ -66,6 +66,16 @@
     (cmail-show-contents (cmail-get-page-number-from-summary))
     (set-buffer *cmail-mail-buffer)
     (current-buffer)))
+
+(defun mhc-cmail-mime-get-raw-buffer ()
+  (let ((page (cmail-get-page-number-from-summary)) beg end)
+    (save-excursion
+      (cmail-get-folder)
+      (cmail-n-page page)
+      (setq beg (point))
+      (setq end (cmail-page-max))
+      (narrow-to-region beg end)
+      (current-buffer))))
 
 (defun mhc-cmail/date-to-buffer (date)
   "**cmail-summary**")
@@ -220,10 +230,6 @@
 	(set-buffer *cmail-summary-buffer)))
     (cmail-fixcp)))
 
-(if (featurep 'mhc-mime)
-    (defalias 'mhc-cmail-eword-decode-string 'eword-decode-string)
-  (defalias 'mhc-cmail-eword-decode-string 'identity))
-
 (defun mhc-cmail-draft-setup-new ()
   (goto-char (point-min))
   (insert mail-header-separator "\n"))
@@ -255,18 +261,28 @@
 (provide 'mhc-cmail)
 (put 'mhc-cmail 'summary-filename 'mhc-cmail-summary-filename)
 (put 'mhc-cmail 'summary-display-article 'mhc-cmail-summary-display-article)
-(put 'mhc-cmail 'get-import-buffer 'mhc-cmail-get-import-buffer)
 (put 'mhc-cmail 'draft-mode 'mhc-cmail-draft-mode)
 (put 'mhc-cmail 'generate-summary-buffer 'mhc-cmail-generate-summary-buffer)
 (put 'mhc-cmail 'insert-summary-contents 'mhc-cmail-insert-summary-contents)
 (put 'mhc-cmail 'summary-search-date 'mhc-cmail-summary-search-date)
 (put 'mhc-cmail 'summary-mode-setup 'mhc-cmail-summary-mode-setup)
-(put 'mhc-cmail 'highlight-message   'mhc-summary/true)
-(put 'mhc-cmail 'draft-setup-new     'mhc-cmail-draft-setup-new)
-(put 'mhc-cmail 'draft-reedit-buffer 'mhc-cmail-draft-reedit-buffer)
-(put 'mhc-cmail 'draft-reedit-file   'mhc-cmail-draft-reedit-file)
-(put 'mhc-cmail 'draft-translate     'mhc-cmail-draft-translate)
-(put 'mhc-cmail 'eword-decode-string 'mhc-cmail-eword-decode-string)
+(if (featurep 'mhc-mime)
+    (progn
+      (put 'mhc-cmail 'get-import-buffer   'mhc-mime-get-import-buffer)
+      (put 'mhc-cmail 'mime-get-raw-buffer 'mhc-cmail-mime-get-raw-buffer)
+      (put 'mhc-cmail 'draft-setup-new     'mhc-mime-draft-setup-new)
+      (put 'mhc-cmail 'draft-reedit-buffer 'mhc-mime-draft-reedit-buffer)
+      (put 'mhc-cmail 'draft-reedit-file   'mhc-mime-draft-reedit-file)
+      (put 'mhc-cmail 'draft-translate     'mhc-mime-draft-translate)
+      (put 'mhc-cmail 'eword-decode-string 'mhc-mime-eword-decode-string))
+  (put 'mhc-cmail 'get-import-buffer   'mhc-cmail-get-import-buffer)
+  (put 'mhc-cmail 'highlight-message   'mhc-summary/true)
+  (put 'mhc-cmail 'draft-setup-new     'mhc-cmail-draft-setup-new)
+  (put 'mhc-cmail 'draft-reedit-buffer 'mhc-cmail-draft-reedit-buffer)
+  (put 'mhc-cmail 'draft-reedit-file   'mhc-cmail-draft-reedit-file)
+  (put 'mhc-cmail 'draft-translate     'mhc-cmail-draft-translate)
+  (put 'mhc-cmail 'eword-decode-string 'identity))
+
 
 ;;; Copyright Notice:
 
