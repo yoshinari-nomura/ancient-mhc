@@ -1,3 +1,8 @@
+2000-07-18  Toshihiko SHIMOKAWA  <toshi@csce.kyushu-u.ac.jp>
+
+	* next_year.xpm: correct color information
+	* prev_year.xpm: Ditto.
+
 2000-07-06  MIYOSHI Masanori  <miyoshi@ask.ne.jp>
 
 	* 00readme.w32.jis: New file for Windows users.
