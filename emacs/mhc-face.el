@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 2000/02/08
-;; Revised: $Date: 2000/07/21 05:15:08 $
+;; Revised: $Date: 2000/08/04 10:57:07 $
 
 ;;;
 ;;; Commentay:
@@ -71,13 +71,14 @@ refer to mhc-calendar-hnf-face-alist-internal.")
 (eval-when-compile
   (cond
    ((featurep 'xemacs)
-    ;; (make-face-bold FACE &optional LOCALE TAGS)
+    ;; XEmacs 21.2 (make-face-bold FACE &optional LOCALE TAGS)
+    ;; XEmacs 21.1 (make-face-bold FACE &optional LOCALE)
     (defmacro mhc-face/make-face-bold (face)
-      (` (make-face-bold (, face) nil nil)))
+      (` (make-face-bold (, face))))
     (defmacro mhc-face/make-face-italic (face)
-      (` (make-face-italic (, face) nil nil)))
+      (` (make-face-italic (, face))))
     (defmacro mhc-face/make-face-bold-italic (face)
-      (` (make-face-bold-italic (, face) nil nil))))
+      (` (make-face-bold-italic (, face)))))
    (t
     ;; (make-face-bold FACE &optional FRAME NOERROR)
     (defmacro mhc-face/make-face-bold (face)

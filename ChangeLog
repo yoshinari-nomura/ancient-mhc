@@ -2,6 +2,9 @@
 
 	* emacs/mhc.el (mhc-setup): Fix, called mhc-icon-setup() twice.
 
+	* emacs/mhc-face.el (make-face-xxx): Fill the gap between another
+	version's XEmacs.
+
 2000-08-04  Yuuichi Teranishi  <teranisi@quickhack.net>
 
 	* emacs/mhc-schedule.el (mhc-schedule-subject): Don't decode
