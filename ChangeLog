@@ -1,3 +1,14 @@
+2002-11-21  Yoshinari NOMURA  <nom@quickhack.net>
+
+	* ruby-ext/mhc_pilib.c (rldp_ReadAppBlock):
+	add application info
+
+	* ruby-ext/extconf.rb.in (toplevel):
+	add LDFLAGS for FreeBSD
+
+	* configure.rb (toplevel):
+	add some items to lib_search_path and inc_search_path for NetBSD.
+
 2002-11-11 Yoichi NAKAYAMA <yoichi@eken.phys.nagoya-u.ac.jp> / nom
 
 	* emacs/mhc-cvs.el, emacs/mhc-e21.el, emacs/mhc-file.el,
