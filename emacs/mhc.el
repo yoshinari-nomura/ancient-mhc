@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1994/07/04
-;; Revised: $Date: 2000/08/07 02:16:21 $
+;; Revised: $Date: 2000/08/10 03:58:02 $
 
 ;;;
 ;;; Commentay:
@@ -515,6 +515,24 @@ Returns t if the importation was succeeded."
   (mhc-draft-set-as-not-done)
   (mhc-draft-finish)
   (message ""))
+
+(defcustom mhc-browse-x-url-function 'browse-url
+  "*A function to browse URL."
+  :group 'mhc
+  :type 'function)
+
+(defun mhc-browse-x-url ()
+  "Browse X-URL field."
+  (interactive)
+  (let ((filename (mhc-summary-filename))
+	url)
+    (with-temp-buffer
+      (insert-file-contents filename)
+      (if (setq url (mhc-header-narrowing (mhc-header-get-value "x-url")))
+	  (progn
+	    (funcall mhc-browse-x-url-function url)
+	    (message "X-URL browser started."))
+	(message "No X-URL field.")))))
 
 (defun mhc-modify-file (file)
   (if (and (stringp file) (file-exists-p file))

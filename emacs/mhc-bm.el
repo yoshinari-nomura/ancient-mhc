@@ -3,17 +3,18 @@
 ;; Author:  Yuuichi Teranishi <teranisi@gohome.org>
 ;;
 ;; Created: 2000/05/27
-;; Revised: $Date: 2000/08/04 11:01:23 $
+;; Revised: $Date: 2000/08/10 03:58:02 $
 
 (require 'bitmap)
 (require 'mhc-face)
 
 (defcustom mhc-bm-icon-alist
-  '(("Holiday"     . ("Holiday.xbm" "OrangeRed" "White"))
+  '(("Conflict"    . ("Conflict.xbm" "Yellow"))
     ("Private"     . ("Private.xbm" "HotPink"))
+    ("Holiday"     . ("Holiday.xbm" "OrangeRed" "White"))
     ("Todo"         .("CheckBox.xbm" "Red"))
     ("Done"        . ("CheckedBox.xbm" "Red"))
-    ("Conflict"    . ("Conflict.xbm" "Yellow")))
+    ("Link"       .  ("Link.xbm" "Gray")))
   "*Alist to define icons.
 Each element should have the form
  (NAME . (ICON-FILE FG BG))
@@ -41,7 +42,8 @@ Example:
 
 (defcustom mhc-icon-function-alist
   '(("Todo" . mhc-todo-set-as-done)
-    ("Done" . mhc-todo-set-as-not-done))
+    ("Done" . mhc-todo-set-as-not-done)
+    ("Link" . mhc-browse-x-url))
   "*Alist to define callback function for icons.
 Each element should have the form
  (NAME . FUNCTION)
@@ -136,18 +138,20 @@ icon line."
 (defun mhc-put-icon (icons)
   "Put ICONS on current buffer.
 Icon is defined by `mhc-bm-icon-alist'."  
-  (let (icon pos)
+  (let (icon pos func overlay)
     (while icons
       (setq icon (cdr (assoc (downcase (car icons))
 			     mhc-bm/icon-bmstr-alist)))
       (setq pos (point))
       (and icon (insert icon))
-      (put-text-property pos (point)
-			 'mhc-bm-icon-function
-			 (cdr (assoc (downcase (car icons))
-				     mhc-bm/icon-function-alist)))
-      (put-text-property pos (point) 'local-map mhc-bm-icon-keymap)
-;      (put-text-property pos (point) 'mouse-face 'highlight)
+      (when (setq func (cdr (assoc (downcase (car icons))
+				   mhc-bm/icon-function-alist)))
+	(put-text-property pos (point)
+			   'mhc-bm-icon-function func)
+	(put-text-property pos (point) 'local-map mhc-bm-icon-keymap)
+	(setq overlay (make-overlay pos (point)))
+	(overlay-put overlay 'face (get-text-property 0 'face icon))
+	(overlay-put overlay 'mouse-face 'highlight))
       (setq icons (cdr icons)))))
 
 (provide 'mhc-bm)

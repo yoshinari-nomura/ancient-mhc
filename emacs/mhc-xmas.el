@@ -3,14 +3,15 @@
 ;; Author:  Yuuichi Teranishi <teranisi@gohome.org>
 ;;
 ;; Created: 1999/12/02
-;; Revised: $Date: 2000/08/04 11:01:24 $
+;; Revised: $Date: 2000/08/10 03:58:02 $
 
 (defcustom mhc-xmas-icon-alist 
   '(("Conflict"   . "Conflict.xpm")
     ("Private"    . "Private.xpm")
     ("Holiday"    . "Holiday.xpm")
     ("Todo"       . "CheckBox.xpm")
-    ("Done"       . "CheckedBox.xpm"))
+    ("Done"       . "CheckedBox.xpm")
+    ("Link"       . "Link.xpm"))
   "*Alist to define icons.
 Each element should have the form
  (NAME . ICON-FILE)
@@ -33,7 +34,8 @@ Example:
 
 (defcustom mhc-icon-function-alist
   '(("Todo" . mhc-todo-set-as-done)
-    ("Done" . mhc-todo-set-as-not-done))
+    ("Done" . mhc-todo-set-as-not-done)
+    ("Link" . mhc-browse-x-url))
   "*Alist to define callback function for icons.
 Each element should have the form
  (NAME . FUNCTION)

@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>,
 ;;          Yuuichi Teranishi <teranisi@quickhack.net>
 ;; Created: 2000/07/25
-;; Revised: $Date: 2000/08/07 02:16:21 $
+;; Revised: $Date: 2000/08/10 03:58:02 $
 
 ;;; Commentary:
 
@@ -172,7 +172,6 @@ If optional argument NO-CONFIRM is non-nil, kill without confirmation."
   (let ((record
 	 (mhc-parse-buffer (mhc-record-new mhc-draft-buffer-file-name))))
     (mhc-calendar-input-exit)
-    ;(mhc-header-delete-separator)
     (if (mhc-db-add-record-from-buffer record (current-buffer)
 				       (not (interactive-p)))
 	(progn
