@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@mew.org>
 ;;
 ;; Created: 1994/07/04
-;; Revised: $Date: 2000/05/26 01:06:41 $
+;; Revised: $Date: 2000/05/26 18:05:42 $
 
 ;;;
 ;;; Commentay:
@@ -101,7 +101,6 @@
 		  mhc-mode-map
 		  "Menu used in mhc mode." 
 		  mhc-mode-menu-spec)
-(if (featurep 'xemacs) (easy-menu-add mhc-mode-menu))
 
 (defvar mhc-mode nil
   "Non-nil when in mhc-mode.")
@@ -150,6 +149,7 @@
   (setq mhc-mode (if (null arg)
 		     (not mhc-mode)
 		   (> (prefix-numeric-value arg) 0)))
+  (if (featurep 'xemacs) (easy-menu-add mhc-mode-menu))
   (force-mode-line-update))
 
 
