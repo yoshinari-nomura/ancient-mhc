@@ -3,7 +3,7 @@
 ################################################################
 
 Created: 1999/04/07
-Revised: $Date: 2000/05/29 15:08:23 $
+Revised: 2000/05/22 10:02:25
 
 mhc の使いかた
 
@@ -393,16 +393,16 @@ mhc の使いかた
 11. その他
 
         mhcに関するお話をするメイリングリストを上げました。
-        mhc-ctl@swlab.csce.kyushu-u.ac.jp に
+        mhc-ctl@quickhack.net に
 
                 subscribe Your Name (例: subscribe Yoshinari Nomura)
 
         と書いたメールを送ることによって、入会の確認メールが来ます。
         質問・レポート等は
 
-            mhc@swlab.csce.kyushu-u.ac.jp
+            mhc@quickhack.net
 
-        宛てか nom@mew.org に下さい。
+        宛てか nom@quickhack.net に下さい。
 
     iij の大原さんが、mhc の CGI インターフェースと、mhc のページを作
     成されています。合せて御覧下さい。

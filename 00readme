@@ -4,7 +4,7 @@
                         Yoshinari Nomura
 
 Created: 1999/09/01
-Revised: $Date: 2000/05/29 15:08:22 $
+Revised: 2000/05/22 10:00:48
 
 ** DESCRIPTION:
 
@@ -12,7 +12,7 @@ MHC is designed to help those who receive most appointments via email.
 Using MHC, you can easily import schedule articles from emails.
 
 You can get the latest version from:
- http://www.swlab.csce.kyushu-u.ac.jp/~nom/prj/mhc/
+ http://www.quickhack.net/mhc/
 
 MHC has following features:
 
@@ -86,16 +86,16 @@ Each manpage may be included in sub directory or embedded the tool itself.
 ** FOR MORE INFORMATION:
 
 Please send me any comments or  bug reports:
-  nom@mew.org
+  nom@quickhack.net or mhc-core@quickhack.net
 
 You can get the latest version from:
-  http://www.swlab.csce.kyushu-u.ac.jp/~nom/prj/mhc/
+  http://www.quickhack.net/mhc/
 
-I also opened mailing list, ``mhc@swlab.csce.kyushu-u.ac.jp''.
+I also opened mailing list, ``mhc@quickhack.net''.
 Almost subscribers are Japanese. If you read Japanese, I recommend you
 to subscribe it. Please send a mail to following address,
 
-  mhc-ctl@swlab.csce.kyushu-u.ac.jp
+  mhc-ctl@quickhack.net
 
 with such content:
 
