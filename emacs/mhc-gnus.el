@@ -194,7 +194,11 @@ this function."
     (insert-buffer buffer))
   (when original
     ;; buffer is raw buffer.
-    (mime-to-mml))
+    (mime-to-mml)
+    (mhc-header-narrowing
+      (mhc-header-delete-header
+       (concat "^\\(" (mhc-regexp-opt mhc-draft-unuse-hdr-list) "\\)")
+       'regexp)))
   (mhc-header-narrowing
     (mhc-header-delete-header
      "^\\(Content-.*\\|Mime-Version\\|User-Agent\\):" 'regexp))
