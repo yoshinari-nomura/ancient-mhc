@@ -77,6 +77,11 @@
       (mhc-schedule/set-time schedule begin end)))
   schedule)
 
+;; For backward compatibility.
+(defun mhc-parse/old-style-date (record schedule)
+  (mhc-logic-parse-old-style-date (mhc-schedule-condition schedule))
+  (mhc-parse/time record schedule))
+
 (defun mhc-parse/alarm (record schedule)
   (mhc-schedule/set-alarm schedule (mhc-parse/continuous-lines))
   schedule)

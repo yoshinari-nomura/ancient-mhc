@@ -28,6 +28,8 @@
     ("x-sc-todo"	"X-SC-ToDo:"		mhc-parse/todo)
     ("x-sc-record-id"	"X-SC-Record-Id:"	mhc-parse/record-id)
     ("x-sc-schedule"	"X-SC-Schdule:"		mhc-parse/schedule)
+    ;; For backward compatibility
+    ("x-sc-date"	"X-SC-Date:"		mhc-parse/old-style-date)
     ;; FIXME: Í×ºï½ü
     ("x-sc-next"	"X-SC-Next:"		mhc-parse/next)))
 

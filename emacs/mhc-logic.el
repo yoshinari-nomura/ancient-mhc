@@ -172,6 +172,10 @@
   (mhc-regexp-opt (mapcar (function car) mhc-logic/month-alist) 'paren)
   "構文要素の月に一致する正規表現")
 
+(defconst mhc-logic/old-style-date-regexp
+  "\\([0-9]+\\)[\t ]+\\([A-Z][a-z][a-z]\\)[\t ]+\\([0-9]+\\)"
+  "構文要素の旧形式の日付指定に一致する正規表現")
+
 
 (defmacro mhc-logic/looking-at (&rest regexp)
   "正規表現に一致する構文要素を発見するマクロ"
@@ -193,6 +197,31 @@
 	    days (cons (if (match-string 1) (cons d nil) d) days))
       (goto-char (match-end 0)))
     (mhc-logic/set-day logicinfo days)))
+
+
+(defun mhc-logic-parse-old-style-date (logicinfo)
+  "X-SC-Date: ヘッダの日付部分を解析する関数"
+  (if (looking-at mhc-logic/space-regexp)
+      (goto-char (match-end 0)))
+  (let (month)
+    (if (and (mhc-logic/looking-at mhc-logic/old-style-date-regexp)
+	     (setq month (cdr (assoc (downcase (match-string 2))
+				     mhc-logic/month-alist))))
+	(let ((year (string-to-number (match-string 3))))
+	  (mhc-logic/set-day 
+	   logicinfo
+	   (cons (ddate-days
+		  (list
+		   (cond ((< year 69)
+			  (+ year 2000))
+			 ((< year 1000)
+			  (+ year 1900))
+			 (t year))
+		   month
+		   (string-to-number (match-string 1))))
+		 (mhc-logic/day logicinfo)))
+	  (goto-char (match-end 0)))
+      (error "Parse ERROR !!!"))))
 
 
 (defun mhc-logic-parse-cond (logicinfo)
