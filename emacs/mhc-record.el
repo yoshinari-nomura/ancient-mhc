@@ -140,7 +140,7 @@
 			   ((eq status 'delete) ?D)
 			   ((eq status 'modify) ?M)
 			   (t ??))
-			  (format-time-string "%Y-%m-%d %H:%M")
+			  (format-time-string "%Y-%m-%d %T")
 			  (mhc-record-id record)
 			  (mhc-record-name record)
 			  (mhc-record-subject-as-string record)))
