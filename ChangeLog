@@ -1,5 +1,9 @@
 2000-07-31  Yuuichi Teranishi  <teranisi@quickhack.net>
 
+	* emacs/mhc-mime.el (mhc-mime-draft-reedit-file):
+	Use `insert-file-contents-as-raw-text-CRLF' instead of
+	`insert-file-contents-as-binary'.
+
 	* emacs/mhc-wl.el (mhc-wl-summary-mode-setup): Recover value of
 	`mhc-wl-exit-buffer' after `wl-summary-mode'.
 
