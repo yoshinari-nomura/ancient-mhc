@@ -3,27 +3,18 @@
 ## Author:  Yoshinari Nomura <nom@quickhack.net>
 ##
 ## Created: 1999/07/16
-## Revised: $Date: 2000/06/26 08:06:04 $
+## Revised: $Date: 2000/06/28 13:58:41 $
 ##
 
 #$DEBUG = true
 
 require 'gtk'
-require 'kconv'
 
+require 'mhc-kconv'
 require 'mhc-date'
 require 'mhc-signal'
 
 # $XPM_PATH = '/usr/local/lib/gemcal/xpm'
-
-case $KCODE
-when 'JIS'
-  $KANJI_CODE = Kconv::JIS
-when 'SJIS'
-  $KANJI_CODE = Kconv::SJIS
-else
-  $KANJI_CODE = Kconv::EUC
-end
 
 # xxx: from ruby-gtk 0.23, Gtk::CAN_* changed to Gtk::Widget::CAN_*
 #
@@ -451,12 +442,12 @@ class GtkDayBook < Gtk::VBox
   end
 
   def append(item, time = '')
-    @lst .append([time, Kconv::kconv(item, $KANJI_CODE, true)])
+    @lst .append([time, MhcKconv::todisp(item)])
     return self
   end
 
   def set_tip(tip)
-    @tip = tip ? Kconv::kconv(tip .to_s, $KANJI_CODE, true) : nil
+    @tip = tip ? MhcKconv::todisp(tip .to_s) : nil
     TIPS .set_tip(@btn, @tip, nil)
     return self
   end
@@ -550,7 +541,8 @@ class GtkCalendar < Gtk::VBox
     
     ## add week label
     for w in 0 .. 6
-      wlabel = Gtk::Label .new(week_label[w]) .set_style(STYLE_ARRAY[w])
+      wlabel = Gtk::Label .new(MhcKconv::todisp(week_label[w]))
+      wlabel .set_style(STYLE_ARRAY[w])
       w_tbl .attach(wlabel, w, w + 1, 0, 1, FILL, NONE, 5, 0)
     end
 
@@ -874,7 +866,7 @@ class GtkFileViewer < Gtk::VBox
 #     @txt .insert(nil, RED,   WHITE, hdr .to_s)
 #     @txt .insert(nil, BLACK, nil, "\n\n" + value .to_s)
 
-    @txt .insert_text(Kconv::kconv(text, $KANJI_CODE, true), 0)
+    @txt .insert_text(MhcKconv::todisp(text), 0)
     @txt .set_editable(@text_editable) .thaw
   end
 
@@ -1007,7 +999,7 @@ class GtkEntry < Gtk::HBox
   end
 
   def set_text(str)
-    @ent .set_text(Kconv::kconv(str, $KANJI_CODE, true))
+    @ent .set_text(MhcKconv::todisp(str))
     return self
   end
 

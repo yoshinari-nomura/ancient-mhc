@@ -3,8 +3,10 @@
 ## Author:  Yoshinari Nomura <nom@quickhack.net>
 ##
 ## Created: 1999/07/16
-## Revised: $Date: 2000/05/29 14:59:25 $
+## Revised: $Date: 2000/06/28 13:58:41 $
 ##
+
+require 'mhc-kconv'
 
 class MhcTime
   include Comparable
@@ -106,9 +108,16 @@ class MhcDate
 
   ## できるだけ人間に分かりやすい表現形式
   if ENV['LANG'] =~ /^ja/i
-    def ym_js; format("%04d年%02d月", @y, @m)                            ; end
-    def md_js; format("%02d月%02d日(%s)", @m, @d, W_JLABEL[w])           ; end
-    def to_js; format("%04d年%02d月%02d日(%s)", @y, @m, @d, W_JLABEL[w]) ; end
+    def ym_js
+      MhcKconv::todisp(format("%04d年%02d月", @y, @m))
+    end
+    def md_js
+      MhcKconv::todisp(format("%02d月%02d日(%s)", @m, @d, W_JLABEL[w]))
+    end
+    def to_js
+      MhcKconv::todisp(format("%04d年%02d月%02d日(%s)",
+			      @y, @m, @d, W_JLABEL[w]))
+    end
   else
     def ym_js; format("%s %d", m_s, @y)                             ; end
     def md_js; format("%s, %d %s", w_s, @d, m_s)                    ; end

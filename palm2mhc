@@ -5,12 +5,12 @@
 ## Author:  Yoshinari Nomura <nom@quickhack.net>
 ##
 ## Created: 1999/10/08
-## Revised: $Date: 2000/06/26 07:32:33 $
+## Revised: $Date: 2000/06/28 13:58:40 $
 ##
 
 $DEBUG = false
 
-require 'kconv'
+require 'mhc-kconv'
 require 'mhc-palm'
 require 'mhc-date'
 require 'mhc-schedule'
@@ -103,7 +103,7 @@ pdb .each_record{|rec|
 
     if x
       print "***************************************************************\n"
-      print x .dump
+      print MhcKconv::todisp(x .dump)
       print "***************************************************************\n"
 
       if !$flag_noharm

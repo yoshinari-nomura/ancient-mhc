@@ -5,7 +5,7 @@
 ## Author:  Yoshinari Nomura <nom@quickhack.net>
 ##
 ## Created: 1999/09/01
-## Revised: $Date: 2000/06/26 04:16:56 $
+## Revised: $Date: 2000/06/28 13:58:40 $
 ##
 
 # $DEBUG = 1
@@ -15,21 +15,12 @@ LIB = File .expand_path(File .dirname(File .symlink?($0) &&
 $LOAD_PATH .unshift(LIB + '/ruby-ext/lib')
 
 require 'gtk'
-require 'kconv'
 
+require 'mhc-kconv'
 require 'mhc-signal'
 require 'mhc-gtk'
 require 'mhc-date'
 require 'mhc-schedule'
-
-case $KCODE
-when 'JIS'
-  $KANJI_CODE = Kconv::JIS
-when 'SJIS'
-  $KANJI_CODE = Kconv::SJIS
-else
-  $KANJI_CODE = Kconv::EUC
-end
 
 ################################################################
 # Immediate
@@ -691,7 +682,7 @@ MhcCalendar .new(d, $db, daybook, x, y)
 $alarm = MhcAlarm .new($db)
 $alarm .signal_connect('time-arrived'){|date, sch|
   GtkConfirm .new("#{date .to_js} #{sch .time_b} " +
-		  "#{Kconv::kconv(sch .subject, $KANJI_CODE, true)}\n")
+		  "#{MhcKconv::todisp(sch .subject)}\n")
 }
 $alarm .check
 Gtk .main

@@ -5,7 +5,7 @@
 ## Author:  Yoshinari Nomura <nom@quickhack.net>
 ##
 ## Created: 1999/11/11
-## Revised: $Date: 2000/06/23 07:07:51 $
+## Revised: $Date: 2000/06/28 13:58:40 $
 ##
 ## today was originally written in perl.
 ## This  is a ruby version of it. Original authors were
@@ -15,29 +15,15 @@
 ##
 
 $DEBUG2       = false
-$KANJI_KCODE  = $KCODE
 
 MailServer    = 'localhost'  ## for --mail option
 MyHostName    = 'localhost'  ## for --mail option
 
 require 'mhc-schedule'
-require 'kconv'
+require 'mhc-kconv'
 require 'net/smtp'
 
 class String
-  def kconv(code = 'JIS')
-    case code
-    when 'JIS'
-      return Kconv::tojis(self)
-    when 'SJIS'
-      return Kconv::tosjis(self)
-    when 'EUC'
-      return Kconv::toeuc(self)
-    else
-      return self
-    end
-  end
-
   # digest a string upto max size.
   # when the bound is unsafe for muti-bytes, replace the character with '$'
   def digest (max, tail_adjust = '$', fill_up = nil)
@@ -134,8 +120,7 @@ formatter_normal = Proc .new{|date, items|
     ret += heading + format("%-11s %s\n", sch .time_as_string, sch .subject)
     first = false
   }
-  ret .kconv($KANJI_KCODE)
-
+  MhcKconv::todisp(ret)
 }
 
 formatter_ps = Proc .new{|date, items|
@@ -151,7 +136,7 @@ formatter_ps = Proc .new{|date, items|
 	     sch .time_b .to_s,
 	     sch .subject .digest(15) .gsub(/([()])/, '\\\\\1'))
   }
-  ret .kconv($KANJI_CODE)
+  MhcKconv::todisp(ret)
 }
 
 formatter_html = Proc .new{|date, items|
@@ -171,7 +156,7 @@ formatter_html = Proc .new{|date, items|
   end
   buffer += format("%02d/%02d(%s)", date .m, date .d, week) + " "
   buffer += string .digest(buffer_max) + "<BR>\n"
-  buffer .kconv($KANJI_KCODE)
+  MhcKconv::todisp(buffer)
 }
 
 ################################################################
@@ -265,13 +250,14 @@ if mail_address
     get_schedule(db, date_from, date_to, category, formatter, hook_proc)
 
   if contents && contents != ''
-    message = (header + contents) .kconv('JIS')
+    message = MhcKconv::tomail(header + contents)
     Net::SMTPSession .start(MailServer, 25, MyHostName) {|server|
       server .sendmail(message, mail_address, [mail_address])
     }
   end
 else
-  print get_schedule(db, date_from, date_to, category, formatter, hook_proc)
+  print MhcKconv::todisp(get_schedule(db, date_from, date_to,
+				      category, formatter, hook_proc))
 end
 
 ################################################################

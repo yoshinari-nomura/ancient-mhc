@@ -5,12 +5,12 @@
 ## Author:  Yoshinari Nomura <nom@quickhack.net>
 ##
 ## Created: 1999/10/08
-## Revised: $Date: 2000/06/23 07:07:51 $
+## Revised: $Date: 2000/06/28 13:58:40 $
 ##
 
 $DEBUG = false
 
-require 'kconv'
+require 'mhc-kconv'
 require 'mhc-palm'
 require 'mhc-date'
 require 'mhc-schedule'
@@ -122,7 +122,7 @@ end
 
 mdb = MhcScheduleDB .new($flag_dir)
 mdb .each_sch($flag_from, $flag_to){|sch|
-  print "adding ", Kconv::toeuc(sch .subject), "\n"
+  print "adding ", MhcKconv::todisp(sch .subject), "\n"
 
   if p_rec_array = sch .to_palm
     print "    converted into #{p_rec_array .length} palm article(s)."
