@@ -3,7 +3,7 @@
 ## Author:  Yoshinari Nomura <nom@quickhack.net>
 ##
 ## Created: 1999/09/01
-## Revised: $Date: 2000/05/29 14:59:26 $
+## Revised: $Date: 2000/06/26 04:08:40 $
 ##
 
 require 'mhc-date'
@@ -595,7 +595,12 @@ class PilotApptRecord < PilotRecord
       end
     }
     x = MhcScheduleItem .new(str, false)
-    x .set_description(note)
+
+    note_hdr, note_desc, datebk3_icon = conv_note(note)
+    x .set_non_xsc_header(note_hdr)
+    x .set_description(note_desc)
+    x .add_category(datebk3_icon) if datebk3_icon
+
     x .set_pilot_id([@id])
     return x
   end
@@ -603,6 +608,35 @@ class PilotApptRecord < PilotRecord
   ################################################################
   ## private
 
+  ## Palm のノート -> mhc の body と X-SC-* 以外のヘッダ部分に変換
+  def conv_note(string)
+    if string =~ /^(\#\#@@@.@@@)\n(.*)/np
+      datebk3_icon, string = $1, $2
+    end
+
+    part1_is_header = true
+
+    part1, part2 = string .split("\n\n", 2)
+
+    if !(part1 =~ /^[ \t]+/ or part1 =~ /^[A-Za-z0-9_-]+:/)
+      part1_is_header = false
+    end
+
+    part1 .split("\n") .each{|line|
+      if !(string =~ /^[ \t]+/ or string =~ /^[A-Za-z0-9_-]+:/)
+	part1_is_header = false
+      end
+    }
+
+    if part1_is_header
+      header, body = part1, part2
+    else
+      header, body = nil, string
+    end
+
+    return header, body, datebk3_icon
+  end
+    
   ## Time クラスインスタンスの 時間部分だけを置き換える
   def replace_time(time, hour, min)
     return Time .local(*time .to_a .indexes(5, 4, 3) + [hour, min])
