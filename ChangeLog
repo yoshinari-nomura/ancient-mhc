@@ -1,3 +1,8 @@
+2001-03-10  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+
+	* emacs/mhc-calendar.el (toplevel): Condition to define
+	`easy-menu-add' is changed to avoid redundancy of definition.
+
 2001-03-05  Yuuichi Teranishi  <teranisi@quickhack.net>
 
 	* emacs/mhc.el (mhc-scan-month):

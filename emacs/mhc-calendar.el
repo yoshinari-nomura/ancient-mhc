@@ -5,7 +5,7 @@
 ;;          MIYOSHI Masanori <miyoshi@ask.ne.jp>
 ;;
 ;; Created: 05/12/2000
-;; Reviesd: $Date: 2001/01/31 11:26:35 $
+;; Reviesd: $Date: 2001/03/10 12:19:52 $
 
 ;;; Configration Variables:
 
@@ -191,8 +191,9 @@ ww-japanese-long => \"土曜日\"
   (defvar ww)
   (defvar view-exit-action)
   (defvar mhc-calendar-mode-menu)
-  (unless (featurep 'xemacs)
-    (defun easy-menu-add (menu) ())))
+  (or (fboundp 'easy-menu-add)
+      (condition-case nil (require 'easymenu) (error nil))
+      (defun easy-menu-add (&rest args) ())))
 
 ;; Compatibilities between emacsen
 (if (fboundp 'text-property-any)
