@@ -1,3 +1,25 @@
+2000-06-26  Yoshinari Nomura  <nom@quickhack.net>
+
+        Merge From Current:
+
+	* mhc/gemcal (MhcScheduleEdit#conv_description):
+	New function to divide non X-SC- headers from body. Fix
+		duplication of non X-SC- headers.
+
+	* mhc/ruby-ext/lib/mhc-schedule.rb 
+	 (MhcScheduleItem#set_non_xsc_header): New function to divide non X-SC-
+	    headers from body.
+	(MhcScheduleItem#dump_without_xsc_header): Ditto.
+	(MhcScheduleItem#to_palm): datebk3 compliant (I hope).
+
+	* mhc/ruby-ext/lib/mhc-palm.rb (PilotApptRecord#to_xsc):
+	datebk3 compliant (I hope).
+
+	* mhc/ruby-ext/lib/mhc-gtk.rb (GtkTimeRangeEdit):
+	fix for setting end time.
+
+	* mhc/ruby-ext/extconf.rb: add header check.
+
 2000-06-23  Yoshinari Nomura  <nom@quickhack.net>
 
 	* emacs/mhc-guess.el (gdate-gather-time-list2):
