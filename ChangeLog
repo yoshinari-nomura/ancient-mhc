@@ -1,3 +1,16 @@
+2002-09-24  Hideyuki SHIRAI  <shirai@quickhack.net>
+
+	* emacs/mhc-summary.el (mhc-summary/cw-separator) 
+	(mhc-summary/cw-week): New variables.
+	(mhc-summary/insert-separator, mhc-summary-make-contents):
+	Support `mhc-summary/cw-separator'.
+	(mhc-summary/line-day-of-week-string) 
+	(mhc-summary/line-day-of-week-ja-string): Use
+	`mhc-summary/cw-week' insted of 'mhc-summary-use-cw'.
+
+	* emacs/mhc-face.el (mhc-symbol-face-alist-internal): Add
+	`mhc-summary-face-cw'.
+
 2002-09-23  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* emacs/mhc.el (mhc-scan-month): Use `mhc-calendar-width'.

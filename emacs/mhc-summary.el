@@ -441,6 +441,9 @@ It indicates a type of the property to put on the inserted string.
 PROP-VALUE is the property value correspond to PROP-TYPE.
 ")
 
+(defvar mhc-summary/cw-separator nil)
+(defvar mhc-summary/cw-week nil)
+
 ;;; MUA Backend Functions:
 
 (defun mhc-summary-mailer-type ()
@@ -535,17 +538,28 @@ If optional argument FOR-DRAFT is non-nil, Hilight message as draft message."
 
 
 ;;; Codes:
-(defun mhc-summary/insert-separator (&optional wide)
+(defun mhc-summary/insert-separator (&optional wide str)
   (let (hr)
     (if wide
 	(progn
 	  (setq hr (make-string
 		    (- (window-width) 2) mhc-summary-month-separator))
 	  (mhc-face-put hr 'mhc-summary-face-month-separator))
-      (setq hr (make-string
-		(- (window-width) mhc-calendar-width)
-		mhc-summary-separator))
-      (mhc-face-put hr 'mhc-summary-face-separator))
+      (if (stringp str)
+	  (let ((hr1 (make-string 4 mhc-summary-separator))
+		hr2)
+	    (mhc-face-put hr1 'mhc-summary-face-separator)
+	    (mhc-face-put str 'mhc-summary-face-cw)
+	    (setq hr2 (make-string
+			      (- (window-width) mhc-calendar-width
+				 (length hr1) (length str))
+			      mhc-summary-separator))
+	    (mhc-face-put hr2 'mhc-summary-face-separator)
+	    (setq hr (concat hr1 str hr2)))
+	(setq hr (make-string
+		  (- (window-width) mhc-calendar-width)
+		  mhc-summary-separator))
+	(mhc-face-put hr 'mhc-summary-face-separator)))
     (insert hr "\n")))
 
 
@@ -612,9 +626,12 @@ If optional argument FOR-DRAFT is non-nil, Hilight message as draft message."
 	   (eq (mhc-day-day-of-week (car dayinfo-list))
 	       (mhc-end-day-of-week))
 	   (> (length dayinfo-list) 1)
-	   (mhc-summary/insert-separator))
+	   (mhc-summary/insert-separator
+	    nil
+	    (when mhc-summary/cw-separator
+	      (format " CW %d " (mhc-date-cw
+				 (mhc-date++ (mhc-day-date (car dayinfo-list))))))))
       (setq dayinfo-list (cdr dayinfo-list)))))
-
 
 (defun mhc-summary-make-todo-memo (today mailer category-predicate secret)
   (when mhc-insert-todo-list
@@ -683,7 +700,7 @@ If optional argument FOR-DRAFT is non-nil, Hilight message as draft message."
 (defun mhc-summary/line-day-of-week-string ()
   (if mhc-tmp-first
       (let ((week (mhc-day-day-of-week mhc-tmp-dayinfo)))
-	(if (and mhc-summary-use-cw (= week 1) )
+	(if (and mhc-summary/cw-week (= week 1) )
 	    (format "%3s"
 		    (format "w%d" (mhc-date-cw (mhc-day-date mhc-tmp-dayinfo))))
 	  (aref ["Sun" "Mon" "Tue" "Wed" "Thu" "Fri" "Sat"] week)))
@@ -692,7 +709,7 @@ If optional argument FOR-DRAFT is non-nil, Hilight message as draft message."
 (defun mhc-summary/line-day-of-week-ja-string ()
   (if mhc-tmp-first
       (let ((week (mhc-day-day-of-week mhc-tmp-dayinfo)))
-	(if (and mhc-summary-use-cw (= week 1) )
+	(if (and mhc-summary/cw-week(= week 1) )
 	    (format "%2d" (mhc-date-cw (mhc-day-date mhc-tmp-dayinfo)))
 	  (aref ["日" "月" "火" "水" "木" "金" "土"] week)))
     (make-string 2 ? )))
@@ -792,6 +809,11 @@ If optional argument FOR-DRAFT is non-nil, Hilight message as draft message."
   (if (and (interactive-p)
 	   (mhc-use-icon-p))
       (call-interactively 'mhc-icon-setup))
+  (setq mhc-summary/cw-separator (and mhc-summary-use-cw
+				      mhc-use-week-separator
+				      (eq mhc-start-day-of-week 1)))
+  (setq mhc-summary/cw-week (and mhc-summary-use-cw
+				 (not mhc-summary/cw-separator)))
   (mhc-line-inserter-setup
    mhc-summary/line-inserter
    mhc-summary-line-format
