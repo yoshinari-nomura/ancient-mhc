@@ -3,7 +3,7 @@
 ## Author:  Yoshinari Nomura <nom@mew.org>
 ##
 ## Created: 1999/07/16
-## Revised: 2000/05/22 11:46:20
+## Revised: $Date: 2000/05/25 16:56:56 $
 ##
 
 ################################################################
@@ -436,7 +436,8 @@ class MhcScheduleItem
   end
 
   def dump
-    return dump_header + non_xsc_header .to_s + "\n" + description .to_s
+    return dump_header + non_xsc_header .to_s + "\n" + 
+      description .to_s .chomp + "\n"
   end
 
   def non_xsc_header
