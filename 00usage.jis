@@ -4,7 +4,7 @@
 ################################################################
 
 Created: 2000/06/26
-Revised: $Date: 2000/09/25 02:19:32 $
+Revised: $Date: 2000/10/04 02:17:11 $
 
 将来ちゃんとしたドキュメントを用意する予定ですが、
 それまでは、このファイルと emacs/00usage.jis 及び、
@@ -18,20 +18,51 @@ Revised: $Date: 2000/09/25 02:19:32 $
 samples/DOT.schedule.sample.jp は日本の祭日についてのデータを記述したファ
 イルです。~/.schedule としてコピーしておくとよいでしょう。
 
-** adb2mhc の使い方
+** today
 
-adb2mhc は、HP200LX のスケジュールソフト用データ (adb ファイル) 
-を MHC にコンバートするプログラムです。
+コマンドラインでの予定一覧表示ツールです。today と単に打つと、
+今日の予定が表示されますが、指定の日のスケジュール一覧表示をすることも
+できます。
 
-  % adb2mhc --mhc-dir /tmp/schedule appt.adb
+today には次のようなオプションが使えます。 
 
-のようにすると、/tmp/schedule 以下に MHC 形式のファイルが多数生成されます。
+  --format=html/ps
+
+    スケジュールを HTML や PostScript (のカレンダー) 形式で出力します。
+
+  --category=CATEGORY
+
+    指定のカテゴリのみを出力することができます。
+     "!CATEGORY" とすると、指定のカテゴリのみの出力抑制ができます。
+
+  --date=[string][+n]
+
+    表示したい日付とその範囲を指定します。
+
+    string に指定できるのは、 today, tomorrow, sun ... sat, yyyymmdd, yymm
+    です。以下によく使われると思われる date の指定を挙げておきます。
+
+	 --date=today+1    今日から明日まで
+	 --date=200007     2000年 7月の一ヶ月分
+			 --format=ps の場合は、これを指定したいでしょう
+	 --date=mon+6      今週一週間のスケジュール
+
+
+  --mail=ADDRESS
+
+    スケジュールを指定のメールアドレスに送信します。
+    cron などで、毎日自分宛にスケジュールを送ると便利でしょう。
 
 ** gemcal
 
 gemcal は、MHC の GUI です。
-閲覧、入力、アラームの発行等することができ、これ単体でもスケジュール
-アプリケーションとして機能するようになっています。
+
+閲覧、入力、アラームの発行等することができ、これ単体でもスケジュールアプ
+リケーションとして機能するようになっています。入力は mhc からの方が便利
+かもしれません。日程の変更等は gemcal の方が便利かもしれません。
+
+ruby/gtk で書かれています。ruby の 1.4.2 + FreeBSD 3.3 / Solaris 2.6 で
+は正常に動くことを確認しています。ruby-gtk は 0.21 以降で使って下さい。
 
 gemcal 
    -g +X+Y     geometory の指定 X と Y には数値が入ります。
@@ -48,14 +79,14 @@ gemcal
    % gemcal &
 
 として起動すればいいでしょう。あとは想像して下さい。
-1ヶ月表示ウィンドウを最大化すると、
-各日付の予定を参照することができます。
+1ヶ月表示ウィンドウを最大化すると、各日付の予定を参照することができます。
 
 
 ** mhc-sync の使い方
 
   mhc-sync は、NotePC とデスクトップといった、MHC を利用している
-  2台の PC 間のスケジュールの同期を取るコマンドです。
+  2台の PC 間のスケジュールの同期を取るコマンドです。mhc-sync と叩くと
+  usage が出ます。
 
   以下を行う前に、バックアップをきちんと取りましょう。
 
@@ -153,7 +184,8 @@ end
 
 ** mhc2palm -- MHC のデータを Palm に転送する
 
-MHC のデータを Palm に転送するコマンドです。
+MHC のデータを Palm/WorkPad に転送するコマンドです。
+pilot-link の libpisock を必要とします。
 
  usage: mhc2palm [-a | -i] [-n] [-d dev] [-r dir] [YYYYMMDD-yyyymmdd]
 
@@ -183,7 +215,8 @@ MHC のデータを Palm に転送するコマンドです。
 
 ** palm2mhc -- Palm のデータを MHC に転送する
 
-Palm のデータを MHC に転送するコマンドです。
+Palm/WorkPad のデータを MHC に転送するコマンドです。
+pilot-link の libpisock を必要とします。
 
  usage: palm2mhc [-a | -u] [-n] [-i] [-d dev] [-r dir]
 
@@ -206,40 +239,14 @@ Palm のデータを MHC に転送するコマンドです。
     -r dir    MHC のデータを保存するディレクトリを指定します。
               デフォルトは /tmp/mhc-schedule です。
 
-** today
+** adb2mhc の使い方
 
-コマンドラインでの予定一覧表示ツールです。today と単に打つと、
-今日の予定が表示されますが、指定の日のスケジュール一覧表示をすることも
-できます。
+adb2mhc は、HP200LX のスケジュールソフト用データ (adb ファイル) 
+を MHC にコンバートするプログラムです。
 
-today には次のようなオプションが使えます。 
+  % adb2mhc --mhc-dir /tmp/schedule appt.adb
 
-  --format=html/ps
-
-    スケジュールを HTML や PostScript (のカレンダー) 形式で出力します。
-
-  --category=CATEGORY
-
-    指定のカテゴリのみを出力することができます。
-     "!CATEGORY" とすると、指定のカテゴリのみの出力抑制ができます。
-
-  --date=[string][+n]
-
-    表示したい日付とその範囲を指定します。
-
-    string に指定できるのは、 today, tomorrow, sun ... sat, yyyymmdd, yymm
-    です。以下によく使われると思われる date の指定を挙げておきます。
-
-	 --date=today+1    今日から明日まで
-	 --date=200007     2000年 7月の一ヶ月分
-			 --format=ps の場合は、これを指定したいでしょう
-	 --date=mon+6      今週一週間のスケジュール
-
-
-  --mail=ADDRESS
-
-    スケジュールを指定のメールアドレスに送信します。
-    cron などで、毎日自分宛にスケジュールを送ると便利でしょう。
+のようにすると、/tmp/schedule 以下に MHC 形式のファイルが多数生成されます。
 
 **  experimental/gp2mhc -- Giga Pocket to MHC の使い方
 
