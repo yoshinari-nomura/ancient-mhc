@@ -1,3 +1,28 @@
+2000-07-13  MIYOSHI Masanori  <miyoshi@ask.ne.jp>
+
+	* ruby-ext/lib/mhc-kconv.rb.in: Renamed from today and modified
+	for make.
+
+	* today.in: Ditto.
+
+	* palm2mhc.in: Ditto.
+
+	* mhc2palm.in: Ditto.
+
+	* mhc-sync.in: Ditto.
+
+	* gemcal.in: Ditto.
+
+	* adb2mhc.in: Ditto.
+
+	* ruby-ext/lib/make.RB.in: New file for make.
+
+	* ruby-ext/make.rb.in: Ditto.
+
+	* make.rb.in: Ditto.
+
+	* configure.rb: New file for configuration.
+
 2000-07-11  MIYOSHI Masanori  <miyoshi@ask.ne.jp>
 
 	* 00readme.w32.jis: Update info of the ruby binary release.

@@ -1,0 +1,98 @@
+#!@@mhc_ruby_path@@
+## make.rb.in -- Installer for Ruby scripts.
+##
+## Author:  MIYOSHI Masanori <miyoshi@quickhack.net>
+##
+## Created: 2000/7/12
+##
+require 'ftools'
+require 'kconv'
+
+DEFAULT_KCODE = "@@mhc_default_kcode@@"
+LIBDIR = "@@mhc_libdir@@"
+
+MAKE_FILES = %w(mhc-kconv.rb)
+INSTALL_FILES = %w(mhc-date.rb mhc-gtk.rb mhc-kconv.rb
+                   mhc-palm.rb mhc-schedule.rb mhc-signal.rb)
+
+def default()
+  files = MAKE_FILES
+  while filename = files.shift()
+    fin = File::open(filename + ".in")
+    fout = File::open(filename, "w")
+    print "creating: " + filename + "\n";
+    while line = fin.gets()
+      fout.puts(gsub("@mhc_default_kcode@", DEFAULT_KCODE))
+    end
+  end
+end
+
+def clean()
+  files = MAKE_FILES + "make.rb"
+  while filename = files.shift()
+    if File::exist?(filename)
+      File::delete(filename)
+      print "removing: " + filename + "\n";
+    end
+  end
+end
+
+def install()
+  files = INSTALL_FILES
+  while filename = files.shift()
+    File::install(filename, LIBDIR, 0644, true)
+  end
+end
+
+def print_usage()
+  print <<END
+Usage: Makefile.rb [target]
+target can be none, install or clean.
+END
+end
+
+if (ARGV.size() == 0)
+  default()
+else
+  case ARGV[0]
+  when "install"
+    install()
+  when "clean"
+    clean()
+  else
+    print_usage();
+    exit(1);
+  end
+end
+
+### Copyright Notice:
+
+## Copyright (C) 2000 MHC developing team. All rights reserved.
+
+## Redistribution and use in source and binary forms, with or without
+## modification, are permitted provided that the following conditions
+## are met:
+## 
+## 1. Redistributions of source code must retain the above copyright
+##    notice, this list of conditions and the following disclaimer.
+## 2. Redistributions in binary form must reproduce the above copyright
+##    notice, this list of conditions and the following disclaimer in the
+##    documentation and/or other materials provided with the distribution.
+## 3. Neither the name of the team nor the names of its contributors
+##    may be used to endorse or promote products derived from this software
+##    without specific prior written permission.
+## 
+## THIS SOFTWARE IS PROVIDED BY THE TEAM AND CONTRIBUTORS ``AS IS''
+## AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+## LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+## FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL
+## THE TEAM OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+## INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+## (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+## SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+## HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+## STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+## ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+## OF THE POSSIBILITY OF SUCH DAMAGE.
+
+### make.rb.in ends here

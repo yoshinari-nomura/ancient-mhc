@@ -7,9 +7,7 @@
 require 'kconv'
 
 module MhcKconv
-  SJIS_HOST_REGEXP = /cygwin|mingw32|os2_emx|sharp-human/
-  DISP_CODE = if SJIS_HOST_REGEXP =~ RUBY_PLATFORM
-		Kconv::SJIS else Kconv::EUC end
+  DISP_CODE = @mhc_default_kcode@
   def todisp(string)
     Kconv::kconv(string, DISP_CODE, Kconv::AUTO)
   end
@@ -33,7 +31,7 @@ end
 
 ### Copyright Notice:
 
-## Copyright (C) 1999, 2000 Yoshinari Nomura.
+## Copyright (C) 2000 MHC developing team. All rights reserved.
 ## All rights reserved.
 
 ## Redistribution and use in source and binary forms, with or without

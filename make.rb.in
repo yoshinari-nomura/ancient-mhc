@@ -1,0 +1,121 @@
+#!@@mhc_ruby_path@@
+## make.rb.in -- Installer for Ruby scripts.
+##
+## Author:  MIYOSHI Masanori <miyoshi@quickhack.net>
+##
+## Created: 2000/7/12
+##
+require 'ftools'
+require 'kconv'
+
+RUBY_PATH = "@@mhc_ruby_path@@"
+BINDIR = "@@mhc_bindir@@"
+SCRIPT_FILES = %w(adb2mhc gemcal mhc-sync mhc2palm palm2mhc today)
+SUBDIRS = %w(ruby-ext)
+
+def process_subdirs(subdirs, *args)
+  target = (args.size() == 1) ? "default" : args[1];
+  while subdir = subdirs.shift()
+    print "Making " + target + " in " + File::expand_path(subdir) + "\n"
+    cd = Dir::pwd()
+    Dir::chdir(subdir)
+    system(RUBY_PATH, *args)
+    Dir::chdir(cd)
+  end
+end
+
+def default()
+  files = SCRIPT_FILES
+  while filename = files.shift()
+    fin = File::open(filename + ".in")
+    fout = File::open(filename, "w")
+    print "creating: " + filename + "\n";
+    while line = fin.gets()
+      fout.puts(gsub("@mhc_ruby_path@", RUBY_PATH))
+    end
+  end
+  process_subdirs(SUBDIRS, "make.rb")
+end
+
+def clean()
+  files = SCRIPT_FILES + "make.rb"
+  while filename = files.shift()
+    if File::exist?(filename)
+      File::delete(filename)
+      print "removing: " + filename + "\n";
+    end
+  end
+  process_subdirs(SUBDIRS, "make.rb", "clean")
+end
+
+def install()
+  files = SCRIPT_FILES
+  while filename = files.shift()
+    File::install(filename, BINDIR, 0644, true)
+  end
+  xpmdir = "xpm"
+  instdir = File::join(BINDIR, xpmdir)
+  if not File::exist?(instdir)
+    Dir::mkdir(instdir)
+  end
+  Dir::foreach(xpmdir) { |f|
+    filename = File::join(xpmdir, f)
+    if FileTest::file?(filename)
+      File::install(filename, instdir, 0644, true)
+    end
+  }
+  process_subdirs(SUBDIRS, "make.rb", "install")
+end
+
+def print_usage()
+  print <<END
+Usage: Makefile.rb [target]
+target can be none, install or clean.
+END
+end
+
+if (ARGV.size == 0)
+  default()
+else
+  case ARGV[0]
+  when "install"
+    install()
+  when "clean"
+    clean()
+  else
+    print_usage();
+    exit(1);
+  end
+end
+
+### Copyright Notice:
+
+## Copyright (C) 2000 MHC developing team. All rights reserved.
+
+## Redistribution and use in source and binary forms, with or without
+## modification, are permitted provided that the following conditions
+## are met:
+## 
+## 1. Redistributions of source code must retain the above copyright
+##    notice, this list of conditions and the following disclaimer.
+## 2. Redistributions in binary form must reproduce the above copyright
+##    notice, this list of conditions and the following disclaimer in the
+##    documentation and/or other materials provided with the distribution.
+## 3. Neither the name of the team nor the names of its contributors
+##    may be used to endorse or promote products derived from this software
+##    without specific prior written permission.
+## 
+## THIS SOFTWARE IS PROVIDED BY THE TEAM AND CONTRIBUTORS ``AS IS''
+## AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+## LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+## FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL
+## THE TEAM OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+## INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+## (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+## SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+## HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+## STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+## ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+## OF THE POSSIBILITY OF SUCH DAMAGE.
+
+### make.rb.in ends here
