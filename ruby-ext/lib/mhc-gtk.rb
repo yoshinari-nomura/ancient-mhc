@@ -3,7 +3,7 @@
 ## Author:  Yoshinari Nomura <nom@quickhack.net>
 ##
 ## Created: 1999/07/16
-## Revised: $Date: 2000/06/26 06:19:55 $
+## Revised: $Date: 2000/06/26 08:11:07 $
 ##
 
 #$DEBUG = true
@@ -53,7 +53,7 @@ widget_class "*" style "default"
 EOS
 else
   FONTSET = "-*-fixed-medium-r-normal--14-*,-*-fixed-medium-r-normal--14-*"
-  FONTSET2 = "-*-*-*-*-bold--14-*,-*-fixed-*-*-normal--14-*"
+  FONTSET2 = "-*-fixed-bold-r-normal--14-*,-*-fixed-*-r-normal--14-*"
   FONT  = Gdk::Font .fontset_load(FONTSET)
   FONT2 = Gdk::Font .fontset_load(FONTSET2)
   Gtk::RC::parse_string <<EOS
