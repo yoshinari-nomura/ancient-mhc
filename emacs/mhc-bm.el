@@ -3,7 +3,7 @@
 ;; Author:  Yuuichi Teranishi <teranisi@gohome.org>
 ;;
 ;; Created: 2000/05/27
-;; Revised: $Date: 2000/08/10 03:58:02 $
+;; Revised: $Date: 2001/02/09 09:40:34 $
 
 (require 'bitmap)
 (require 'mhc-face)
@@ -29,7 +29,7 @@ Example:
     (\"Other\"       . (\"Other.xbm\" \"Red\"))
     (\"Todo\"         .(\"CheckBox.xbm\" \"Red\"))
     (\"Done\"        . (\"CheckedBox.xbm\" \"Red\"))
-    (\"Conflict\"    . (\"Conflict.xpm\" \"Yellow\")))"
+    (\"Conflict\"    . (\"Conflict.xbm\" \"Yellow\")))"
   :group 'mhc
   :type '(repeat
 	  :inline t
