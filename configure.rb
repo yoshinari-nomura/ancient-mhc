@@ -1,9 +1,10 @@
+#!/usr/local/bin/ruby
 ## configure.rb -- Guess values for system-dependent variables.
 ##
 ## Author:  MIYOSHI Masanori <miyoshi@quickhack.net>
 ##          Yoshinari Nomura <nom@quickhack.net>
 ## Created: 2000/7/12
-## Revised: $Date: 2000/07/13 17:43:00 $
+## Revised: $Date: 2000/07/14 05:29:52 $
 
 $LOAD_PATH .unshift('.')
 require 'mhc-make'
@@ -11,27 +12,31 @@ require 'mhc-make'
 ################################################################a
 
 local_config_table = [
-  ['--pilot-link-lib',
+  ['--pilot-link-lib', '@@MHC_PILOT_LINK_LIB@@',
     GetoptLong::OPTIONAL_ARGUMENT,
     "--pilot-link-lib=DIR    pilot-link lib in DIR",
     nil],
 
-  ['--pilot-link-inc',
+  ['--pilot-link-inc', '@@MHC_PILOT_LINK_INC@@',
     GetoptLong::OPTIONAL_ARGUMENT,
     "--pilot-link-inc=DIR    pilot-link header in DIR",
     nil],
 
-  ['--disable-palm',
+  ['--disable-palm', '@@MHC_DISABLE_PALM@@',
     GetoptLong::OPTIONAL_ARGUMENT,
     "--disable-palm          do not require pilot-link",
     '0']
 ]
 
-conf = MhcConfigure .new .set_user_config(ARGV, local_config_table)
+conf = MhcConfigure .new(local_config_table) .parse_argv
 
-conf .set_macro('@@MHC_XPM_PATH@@', 
-		conf .macro('@@MHC_LIBDIR@@') + '/xpm'
-		)
+conf['@@MHC_XPM_PATH@@'] = conf['@@MHC_LIBDIR@@'] + '/xpm'
+
+################################################################
+## command check
+
+conf .search_command('ruby', '@@MHC_RUBY_PATH@@',   false, true)
+conf .search_command('emacs', '@@MHC_EMACS_PATH@@', false, true)
 
 ################################################################
 ## lib check
@@ -39,20 +44,20 @@ conf .set_macro('@@MHC_XPM_PATH@@',
 lib_search_path = ['/usr/local/lib', '/usr/local/pilot/lib']
 inc_search_path = ['/usr/local/include', '/usr/local/pilot/include']
 
-if conf .macro('@@MHC_DISABLE_PALM@@') == '0'
+if conf['@@MHC_DISABLE_PALM@@'] == '0'
   if !(conf .search_library(lib_search_path, 
 			    'pisock', 
 			    'pi_socket',
-			    '@@MHC_PILOT_LINK_LIB@@') and
+			    '@@MHC_PILOT_LINK_LIB@@', false, true) and
        conf .search_include(inc_search_path,
 			    'pi-dlp.h', 
-			    '@@MHC_PILOT_LINK_INC@@'))
+			    '@@MHC_PILOT_LINK_INC@@', false, true))
     STDERR .print "#######################################################\n"
     STDERR .print "Error: Could not find libpisock. "
     STDERR .print "Error: check path and set\n"
     STDERR .print "Error:   --pilot-link-lib=DIR and --pilot-link-inc=DIR.\n"
     STDERR .print "Error: or\n"
-    STDERR .print "Error:  --disable-paml\n"
+    STDERR .print "Error:  --disable-palm\n"
     STDERR .print "ERror: if you don't need palm support.\n"
     STDERR .print "#######################################################\n"
     exit(1)
@@ -75,8 +80,15 @@ infile_list = [
   'ruby-ext/extconf.rb.in:0755'
 ]
 
+file = File .open('configure.log', 'w')
+conf .each_macro{|key, val|
+  file .print "#{key} => #{val}\n"
+}
+
 conf .replace_keywords(infile_list)
 
 print "In ruby-ext/\n"
 Dir .chdir('ruby-ext')
 system('ruby', 'extconf.rb')
+
+exit 0
