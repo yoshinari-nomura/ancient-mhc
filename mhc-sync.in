@@ -6,7 +6,7 @@
 ## Author:  Yoshinari Nomura <nom@quickhack.net>
 ##
 ## Created: 2000/04/26
-## Revised: $Date: 2000/09/25 02:20:58 $
+## Revised: $Date: 2000/10/30 07:05:36 $
 ##
 
 ## mhc-sync [-n] [-x exchange_id] [-r local_dir] [user@]remote.host[:dir]
@@ -76,7 +76,7 @@ class MhcScheduleDB
       file = File .open(filename, 'r')
       header = file .gets("\n\n")
       file .close
-      if header =~ /(^|\n)X-SC-Record-Id:\s*(\S+)/ip
+      if header =~ /^X-SC-Record-Id:\s*(\S+)/i
 	@record_id_to_path_hash[$2] = filename
       end
       STDERR .print "#{filename} -> #{$2}\n" if $DEBUG
