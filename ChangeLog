@@ -1,5 +1,13 @@
 2000-05-31  Yuuichi Teranishi  <teranisi@quickhack.net>
 
+	* icons: New directory.
+
+	* icons/Anniversary.xbm, icons/Anniversary.xpm, icons/Birthday.xbm,
+	icons/Birthday.xpm, icons/Business.xbm, icons/Business.xpm,
+	icons/Holiday.xbm, icons/Holiday.xpm, icons/Other.xbm,
+	icons/Other.xpm, icons/Private.xbm, icons/Private.xpm,
+	icons/Vacation.xbm, icons/Vacation.xpm: New files (Sample icons).
+
 	* emacs/mhc-xmas.el: Added copyright notice.
 
 	* emacs/mhc-bm.el: Ditto.
