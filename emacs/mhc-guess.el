@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1999/04/13
-;; Revised: $Date: 2003/10/10 10:00:38 $
+;; Revised: $Date: 2003/10/10 11:18:46 $
 ;;
 
 ;;;
@@ -120,11 +120,11 @@
 
 (defvar mhc-guess-location-regexp-list
   `(
-    (,(concat "場所[ 　]*[：:][\n 　]*\\([^\n 　]+\\)")
+    (,(concat "場所[ 　]*[：:]*[\n 　]*\\([^\n 　]+\\)")
      mhc-guess/make-location-from-string 1)
     (,(concat "於[ 　]*\\([^\n 　]+\\)")
      mhc-guess/make-location-from-string 1)
-    (,(concat "[＠@][ 　]*\\([^\n 　]+\\)")
+    (,(concat "[@＠][　 ]*\\([^\n　 .]+\\)[　 \n]")
      mhc-guess/make-location-from-string 1)))
 
 ;; keyword to score-alist:
