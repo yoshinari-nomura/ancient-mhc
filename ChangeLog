@@ -1,3 +1,20 @@
+2004-10-25  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* ruby-ext/lib/mhc-schedule.rb (MON_LONG_REGEX, WEK_LONG_REGEX):
+	New constants.
+	(MhcScheduleItem#add_cond, MhcScheduleItem#parse_xsc_headers):
+	Accept full names of months and days of week, as well as shortened
+	names.
+
+	* ruby-ext/lib/mhc-date.rb (M_LONG_LABEL, W_LONG_LABEL): New
+	constants.
+
+	* .cvsignore:
+	* ruby-ext/.cvsignore:
+	* ruby-ext/lib/.cvsignore: New files.
+
+	* emacs/.cvsignore: Add make.rb.
+
 2004-10-24  Fumihiro Kato  <fumihiro@sfc.keio.ac.jp>
 
 	* ruby-ext/lib/mhc-schedule.rb (MhcScheduleItem#select_headers):

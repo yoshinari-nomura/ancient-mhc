@@ -3,7 +3,7 @@
 ## Author:  Yoshinari Nomura <nom@quickhack.net>
 ##
 ## Created: 1999/07/16
-## Revised: $Date: 2004/06/22 10:07:40 $
+## Revised: $Date: 2004/10/25 02:28:57 $
 ##
 
 require 'mhc-kconv'
@@ -63,6 +63,9 @@ class MhcDate
   M_LABEL  = %w(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec)
   W_LABEL  = %w(Sun Mon Tue Wed Thu Fri Sat)
   W_JLABEL = %w(日 月 火 水 木 金 土)
+
+  M_LONG_LABEL = %w(January February March April May June July August September October November December)
+  W_LONG_LABEL = %w(Sunday Monday Tuesday Wednesday Thursday Friday Saturday)
 
   def initialize(y = -1, m = 1, d = 1)
     if y .kind_of?(String) && y =~ /^(\d{4})(\d\d)(\d\d)$/

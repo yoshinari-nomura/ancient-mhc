@@ -3,7 +3,7 @@
 ## Author:  Yoshinari Nomura <nom@quickhack.net>
 ##
 ## Created: 1999/07/16
-## Revised: $Date: 2004/10/24 12:07:27 $
+## Revised: $Date: 2004/10/25 02:28:57 $
 ##
 
 ################################################################
@@ -174,6 +174,9 @@ class MhcScheduleItem
   MON_REGEX = MhcDate::M_LABEL .join('|')
   WEK_REGEX = MhcDate::W_LABEL .join('|')
   ORD_REGEX = MhcDate::O_LABEL .join('|')
+
+  MON_LONG_REGEX = MhcDate::M_LONG_LABEL .join('|')
+  WEK_LONG_REGEX = MhcDate::W_LONG_LABEL .join('|')
 
   HDR_REGEX = '(Subject|Location|Day|Time|Category|Cond|Duration|Alarm|Record-Id)'
 
@@ -377,9 +380,15 @@ class MhcScheduleItem
     case cond
     when /^(#{MON_REGEX})$/oi
       (@cond_mon << cond) .uniq!
+    when /^(#{MON_LONG_REGEX})$/oi
+      cond = MhcDate::M_LABEL[ MhcDate::M_LONG_LABEL .index(cond) ]
+      (@cond_mon << cond) .uniq!
     when /^(#{ORD_REGEX})$/oi
       (@cond_ord << cond) .uniq!
     when /^(#{WEK_REGEX})$/oi
+      (@cond_wek << cond) .uniq!
+    when /^(#{WEK_LONG_REGEX})$/oi
+      cond = MhcDate::W_LABEL[ MhcDate::W_LONG_LABEL .index(cond) ]
       (@cond_wek << cond) .uniq!
     when /^\d+$/
       (@cond_num << format("%02d", cond .to_i)) .uniq!
@@ -988,9 +997,15 @@ class MhcScheduleItem
 	  case d
 	  when /^(#{MON_REGEX})$/oi
 	    @cond_mon << d .capitalize
+	  when /^(#{MON_LONG_REGEX})$/oi
+	    d = MhcDate::M_LABEL[ MhcDate::M_LONG_LABEL .index(d) ]
+	    @cond_mon << d .capitalize
 	  when /^(#{ORD_REGEX})$/oi
 	    @cond_ord << d .capitalize
 	  when /^(#{WEK_REGEX})$/oi
+	    @cond_wek << d .capitalize
+	  when /^(#{WEK_LONG_REGEX})$/oi
+	    d = MhcDate::W_LABEL[ MhcDate::W_LONG_LABEL. index(d) ]
 	    @cond_wek << d .capitalize
 	  when /^\d+$/
 	    @cond_num << format("%02d", d .to_i)
