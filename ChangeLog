@@ -1,3 +1,22 @@
+2000-08-05  Yoshinari Nomura  <nom@quickhack.net>
+
+	* emacs/mhc-minibuf.el (mhc-minibuf/date-to-string):
+	deal with duration.
+	(mhc-minibuf/time-to-string): ditto.
+
+	* emacs/mhc-guess.el (mhc-guess-time, mhc-guess-date):
+	becomes to guess a duration.
+
+	* emacs/mhc-date.el (mhc-time+,mhc-time-): New function.
+
+	* gemcal.in (MhcCalendar::scan):
+	tooltip not to be squeezed in one line.
+
+	* ruby-ext/extconf.rb.in, configure.rb, mhc-make.rb:
+	many changes making configure.rb better.
+
+	* emacs/make.rb.in: New file.
+
 2000-08-04  Yuuichi Teranishi  <teranisi@quickhack.net>
 
 	* emacs/mhc-summary.el (mhc-icon-setup-hook): New hook.
