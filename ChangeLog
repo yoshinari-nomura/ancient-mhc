@@ -1,3 +1,28 @@
+2000-10-03  Yoshinari Nomura  <nom@quickhack.net>
+
+	* emacs/00usage.jis:
+	change abount default category setting.
+
+	* emacs/mhc.el (mhc-setup):
+	setup mhc-default-caegory-predicate-sexp.
+
+	* emacs/mhc.el (mhc-set-default-category):
+	call mhc-rescan-month() after set a category.
+
+	* emacs/mhc.el (mhc-expr-parse):
+	New funcaion. recursive descent parser for category
+	(mhc-got-month), (mhc-rescan-month),(mhc-scan-month),
+	(mhc-insert-schedule): change interface to select category.
+
+	* emacs/mhc-summary.el: (mhc-summary/insert-dayinfo),
+	(mhc-summary-make-contents),
+	(mhc-summary-make-todo-list): change interface to select categry.
+
+	* emacs/mhc-ps.el:
+	(mhc-ps/make-contents), (mhc-ps/process),
+	(mhc-ps-preview), (mhc-ps-print), (mhc-ps-save),
+	(mhc-ps-insert-buffer): change interface to select category.
+
 2000-09-25  Yoshinari Nomura  <nom@quickhack.net>
 
 	* today.in: assume duration is whole month in case --format=ps.
