@@ -2,6 +2,11 @@
 
         Merge From Current:
 
+	* ruby-ext/lib/mhc-schedule.rb (MhcScheduleItem#to_palm):
+	fix initializing of a variable.
+
+	* palm2mhc: don't ask clear of dirty flag in no-interactive mode.
+
 	* mhc/gemcal (MhcScheduleEdit#conv_description):
 	New function to divide non X-SC- headers from body. Fix
 		duplication of non X-SC- headers.
