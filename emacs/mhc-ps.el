@@ -3,7 +3,7 @@
 ;; Author:  TSUCHIYA Masatoshi <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 ;;          Hideyuki SHIRAI <shirai@quickhack.net>
 ;; Created: 2000/06/18
-;; Revised: $Date: 2001/01/31 11:26:37 $
+;; Revised: $Date: 2001/02/01 10:15:47 $
 
 
 ;;; Commentary:
@@ -1023,7 +1023,7 @@ showpage
   "*Create PostScript calendar with selected method."
   (interactive "P")
   (let ((method 'preview)
-	(date (or (mhc-current-date) (mhc-calendar-get-date)))
+	(date (or (mhc-current-date-month) (mhc-calendar-get-date)))
 	year month char)
     (if (or arg (null date))
 	(setq date (mhc-input-month "Month: " date)))
@@ -1034,16 +1034,16 @@ showpage
 	(setq char (read-char))
       (error (setq char ?v)))
     (cond
-     ((eq char ?p)
+     ((memq char '(?p ?P))
       (mhc-ps-print year month mhc-default-category-predicate-sexp))
-     ((eq char ?s)
+     ((memq char '(?s ?S))
       (mhc-ps-save
        year month
        (expand-file-name
 	(mhc-date-format date "mhc%04d%02d.ps" yy mm)
 	(mhc-summary-folder-to-path mhc-base-folder))
        mhc-default-category-predicate-sexp))
-     ((eq char ?i)
+     ((memq char '(?i ?I))
       (mhc-ps-insert-buffer
        year month
        (read-buffer "Insert buffer: " "*mhc-postscript*")
@@ -1056,7 +1056,7 @@ showpage
 (defun mhc-ps-preview (year month &optional category-predicate)
   "*Preview PostScript calendar."
   (interactive
-   (let* ((cdate (or (mhc-current-date) (mhc-calendar-get-date)))
+   (let* ((cdate (or (mhc-current-date-month) (mhc-calendar-get-date)))
 	  (date (mhc-input-month "Month: " cdate)))
      (list
       (mhc-date-yy date)
@@ -1074,7 +1074,7 @@ showpage
 (defun mhc-ps-print (year month &optional category-predicate)
   "*Print PostScript calendar."
   (interactive
-   (let* ((cdate (or (mhc-current-date) (mhc-calendar-get-date)))
+   (let* ((cdate (or (mhc-current-date-month) (mhc-calendar-get-date)))
 	  (date (mhc-input-month "Month: " cdate)))
      (list
       (mhc-date-yy date)
@@ -1092,7 +1092,7 @@ showpage
 (defun mhc-ps-save (year month file &optional category-predicate)
   "*Save PostScript calendar."
   (interactive
-   (let* ((cdate (or (mhc-current-date) (mhc-calendar-get-date)))
+   (let* ((cdate (or (mhc-current-date-month) (mhc-calendar-get-date)))
 	  (date (mhc-input-month "Month: " cdate))
 	  (default (expand-file-name
 		    (mhc-date-format date "mhc%04d%02d.ps" yy mm)
@@ -1112,7 +1112,7 @@ showpage
 (defun mhc-ps-insert-buffer (year month buffer &optional category-predicate)
   "*Insert PostScript calendar."
   (interactive
-   (let* ((cdate (or (mhc-current-date) (mhc-calendar-get-date)))
+   (let* ((cdate (or (mhc-current-date-month) (mhc-calendar-get-date)))
 	  (date (mhc-input-month "Month: " cdate))
 	  (buffer (read-buffer "Insert buffer: " "*mhc-postscript*")))
      (list

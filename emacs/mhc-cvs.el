@@ -451,19 +451,17 @@ from 'month before last' to 'this month next year'."
 	    (setq char (read-char))
 	  (error (setq char ?Z)))	;; dummy set
  	 (cond
- 	  ((eq char ?a)
+ 	  ((memq char '(?a ?A))
  	   (setq loop nil)
-	   (message
-	    (format "[file: %s]  Add CVS repository..." file))
+	   (message (format "[file: %s]  Add CVS repository..." file))
 	   (and (= 0 (mhc-cvs/backend (list "add" file)))
 		(mhc-cvs/modify expf))
-	   (message
-	    (format "[file: %s]  Add CVS repository... done." file)))
-	  ((eq char ?r)
+	   (message (format "[file: %s]  Add CVS repository... done." file)))
+	  ((memq char '(?r ?R))
  	   (setq loop nil)
 	   (message "")
  	   (delete-file expf))
- 	  ((eq char ?m)
+ 	  ((memq char '(?m ?M))
 	   (setq loop nil)
 	   (message "")
  	   (rename-file

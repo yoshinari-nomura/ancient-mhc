@@ -1,3 +1,13 @@
+2001-02-01  Hideyuki SHIRAI  <shirai@quickhack.net>
+
+	* emacs/mhc-cvs.el (mhc-cvs/unknown-file): Treat character when ignore
+	case.
+
+	* emacs/mhc-ps.el (mhc-ps): Ditto.
+	(mhc-ps, mhc-ps-preview, mhc-ps-print, mhc-ps-save,
+	mhc-ps-insert-buffer): Use mhc-current-date-month() instead of
+	mhc-current-date().
+
 2001-01-31  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* emacs/mhc.el (mhc-prefix-map, mhc-mode-menu-spec): Add new keybind
