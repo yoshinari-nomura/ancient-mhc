@@ -1,11 +1,11 @@
-#!/usr/local/bin/ruby
+#!/usr/local/bin/ruby -Ke
 
 ### mhc-sync -- Data synchronization tool for MHC.
 ##
 ## Author:  Yoshinari Nomura <nom@quickhack.net>
 ##
 ## Created: 2000/04/26
-## Revised: $Date: 2000/06/12 02:01:04 $
+## Revised: $Date: 2000/06/23 07:07:51 $
 ##
 
 ## mhc-sync [-n] [-x exchange_id] [-r local_dir] [user@]remote.host[:dir]

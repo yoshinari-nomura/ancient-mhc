@@ -1,11 +1,11 @@
-#!/usr/local/bin/ruby
+#!/usr/local/bin/ruby -Ke
 
 ### palm2mhc -- copy articles from palm to new mhc repository.
 ##
 ## Author:  Yoshinari Nomura <nom@quickhack.net>
 ##
 ## Created: 1999/10/08
-## Revised: $Date: 2000/06/17 15:27:13 $
+## Revised: $Date: 2000/06/23 07:07:51 $
 ##
 
 $DEBUG = false

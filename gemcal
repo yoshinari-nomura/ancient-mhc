@@ -1,11 +1,11 @@
-#!/usr/local/bin/ruby
+#!/usr/local/bin/ruby -Ke
 
 ### gemcal -- Ruby/Gtk based calendar.
 ##
 ## Author:  Yoshinari Nomura <nom@quickhack.net>
 ##
 ## Created: 1999/09/01
-## Revised: $Date: 2000/06/20 07:35:03 $
+## Revised: $Date: 2000/06/23 07:07:51 $
 ##
 
 # $DEBUG = 1
