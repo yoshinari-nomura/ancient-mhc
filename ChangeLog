@@ -1,3 +1,7 @@
+2000-06-02  Hideyuki SHIRAI  <shirai@rdmg.mgcs.mei.co.jp>
+
+	* emacs/mhc-calendar.el (mhc-calendar-hnf-summary-insert): hnf's 'CAT' support.
+
 2000-06-01  MIYOSHI Masanori  <miyoshi@ask.ne.jp>
 
 	* emacs/mhc-calendar.el (mhc-calendar-hnf-summary-insert): Avoid summary insertion when no heading is found.

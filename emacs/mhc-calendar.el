@@ -67,6 +67,7 @@ refer to mhc-calendar-hnf-face-alist-internal.")
 (defconst mhc-calendar-hnf-face-alist-internal
   '((mhc-calendar-hnf-face-mark . (nil    "MediumSeaGreen" nil))
     (mhc-calendar-hnf-face-tag  . (italic "red" "paleturquoise"))
+    (mhc-calendar-hnf-face-cat  . (nil    "DarkGreen" nil))
     (mhc-calendar-hnf-face-new  . (bold   "DarkGreen" nil))
     (mhc-calendar-hnf-face-uri  . (italic "blue" nil))))
 
@@ -323,7 +324,8 @@ The keys that are defined for mhc-calendar-mode are:
 		    (setq beg (point))
 		    (end-of-line)
 		    (put-text-property beg (point) 'mouse-face 'highlight)
-		    (forward-line))))))
+		    (forward-line))))
+	    (set-buffer-modified-p nil)))
     (error nil)))
 
 (defun mhc-calendar-shrink-window ()
@@ -866,6 +868,7 @@ The keys that are defined for mhc-calendar-mode are:
 	 (fname (mhc-calendar-hnf-get-filename ddate))
 	 (buffer-read-only nil)
 	 (headmark "#")
+	 (cat "")
 	 (i 1)
 	 header summary str uri)
     (if (not (file-readable-p fname))
@@ -875,14 +878,23 @@ The keys that are defined for mhc-calendar-mode are:
 	(insert-file-contents fname)
 	(goto-char (point-min))
 	(while (not (eobp))
-	  (cond;; NEW, LNEW adhoc suport
+	  (cond    ;; CAT, NEW, LNEW adhoc suport
+	   ((looking-at "^CAT[ \t]+\\(.*\\)$")
+	    (setq cat (buffer-substring (match-beginning 1) (match-end 1)))
+	    (while (string-match "[ \t]+" cat)
+	      (setq cat (concat (substring cat 0 (match-beginning 0))
+				"]["
+				(substring cat (match-end 0)))))
+	    (setq cat (concat "[" cat "]"))
+	    (mhc-face-put cat 'mhc-calendar-hnf-face-cat)
+	    (setq cat (concat cat " ")))
 	   ((looking-at "^NEW[ \t]+\\(.*\\)$")
 	    (setq str (buffer-substring (match-beginning 1) (match-end 1)))
 	    (mhc-face-put str 'mhc-calendar-hnf-face-new)
 	    (setq header (format "%s%d" headmark i))
 	    (mhc-face-put header 'mhc-calendar-hnf-face-tag)
-	    (setq i (1+ i))
-	    (setq summary (concat summary "     " header " " str "\n")))
+	    (setq summary (concat summary "     " header " " cat str "\n"))
+	    (setq i (1+ i) cat ""))
 	   ((looking-at "^LNEW[ \t]+\\([^ \t]+\\)[ \t]+\\(.*\\)$")
 	    (setq uri (concat "<"
 			      (buffer-substring (match-beginning 1) (match-end 1))
@@ -892,14 +904,13 @@ The keys that are defined for mhc-calendar-mode are:
 	    (mhc-face-put str 'mhc-calendar-hnf-face-new)
 	    (setq header (format "%s%d" headmark i))
 	    (mhc-face-put header 'mhc-calendar-hnf-face-tag)
-	    (setq i (1+ i))
-	    (setq summary (concat summary "     " header " " str " " uri "\n"))))
-	  (forward-line))
-	(put-text-property 0 (length summary) 'mhc-calendar-summary-hnf-prop t summary))
+	    (setq summary (concat summary "     " header " " cat str " " uri "\n"))
+	    (setq i (1+ i) cat "")))
+	  (forward-line)))
       (if summary
 	  (progn
-	    (insert "\n")
-	    (insert summary)))
+	    (put-text-property 0 (length summary) 'mhc-calendar-summary-hnf-prop t summary)
+	    (insert "\n" summary)))
       (delete-char -1)
       (set-buffer-modified-p nil))))
 
