@@ -245,7 +245,8 @@
 
 (defun mhc-cvs/modify (filename &optional offline)
   "ファイルを変更する関数"
-  (or offline (= 0 (mhc-cvs/backend "commit" "-m" "" filename))))
+  (or offline (= 0 (mhc-cvs/backend
+		    "commit" "-m" "" (mhc-cvs/shrink-file-name filename)))))
 
 
 ;;; CVS Backend Function

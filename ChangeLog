@@ -1,3 +1,7 @@
+2000-10-20  Hideyuki SHIRAI  <shirai@quickhack.net>
+
+	* emacs/mhc-cvs.el (mhc-cvs/modify): Exec CVS use relative path.
+
 2000-10-20  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 
 	* emacs/mhc-cvs.el (mhc-cvs-rsh): New variable.
