@@ -3,7 +3,7 @@
 ## Author:  Yoshinari Nomura <nom@quickhack.net>
 ##
 ## Created: 1999/07/16
-## Revised: $Date: 2001/02/03 06:20:12 $
+## Revised: $Date: 2001/02/06 13:37:09 $
 ##
 
 ################################################################
@@ -435,21 +435,21 @@ class MhcScheduleItem
   end
 
   def dump_without_xsc_header
-    hdrs = non_xsc_header .to_s .sub(/\n+$/nm, '')
+    hdrs = non_xsc_header .to_s .sub(/\n+\z/n, '')
     hdrs += "\n" if hdrs != ''
 
     desc = description .to_s
-    desc += "\n" if desc != '' and desc !~ /\n$/nm
+    desc += "\n" if desc != '' and desc !~ /\n\z/n
 
     return hdrs + (desc != '' ? "\n" : '') + desc
   end
 
   def dump
-    hdrs = non_xsc_header .to_s .sub(/\n+$/nm, '')
+    hdrs = non_xsc_header .to_s .sub(/\n+\z/n, '')
     hdrs += "\n" if hdrs != ''
 
     desc = description .to_s
-    desc += "\n" if desc != '' and desc !~ /\n$/nm
+    desc += "\n" if desc != '' and desc !~ /\n\z/n
 
     return dump_header + hdrs + "\n" + desc
   end
@@ -840,7 +840,7 @@ class MhcScheduleItem
       datebk3_icon = cat if cat =~ /^\#\#@@@.@@@$/
     }
     contents = dump_without_xsc_header
-    contents = '' if contents =~ /^\s+$/nm   ## \s includes \n
+    contents = '' if contents =~ /\A\s+\z/n   ## \s includes \n
     contents = datebk3_icon + "\n" + contents if datebk3_icon
     pi_rec .set_note(contents)
 
