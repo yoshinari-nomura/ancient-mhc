@@ -152,8 +152,9 @@ FROM, TO は 1970/01/01 からの経過日数を用いて指定"
 
 (defun mhc-db-add-record-from-buffer (record buffer &optional force-refile)
   (let* ((slot (mhc-logic-record-to-slot record))
-	 (directory (mhc-slot-key-to-directory slot))
+	 (directory (and slot (mhc-slot-key-to-directory slot)))
 	 (old-record))
+    (unless slot (error "Cannot get schedule slot"))
     (if (mhc-record-name record)
 	;; 既存のスケジュールを編集した場合
 	(if (string= directory
@@ -167,7 +168,8 @@ FROM, TO は 1970/01/01 からの経過日数を用いて指定"
       ;; 新規のスケジュールを保存する場合
       (mhc-record-set-name record (mhc-misc-get-new-path directory)))
     (if (y-or-n-p (format "Refile %s to %s "
-			  (mhc-misc-sub (if old-record (mhc-record-name old-record) "")
+			  (mhc-misc-sub (if old-record
+					    (mhc-record-name old-record) "")
 					mhc-mail-path "+")
 			  (mhc-misc-sub (mhc-record-name record)
 					mhc-mail-path "+")))

@@ -2,6 +2,7 @@
 
 	* emacs/mhc-db.el (mhc-db/eval-for-duration): Call `sexp' only if
 	it is non-nil.
+	(mhc-db-add-record-from-buffer): Display error if slot is nil.
 
 	* emacs/mhc-logic.el (mhc-logic-eval-for-date): Ditto.
 
