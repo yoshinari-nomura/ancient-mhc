@@ -1,5 +1,12 @@
 2000-06-06  Yoshinari Nomura  <nom@quickhack.net>
 
+	* emacs/mhc-minibuf.el (mhc-input-day): 
+	Use function instead of quoite. 
+	(mhc-input-time): Ditto.
+
+	* emacs/mhc-date.el (ddate-to-s): overkilling.
+	defmacro -> defsubst. (dtime-to-s): Ditto.
+
 	* emacs/00usage.jis: Descriptions about bytecompile.
 
 	* emacs/mhc.el (mhc-cal-make-rectangle): speedup.

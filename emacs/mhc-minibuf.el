@@ -1,9 +1,9 @@
 ;;; mhc-minibuf.el
 
-;; Author:  Yoshinari Nomura <nom@quickhack.net>
+;; Author:  Yoshinari Nomura <nom@mew.org>
 ;;
 ;; Created: 1999/12/10
-;; Revised: $Date: 2000/05/30 15:04:57 $
+;; Revised: 2000/05/09 15:15:56
 
 ;;;
 ;;; Commentay:
@@ -125,7 +125,6 @@
 (if mhc-minibuf-map
     ()
   (setq mhc-minibuf-map (copy-keymap minibuffer-local-map))
-  (define-key mhc-minibuf-map "\C-c?" 'mhc-minibuf-insert-calendar)
   (define-key mhc-minibuf-map "\C-n"  'mhc-minibuf-next-candidate)
   (define-key mhc-minibuf-map "\C-p"  'mhc-minibuf-prev-candidate)
   (define-key mhc-minibuf-map "\C-v"  'scroll-other-window)
@@ -202,8 +201,8 @@
 					default)
 				       (t
 					(mapconcat 
-					 '(lambda (ddate)
-					    (ddate-to-s1 ddate "/"))
+					 (function (lambda (ddate)
+						     (ddate-to-s1 ddate "/")))
 					 default
 					 " "))))
 				  (current-buffer)
@@ -241,8 +240,6 @@
 	  (setq error t)))
 	(setq str-list (cdr str-list)))
       (if error (beep)))
-    (setq mhc-calendar-separator nil)
-    (setq mhc-calendar-call-buffer nil)
     (ddate-sort ret)))
 
 (defun mhc-input-time (&optional prompt default candidate)
@@ -260,7 +257,7 @@
 		   (current-buffer)
 		   candidate
 		   0
-		   'dtime-to-s))
+		   (function dtime-to-s)))
 	(cond 
 	 ((and (string-match
 		"^\\([0-9]+:[0-9]+\\)\\(-\\([0-9]+:[0-9]+\\)\\)?$" str)
@@ -282,8 +279,8 @@
 
 ;;; Copyright Notice:
 
-;; Copyright (C) 1999, 2000 Yoshinari Nomura. All rights reserved.
-;; Copyright (C) 2000 MHC developing team. All rights reserved.
+;; Copyright (C) 1999, 2000 Yoshinari Nomura.
+;; All rights reserved.
 
 ;; Redistribution and use in source and binary forms, with or without
 ;; modification, are permitted provided that the following conditions
@@ -298,11 +295,11 @@
 ;;    may be used to endorse or promote products derived from this software
 ;;    without specific prior written permission.
 ;; 
-;; THIS SOFTWARE IS PROVIDED BY THE TEAM AND CONTRIBUTORS ``AS IS''
+;; THIS SOFTWARE IS PROVIDED BY Yoshinari Nomura AND CONTRIBUTORS ``AS IS''
 ;; AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 ;; LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
 ;; FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL
-;; THE TEAM OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+;; Yoshinari Nomura OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 ;; INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 ;; (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
 ;; SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)

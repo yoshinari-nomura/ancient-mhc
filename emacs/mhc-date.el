@@ -101,10 +101,10 @@
    (dtime< t1 t2)
    (dtime= t1 t2)))
 
-(defmacro dtime-to-s (dtime &optional need-sec)
-  (` (if (, need-sec)
-	 (apply (quote format) "%02d:%02d:%02d" (, dtime))
-       (apply (quote format) "%02d:%02d" (, dtime)))))
+(defsubst dtime-to-s (dtime &optional need-sec)
+  (if need-sec
+      (apply 'format "%02d:%02d:%02d" dtime)
+    (apply 'format "%02d:%02d" dtime)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; ddate
@@ -215,8 +215,9 @@
 
 ;; for X-SC-*
 
-(defmacro ddate-to-s (ddate)
-  (` (apply (quote format) "%04d%02d%02d" (, ddate))))
+
+(defsubst ddate-to-s (ddate)
+  (apply 'format "%04d%02d%02d" ddate))
 
 (defmacro ddate-yymm-s (ddate)
   (` (apply (quote format) "%04d%02d" (, ddate))))
