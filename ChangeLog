@@ -1,5 +1,7 @@
 2004-05-01  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 
+	* emacs/mhc-draft.el (mhc-draft-unuse-hdr-list): Add some headers.
+
 	* emacs/mhc-gnus.el: Rewritten to support both original Gnus and
 	T-gnus.
 
