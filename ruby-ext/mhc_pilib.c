@@ -3,7 +3,7 @@
 ** Author:  Yoshinari Nomura <nom@quickhack.net>
 **
 ** Created: 1999/09/01
-** Revised: $Date: 2002/11/21 00:04:17 $
+** Revised: $Date: 2004/11/15 00:40:01 $
 **
 */
 
@@ -139,10 +139,16 @@ static VALUE rpi_sock_open(VALUE obj, VALUE dev)
 static VALUE rpi_sock_listen(VALUE obj, VALUE rb_sd)
 {
   int sd = FIX2INT(rb_sd);
+  struct SysInfo     sys_info;
   struct PilotUser   user;
 
   if (pi_listen(sd, 1) < 0)              return Qnil;
   if ((sd = pi_accept(sd, 0, 0)) < 0)    return Qnil;
+
+  /* We must do this to take care of the password being required to sync
+   * on Palm OS 4.x */
+  if (dlp_ReadSysInfo(sd, &sys_info) < 0)return Qnil;
+
   if (dlp_ReadUserInfo(sd, &user) < 0)   return Qnil;
   if (dlp_OpenConduit(sd) < 0)           return Qnil;
 
