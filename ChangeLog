@@ -1,3 +1,9 @@
+2000-07-04  MIYOSHI Masanori  <miyoshi@hrl.hitachi.co.jp>
+
+	* emacs/00usage.jis: Fix a typo.
+
+	* 00usage.jis: Ditto.
+
 2000-07-03  Yuuichi Teranishi  <teranisi@quickhack.net>
 
 	* emacs/mhc.el (mhc-modify-file): Fixed problem when file is already
