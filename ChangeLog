@@ -1,3 +1,8 @@
+2005-03-16  Hideyuki SHIRAI  <shirai@quickhack.net>
+
+	* emacs/mhc-guess.el (mhc-guess-date-regexp-list): Support new
+	regex for Japanese duration.
+
 2005-01-27  Yoichi NAKAYAMA  <yoichi@geiin.org>
 
 	* emacs/mhc-wl.el (mhc-wl-summary-mode-setup): Bind
