@@ -1,3 +1,9 @@
+2001-07-16  Yoshinari NOMURA  <nom@quickhack.net>
+
+	* emacs/mhc-guess.el (mhc-guess-time-regexp-list):
+	change a hankaku colon (typo) to the zenkaku one.
+        Thanks to Mr. KOIE Hidetaka.
+	
 2001-06-25  Yoshinari Nomura  <nom@quickhack.net>
 
 	* emacs/mhc-guess.el: clever mhc-guess-time-regexp.
