@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@mew.org>
 ;;
 ;; Created: 1994/07/04
-;; Revised: $Date: 2000/06/07 01:28:54 $
+;; Revised: $Date: 2000/06/11 09:25:31 $
 
 ;;;
 ;;; Commentay:
@@ -441,7 +441,11 @@
     ;; initialize ephemeral nnvirtual group.
     (gnus-group-read-ephemeral-group
      vgroup `(nnvirtual ,vgroup (nnvirtual-component-groups ,groups))
-     t nil t)
+     t
+     (if (bufferp gnus-summary-buffer)
+	 (cons gnus-summary-buffer 'summary)
+       (cons (current-buffer) 'group))
+     t)
     (if (null (gnus-group-read-group 0 t vgroup))
 	(let (buffer)
 	  (set-buffer (setq buffer (get-buffer-create

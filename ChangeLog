@@ -1,3 +1,9 @@
+2000-06-11  MIYOSHI Masanori  <miyoshi@ask.ne.jp>
+
+	* emacs/mhc.el (mhc-gnus-prepare-summary-buffer): Set QUIT-CONFIG
+	to ensure MHC to be called from a group buffer even if there's no
+	schedule.
+
 2000-06-08  Yoshinari Nomura  <nom@quickhack.net>
 
 	* emacs/mhc-date.el (ddate-yy-s): fix defmacro problem.
