@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1999/04/13
-;; Revised: $Date: 2000/08/05 19:54:40 $
+;; Revised: $Date: 2000/08/06 12:00:58 $
 ;;
 
 ;;;
@@ -61,7 +61,7 @@
 ;; regexp for get date strings.
 ;;
 
-(setq mhc-guess-date-regexp-list
+(defvar mhc-guess-date-regexp-list
   `(
     (,(concat "\\([来今０-９0-9]+\\)[\n　 ]*月[\n 　]*の?[\n 　]*"
 	      "\\([０-９0-9]+\\)日?"
@@ -110,7 +110,7 @@
 
 ;; keyword to score-alist:
 ;;    each element consists of (regexp relative-boundary sameline? score)
-(setq mhc-guess-keyword-score-alist
+(defvar mhc-guess-keyword-score-alist
   '(
     ;; positive factor
     ("^[\t ]+"                                      -200 t   +5)
