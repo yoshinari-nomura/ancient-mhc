@@ -4,7 +4,7 @@
 ;;          TSUCHIYA Masatoshi <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 ;;
 ;; Created: 2000/06/14
-;; Revised: $Date: 2000/06/20 06:12:50 $
+;; Revised: $Date: 2000/06/20 06:50:01 $
 
 ;;;
 ;;; Commentary:
@@ -459,7 +459,10 @@
 
 (defsubst mhc-date-yy+  (date c)
   (mhc-date-let date
-    (mhc-date-new (+ yy c) mm dd)))
+    (setq yy (+ yy c))
+    (if (mhc-date/check yy mm dd)
+	(mhc-date-new yy mm dd)
+      (mhc-date-new yy mm (mhc-date/last-day-of-month yy mm)))))
 
 (defmacro mhc-date-yy-  (date c) `(mhc-date-yy+ ,date (- ,c)))
 (defmacro mhc-date-yy++ (date)   `(mhc-date-yy+ ,date 1))
