@@ -91,6 +91,11 @@
   (wl-summary-buffer-set-folder (mhc-wl/date-to-folder date))
   (make-local-variable 'wl-summary-highlight)
   (setq wl-summary-highlight nil)
+  (setq wl-summary-buffer-next-folder-func
+	(lambda () (mhc-goto-next-month 1)))
+  (setq wl-summary-buffer-prev-folder-func
+	(lambda () (mhc-goto-prev-month 1)
+	  (goto-char (point-max))))
   (setq wl-summary-buffer-target-mark-list '(nil))
   (setq wl-summary-buffer-number-regexp "[0-9]+")
   (setq wl-summary-buffer-msgdb '(nil)))
