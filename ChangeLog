@@ -1,3 +1,14 @@
+2001-09-13  Yuuichi Teranishi  <teranisi@quickhack.net>
+
+	* emacs/mhc.el (toplevel): Require 'cl at compile time;
+	Require 'poe and 'pcustom on Mule 2.3.
+
+	* emacs/mhc-parse.el (mhc-parse/internal-parser): Use `format' to
+	get rid of text property on header field name string.
+
+	* emacs/mhc-calendar.el (mhc-calendar/tp-any): Define using
+	defsubst instead of defalias.
+
 2001-09-13  Toshihiko SHIMOKAWA  <toshi@tea.forus.or.jp>
 
 	* mhc2palm.in: modify progress message.

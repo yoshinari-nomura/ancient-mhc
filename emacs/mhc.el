@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1994/07/04
-;; Revised: $Date: 2001/05/28 01:01:18 $
+;; Revised: $Date: 2001/09/13 08:07:16 $
 
 ;;;
 ;;; Commentay:
@@ -27,6 +27,14 @@
 ;; for Gnus user:
 ;;   (autoload 'mhc-gnus-setup "mhc-gnus")
 ;;   (add-hook 'gnus-startup-hook 'mhc-gnus-setup)
+
+(eval-when-compile (require 'cl))
+
+;; For Mule 2.3
+(eval-and-compile
+  (when (boundp 'MULE)
+    (require 'poe)
+    (require 'pcustom)))
 
 (require 'mhc-vars)
 (require 'mhc-record)

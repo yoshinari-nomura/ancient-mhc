@@ -171,7 +171,8 @@
     (while (not (eobp))
       (if (looking-at "\\([^ \t:]+\\):")
 	  (progn
-	    (setq func (mhc-header-parse-function (match-string 1)))
+	    (setq func (mhc-header-parse-function
+			(format "%s" (match-string 1))))
 	    (mhc-header-goto-end)
 	    (if (fboundp func)
 		(save-restriction

@@ -5,7 +5,7 @@
 ;;          MIYOSHI Masanori <miyoshi@ask.ne.jp>
 ;;
 ;; Created: 05/12/2000
-;; Reviesd: $Date: 2001/03/21 10:13:12 $
+;; Reviesd: $Date: 2001/09/13 08:07:16 $
 
 ;;; Configration Variables:
 
@@ -197,7 +197,8 @@ ww-japanese-long => \"土曜日\"
 
 ;; Compatibilities between emacsen
 (if (fboundp 'text-property-any)
-    (defalias 'mhc-calendar/tp-any 'text-property-any)
+    (defsubst mhc-calendar/tp-any (beg end prop value)
+      (text-property-any beg end prop value))
   (defsubst mhc-calendar/tp-any (beg end prop value)
     (while (and beg (< beg end)
 		(not (eq value (get-text-property beg prop))))
