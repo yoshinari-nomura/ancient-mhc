@@ -2,6 +2,9 @@
 
 	* emacs/mhc-gnus.el (mhc-gnus-draft-translate): Do not add
 	User-Agent header.  Add Date header and From header.
+	(mhc-gnus-draft-reedit-buffer): When no MIME header is found,
+	decode an input text instead of converting it to a human-editable
+	text written in MML.
 
 	* emacs/mhc-draft.el (mhc-draft-unuse-hdr-list): Add some headers.
 

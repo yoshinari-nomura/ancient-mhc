@@ -192,19 +192,22 @@ this function."
   (unless (eq (current-buffer) buffer)
     (erase-buffer)
     (insert-buffer buffer))
-  (when original
-    ;; buffer is raw buffer.
-    (mime-to-mml)
+  (if original
+      (progn
+	(if (mhc-header-narrowing (mhc-header-valid-p "Content-Type"))
+	    (mime-to-mml)
+	  (decode-coding-region (point-min) (point-max) 'undecided))
+	(mhc-header-narrowing
+	  (mhc-header-delete-header
+	   (concat "^\\(" (mhc-regexp-opt mhc-draft-unuse-hdr-list) "\\)")
+	   'regexp)))
     (mhc-header-narrowing
       (mhc-header-delete-header
-       (concat "^\\(" (mhc-regexp-opt mhc-draft-unuse-hdr-list) "\\)")
-       'regexp)))
-  (mhc-header-narrowing
-    (mhc-header-delete-header
-     "^\\(Content-.*\\|Mime-Version\\|User-Agent\\):" 'regexp))
+       "^\\(Content-.*\\|Mime-Version\\|User-Agent\\):" 'regexp)))
   (goto-char (point-min))
   (when (re-search-forward "^$" nil t)
-    (insert mail-header-separator)))
+    (insert mail-header-separator)
+    (forward-char 1)))
 
 (defun mhc-gnus-draft-reedit-file (file)
   "Prepare a draft from the FILE.
