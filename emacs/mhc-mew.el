@@ -279,12 +279,13 @@
 
 
 (defun mhc-mew-highlight-message (for-draft)
-    (mew-highlight-header)
-    ;; Mew-1.95b104 or later, not have functions.
-    (when (and (fboundp 'mew-highlight-url)
-	       (fboundp 'mew-highlight-body))
-      (mew-highlight-url)
-      (mew-highlight-body)))
+  (when (mew-header-end)
+    (mew-highlight-header))
+  ;; Mew-1.95b104 or later, not have functions.
+  (when (and (fboundp 'mew-highlight-url)
+	     (fboundp 'mew-highlight-body))
+    (mew-highlight-url)
+    (mew-highlight-body)))
 
 
 (defun mhc-mew-draft-translate ()

@@ -1,3 +1,8 @@
+2005-01-27  Hideyuki SHIRAI  <shirai@rdmg.mgcs.mei.co.jp>
+
+	* emacs/mhc-mew.el (mhc-mew-highlight-message): Highlight headers
+	when import buffer has headers.
+
 2005-01-19  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
 	* emacs/mhc-gnus.el (mhc-gnus-insert-summary-contents): Pass null
@@ -237,7 +242,7 @@
 2003-10-14  Hiroya Murata <lapis-lazuli@pop06.odn.ne.jp> / nom
 
 	* emacs/mhc-wl.el (mhc-wl-summary-mode-setup): Bind
-	`wl-summary-lazy-highlight' and `wl-summary-lazy-update-mark' to nil. 
+	`wl-summary-lazy-highlight' and `wl-summary-lazy-update-mark' to nil.
 
 2003-10-13  Yoshinari Nomura  <nom@quickhack.net>
 
@@ -292,7 +297,7 @@
 
 	* emacs/mhc.el (mhc-scan-month): Use format-string. Thanks to
 	Yoichi NAKAYAMA <yoichi@geiin.org> for his suggestion.
-	
+
 	* emacs/mhc-cvs.el (mhc-cvs/unknown-file): Correct the wrong use
 	of `message'.  Thanks to Yoichi NAKAYAMA <yoichi@geiin.org> for
 	his suggestion.
@@ -348,7 +353,7 @@
 	with `-n' option.
 	($flag_separation): New varialbes.
 	Initialize Outlook even if `-n' option is specified.
-	
+
 2003-02-26  MIYOSHI Masanori  <miyoshi@boreas.dti.ne.jp>
 
 	* mhc2ol.in (RepeatPattern): Add instance varialbes for start time
@@ -476,7 +481,7 @@
 2002-09-26  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* emacs/mhc-summary.el (mhc-summary-line-format): Change default
-	value for 'english. 
+	value for 'english.
 	(mhc-summary-line-format-alist): Add `S' rule.
 	(mhc-todo-string-deadline-day): Remove no good space.
 	(mhc-summary-make-memo-list): Support `category-predicate'.
@@ -498,11 +503,11 @@
 	* emacs/mhc.el (mhc-scan-month): Use `frame-width' instead of
 	`window-width'. Guard error of make-string with minus count.
 
-	* emacs/mhc-summary.el (mhc-summary/cw-separator) 
+	* emacs/mhc-summary.el (mhc-summary/cw-separator)
 	(mhc-summary/cw-week): New variables.
 	(mhc-summary/insert-separator, mhc-summary-make-contents):
 	Support `mhc-summary/cw-separator'.
-	(mhc-summary/line-day-of-week-string) 
+	(mhc-summary/line-day-of-week-string)
 	(mhc-summary/line-day-of-week-ja-string): Use
 	`mhc-summary/cw-week' insted of 'mhc-summary-use-cw'.
 	(mhc-summary/make-string): New inline function.
@@ -584,7 +589,7 @@
 	* emacs/mhc-vars.el (mhc-insert-memo-list): New user variable.
 	(mhc-insert-zombi-list): Remove.
 
-	* emacs/mhc-summary.el (mhc-memo-line-format) 
+	* emacs/mhc-summary.el (mhc-memo-line-format)
 	(mhc-memo-string-heading): New user variable.
 	(mhc-memo/line-inserter, mhc-memo-line-format-alist): New
 	variable.
@@ -655,7 +660,7 @@
 
 2002-02-02 ABE Yasushi <yasushi@stbbs.net> / nom@quickhack.net
 
-	* ruby-ext/lib/mhc-schedule.rb 
+	* ruby-ext/lib/mhc-schedule.rb
 	(MhcScheduleItem#todo?): New function.
 	(MhcScheduleItem#sch_to_slot): Change for TODO articles.
 
@@ -765,11 +770,11 @@
 	* ruby-ext/lib/mhc-palm.rb (PilotApptRecord#to_xsc):
 	create X-SC-Location from a string srounded by '[' and ']' in
 	Palm's description field.
-        
+
 	* ruby-ext/lib/mhc-schedule.rb (MhcScheduleItem#to_palm):
 	Append the value of X-SC-Location enclosing by '[' and ']'
 	to Palm's description field.
-	
+
 2001-08-07  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* emacs/mhc-mew.el (mhc-mew-draft-translate): Catch the error for
@@ -780,7 +785,7 @@
 	* emacs/mhc-guess.el (mhc-guess-time-regexp-list):
 	change a hankaku colon (typo) to the zenkaku one.
         Thanks to Mr. KOIE Hidetaka.
-	
+
 2001-06-25  Yoshinari Nomura  <nom@quickhack.net>
 
 	* emacs/mhc-guess.el: clever mhc-guess-time-regexp.
@@ -819,7 +824,7 @@
 	* configure.rb: xpm path is now configurable.
 	search /usr/include/libpisock in checking libpisock.
 	(Thanks to Fumitoshi UKAI <ukai@debian.or.jp>)
-	
+
 	* ruby-ext/extconf.rb.in:
 	remove embeded LD_RUN_PATH.
 	(Thanks to Fumitoshi UKAI <ukai@debian.or.jp>)
@@ -853,7 +858,7 @@
 	* ruby-ext/lib/mhc-signal.rb (signal_disconnect):
 	  use `delete' to remove items from a hash.
 
-	* mhc-make.rb (install): 
+	* mhc-make.rb (install):
 	  dig destination directories before installation.
 
 2001-03-10  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
@@ -954,7 +959,7 @@
 	mhc-input-time-regex, mhc-subject-hist, mhc-input-subject,
 	mhc-location-hist, mhc-input-location, mhc-category-hist,
 	mhc-input-category): Move from mhc.el.
-	
+
 	* emacs/mhc-face.el (mhc-symbol-face-alist-internal): Add
 	mhc-summary-face-month-separator.
 
@@ -1059,7 +1064,7 @@
 2000-12-13  Keiichi Suzuki <keiichi@nanap.org> / nom@quickhack.net
 
 	* emacs/mhc-gnus.el, emacs/mhc-mime.el: some changes for Nana7.
-	
+
 2000-12-13  Yoshinari Nomura  <nom@quickhack.net>
 
 	* emacs/mhc-guess.el (mhc-guess/make-date-from-yyyymmdd):
@@ -1093,7 +1098,7 @@
 2000-10-21  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* emacs/mhc-cvs.el (mhc-cvs/add, mhc-cvs/remove): Do not shrink
-	filename when call mhc-cvs/modify(). 	
+	filename when call mhc-cvs/modify().
 
 2000-10-20  Hideyuki SHIRAI  <shirai@quickhack.net>
 
@@ -1120,9 +1125,9 @@
 
 	* emacs/mhc-db.el (mhc-db-add-exception-rule):
 	call mhc-draft-reedit-buffer before
-        modifying a buffer. 
+        modifying a buffer.
 	Tnx, Mr.Takaaki MORIYAMA <taka@airlab.cs.ritsumei.ac.jp>
-	
+
 2000-10-10  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* emacs/mhc.el (mhc-mode): Modify doc-string.
@@ -1141,7 +1146,7 @@
 
 	* emacs/00usage.jis: Untabified. Move some descriptions to
 	../00usage.jis.  Delete some obsolete descrptions.
-	
+
 	* 00usage.jis: Merge descrption from emacs/00usage.jis. Change an
 	order of descrption.
 
@@ -1386,13 +1391,13 @@
 	Execute mew-header-encode-region() safer.
 
 	* emacs/mhc.el (mhc-edit): Ensure reedit when imported buffer is schedule.
-	
+
 2000-08-03  Yoshinari NOMURA  <nom@quickhack.net>
 
 	* ruby-ext/lib/mhc-gtk.rb.in (toplevel):
 	if Win32 plathome, override MhcKconv::todisp using Uconv::euctou8
         (Thanks to Mr. WATANABE Hirofumi)
-	
+
 	* ruby-ext/lib/mhc-palm.rb (toplevel): rescue LoadError of mhc_pilib.
         (Thanks to Mr. WATANABE Hirofumi)
 
@@ -1428,7 +1433,7 @@
 
 	* emacs/mhc.el (mhc-setup): Run hook with symbol name.
 	(mhc-exit): Ditto.
-	
+
 	* emacs/mhc-calendar.el (mhc-calendar-insert-summary-contents):
 	Bind mhc-mailer-package to 'calendar as decode-string.
 	(mhc-calendar-eword-decode-string): New function, decode encoded word
@@ -1684,7 +1689,7 @@
 
 	* emacs/mhc-minibuf.el (mhc-input-day):
 	Rename mhc-calendar-separator to mhc-calendar-date-separator.
-	
+
 	* emacs/mhc-summary.el (mhc-use-week-separator): Move from mhc.el.
 	(mhc-summary-separator): New variable.
 	(mhc-summary/insert-separator): Use mhc-summary-separator.
@@ -1713,12 +1718,12 @@
 	Add mhc-calendar-face-default and mhc-summary-face-default.
 	(mhc-face-get-effect): undo make new-face method to nom-san's way.
 	Typo fix, make-face/make-face-italic to mhc-face/make-face-italic.
-	
+
 	* emacs/mhc.el (mhc-cal-make-rectangle):
 	Use 'mhc-calendar-face-default face instead of 'default.
 	(top-level): Typo fix,
 	(make-variable-buffer-local 'mhc-summary-buffer-current-.....).
-	
+
 	* emacs/mhc-summary.el (mhc-summary-line-insert):
 	Use 'mhc-summary-face-default face instead of 'default.
 	(mhc-summary-todo/line-deadline-face): Ditto.
@@ -1727,7 +1732,7 @@
 
 	* emacs/mhc-cmail.el:
 	override some cmail's functions to make cmail-read-contents
-	available. 
+	available.
 
 2000-07-19  Hideyuki SHIRAI  <shirai@quickhack.net>
 
@@ -1736,10 +1741,10 @@
 	(mhc-face/mhc-face-italic): Ditto.
 	(mhc-face/mhc-face-bold-italic): Ditto.
 	(mhc-face-get-effect): Use above macros. Make face name as
-	mhc-effect-*-*. 
+	mhc-effect-*-*.
 
 	* emacs/mhc-ps.el (mhc-ps-preview-command-arguments): Change
-	  default value. 
+	  default value.
 	(mhc-ps-paper-fill-print): New variable.
 	(mhc-ps/replace-table): Use mhc-ps-paper-fill-print.
 	(mhc-ps/process): Use expand-file-name()
@@ -1771,13 +1776,13 @@
 	* emacs/mhc.el (mhc-mode-menu-spec): Add PostScript menu.
 	(mhc-setup): Autoload mhc-ps-save and mhc-ps-insert-buffer.
 
-	* emacs/mhc-ps.el (mhc-ps-string-column): New variable, 
+	* emacs/mhc-ps.el (mhc-ps-string-column): New variable,
 	but not used ^^;
 	(mhc-ps/string): Fix 'Sixth week' problem.
 	(mhc-ps/replace-table): Ditto.
 	(mhc-ps/weeks): New function, return number of weeks.
 	(mhc-ps/compose-subject): Change method for truncate and fill.
-	(mhc-ps/make-contents): Add 'file' option. 
+	(mhc-ps/make-contents): Add 'file' option.
 	(mhc-ps/process): New function, modified mhc-ps/start-process.
 	(mhc-ps/process-sentinel): New function for delete PS file.
 	(mhc-ps-preview): Support Win32 enviroment.
@@ -1857,7 +1862,7 @@
 
 2000-07-13  Yoshinari Nomura  <nom@quickhack.net>
 
-	* make.rb.in, configure.rb, 
+	* make.rb.in, configure.rb,
 	  ruby-ext/lib/make.RB.in, ruby-ext/make.rb.in:
 	change newline CRLF -> LF.
 
@@ -1906,10 +1911,10 @@
 	* today : Change help message of --format.
 	Remove code conversion at final display.  Now, every formatter
 	module is responsible to code conversion.
-	
+
 	* ruby-ext/lib/mhc-kconv.rb : Change to module.
 	Add tohtml, tops for formatter module of 'today'.
-		
+
 	* gemcal : Change some global variables to local variables.
 
 2000-07-08  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
@@ -2010,7 +2015,7 @@
 	  safe. (thanks to Teranishi-san)
 
 	* emacs/mhc-calendar.el (mhc-calendar/in-date-p): Renamed
-	  'mhc-calendar/in-day-p'. 
+	  'mhc-calendar/in-day-p'.
 
 2000-06-28  MIYOSHI Masanori  <miyoshi@ask.ne.jp>
 
@@ -2029,7 +2034,7 @@
 	* mhc-sync: Ditto.
 
 	* gemcal: Ditto.
-	
+
 2000-06-28  Yuuichi Teranishi  <teranisi@gohome.org>
 
 	* emacs/mhc-wl.el (mhc-wl-summary-mode-setup):
@@ -2039,12 +2044,12 @@
 2000-06-28  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* emacs/mhc-summary.el (mhc-summary-insert-contents): If mailer eq
-	  'direct, 
+	  'direct,
 	disable icon and insert \n.
 	(mhc-summary-line-insert): Set background color, if today.
 
 	* emacs/mhc-calendar.el (mhc-calendar-insert-summary-contents):
-	  Follow up new method. 
+	  Follow up new method.
 
 	* emacs/mhc-ps.el (mhc-ps/substring): Use mhc-string-to-char-list
 	instead of string-to-list.
@@ -2162,7 +2167,7 @@
 	New function to divide non X-SC- headers from body. Fix
 		duplication of non X-SC- headers.
 
-	* ruby-ext/lib/mhc-schedule.rb 
+	* ruby-ext/lib/mhc-schedule.rb
 	 (MhcScheduleItem#set_non_xsc_header): New function to divide non X-SC-
 	    headers from body.
 	(MhcScheduleItem#dump_without_xsc_header): Ditto.
@@ -2187,7 +2192,7 @@
 
 	* emacs/mhc-ps.el (mhc-ps/compose-subject): If
 		  mhc-ps-truncate-lines is nil, use fill-region again.
-	
+
 
 2000-06-24  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
@@ -2216,7 +2221,7 @@
 	* experimental/gp2mhc, experimental/my-meeting2000:
 	Add -Ke option to #!/usr/local/bin/ruby line.
 
-	* today, adb2mhc, gemcal, mhc-sync, mhc2palm, palm2mhc: 
+	* today, adb2mhc, gemcal, mhc-sync, mhc2palm, palm2mhc:
 	Add -Ke option to #!/usr/local/bin/ruby line.
 
 	* 00todo.jis: updated.
@@ -2226,21 +2231,21 @@
 2000-06-22  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* emacs/mhc-calendar.el (mhc-calendar): Requested month displays
-		  center position. 
+		  center position.
 	(mhc-calendar-goto-today): New function.
 
 	* emacs/mhc.el (mhc-input-month): Treat default date option.
 
 	* emacs/mhc-date.el (mhc-date-yymm=): Fix mhc-date-mm's
-		  option. (d1, d2) 
+		  option. (d1, d2)
 	(mhc-date-yymm<): Ditto.
 
 	* emacs/mhc-record.el (mhc-record-write-buffer): Add 'nomsg option
-		  when write-region. 
+		  when write-region.
 	(mhc-record/append-log): Ditto.
 
 	* emacs/MHC-MK (comment): Change exemplum for Meadow.
-	
+
 2000-06-22  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
 	* 00readme, 00readme.jis: Follow changes in mailing list address
@@ -2255,7 +2260,7 @@
 	(mhc-summary-make-contents): Set `mhc-summary/today'.
 
 	* emacs/mhc-db.el (mhc-db/eval-for-duration): Follow changes in
-		  mhc-day.el. 
+		  mhc-day.el.
 	Dependency above timezone.el removed.
 
 	* emacs/mhc-day.el: Reconstruction of data structure.
@@ -2289,8 +2294,8 @@
 
 	* emacs/mhc-date.el (mhc-date-yy+): Fix dd's overrun.
 	* today: Change Author's mail address.
-	* emacs/mhc.el:	Change interfaces to guess functions. 
-	       Change indent fitting to 80 columns. 
+	* emacs/mhc.el:	Change interfaces to guess functions.
+	       Change indent fitting to 80 columns.
 	* emacs/mhc-minibuf.el: Change interfaces to guess functions.
 	* emacs/mhc-guess.el: drastically changed: data structure,
 		  function names, algorithms.
@@ -2306,9 +2311,9 @@
 2000-06-20  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* emacs/mhc-date.el (mhc-date-mm+): If check is nil, return
-		  last-day instead of '1'. 
+		  last-day instead of '1'.
 	(mhc-date-digit-to-ww-japanese-string): New function, return
-		japanese day of week. 
+		japanese day of week.
 
 2000-06-19  Hideyuki SHIRAI  <shirai@quickhack.net>
 
@@ -2341,20 +2346,20 @@
 	* emacs/mhc-wl.el (mhc-wl-search-date): Renamed `mhc-wl-search-day'.
 	* emacs/mhc-mew.el (mhc-mew-search-date): Renamed `mhc-mew-search-day'.
 	* emacs/mhc-gnus.el (mhc-gnus-search-date): Renamed
-		  `mhc-gnus-search-day'. 
+		  `mhc-gnus-search-day'.
 
 2000-06-19  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* emacs/mhc.el (mhc-goto-today): Use mhc-summary-search-day().
 	* emacs/mhc-summary.el (mhc-summary-search-day): New function, for
-		  search YY MM DD in summary-buffer. 
+		  search YY MM DD in summary-buffer.
 	* emacs/mhc-wl.el (mhc-wl-summary-search-day): Ditto.
 	* emacs/mhc-gnus.el (mhc-gnus-summary-search-day): Ditto.
 	* emacs/mhc-mew.el (mhc-mew-summary-search-day): Ditto.
 	(mhc-mew/header-string-review): New constant, header-string when
-		schedule exist. 
+		schedule exist.
 	(mhc-mew-insert-summary-contents): If shedule exist, put review mark.
-	
+
 2000-06-19  Yoshinari Nomura  <nom@quickhack.net>
 
 	* emacs/mhc.el (mhc-goto-today): Fix typo.
@@ -2424,10 +2429,10 @@
 	* emacs/mhc-wl.el: Ditto.
 	* emacs/mhc-date.el: Some bug fixes.
 	* emacs/mhc-calendar.el: Quick hack to follow reconstruction of
-		  mhc-date.el. 
+		  mhc-date.el.
 	* emacs/ddate.el: Ditto.
 	* emacs/Makefile: Add suffix rule.
-	
+
 2000-06-18  Yoshinari Nomura  <nom@quickhack.net>
 
 	* emacs/mhc-date.el: Rewrite all codes.
@@ -2449,7 +2454,7 @@
 
 	* emacs/mhc.el: Removed dependency declaration above mhc-sync.el.
 	(mhc-modify-file): Alter the file opening codes, removed
-		`find-file-other-window'. 
+		`find-file-other-window'.
 	(mhc-draft-buffer-file-name): New internal variable to keep file name.
 	(mhc-draft-finish): Refer `mhc-draft-buffer-file-name' to decide
 	original schedule file.
@@ -2484,7 +2489,7 @@
 2000-06-16  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
 	* emacs/mhc.el (mhc-goto-month): Refer
-		  `mhc-default-hide-private-schedules' 
+		  `mhc-default-hide-private-schedules'
 	to decide which action is suitable as default, display private
 	schedules or not.
 	(mhc-goto-this-month): Ditto.
@@ -2561,7 +2566,7 @@
 
 	* emacs/mhc.el (toplevel): Require mhc-calendar, mhc-sync.
 	(mhc-delete-file, mhc-modify-file): New functions to call from mhc
-		and mhc-calendar. 
+		and mhc-calendar.
 	(mhc-edit): Support mhc-calendar-mode.
 	(mhc-setup-p): New variable.
 	(mhc-setup): Add in mhc-calendar's setup funciton.
@@ -2575,17 +2580,17 @@
 	* emacs/mhc-mew.el: (require 'mew) instead of mew-vars.
 
 	* emacs/mhc-logic.el: (require 'bytecomp) in top level, for
-		  byte-compile-wanings. 
-	
+		  byte-compile-wanings.
+
 	* emacs/mhc-face.el (mhc-calendar-hnf-face-*): New variable form
-		  mhc-calendar. 
+		  mhc-calendar.
 
 	* emacs/mhc-calendar.el: Sync up to main trunk.
 
 	* emacs/mhc-sync.el: New file for ruby sync script.
 
 	* emacs/Makefile: Include mhc-bm.el, mhc-xmas.el, mhc-calendar.el
-		  and mhc-sync.el. 
+		  and mhc-sync.el.
 
 2000-06-12  Yoshinari Nomura  <nom@quickhack.net>
 
@@ -2629,7 +2634,7 @@
 2000-06-05  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* emacs/mhc-calendar.el (mhc-calendar-hnf-summary-insert): 'SUB',
-		  'LSUB' suport. 
+		  'LSUB' suport.
 	(mhc-calendar-hnf-search-title): New function.
 	(mhc-calendar-hnf-edit, mhc-calendar-hnf-view): Goto TITLE position.
 
@@ -2665,7 +2670,7 @@
 2000-06-02  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* emacs/mhc-calendar.el (mhc-calendar-hnf-summary-insert): hnf's
-		  'CAT' support. 
+		  'CAT' support.
 
 2000-06-01  MIYOSHI Masanori  <miyoshi@ask.ne.jp>
 
@@ -2675,12 +2680,12 @@
 2000-06-01  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* emacs/mhc-calendar.el (mhc-calendar-hnf-face-setup): Do ditto
-		  mhc-face-setup. 
+		  mhc-face-setup.
 	(mhc-calendar-hnf-edit): Call hnf-initial-function like hns.
 	(mhc-calendar-hnf-mark-diary-entries): Fatal bug fix ^^;
 	(mhc-calendar-hnf-summary-insert): More colorful, but i have no
-		knowledge of hnf. 
-	
+		knowledge of hnf.
+
 2000-06-01  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
 	* emacs/mhc-logic.el (mhc-logic/week-of-month-alist): Key string
@@ -2803,15 +2808,15 @@
 
 	* emacs/mhc-calendar.el: New file. MINI calender mode(like 'M-x
 		  calendar').
- 
-	* emacs/mhc.el, mhc-minibuf.el: adapt to mhc-calendar.el 
+
+	* emacs/mhc.el, mhc-minibuf.el: adapt to mhc-calendar.el
 
 	* emacs/mhc-guess.el: tiny typo fix.
 
 2000-05-29  Yoshinari NOMURA  <nom@quickhack.net>
 
 	* 00readme.jis, 00todo.jis, emacs/00usage.jis,
-		  samples/DOT.schedule.sample.jp, 00readme: 
+		  samples/DOT.schedule.sample.jp, 00readme:
 	add cvs date indicator Date: in Revised: header.
 
 	* ruby-ext/lib/mhc-palm.rb, ruby-ext/lib/mhc-schedule.rb,
@@ -2822,7 +2827,7 @@
 		  ruby-ext/lib/mhc-date.rb, ruby-ext/lib/mhc-gtk.rb,
 		  ruby-ext/mhc_pilib.c, 00copyright, adb2mhc,
 		  emacs/mhc-date.el, emacs/mhc-face.el, gemcal, mhc-sync,
-		  mhc2palm, mscan, palm2mhc, today, today.pl: 
+		  mhc2palm, mscan, palm2mhc, today, today.pl:
 	change copyright notices.
 
 	* NEWS.jis, NEWS : info about 0.25.
