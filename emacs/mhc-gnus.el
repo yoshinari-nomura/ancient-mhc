@@ -39,6 +39,7 @@
 
 ;; Setup function:
 
+;;;###autoload
 (defun mhc-gnus-setup ()
   (require 'mhc)
   (mhc-setup)

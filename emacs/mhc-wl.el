@@ -24,6 +24,7 @@
 
 ;; Setup function:
 
+;;;###autoload
 (defun mhc-wl-setup ()
   (require 'mhc)
   (mhc-setup)

@@ -28,4 +28,4 @@ install-package:
 	$(XEMACS) $(FLAGS) -f make-mhc-install-package $(OPTS) # $(MAKE)
 
 clean:
-	-rm -f *.elc
+	-rm -f *.elc auto-autoloads.el custom-load.el

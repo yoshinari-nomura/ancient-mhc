@@ -71,7 +71,8 @@
   :group 'mhc
   :type 'boolean)
 
-(defcustom mhc-icon-path "~/icons"
+(defcustom mhc-icon-path (if (fboundp 'locate-data-directory)
+			     (locate-data-directory "mhc"))
   "*Icon path for MHC."
   :group 'mhc
   :type 'directory)

@@ -75,6 +75,7 @@
 	dir)))
 
 (defvar make-mhc/source-directory default-directory)
+(defvar make-mhc/icon-source-directory "../icons")
 
 (defvar make-mhc/with-mew nil)
 (defvar make-mhc/with-wl nil)
@@ -229,7 +230,34 @@
 
 (defun make-mhc-install-package ()
   (make-mhc-compile-package)
-  (make-mhc-install)
-  (make-mhc/update-package-files make-mhc/module-prefix dir))
+  (make-mhc/update-package-files make-mhc/module-prefix dir)
+  (or make-mhc/debug
+      (make-mhc/make-directory make-mhc/lisp-directory))
+  (mapcar
+   (lambda (module)
+     (make-mhc/install-file
+      (expand-file-name (concat module ".el") make-mhc/source-directory)
+      (expand-file-name (concat module ".el") make-mhc/lisp-directory))
+     (make-mhc/install-file
+      (expand-file-name (concat module ".elc") make-mhc/source-directory)
+      (expand-file-name (concat module ".elc") make-mhc/lisp-directory)))
+   (append
+    (mapcar 'car make-mhc/module-alist)
+    ;; Add XEmacs package stuff.
+    (list "auto-autoloads"
+	  "custom-load")))
+  ;; Install icons.
+  (let ((icon-dir (expand-file-name
+		   (concat make-mhc/package-directory
+			   "/etc/" make-mhc/module-prefix))))
+    (or make-mhc/debug
+	(make-mhc/make-directory icon-dir))
+    (mapcar
+     (lambda (icon)
+       (make-mhc/install-file
+	icon
+	(expand-file-name
+	 (file-name-nondirectory icon) icon-dir)))
+     (directory-files make-mhc/icon-source-directory t "^.*\\.xpm$"))))
 
 ;;; MHC-MK ends here
