@@ -1,3 +1,16 @@
+2001-03-05  Yuuichi Teranishi  <teranisi@quickhack.net>
+
+	* emacs/mhc.el (mhc-scan-month):
+	Set `mhc-summary-buffer-current-date-month' before inserting summary
+	contents.
+
+	* emacs/mhc-wl.el (toplevel): Require 'static.
+	(mhc-wl-summary-filename): Added definition for luna-fied API.
+	(mhc-wl-insert-summary-contents): Modified for `mhc-use-wide-scope'.
+	(mhc-wl/date-to-folder): Ditto.
+	(mhc-wl-summary-mode-setup): Set `wl-summary-buffer-folder-indicator';
+	Follow the luna-fied API.
+
 2001-02-16  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* emacs/mhc-mew.el (mhc-mew-summary-mode-setup): Follow suit for

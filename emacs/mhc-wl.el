@@ -15,7 +15,7 @@
 (require 'wl-summary)
 (require 'elmo-localdir)
 (require 'mhc-mime)
-
+(require 'static)
 
 ;; Setup function:
 
@@ -32,17 +32,23 @@
 
 ;; Backend methods:
 
-(defun mhc-wl-summary-filename ()
-  "Return FILENAME on current line."
-  (let* ((fld-num (elmo-multi-get-real-folder-number
-		   wl-summary-buffer-folder-name
-		   (wl-summary-message-number)))
-	 (fld (car fld-num))
-	 (num (cdr fld-num)))
-    (expand-file-name
-     (number-to-string num)
-     (elmo-localdir-get-folder-directory
-      (elmo-folder-get-spec fld)))))
+(static-if (fboundp 'elmo-message-file-name)
+    (defun mhc-wl-summary-filename ()
+      "Return FILENAME on current line ."
+      (elmo-message-file-name
+       wl-summary-buffer-elmo-folder
+       (wl-summary-message-number)))
+  (defun mhc-wl-summary-filename ()
+    "Return FILENAME on current line."
+    (let* ((fld-num (elmo-multi-get-real-folder-number
+		     wl-summary-buffer-folder-name
+		     (wl-summary-message-number)))
+	   (fld (car fld-num))
+	   (num (cdr fld-num)))
+      (expand-file-name
+       (number-to-string num)
+       (elmo-localdir-get-folder-directory
+	(elmo-folder-get-spec fld))))))
 
 
 (defun mhc-wl-summary-display-article ()
@@ -67,7 +73,9 @@
 
 ;; mhc-tmp-schedule is already bound.
 (defun mhc-wl-insert-summary-contents (inserter)
-  (let (head path pos)
+  (let ((today (mhc-current-date-month))
+	(date (mhc-day-date mhc-tmp-dayinfo))
+	head path)
     (setq path (mhc-record-name (mhc-schedule-record mhc-tmp-schedule))
 	  head
 	  (cond
@@ -76,8 +84,17 @@
 	   ((string-match "/intersect/" path)
 	    (format "1%05d"
 		    (string-to-number (file-name-nondirectory path))))
-	   (t 
+	   ;; This month
+	   ((mhc-date-yymm= today date)
 	    (format "2%05d"
+		    (string-to-number (file-name-nondirectory path))))
+	   ;; Previous month
+	   ((mhc-date-yymm= (mhc-date-mm- today 1) date)
+	    (format "3%05d"
+		    (string-to-number (file-name-nondirectory path))))
+	   ;; Next month
+	   ((mhc-date-yymm= (mhc-date-mm+ today 1) date)
+	    (format "4%05d"
 		    (string-to-number (file-name-nondirectory path)))))
 	  head (concat head (if path "*| " " | ")))
     (put-text-property 0 (length head) 'invisible t head)
@@ -88,11 +105,17 @@
 
 (defsubst mhc-wl/date-to-folder (date)
   (mhc-date-format date
-		   "*%s/intersect,%s/%04d/%02d"
+		   "*%s/intersect,%s/%04d/%02d,%s/%04d/%02d,%s/%04d/%02d"
 		   mhc-base-folder
 		   mhc-base-folder
 		   yy
-		   mm))
+		   mm
+		   mhc-base-folder
+		   (if (eq mm 1) (- yy 1) yy)
+		   (if (eq mm 1) 12 (- mm 1))
+		   mhc-base-folder
+		   (if (eq mm 12) (+ yy 1) yy)
+		   (if (eq mm 12) 1 (+ mm 1))))
 
 
 (defvar mhc-wl-exit-buffer nil)
@@ -125,8 +148,11 @@
     (setq wl-summary-buffer-exit-func 'mhc-wl-summary-exit)
     (setq wl-summary-buffer-target-mark-list '(nil))
     (setq wl-summary-buffer-number-regexp "[0-9]+")
-    (setq wl-summary-buffer-msgdb '(nil))))
-
+    (setq wl-summary-buffer-folder-indicator (buffer-name))
+    (static-if (fboundp 'elmo-folder-msgdb)
+	(elmo-folder-set-msgdb-internal wl-summary-buffer-elmo-folder
+					'(nil))
+      (setq wl-summary-buffer-msgdb '(nil)))))
 
 (defun mhc-wl-generate-summary-buffer (date)
   (wl-summary-toggle-disp-msg 'off)

@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1994/07/04
-;; Revised: $Date: 2001/01/31 11:26:37 $
+;; Revised: $Date: 2001/03/05 06:02:55 $
 
 ;;;
 ;;; Commentay:
@@ -474,6 +474,9 @@ If HIDE-PRIVATE, private schedules are suppressed."
 	 today mailer category-predicate secret)
 	(insert (make-string mhc-todo-mergin ?\n))
 	(mhc-summary/insert-separator)))
+    (unless (eq 'direct mailer)
+      (setq mhc-summary-buffer-current-date-month
+	    (mhc-date-mm-first date)))
     (when (and bfrom bto)
       (mhc-summary-make-contents bfrom bto mailer category-predicate secret)
       (when mhc-use-month-separator
@@ -500,7 +503,7 @@ If HIDE-PRIVATE, private schedules are suppressed."
       (setq mhc-summary-buffer-current-date-month
 	    (mhc-date-mm-first date))
       (mhc-goto-today t)
-    (message (mhc-date-format date "Scanning %04d/%02d ... done." yy mm)))))
+      (message (mhc-date-format date "Scanning %04d/%02d ... done." yy mm)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; import, edit, delete, modify
