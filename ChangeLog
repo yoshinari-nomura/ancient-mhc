@@ -1,7 +1,7 @@
 2000-05-31  Hideyuki SHIRAI  <shirai@rdmg.mgcs.mei.co.jp>
 
 	* emacs/mhc.el (mhc-sync): New function.
-	Bind mhc-sync process coding-system.
+	Bind mhc-sync process coding-system. Ignore illegal passwd request.
 
 	* emacs/mhc-calendar.el: Display Hyper Nikki System's title in summary view.
 

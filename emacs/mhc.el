@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1994/07/04
-;; Revised: $Date: 2000/05/31 12:02:24 $
+;; Revised: $Date: 2000/05/31 14:23:33 $
 
 ;;;
 ;;; Commentay:
@@ -1287,6 +1287,7 @@ Returns t if the importation was succeeded."
 (defconst mhc-sync-passwd-regex "password:\\|passphrase:\\|Enter passphrase for RSA")
 (defvar mhc-sync-process nil)
 (defvar mhc-sync-read-passwd nil)
+(defvar mhc-sync-req-passwd nil)
 
 (defun mhc-sync ()
   "Execute mhc-sync."
@@ -1302,6 +1303,7 @@ Returns t if the importation was succeeded."
 	  (erase-buffer)
 	  (setq buffer-read-only t)
 	  (message "mhc-sync ...")
+	  (setq mhc-sync-req-passwd t)
 	  (setq mhc-sync-process
 		(apply (function start-process)
 		       "mhc-sync" buf "mhc-sync"
@@ -1323,10 +1325,13 @@ Returns t if the importation was succeeded."
 		    passwd)
 		(goto-char (point-max))
 		(insert string)
-		(if (string-match mhc-sync-passwd-regex string)
-		  (progn
-		    (setq passwd (mhc-sync-read-passwd string))
-		    (process-send-string process (concat passwd "\n"))))))
+		(cond
+		 ((and mhc-sync-req-passwd
+		       (string-match mhc-sync-passwd-regex string))
+		  (setq passwd (mhc-sync-read-passwd string))
+		  (process-send-string process (concat passwd "\n")))
+		 ((string-match "---------------------" string)
+		  (setq mhc-sync-req-passwd nil)))))
 	  (if (get-buffer obuf)
 	      (set-buffer obuf))))))
 
