@@ -1,3 +1,7 @@
+2000-06-26  Toshihiko SHIMOKAWA  <toshi@tea.forus.or.jp>
+
+	* mhc-gtk.rb: fix FONTSET2 for non cygwin environments.
+
 2000-06-26  Yoshinari Nomura  <nom@quickhack.net>
 
 	* ruby-ext/lib/mhc-schedule.rb (MhcScheduleItem#to_palm):
