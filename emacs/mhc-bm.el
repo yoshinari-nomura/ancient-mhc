@@ -3,7 +3,7 @@
 ;; Author:  Yuuichi Teranishi <teranisi@gohome.org>
 ;;
 ;; Created: 2000/05/27
-;; Revised: $Date: 2000/08/04 02:31:43 $
+;; Revised: $Date: 2000/08/04 03:18:39 $
 
 (require 'bitmap)
 (require 'mhc-face)
@@ -126,7 +126,7 @@ icon line."
 
 (defun mhc-use-icon-p ()
   "Returns t if MHC displays icon."
-  (and window-system mhc-use-icon))
+  (and window-system mhc-use-icon mhc-icon-path))
 
 (defun mhc-icon-exists-p (name)
   "Returns non-nil if icon with NAME exists."

@@ -1,6 +1,7 @@
 2000-08-04  Yuuichi Teranishi  <teranisi@quickhack.net>
 
 	* emacs/mhc-bm.el (mhc-bm-icon-alist): Fixed typo (xpm->xbm).
+	(mhc-use-icon-p): Return nil if mhc-icon-path is nil.
 
 	* emacs/mhc-mime.el (mhc-mime/draft-reedit): Delete header separator
 	if already exists.
