@@ -674,12 +674,13 @@ If optional argument FOR-DRAFT is non-nil, Hilight message as draft message."
     (when schedules
       (insert (format "%s\n" mhc-memo-string-heading))
       (while schedules
-	(mhc-summary-insert-contents
-	 (car schedules)
-	 (and secret
-	      (mhc-schedule-in-category-p (car schedules) "private"))
-	 'mhc-memo-line-insert
-	 mailer)
+	(when (funcall category-predicate (car schedules))
+	  (mhc-summary-insert-contents
+	   (car schedules)
+	   (and secret
+		(mhc-schedule-in-category-p (car schedules) "private"))
+	   'mhc-memo-line-insert
+	   mailer))
 	(setq schedules (cdr schedules))))))
 
 

@@ -4,6 +4,7 @@
 	value for 'english. 
 	(mhc-summary-line-format-alist): Add `S' rule.
 	(mhc-todo-string-deadline-day): Remove no good space.
+	(mhc-summary-make-memo-list): Support `category-predicate'.
 
 2002-09-25  Hideyuki SHIRAI  <shirai@quickhack.net>
 
