@@ -6,7 +6,7 @@
 ## Author:  Yoshinari Nomura <nom@quickhack.net>
 ##
 ## Created: 1999/09/01
-## Revised: $Date: 2000/07/13 17:32:03 $
+## Revised: $Date: 2000/08/05 19:51:58 $
 ##
 
 # $DEBUG = 1
@@ -619,8 +619,8 @@ class MhcCalendar
       first = true
       item .each{|x|
 	@vml .d(dd) .append(x .subject, x .time_b .to_s)
-	s = (x .time_b .to_s + " " + x .subject) .gsub("\s", "\x07") + " "
-	@vml .d(dd) .append_tip(s)
+	s = (x .time_b .to_s + " " + x .subject) .gsub("\s", "\x07")
+	@vml .d(dd) .append_tip(MhcKconv::todisp(s) + " ")
 	@path[dd] << x .path
 
 	if x .in_category?('Holiday')
