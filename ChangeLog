@@ -1,3 +1,13 @@
+2000-10-04  Hideyuki SHIRAI  <shirai@quickhack.net>
+
+	* emacs/00usage.jis: Change key bind in mhc-mode. Account for
+	mhc-prefix-key.
+
+	* emacs/mhc.el (mhc-prefix-key, mhc-prefix-map): New variable for
+	'Emacs Minor Mode Conventions'.
+	(mhc-mode-map): Use mhc-prefix-key and mhc-prefix-map.
+	(mhc-mode): Change doc-string, used \\<mhc-mode-map> & \\[function].
+
 2000-10-03  Yoshinari Nomura  <nom@quickhack.net>
 
 	* emacs/00usage.jis:

@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1994/07/04
-;; Revised: $Date: 2000/10/03 15:11:09 $
+;; Revised: $Date: 2000/10/04 01:16:36 $
 
 ;;;
 ;;; Commentay:
@@ -89,24 +89,31 @@
 	 ["Save" mhc-ps-save t]
 	 ["Insert buffer" mhc-ps-insert-buffer t])))
 
-(defvar mhc-mode-map
-  (let ((map (make-sparse-keymap)))
-    (define-key map "\C-cg" 'mhc-goto-month)
-    (define-key map "\C-c." 'mhc-goto-this-month)
-    (define-key map "\C-cn" 'mhc-goto-next-month)
-    (define-key map "\C-cp" 'mhc-goto-prev-month)
-    (define-key map "\C-cf" 'mhc-goto-today)
-    (define-key map "\C-c|" 'mhc-import)
-    (define-key map "\C-cm" 'mhc-modify)
-    (define-key map "\C-ce" 'mhc-edit)
-    (define-key map "\C-cs" 'mhc-rescan-month)
-    (define-key map "\C-cd" 'mhc-delete)
-    (define-key map "\C-cc" 'mhc-set-default-category)
-    (define-key map "\C-ci" 'mhc-insert-schedule)
-    (define-key map "\C-c?" 'mhc-calendar)
-    (define-key map "\C-ct" 'mhc-calendar-toggle-insert-rectangle)
-    map)
-  "Keymap for `mhc-mode'.")
+(defvar mhc-prefix-key "\C-c."
+  "*Prefix key to call MHC functions.")
+
+(defvar mhc-mode-map nil "Keymap for `mhc-mode'.")
+(defvar mhc-prefix-map nil "Keymap for 'mhc-key-prefix'.")
+
+(if (and mhc-mode-map mhc-prefix-map)
+    ()
+  (setq mhc-mode-map (make-sparse-keymap))
+  (setq mhc-prefix-map (make-sparse-keymap))
+  (define-key mhc-prefix-map "g" 'mhc-goto-month)
+  (define-key mhc-prefix-map "." 'mhc-goto-this-month)
+  (define-key mhc-prefix-map "n" 'mhc-goto-next-month)
+  (define-key mhc-prefix-map "p" 'mhc-goto-prev-month)
+  (define-key mhc-prefix-map "f" 'mhc-goto-today)
+  (define-key mhc-prefix-map "|" 'mhc-import)
+  (define-key mhc-prefix-map "m" 'mhc-modify)
+  (define-key mhc-prefix-map "e" 'mhc-edit)
+  (define-key mhc-prefix-map "s" 'mhc-rescan-month)
+  (define-key mhc-prefix-map "d" 'mhc-delete)
+  (define-key mhc-prefix-map "c" 'mhc-set-default-category)
+  (define-key mhc-prefix-map "i" 'mhc-insert-schedule)
+  (define-key mhc-prefix-map "?" 'mhc-calendar)
+  (define-key mhc-prefix-map "t" 'mhc-calendar-toggle-insert-rectangle)
+  (define-key mhc-mode-map mhc-prefix-key mhc-prefix-map))
 
 (defvar mhc-mode nil "Non-nil when in mhc-mode.")
 
@@ -119,29 +126,30 @@
 (defvar mhc-mode-menu)
 
 (defun mhc-mode (&optional arg) "\
+\\<mhc-mode-map>
    MHC is the mode for registering schdule directly from email.  
    Requres Mew or Wanderlust or Gnus.
 
    Key assinment on mhc-mode.
 
-   C-c .  Review the schedule of this month
-   C-c n  Review the schedule of next month
-   C-c p  Review the schedule of previous month
-   C-c g  Jump to your prefer month
-   C-c s  Rescan the buffer of the month
-   C-c f  Move cursor to today (Only available reviewing this month)
-   C-c |  Register the reviewing mail to schdule
-   C-c d  Delete the schdule on the cursor line
-   C-c m  Edit the schdule on the cursor line
-   C-c e  Create new schdule file
-   C-c c  Change default category
-   C-c ?  Display 3 months mini calendar
-   C-c t  Toggle 3 months calendar
+\\[mhc-goto-this-month]	Review the schedule of this month
+\\[mhc-goto-next-month]	Review the schedule of next month
+\\[mhc-goto-prev-month]	Review the schedule of previous month
+\\[mhc-goto-month]	Jump to your prefer month
+\\[mhc-rescan-month]	Rescan the buffer of the month
+\\[mhc-goto-today]	Move cursor to today (Only available reviewing this month)
+\\[mhc-import]	Register the reviewing mail to schdule
+\\[mhc-delete]	Delete the schdule on the cursor line
+\\[mhc-set-default-category]	Edit the schdule on the cursor line
+\\[mhc-edit]	Create new schdule file
+\\[mhc-set-default-category]	Change default category
+\\[mhc-calendar]	Display 3 months mini calendar
+\\[mhc-calendar-toggle-insert-rectangle]	Toggle 3 months calendar
 
-   C-u prefix is available on using C-cs C-c. C-cg, it works to
-   assign the category (see below)
+   '\\[universal-argument]' prefix is available on using '\\[mhc-rescan-month]', '\\[mhc-goto-this-month]', '\\[mhc-goto-month]'
+  , it works to assign the category (see below).
 
-   The prefix arg C-cn C-cp is also available and you can indicate
+   The prefix arg '\\[mhc-goto-next-month]', '\\[mhc-goto-prev-month]' is also available and you can indicate
    the number of months to forward/back.
 
    Field names using by MHC.
