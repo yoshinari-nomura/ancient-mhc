@@ -3,7 +3,7 @@
 ## Author:  MIYOSHI Masanori <miyoshi@quickhack.net>
 ##          Yoshinari Nomura <nom@quickhack.net>
 ## Created: 2000/7/12
-## Revised: $Date: 2000/08/21 08:48:52 $
+## Revised: $Date: 2000/12/19 02:06:17 $
 
 require 'rbconfig'
 require 'mkmf'
@@ -247,7 +247,7 @@ class MhcConfigure
 
     ## set useful macros.
     @macros['@@MHC_RUBY_VERSION@@'] = 
-      VERSION .split('.') .filter{|i| format("%02d", i)} .join('')
+      VERSION .split('.') .collect{|i| format("%02d", i)} .join('')
     @macros['@@MHC_TOPDIR@@'] = Dir .pwd
   end
 
