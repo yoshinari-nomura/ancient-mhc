@@ -3,7 +3,10 @@
 ################################################################
 
 Created: 1999/04/07
-Revised: $Date: 2000/05/26 10:57:08 $
+Revised: $Date: 2000/05/26 20:06:50 $
+
+・ ChangeLog, NEWS を追加。以降は、00changes.jis は更新しない。
+・ emacs/mhc.el: menu fix for xemacs. (thanks to shirai san)
 
 * mhc-snap20000526-2 (2000-05-26)
 
