@@ -1,4 +1,19 @@
-2000-05-29  Yoshinari Nomura  <nom@quickhack.net>
+2000-05-29  Yoshinari NOMURA  <nom@quickhack.net>
+
+	* 00readme.jis, 00todo.jis, emacs/00usage.jis,
+		  samples/DOT.schedule.sample.jp, 00readme: 
+	add cvs date indicator Date: in Revised: header.
+
+	* ruby-ext/lib/mhc-palm.rb, ruby-ext/lib/mhc-schedule.rb,
+		  ruby-ext/lib/mhc-signal.rb, emacs/mhc-guess.el,
+		  emacs/mhc-minibuf.el, emacs/mhc-misc.el,
+		  emacs/mhc-schedule.el, emacs/mhc.el, ruby-ext/00readme,
+		  ruby-ext/ext-helper.c, ruby-ext/ext-helper.h,
+		  ruby-ext/lib/mhc-date.rb, ruby-ext/lib/mhc-gtk.rb,
+		  ruby-ext/mhc_pilib.c, 00copyright, adb2mhc,
+		  emacs/mhc-date.el, emacs/mhc-face.el, gemcal, mhc-sync,
+		  mhc2palm, mscan, palm2mhc, today, today.pl: 
+	change copyright notices.
 
 	* NEWS.jis, NEWS : info about 0.25.
 
