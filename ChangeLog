@@ -1,3 +1,8 @@
+2000-06-17  Yoshinari Nomura  <nom@quickhack.net>,
+            MIYOSHI Masanori  <miyoshi@ask.ne.jp>
+
+	* palm2mhc: call ad_sch() in non interactive mode.
+
 2000-06-13  MIYOSHI Masanori  <miyoshi@ask.ne.jp>
 
 	* emacs/mhc.el (mhc-gnus-prepare-summary-buffer): Use
