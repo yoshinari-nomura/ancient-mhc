@@ -1,3 +1,9 @@
+2000-05-31  Hideyuki SHIRAI  <shirai@rdmg.mgcs.mei.co.jp>
+
+	* emacs/mhc.el (mhc-sync): New function.
+
+	* emacs/mhc-calendar.el: Display Hyper Nikki System's title in summary view.
+
 2000-05-31  Yuuichi Teranishi  <teranisi@quickhack.net>
 
 	* emacs/mhc.el (mhc-scan-month): 

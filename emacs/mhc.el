@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1994/07/04
-;; Revised: $Date: 2000/05/31 08:44:13 $
+;; Revised: $Date: 2000/05/31 10:45:41 $
 
 ;;;
 ;;; Commentay:
@@ -78,6 +78,21 @@
   :type '(choice (const :tag "Mew" mew)
 		 (const :tag "Wanderlust" wl)
 		 (const :tag "Gnus" gnus)))
+
+(defcustom mhc-sync-id nil
+  "*Identical id of mhc-sync (-x option)."
+  :group 'mhc
+  :type 'string)
+
+(defcustom mhc-sync-remote nil
+  "*Remote server repository of mhc-sync ([user@]remote.host[:dir])."
+  :group 'mhc
+  :type 'string)
+  
+(defcustom mhc-sync-localdir nil
+  "*Local repository directory of mhc-sync (-r option)."
+  :group 'mhc
+  :type 'string)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Icon
@@ -1267,6 +1282,79 @@ Returns t if the importation was succeeded."
   (interactive)
   (let ((path (mhc-summary-filename)))
     (view-file-other-window path)))
+
+;; mhc-sync (Ruby script)
+(defconst mhc-sync-passwd-regex "password:\\|passphrase:\\|Enter passphrase for RSA")
+(defvar mhc-sync-process nil)
+(defvar mhc-sync-read-passwd nil)
+
+(defun mhc-sync ()
+  "Execute mhc-sync."
+  (interactive)
+  (if (and (stringp mhc-sync-remote) (stringp mhc-sync-id))
+      (if (processp mhc-sync-process)
+	  (message "another mhc-sync running.")
+	(let ((buf (get-buffer-create "*mhc-sync*"))
+	      (ldir (expand-file-name
+		     (if mhc-sync-localdir mhc-sync-localdir "~/Mail/schedule"))))
+	  (pop-to-buffer buf)
+	  (setq buffer-read-only nil)
+	  (erase-buffer)
+	  (setq buffer-read-only t)
+	  (message "mhc-sync ...")
+	  (setq mhc-sync-process
+		(apply (function start-process)
+		       "mhc-sync" buf "mhc-sync"
+		       (list "-x" mhc-sync-id "-r" ldir mhc-sync-remote)))
+	  (set-process-filter mhc-sync-process 'mhc-sync-filter)
+	  (set-process-sentinel mhc-sync-process 'mhc-sync-sentinel)))
+    (message "No remote server specified.")))
+
+(defun mhc-sync-filter (process string)
+  (if (bufferp (process-buffer process))
+      (let ((obuf (buffer-name)))
+	(unwind-protect
+	    (progn
+	      (set-buffer (process-buffer process))
+	      (let ((buffer-read-only nil)
+		    passwd)
+		(goto-char (point-max))
+		(insert string)
+		(if (string-match mhc-sync-passwd-regex string)
+		  (progn
+		    (setq passwd (mhc-sync-read-passwd string))
+		    (process-send-string process (concat passwd "\n"))))))
+	  (if (get-buffer obuf)
+	      (set-buffer obuf))))))
+
+(defun mhc-sync-sentinel (process event)
+  (if (bufferp (process-buffer process))
+      (progn
+	(pop-to-buffer (process-buffer process))
+	(let ((buffer-read-only nil))
+	  (goto-char (point-max))
+	  (insert "<<<transfer finish>>>"))))
+  (setq mhc-sync-process nil)
+  (message "mhc-sync ... done."))
+
+(defun mhc-sync-read-passwd (string) ;; xxx
+  (if mhc-sync-read-passwd
+      ()
+    (cond
+     ((fboundp 'mew-read-passwd)
+      (setq mhc-sync-read-passwd 'mew-read-passwd))
+     ((fboundp 'elmo-read-passwd)
+      (setq mhc-sync-read-passwd 'elmo-read-passwd))
+     ((fboundp 'nnmail-read-passwd)
+      (setq mhc-sync-read-passwd 'nnmail-read-passwd))
+     ((fboundp 'pop3-read-passwd)
+      (setq mhc-sync-read-passwd 'pop3-read-passwd))
+     ((fboundp 'read-passwd)
+      (setq mhc-sync-read-passwd (lambda (string)
+				   (condition-case nil
+				       (read-passwd string)
+				     (error "")))))))
+  (funcall mhc-sync-read-passwd string))
 
 (mhc-db-setup mhc-schedule-file (mhc-summary-folder-to-path mhc-base-folder))
 (mhc-face-setup)
