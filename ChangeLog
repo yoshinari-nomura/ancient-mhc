@@ -1,3 +1,8 @@
+2002-09-07  Hideyuki SHIRAI  <shirai@quickhack.net>
+
+	* emacs/mhc-db.el (mhc-db-scan-todo): Support funny Todo so it has
+	no `day'. (TNX, Mr. MINABE Oki <minabe@kitanet.ne.jp>)
+
 2002-09-06  T.Tanaka <toc.tanaka@toshiba.co.jp>
 
 	* mhc2ol.in: Support `priority' feature.

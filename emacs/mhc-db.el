@@ -148,8 +148,8 @@ FROM, TO は 1970/01/01 からの経過日数を用いて指定"
 			   (mhc-db/get-sexp-list-for-month year month))
 			 day 'todo))
 		       (lambda (x y)
-			 (< (mhc-schedule-todo-deadline x)
-			    (mhc-schedule-todo-deadline y)))))
+			 (< (or (mhc-schedule-todo-deadline x) 22644) ;; 31-Dec-2031
+			    (or (mhc-schedule-todo-deadline y) 22644)))))
 		(lambda (a b)
 		  (if (and (null (car a)) (car b))
 		      nil
