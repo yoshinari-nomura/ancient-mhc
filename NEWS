@@ -2,7 +2,66 @@ MHC NEWS -- User-visible changes in MHC.
 
 * Changes in MHC 0.25
 
-Sorry, filled later...
+** Common changes within MHC.
+
+*** MHC changes its official name.
+    Now, MHC stands for Message Harmonized Calendaring system.
+
+*** MHC deals with location data.
+    MHC has X-SC-Location: field which keeps a location
+    such as meeting room.
+
+*** MHC becames to permit a time over 24:00. (ex. 26:00)
+
+** Changes in mhc (elisp) 
+
+*** Gnus is supported.
+    mhc now supports Mew, Wanderlust and Gnus.
+
+*** mhc has 3 month calendar like the calendar.el
+    Using the right space of summary buffer, mhc inserts
+    3-month mini calendar. C-ct toggles the insertion of it.
+
+*** Repository directory is now customizable.
+    In the previous version of mhc, the location for
+    schedule repository was fixed at ~/Mail/schedule/ and 
+    .schedule. Now, you can change it.
+
+*** Summary buffer can display a location in X-SC-Location:
+
+*** Faces in a summary buffer are now customizable.
+    (mhc-category-face-alist, mhc-symbol-face-alist)
+
+*** Some keybinds are changes. (C-c> , C-c<)
+    2 keybinds C-c> and C-c< are changed to C-cp and C-cn,
+    not to violate the minor-mode convention.
+
+*** mhc-import by C-c| becomes more convenient.
+    In case you import an article which already has X-SC-*: fields, 
+    mhc uses these values as defaults.
+
+*** M-p and M-n become wiser.
+    mhc becomes to have its own history alists.
+
+*** Date: input in mhc-import becomes easier.
+    For example, when you import `Conference from 2000-5-15 to 17th,'
+    you can newly use `-' like: 5/15-17.
+
+** Changes in other tools.
+
+*** gemcal is available on Windows9x platform.
+    But currently, gemcal cannot open an e-mail which corresponds a
+    schedule item, because of some problems of ruby-gtk for windows.
+
+*** mhc-sync is available.
+    mhc-sync synchronizes schedule articles among 2 machines via ssh.
+    You must do some preparations before beginning to use mhc-sync.
+    Please carefully read descriptions contained in the mhc-sync
+    script itself.
+
+*** palm2mhc now has interactive option -i.
+    Before import schedule articles from your Palm, palm2mhc 
+    makes some confirmations.
 
 * For details of changes, see the file ChangeLog.
 
