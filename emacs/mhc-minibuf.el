@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1999/12/10
-;; Revised: $Date: 2000/06/18 06:57:51 $
+;; Revised: $Date: 2000/06/18 09:59:07 $
 
 ;;;
 ;;; Commentay:
@@ -187,7 +187,7 @@
 ;;
 
 (defun mhc-minibuf-date-to-s (obj)
-  (mhc-date-format obj "%04d/%02d/%02d"))
+  (mhc-date-format obj "%04d/%02d/%02d" yy mm dd))
 
 (defun mhc-input-day (&optional prompt default candidate)
   (interactive)
