@@ -92,20 +92,21 @@
 
 (defun mhc-mew/schedule-foldermsg (schedule)
   (let ((path (mhc-record-name (mhc-schedule-record schedule))) fld-msg)
-    (setq fld-msg
-	  (if (and 
-	       path
-	       (string-match
-		(concat "^"
-			(regexp-quote (file-name-as-directory mhc-mail-path)))
-		path))
-	      (concat "+" (substring path (match-end 0)))
-	    (concat mhc-base-folder "/1970/01/0")))
-    (concat
-     "\r "
-     (directory-file-name (file-name-directory fld-msg))
-     " "
-     (file-name-nondirectory fld-msg))))
+    (if (and 
+	 path
+	 (string-match
+	  (concat "^"
+		  (regexp-quote (file-name-as-directory mhc-mail-path)))
+	  path))
+	(progn
+	  (setq fld-msg
+		(concat "+" (substring path (match-end 0))))
+	  (concat
+	   "\r "
+	   (directory-file-name (file-name-directory fld-msg))
+	   " "
+	   (file-name-nondirectory fld-msg)))
+      "")))
 
 
 (defun mhc-mew-insert-summary-contents (inserter)
