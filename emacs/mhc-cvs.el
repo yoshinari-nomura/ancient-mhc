@@ -166,7 +166,21 @@
   t) ; return value
 
 (defun mhc-cvs/delay-add-and-remove (directory)
-  (let ((entries (directory-files directory nil nil t)))
+  (let* ((entries (directory-files directory nil nil t))
+	 (dir-entries entries))
+    (while dir-entries
+      ;; オフライン状態の時に追加されたディレクトリを実際に追加する
+      (when (string-match (concat "^\\.mhc-cvs-added-\\(.*"
+				  (regexp-quote (cdr mhc-cvs-directory-separator))
+				  "\\)$")
+			  (car dir-entries))
+	(mhc-cvs/add (expand-file-name
+		      (mhc-cvs/recover-directory-separator
+		       (substring (car dir-entries)
+				  (match-beginning 1) (match-end 1)))
+		      directory))
+	(setq entries (delete (car dir-entries) entries)))
+      (setq dir-entries (cdr dir-entries)))
     (while entries
       (cond
        ;; オフライン状態の時に追加されたファイルを実際に追加する
@@ -222,7 +236,9 @@
 	(removed (mhc-cvs/get-removed-file-name filename)))
     (if (file-exists-p removed) (delete-file removed))
     (if offline
-	(not (copy-file filename added t))
+	(if (file-directory-p filename)
+	    (not (write-region "add directory" nil added nil 'nomsg))
+	  (not (copy-file filename added t)))
       (if (file-exists-p added) (delete-file added))
       (and (= 0 (mhc-cvs/backend "add" (mhc-cvs/shrink-file-name filename)))
 	   (mhc-cvs/modify filename)))))

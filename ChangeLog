@@ -1,3 +1,10 @@
+2000-11-02  Hideyuki SHIRAI  <shirai@quickhack.net>
+
+	* emacs/mhc-cvs.el (mhc-cvs/add): Use write-region() instead of
+	copy-file() when 'filename' is a directory.
+	(mhc-cvs/delay-add-and-remove): Check and add directory before
+	handling file.
+
 2000-10-30  Yoshinari Nomura  <nom@quickhack.net>
 
 	* mhc-sync.in (MhcScheduleDB#scan_all):
