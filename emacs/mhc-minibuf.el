@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1999/12/10
-;; Revised: $Date: 2002/10/15 12:02:22 $
+;; Revised: $Date: 2003/10/10 10:00:38 $
 
 ;;;
 ;;; Commentay:
@@ -18,6 +18,7 @@
 (defvar mhc-minibuf-candidate-offset    0)
 (defvar mhc-minibuf-candidate-overlay   nil)
 (defvar mhc-minibuf-candidate-buffer    nil)
+(defvar mhc-minibuf-candidate-delimiter nil)
 
 ;; (make-variable-buffer-local 'mhc-minibuf-candidate-to-s-func)
 ;; (make-variable-buffer-local 'mhc-minibuf-candidate-alist)
@@ -25,13 +26,15 @@
 ;; (make-variable-buffer-local 'mhc-minibuf-candidate-overlay)
 ;; (make-variable-buffer-local 'mhc-minibuf-candidate-buffer)
 
-(defun mhc-minibuf-read (&optional prompt default buffer cand offset to-s)
+(defun mhc-minibuf-read (&optional prompt default
+				   buffer cand offset to-s delimiter)
   (if mhc-minibuf-candidate-overlay
       (delete-overlay mhc-minibuf-candidate-overlay))
   (setq mhc-minibuf-candidate-buffer    buffer
 	mhc-minibuf-candidate-alist     cand
 	mhc-minibuf-candidate-offset    (or offset 0)
-	mhc-minibuf-candidate-to-s-func to-s)
+	mhc-minibuf-candidate-to-s-func to-s
+	mhc-minibuf-candidate-delimiter delimiter)
   (if cand
       (progn
 	(setq mhc-minibuf-candidate-overlay
@@ -141,16 +144,29 @@
 ;; minibuffer functions
 ;;
 
-(defun mhc-minibuf-delete-word ()
+;; (defun mhc-minibuf-delete-word ()
+;;   (delete-region
+;;    (save-excursion
+;;      (while (and (not (bobp))
+;; 		 (string-match "[0-9:/-]"
+;; 			       (buffer-substring
+;; 				(1- (point)) (point))))
+;;        (forward-char -1))
+;;      (point))
+;;    (point)))
+
+(defun mhc-minibuf-delete-word (&optional delimiter)
   (delete-region
    (save-excursion
      (while (and (not (bobp))
-		 (string-match "[0-9:/-]"
+		 (string-match (or delimiter "[0-9:/-]")
 			       (buffer-substring
 				(1- (point)) (point))))
        (forward-char -1))
      (point))
    (point)))
+
+
 
 (defun mhc-minibuf-move-candidate (offset &optional absolute non-minibuf)
   (if (not mhc-minibuf-candidate-alist)
@@ -180,7 +196,8 @@
 	  ;; (if (string-match "-" str)
 	  ;; (delete-region (point-min) (point-max))
 	  ;; (mhc-minibuf-delete-word))
-	  (mhc-minibuf-delete-word)
+	  (mhc-minibuf-delete-word
+	   mhc-minibuf-candidate-delimiter)
 	  (insert str))))))
 
 (defun mhc-minibuf-next-candidate ()
@@ -211,6 +228,14 @@
 	(concat
 	 (mhc-time-to-string time) "-" (mhc-time-to-string time2))
       (mhc-time-to-string time))))
+
+(defun mhc-minibuf/location-to-string (location-cons)
+  (let ((loc (car location-cons))
+	(loc2 (cdr location-cons)))
+    (if loc2
+	(concat
+	 (format "%s" loc) "-" (format "%s" loc2))
+      (format "%s" loc))))
 
 (defun mhc-input-day (&optional prompt default candidate)
   (interactive)
@@ -340,11 +365,19 @@
 
 (defvar mhc-location-hist nil)
 
+;; (defun mhc-input-location (&optional prompt default)
+;;   (interactive)
+;;   (read-from-minibuffer  (or prompt "Location: ")
+;; 			 (or default "")
+;; 			 nil nil 'mhc-location-hist))
+
 (defun mhc-input-location (&optional prompt default)
-  (interactive)
-  (read-from-minibuffer  (or prompt "Location: ")
-			 (or default "")
-			 nil nil 'mhc-location-hist))
+  (mhc-minibuf-read "Location: " nil
+		    (current-buffer)
+		    (mhc-guess-location)
+		    0
+		    (function mhc-minibuf/location-to-string)
+		    "[^ ]"))
 
 (defvar mhc-category-hist nil)
 

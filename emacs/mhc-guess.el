@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1999/04/13
-;; Revised: $Date: 2001/10/17 08:07:51 $
+;; Revised: $Date: 2003/10/10 10:00:38 $
 ;;
 
 ;;;
@@ -118,6 +118,15 @@
      mhc-guess/make-time-from-hhmm 1 2 5 7 6)
     ))
 
+(defvar mhc-guess-location-regexp-list
+  `(
+    (,(concat "場所[ 　]*[：:][\n 　]*\\([^\n 　]+\\)")
+     mhc-guess/make-location-from-string 1)
+    (,(concat "於[ 　]*\\([^\n 　]+\\)")
+     mhc-guess/make-location-from-string 1)
+    (,(concat "[＠@][ 　]*\\([^\n 　]+\\)")
+     mhc-guess/make-location-from-string 1)))
+
 ;; keyword to score-alist:
 ;;    each element consists of (regexp relative-boundary sameline? score)
 (defvar mhc-guess-keyword-score-alist
@@ -178,6 +187,9 @@
 (defun mhc-guess-time (&optional hint1)
   (mhc-guess/guess mhc-guess-time-regexp-list hint1))
 
+
+(defun mhc-guess-location (&optional hint1)
+  (mhc-guess/guess mhc-guess-location-regexp-list hint1))
 
 (defun mhc-guess/guess (control-regexp-lst &optional hint1 now)
   (let ((score-list
@@ -370,6 +382,13 @@
 	   ((string= mm-str "半")    30)
 	   (t                        (mhc-guess/string-to-int mm-str))))
       (mhc-time-new xHH xMM t))))
+
+;;
+;; make location from string
+;;
+
+(defun mhc-guess/make-location-from-string (now str)
+  (cons str nil))
 
 ;;
 ;; scoring
