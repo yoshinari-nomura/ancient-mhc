@@ -5,7 +5,7 @@
 ;;          MIYOSHI Masanori <miyoshi@quickhack.net>
 ;;
 ;; Created: 05/12/2000
-;; Reviesd: $Date: 2002/12/01 03:55:06 $
+;; Reviesd: $Date: 2003/01/21 03:39:19 $
 
 ;;; Configration Variables:
 
@@ -616,7 +616,8 @@ The keys that are defined for mhc-calendar-mode are:
     (goto-char (point-max))
     (insert "\n")
     (mhc-summary/insert-separator nil nil
-				  (* mhc-calendar-next-offset 3))
+				  (min (1- (window-width))
+				       (* mhc-calendar-next-offset 3)))
     (mhc-summary-make-contents date date 'mhc-calendar)
     (delete-char -1)
     (set-buffer-modified-p nil)))
@@ -668,9 +669,10 @@ The keys that are defined for mhc-calendar-mode are:
     (while (> i 0)
       (goto-char (point-min))
       (mhc-misc-move-to-column col)
-      (mhc-misc-insert-rectangle (mhc-calendar/make-rectangle caldate "|"))
+      (mhc-misc-insert-rectangle
+       (mhc-calendar/make-rectangle caldate (if (= i 3) "" "|")))
       (setq caldate (mhc-date-mm+ caldate 1))
-      (setq col (+ col mhc-calendar-next-offset))
+      (setq col (- (+ col mhc-calendar-next-offset) (if (= i 3) 1 0)))
       (setq i (1- i)))
     (goto-char (point-min))
     (while (re-search-forward prefix nil t)
@@ -688,7 +690,7 @@ The keys that are defined for mhc-calendar-mode are:
       (let ((cdate (mhc-date-let mhc-calendar-date (mhc-date-new yy mm 1)))
 	    beg end yymm dd)
 	(goto-char (point-min))
-	(while (re-search-forward "\\([ 123][0-9]\\)[ \n]" nil 'end)
+	(while (re-search-forward " \\([ 123][0-9]\\)[ \n]" nil 'end)
 	  (setq beg (match-beginning 1) end (match-end 1))
 	  (setq dd (1- (string-to-number (buffer-substring beg end))))
 	  (goto-char end)

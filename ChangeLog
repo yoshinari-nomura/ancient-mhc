@@ -1,3 +1,11 @@
+2003-01-21  Hideyuki SHIRAI  <shirai@quickhack.net>
+
+	* emacs/mhc-calendar.el (mhc-calendar/view-summary-insert): Don't
+	over window-width.
+	(mhc-calendar/create-buffer): Fit to 80colum display.
+	(mhc-calendar/put-property-date): Fix bug; don't put date
+	property to cw number.
+
 2003-01-08  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* emacs/mhc-mew.el (mhc-mew-summary-mode-setup): Set `vinfo-flds'
