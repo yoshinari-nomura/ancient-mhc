@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 2000/02/08
-;; Revised: $Date: 2000/07/19 01:29:45 $
+;; Revised: $Date: 2000/07/21 01:48:49 $
 
 ;;;
 ;;; Commentay:
@@ -37,9 +37,11 @@ refer to mhc-calendar-hnf-face-alist-internal.")
 ;; for necessary faces.
 
 (defconst mhc-symbol-face-alist-internal
-  '((mhc-calendar-face-saturday . (nil "blue"        nil))
+  '((mhc-calendar-face-default  . (nil nil           nil))
+    (mhc-calendar-face-saturday . (nil "blue"        nil))
     (mhc-calendar-face-sunday   . (nil "red"         nil))
     ;;
+    (mhc-summary-face-default   . (nil nil           nil))
     (mhc-summary-face-saturday  . (nil "blue"        nil))
     (mhc-summary-face-sunday    . (nil "red"         nil))
     (mhc-summary-face-today     . (nil "black"       "chocolate"))
@@ -129,9 +131,9 @@ refer to mhc-calendar-hnf-face-alist-internal.")
 ;; get decolated face from face and effect
 ;; ex. mhc-summary-face + today -> mhc-summary-face-today
 (defun mhc-face-get-effect (face effect)
-  (let ((new-face (intern (concat "mhc-effect-"
-				  (symbol-name face) "-"
-				  (symbol-name effect))))
+  (let ((new-face (intern (concat
+			   (symbol-name face) "-"
+			   (symbol-name effect))))
 	effect-list)
     (if (mhc-facep new-face)
 	()

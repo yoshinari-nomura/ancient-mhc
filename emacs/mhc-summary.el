@@ -459,7 +459,7 @@ PROP-VALUE is the property value correspond to PROP-TYPE.
   (and mhc-tmp-deadline
        (if (mhc-date= mhc-tmp-deadline mhc-tmp-day)
 	   'mhc-summary-face-sunday
-	 'default)))
+	 'mhc-summary-face-default)))
 
 
 (defun mhc-summary/line-parse-format (format spec-alist)
@@ -538,7 +538,7 @@ PROP-VALUE is the property value correspond to PROP-TYPE.
 			    'mhc-summary-face-sunday)
 			   ((eq (mhc-day-day-of-week mhc-tmp-dayinfo) 6)
 			    'mhc-summary-face-saturday)
-			   (t 'default)))
+			   (t 'mhc-summary-face-default)))
 	(pos (point)))
     (if (mhc-date= (mhc-day-date mhc-tmp-dayinfo) (mhc-date-now))
 	(setq mhc-tmp-day-face (mhc-face-get-today-face mhc-tmp-day-face)))

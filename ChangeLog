@@ -1,3 +1,16 @@
+2000-07-21  Hideyuki SHIRAI  <shirai@quickhack.net>
+
+	* emacs/mhc-face.el (mhc-symbol-face-alist-internal):
+	Add mhc-calendar-face-default and mhc-summary-face-default.
+	(mhc-face-get-effect): undo make new-face method to nom-san's way.
+
+	* emacs/mhc.el (mhc-cal-make-rectangle):
+	Use 'mhc-calendar-face-default face instead of 'default.
+
+	* emacs/mhc-summary.el (mhc-summary-line-insert):
+	Use 'mhc-summary-face-default face instead of 'default.
+	(mhc-summary-todo/line-deadline-face): Ditto.
+
 2000-07-19  Yoshinari Nomura  <nom@quickhack.net>
 
 	* emacs/mhc-cmail.el:
