@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1997/10/12
-;; Revised: $Date: 2000/06/12 11:24:56 $
+;; Revised: $Date: 2000/06/18 09:59:33 $
 
 ;;;
 ;;; Commentay:
@@ -40,6 +40,15 @@
 (defun mhc-misc-strip (str)
   (mhc-misc-sub 
    (mhc-misc-sub str "^[\t ]+" "") "[\t ]+$" ""))
+
+(defun mhc-misc-substring-to-int (str pos)
+  (cond
+   ((stringp str)
+    (string-to-int
+     (substring str (match-beginning pos) (match-end pos))))
+   (t
+    (string-to-int
+     (buffer-substring (match-beginning pos) (match-end pos))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; file & path
