@@ -1,9 +1,9 @@
 /* XPM */
 static char * prev_year_xpm[] = {
 /* columns rows colors chars-per-pixel */
-"18 10 3 1",
+"18 10 2 1",
 /*US*/
-" 	s None	c None",
+" 	c None",
 ".	c Brown",
 /* pixels */
 "      ...   ...   ",
