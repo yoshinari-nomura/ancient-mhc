@@ -124,7 +124,7 @@ this function."
       (setq x (length nnmhc-article-list)))
     (funcall inserter)
     (if x
-	(let ((header (mhc-gnus/make-full-mail-header x subject)))
+	(let ((header (mhc-gnus/make-full-mail-header x subject "")))
 	  (put-text-property pos (point) 'gnus-number x)
 	  (push (gnus-data-make x 0 0 header 0) gnus-newsgroup-data))
       (remove-text-properties pos (point) '(gnus-number nil)))
