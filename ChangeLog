@@ -1,80 +1,9 @@
-2000-06-02  Hideyuki SHIRAI  <shirai@rdmg.mgcs.mei.co.jp>
+2000-06-02  Yoshinari Nomura  <nom@quickhack.net>
 
-	* emacs/mhc-calendar.el (mhc-calendar-hnf-summary-insert): hnf's 'CAT' support.
+	* 00readme, 00readme.jis, emacs/00usage.jis:
+	Change ML address and Web address.
 
-2000-06-01  MIYOSHI Masanori  <miyoshi@ask.ne.jp>
-
-	* emacs/mhc-calendar.el (mhc-calendar-hnf-summary-insert): Avoid summary insertion when no heading is found.
-
-2000-06-01  Hideyuki SHIRAI  <shirai@rdmg.mgcs.mei.co.jp>
-
-	* emacs/mhc-calendar.el (mhc-calendar-hnf-face-setup): Do ditto mhc-face-setup.
-	(mhc-calendar-hnf-edit): Call hnf-initial-function like hns.
-	(mhc-calendar-hnf-mark-diary-entries): Fatal bug fix ^^;
-	(mhc-calendar-hnf-summary-insert): More colorful, but i have no knowledge of hnf.
-	
-2000-05-31  Hideyuki SHIRAI  <shirai@rdmg.mgcs.mei.co.jp>
-
-	* emacs/mhc.el (mhc-sync): New function.
-	Bind mhc-sync process coding-system. Ignore illegal passwd request.
-
-	* emacs/mhc-calendar.el: Display Hyper Nikki System's title in summary view.
-
-2000-05-31  Yuuichi Teranishi  <teranisi@quickhack.net>
-
-	* emacs/mhc.el (mhc-scan-month): 
-	Set `wl-summary-buffer-name' as local variable.
-
-	* icons: New directory.
-
-	* icons/Anniversary.xbm, icons/Anniversary.xpm, icons/Birthday.xbm,
-	icons/Birthday.xpm, icons/Business.xbm, icons/Business.xpm,
-	icons/Holiday.xbm, icons/Holiday.xpm, icons/Other.xbm,
-	icons/Other.xpm, icons/Private.xbm, icons/Private.xpm,
-	icons/Vacation.xbm, icons/Vacation.xpm: New files (Sample icons).
-
-	* emacs/mhc-xmas.el: Added copyright notice.
-
-	* emacs/mhc-bm.el: Ditto.
-
-	* emacs/mhc.el (toplevel): Require 'mhc-xmas on XEmacs.
-	Require 'mhc-bm if bitmap is installed.
-	(mhc-use-icon-p): New function.
-	(mhc-use-icon): New user option.
-	(mhc-icon-path): New user option.
-	(mhc-scan-month): Call `mhc-icon-setup' if `mhc-use-icon-p' returns t.
-	(mhc-sch-scan1): Display icon (Use `mhc-put-icon' and `mhc-get-icon').
-	(mhc-scan-month): Set `wl-summary-buffer-name' to avoid treating MHC
-	buffer as sticky.
-
-	* emacs/mhc-xmas.el: New module.
-
-	* emacs/mhc-bm.el: Ditto.
-
-2000-05-31  Hideyuki SHIRAI  <shirai@rdmg.mgcs.mei.co.jp>
-
-	* emacs/mhc-calendar.el: New file. MINI calender mode(like 'M-x calendar').
-
-	* emacs/mhc.el, mhc-minibuf.el: adapt to mhc-calendar.el 
-
-	* emacs/mhc-guess.el: tiny typo fix.
-
-2000-05-29  Yoshinari NOMURA  <nom@quickhack.net>
-
-	* 00readme.jis, 00todo.jis, emacs/00usage.jis,
-		  samples/DOT.schedule.sample.jp, 00readme: 
-	add cvs date indicator Date: in Revised: header.
-
-	* ruby-ext/lib/mhc-palm.rb, ruby-ext/lib/mhc-schedule.rb,
-		  ruby-ext/lib/mhc-signal.rb, emacs/mhc-guess.el,
-		  emacs/mhc-minibuf.el, emacs/mhc-misc.el,
-		  emacs/mhc-schedule.el, emacs/mhc.el, ruby-ext/00readme,
-		  ruby-ext/ext-helper.c, ruby-ext/ext-helper.h,
-		  ruby-ext/lib/mhc-date.rb, ruby-ext/lib/mhc-gtk.rb,
-		  ruby-ext/mhc_pilib.c, 00copyright, adb2mhc,
-		  emacs/mhc-date.el, emacs/mhc-face.el, gemcal, mhc-sync,
-		  mhc2palm, mscan, palm2mhc, today, today.pl: 
-	change copyright notices.
+2000-05-29  Yoshinari Nomura  <nom@quickhack.net>
 
 	* NEWS.jis, NEWS : info about 0.25.
 
