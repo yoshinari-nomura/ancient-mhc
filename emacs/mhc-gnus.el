@@ -76,7 +76,11 @@
 	 (method `(nnmhc ,group))
 	 (vgroup (gnus-group-prefixed-name group method)))
     ;; initialize ephemeral nnmhc group.
-    (gnus-group-read-ephemeral-group vgroup method t nil t)
+    (gnus-group-read-ephemeral-group vgroup method t
+				     (if (buffer-live-p gnus-summary-buffer)
+					 (cons gnus-summary-buffer 'summary)
+				       (cons (current-buffer) 'group))
+				     t)
     (gnus-group-read-group 0 t vgroup)
     (gnus-summary-make-local-variables)
     (setq inhibit-read-only t)

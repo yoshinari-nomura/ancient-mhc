@@ -1,3 +1,9 @@
+2000-06-13  MIYOSHI Masanori  <miyoshi@ask.ne.jp>
+
+	* emacs/mhc-gnus.el (mhc-gnus-generate-summary-buffer): Set
+	QUIT-CONFIG to ensure MHC to be called from a group buffer even if
+	there's no schedule.
+
 2000-06-12  Hideyuki SHIRAI  <shirai@rdmg.mgcs.mei.co.jp>
 
 	* emacs/mhc.el (toplevel): Require mhc-calendar, mhc-sync.
