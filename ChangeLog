@@ -3,12 +3,12 @@
 	* emacs/mhc-bm.el (mhc-bm-icon-alist): New variable.
 	(Renamed from mhc-bm-category-icon-alist.)
 	All other related portions are changed.
-	(toplevel): Put $Date: 2000/07/03 00:50:16 $ field.
+	(toplevel): Put CVS date keyword.
 
 	* emacs/mhc-xmas.el (mhc-xmas-icon-alist): New variable.
 	(Renamed from mhc-xmas-category-icon-alist.)
 	All other related portions are changed.
-	(toplevel): Put $Date: 2000/07/03 00:50:16 $ field.
+	(toplevel): Put CVS date keyword.
 
 	* emacs/mhc-summary.el (mhc-summary-line-format-alist):	Quote
 	PROP-TYPE.
