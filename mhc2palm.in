@@ -6,10 +6,13 @@
 ## Author:  Yoshinari Nomura <nom@quickhack.net>
 ##
 ## Created: 1999/10/08
-## Revised: $Date: 2000/07/14 06:59:50 $
+## Revised: $Date: 2000/07/18 12:21:51 $
 ##
 
 $DEBUG = false
+
+STDOUT .sync= true
+STDERR .sync= true
 
 require 'mhc-kconv'
 require 'mhc-palm'
@@ -22,6 +25,7 @@ usage: mhc2palm [-a | -i] [-n] [-d dev] [-r dir] [YYYYMMDD-yyyymmdd]
 
   mhc2palm -- Add/Copy mhc articles to a palm.
 
+    -v     : Verbose mode.
     -a     : Add mhc articles to a palm.
              all the original records of the palm will remain.
     -i     : Copy mhc articles into the palm.
@@ -47,14 +51,14 @@ def send_to_palm(pdb, p_rec_array)
   new_id_array = []
   p_rec_array .each{|p_rec|
     if new_id = pdb .write_record(p_rec)
-      print "(new_id = #{new_id}) "
+      print "(new_id = #{new_id}) " if $flag_verbose
       new_id_array << new_id
     else
-      print "write_error "
+      return nil # fail.
     end
   }
-  print "\n"
-  return new_id_array
+  print "\n"  if $flag_verbose
+  return new_id_array # success.
 end
 
 
@@ -62,18 +66,22 @@ end
 ## option check.
 ##
 
+$flag_verbose = false
 $flag_noharm, $flag_append, $flag_install = false, false, false
 $flag_device, $flag_from, $flag_to = '/dev/pilot', nil, nil
 $flag_dir = File .expand_path("~/Mail/schedule")
 
 while ARGV .length > 0
   case ARGV[0]
+  when '-v'
+    $flag_verbose = true
   when '-a'
     $flag_append  = true
   when '-i'
     $flag_install = true
   when '-n'
     $flag_noharm  = true
+    $flag_verbose = true
   when '-d'
     ARGV .shift
     $flag_device  = ARGV[0]
@@ -121,24 +129,39 @@ end
 ## Open mhc & copy to palm
 ##
 
+sch_count, sent = 0, 0
+
 mdb = MhcScheduleDB .new($flag_dir)
 mdb .each_sch($flag_from, $flag_to){|sch|
-  print "adding ", MhcKconv::todisp(sch .subject), "\n"
+  sch_count += 1
+
+  print "adding ", MhcKconv::todisp(sch .subject), "\n" if $flag_verbose
 
   if p_rec_array = sch .to_palm
-    print "    converted into #{p_rec_array .length} palm article(s)."
+    if $flag_verbose
+      print "    converted into #{p_rec_array .length} palm article(s)."
+    end
 
     if !$flag_noharm
-      print " sending to palm ...\n    "
-      send_to_palm(pdb, p_rec_array)
+      print " sending to palm ...\n    " if $flag_verbose
+      if (! (send_to_palm(pdb, p_rec_array) .nil?))
+	sent += 1
+	print "."
+      else
+	print MhcKconv::todisp("(#{sch .subject}) write_error\n")
+      end
     else
-      print " not sent.\n"
+      print " not sent.\n" if $flag_verbose
     end
   else
-    print "    failed to convert.\n"
+    print "failed to convert."
+    print MhcKconv::todisp("  subject: #{sch .subject}\n")
+    print "  first occured: #{sch .occur_min}\n"
+    print "  path: #{sch .path}\n"
   end
-  print "\n"
+  print "\n"  if $flag_verbose
 }
+print "\n#{sent}/#{sch_count} article(s) successfully sent.\n"
 
 ##
 ## close palm & exit
