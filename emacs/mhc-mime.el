@@ -3,7 +3,7 @@
 ;; Author:  Yuuichi Teranishi <teranisi@quickhack.net>
 ;;
 ;; Created: 2000/07/26
-;; Revised: $Date: 2000/07/28 00:28:06 $
+;; Revised: $Date: 2000/07/31 01:09:07 $
 
 ;;; Commentary:
 
@@ -26,7 +26,8 @@
 	mime-view-ignored-field-list)
     (with-current-buffer (get-buffer-create mhc-mime-import-buffer)
       (mime-view-buffer raw-buffer (current-buffer))
-      (mhc-highlight-message)
+      (let (buffer-read-only)
+	(mhc-highlight-message))
       (if get-original
 	  (cons raw-buffer (current-buffer))
 	(current-buffer)))))
