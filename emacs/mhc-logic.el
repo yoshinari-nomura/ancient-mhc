@@ -353,7 +353,7 @@
 			 (if and
 			     (if (= 1 (length and))
 				 (list (car and) t)
-			       (list (cons 'and (nreverse and)) t))))
+			       (list (cons 'and (reverse and)) t))))
 		       (mapcar (lambda (day)
 				 (if (consp day)
 				     `((mhc-logic/condition-day ,(car day)) nil)
