@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@mew.org>
 ;;
 ;; Created: 1994/07/04
-;; Revised: $Date: 2000/06/06 04:12:36 $
+;; Revised: $Date: 2000/06/06 06:08:18 $
 
 ;;;
 ;;; Commentay:
@@ -41,22 +41,32 @@
 (require 'mhc-face)
 (provide 'mhc)
 
-(defconst mhc-version "mhc version 0.25")
+(defconst mhc-version "mhc version 0.25pre4")
 
 (if (fboundp 'defgroup)
-    (defgroup mhc nil
-      "Various sorts of MH Calender."
-      :group 'mail))
+    (defalias 'mhc-defgroup 'defgroup)
+  (defmacro mhc-defgroup (symbol members doc &rest args) nil))
+(put 'mhc-defgroup 'lisp-indent-function 'defun)
 
 (if (fboundp 'defcustom)
-    (defcustom mhc-mailer-package 'mew
-      "*Variable to set your favorite mailer."
-      :group 'mhc
-      :type '(choice (const :tag "Mew" mew)
-		     (const :tag "Wanderlust" wl)
-		     (const :tag "Gnus" gnus)))
-  (defvar mhc-mailer-package 'mew) ;; select 'mew, 'wl or 'gnus
-  )
+    (defalias 'mhc-defcustom 'defcustom)
+  (defmacro mhc-defcustom (symbol value doc &rest args) 
+    (` (defvar (, symbol) (, value) (, doc)))))
+(put 'mhc-defcustom 'lisp-indent-function 'defun)
+
+;;; Configration Variables:
+(mhc-defgroup mhc
+  nil
+  "Various sorts of MH Calender."
+  :group 'mail)
+
+(mhc-defcustom mhc-mailer-package 'mew
+  "*Variable to set your favorite mailer."
+  :group 'mhc
+  :type '(radio (const :tag "Mew" mew)
+		(const :tag "Wanderlust" wl)
+		(const :tag "Gnus" gnus)))
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Menu setup
@@ -1129,7 +1139,7 @@ Returns t if the importation was succeeded."
 
 (defun mhc-cal-make-rectangle (&optional ddate)
   (interactive)
-  (let (last dd ww month sch dstr (i 0) (week "|"))
+  (let (last dd ww month sch dstr (i 0) (week "|") (update t) today color)
     (setq last (ddate-mm-last-day  (or ddate (ddate-now)))
 	  dd   (ddate-mm-first-day (or ddate (ddate-now)))
 	  ww   (ddate-ww dd)
@@ -1143,13 +1153,13 @@ Returns t if the importation was succeeded."
       (setq color
 	    (cond
 	     ((eq (ddate-ww dd) 0) 'mhc-calendar-face-sunday)
-	     ((mhc-db-holiday-p dd)
+	     ((mhc-db-holiday-p dd update)
 	      (mhc-face-category-to-face "Holiday"))
 	     ((eq (ddate-ww dd) 6) 'mhc-calendar-face-saturday)
 	     (t 'default)))
       (if (equal dd today)
 	  (setq color (mhc-face-get-gray-face color)))
-      (if (mhc-db-busy-p dd)
+      (if (mhc-db-busy-p dd update)
 	  (setq color (mhc-face-get-underline-face color)))
       (if (and (not (string= week "|")) (= (ddate-ww dd) 0))
 	  (setq month (cons week month)
@@ -1158,11 +1168,10 @@ Returns t if the importation was succeeded."
       (if color
 	  (mhc-face-put  dstr color))
       (setq week (concat week " " dstr))
+      (setq update nil)
       (setq dd (ddate-inc dd)))
     (setq month (cons week month))
-    (nreverse month)
-    ))
-
+    (nreverse month)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; misc.
