@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1994/07/04
-;; Revised: $Date: 2000/06/21 01:25:28 $
+;; Revised: $Date: 2000/06/21 09:10:25 $
 
 ;;;
 ;;; Commentay:
@@ -679,7 +679,6 @@ C-c ?    mhc-draft-insert-calendar
 	    (mhc-cal-make-rectangle (mhc-date-mm++ date))))))
 
 (defun mhc-cal-make-rectangle (&optional date)
-  (interactive)
   (let* ((today (mhc-date-now))
 	 (days (mhc-db-scan-month (mhc-date-yy (or date today))
 				  (mhc-date-mm (or date today)) t))
@@ -696,16 +695,15 @@ C-c ?    mhc-draft-insert-calendar
     (while days
       (setq color
 	    (cond
-	     ((= 0 (mhc-day-day-of-week (car days))) 'mhc-calendar-face-sunday)
+	     ((= 0 (mhc-day-day-of-week (car days)))
+	      'mhc-calendar-face-sunday)
 	     ((mhc-day-holiday (car days)) 
 	      (mhc-face-category-to-face "Holiday"))
 	     ((= 6 (mhc-day-day-of-week (car days))) 
 	      'mhc-calendar-face-saturday)
 	     (t 'default)))
-      (and (= (mhc-date-dd today) (mhc-day-day-of-month (car days)))
-	   (= (mhc-date-mm today) (mhc-day-month (car days)))
-	   (= (mhc-date-yy today) (mhc-day-year (car days)))
-	   (setq color (mhc-face-get-gray-face color)))
+      (if (mhc-date= today (mhc-day-date (car days)))
+	  (setq color (mhc-face-get-gray-face color)))
       (if (mhc-day-busy-p (car days))
 	  (setq color (mhc-face-get-underline-face color)))
       (setq week (cons (format "%2d" (mhc-day-day-of-month (car days)))

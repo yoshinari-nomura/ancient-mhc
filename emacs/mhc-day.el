@@ -18,11 +18,11 @@
 ;; follows:
 ;;
 ;;     MHC-DAY      ::= ( KEY . VALUE )
-;;     KEY          ::= ( YEAR MONTH DAY-OF-MONTH )
+;;     KEY          ::= DATE
+;;     VALUE        ::= [ YEAR MONTH DAY-OF-MONTH DAY-OF-WEEK HOLIDAY SCHEDULES ]
 ;;     YEAR         ::= integer, larger than 1900.
 ;;     MONTH        ::= integer, between 1 and 12.
 ;;     DAY-OF-MONTH ::= integer, between 1 and 31.
-;;     VALUE        ::= [ DAY-OF-WEEK HOLIDAY SCHEDULES ]
 ;;     DAY-OF-WEEK  ::= integer, between 0 and 6.
 ;;     HOLIDAY      ::= nil or t.  t stands for holiday.
 ;;     SCHEDULES    ::= MHC-SCHEDULE*
@@ -30,16 +30,15 @@
 
 ;;; Code:
 
-(require 'timezone)
-
-
 ;; Function and macros to manipulate MHC-DAY structure:
 
-(defun mhc-day-new (year month day-of-month &optional day-of-week holiday schedules)
+(defun mhc-day-new (date year month day-of-month &optional day-of-week holiday schedules)
   "Constructor of MHC-DAY structure."
-  (cons (list year month day-of-month)
-	(vector (or day-of-week
-		    (% (timezone-absolute-from-gregorian month year day-of-month) 7))
+  (cons date
+	(vector year
+		month
+		day-of-month
+		(or day-of-week (mhc-date-ww date))
 		holiday
 		schedules)))
 
@@ -48,23 +47,25 @@
 (defmacro mhc-day/value (dayinfo)
   `(cdr ,dayinfo))
 
+(defmacro mhc-day-date (dayinfo)
+  `(mhc-day/key ,dayinfo))
 (defmacro mhc-day-year (dayinfo)
-  `(car (mhc-day/key ,dayinfo)))
-(defmacro mhc-day-month (dayinfo)
-  `(nth 1 (mhc-day/key ,dayinfo)))
-(defmacro mhc-day-day-of-month (dayinfo)
-  `(nth 2 (mhc-day/key ,dayinfo)))
-(defmacro mhc-day-day-of-week (dayinfo)
   `(aref (mhc-day/value ,dayinfo) 0))
-(defmacro mhc-day-holiday (dayinfo)
+(defmacro mhc-day-month (dayinfo)
   `(aref (mhc-day/value ,dayinfo) 1))
-(defmacro mhc-day-schedules (dayinfo)
+(defmacro mhc-day-day-of-month (dayinfo)
   `(aref (mhc-day/value ,dayinfo) 2))
+(defmacro mhc-day-day-of-week (dayinfo)
+  `(aref (mhc-day/value ,dayinfo) 3))
+(defmacro mhc-day-holiday (dayinfo)
+  `(aref (mhc-day/value ,dayinfo) 4))
+(defmacro mhc-day-schedules (dayinfo)
+  `(aref (mhc-day/value ,dayinfo) 5))
 
 (defmacro mhc-day-set-holiday (dayinfo holiday)
-  `(aset (mhc-day/value ,dayinfo) 1 ,holiday))
+  `(aset (mhc-day/value ,dayinfo) 4 ,holiday))
 (defmacro mhc-day-set-schedules (dayinfo schedules)
-  `(aset (mhc-day/value ,dayinfo) 2 ,schedules))
+  `(aset (mhc-day/value ,dayinfo) 5 ,schedules))
 
 (defun mhc-day-day-of-week-as-string (dayinfo)
   "Return three letter code of the day of week."
@@ -79,30 +80,9 @@
 	    (throw 'busy t))
 	(setq schedules (cdr schedules))))))
 
-(defun mhc-day-today-p (dayinfo)
-  (let ((time (decode-time (current-time))))
-    (and
-     (eq (mhc-day-day-of-month dayinfo) (nth 3 time))
-     (eq (mhc-day-month dayinfo) (nth 4 time))
-     (eq (mhc-day-year dayinfo) (nth 5 time)))))
 
 
 ;; Utility functions:
-
-(defun mhc-day-encode-time (day) "\
-Convert DAY, as the number of days since 1970/01/01, \
-to the time expression of Emacs.
-Note: encode-time or current-time."
-  (let (high low)
-    ;; 整数が 28 bit の場合を考慮し、overflow しないよう小細工している
-    (setq high (/ (setq day (* day 24)) 65536)
-	  low (% day 65536))
-    (setq high (+ (* high 60) (/ (setq day (* low 60)) 65536))
-	  low (% day 65536))
-    (setq high (+ (* high 60) (/ (setq day (* low 60)) 65536))
-	  low (% day 65536))
-    (list high low 0)))
-
 
 (defmacro mhc-day-let (day &rest form) "\
 This special form converts DAY, as the number of days since

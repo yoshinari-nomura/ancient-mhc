@@ -236,6 +236,7 @@
      icon)))
 
 
+(defvar mhc-summary/today nil)
 
 (defun mhc-summary/insert-dayinfo-internal
   (dayinfo schedule mailer &optional require-date-string conflict secret)
@@ -247,18 +248,20 @@
 	  (setq icon (cdr contents))
 	  (setq contents (car contents))))
     (let ((week-color (cond
-		       ((mhc-schedule-in-category-p schedule "holiday")
-			'mhc-category-face-holiday)
 		       ((eq (mhc-day-day-of-week dayinfo) 0)
 			'mhc-summary-face-sunday)
+		       ((mhc-day-holiday dayinfo)
+			'mhc-category-face-holiday)
 		       ((eq (mhc-day-day-of-week dayinfo) 6)
 			'mhc-summary-face-saturday)))
-	  date day-of-week)
+	  date
+	  day-of-week)
       (if require-date-string
 	  (setq date (cons (format "%02d/%02d"
 				   (mhc-day-month dayinfo)
 				   (mhc-day-day-of-month dayinfo))
-			   (if (mhc-day-today-p dayinfo)
+			   (if (mhc-date= mhc-summary/today
+					  (mhc-day-date dayinfo))
 			       'mhc-summary-face-today
 			     week-color))
 		day-of-week (cons (mhc-day-day-of-week-as-string dayinfo)
@@ -315,6 +318,7 @@
 (defun mhc-summary-make-contents
   (from to mailer &optional category category-is-invert secret)
   (let ((dayinfo-list (mhc-db-scan from to)))
+    (setq mhc-summary/today (mhc-date-now))
     (while dayinfo-list
       (mhc-summary/insert-dayinfo
        (car dayinfo-list) mailer category category-is-invert secret)
