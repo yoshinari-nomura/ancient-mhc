@@ -1,3 +1,8 @@
+2002-02-07  Yuuichi Teranishi  <teranisi@gohome.org>
+
+	* emacs/mhc-wl.el (mhc-wl-summary-mode-setup): Setup
+	wl-message-buffer-prefetch-get-next-function.
+
 2002-02-02 ABE Yasushi <yasushi@stbbs.net> / nom@quickhack.net
 
 	* ruby-ext/lib/mhc-schedule.rb 

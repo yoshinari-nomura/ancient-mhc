@@ -195,6 +195,8 @@
 	      'mhc-wl-summary-next-message)
       (setq wl-summary-buffer-next-message-func 
 	    'mhc-wl-summary-next-message))
+    (make-local-variable 'wl-message-buffer-prefetch-get-next-function)
+    (setq wl-message-buffer-prefetch-get-next-function 'ignore)
     (setq wl-summary-buffer-target-mark-list '(nil))
     (setq wl-summary-buffer-number-regexp "[0-9]+")
     (setq wl-summary-buffer-folder-indicator (buffer-name))
