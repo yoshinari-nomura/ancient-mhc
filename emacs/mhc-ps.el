@@ -2,7 +2,7 @@
 
 ;; Author:  TSUCHIYA Masatoshi <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 ;; Created: 2000/06/18
-;; Revised: $Date: 2000/06/24 11:44:01 $
+;; Revised: $Date: 2000/06/26 01:18:21 $
 
 
 ;;; Commentary:
@@ -715,11 +715,11 @@ showpage
 
 
 (defun mhc-ps/substring (str width)
-  (let ((clist (mhc-string-to-list str))
+  (let ((clist (string-to-list str))
 	cw (i 0) (w 0) (ow 0) (spc (string-to-char " ")))
     (catch 'loop
       (while clist
-	(setq w (+ w (mhc-char-width (car clist))))
+	(setq w (+ w (char-width (car clist))))
 	(if (> w width) (throw 'loop nil))
 	(setq i (+ i (length (char-to-string (car clist)))))
 	(setq clist (cdr clist))))
@@ -735,20 +735,29 @@ showpage
 	 (setq subject (substring subject pos (match-beginning 0))))
     (setq subject (concat mstr subject))
     (cond
-     ((<= (mhc-string-width subject) mhc-ps-string-width)
+     ((<= (string-width subject) mhc-ps-string-width)
       (list subject))
      (mhc-ps-truncate-lines
-      (list (concat (mhc-ps/substring subject mhc-ps-string-width) "$")))
+      (setq subject (mhc-ps/substring subject mhc-ps-string-width))
+      (if (= (string-width subject) mhc-ps-string-width)
+	  (list subject)
+	(list (concat subject "$"))))
      (t
-      ;; folding, xxx FIX ME Kinsoku-syori?
-      (let (ret str)
-	(while (not (string= subject ""))
-	  (setq str (mhc-ps/substring subject mhc-ps-string-width))
-	  (setq ret (cons str ret))
-	  (if (string-match (concat "^" (regexp-quote str) "\\(.+\\)$") subject)
-	      (setq subject (concat mstr (substring subject (match-beginning 1))))
-	    (setq subject "")))
-	(nreverse ret))))))
+      (with-temp-buffer
+	(let ((fill-column mhc-ps-string-width)
+	      (left-margin margin)
+	      ret)
+	  (insert subject)
+	  ;; FIXME: fill-region は Emacs のバージョンによって動作がかなり
+	  ;; 異なっているので、違いを吸収する何らかの処置が必要。
+	  (fill-region (point-min) (point-max))
+	  (goto-char (point-min))
+	  (while (not (eobp))
+	    (setq ret (cons (buffer-substring
+			     (point) (progn (end-of-line) (point)))
+			    ret))
+	    (forward-line 1))
+	  (nreverse ret)))))))
 
 
 (defun mhc-ps/encode-string (string)

@@ -1,3 +1,12 @@
+2000-06-26  Hideyuki SHIRAI  <shirai@rdmg.mgcs.mei.co.jp>
+
+	* emacs/mhc-compat.el (mhc-string-width): Remove function. This defined by APEL.
+	(mhc-char-width): Ditto.
+	(mhc-string-to-list): Ditto.
+
+	* emacs/mhc-ps.el (mhc-ps/compose-subject): If mhc-ps-truncate-lines is nil
+	, use fill-region again.
+
 2000-06-24  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 
 	* emacs/mhc-ps.el (mhc-ps/encode-string): New function.
