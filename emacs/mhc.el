@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1994/07/04
-;; Revised: $Date: 2001/03/21 08:59:41 $
+;; Revised: $Date: 2001/05/28 01:01:18 $
 
 ;;;
 ;;; Commentay:
@@ -406,6 +406,7 @@ If HIDE-PRIVATE, private schedules are suppressed."
     (if mhc-default-hide-private-schedules
 	(not current-prefix-arg)
       current-prefix-arg)))
+  (move-to-column 1)
   (let ((line (+ (count-lines (point-min) (point))
 		 (if (= (current-column) 0) 1 0))))
     (mhc-scan-month (or (mhc-current-date-month) (mhc-date-now))
