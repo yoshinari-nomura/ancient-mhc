@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1999/04/13
-;; Revised: $Date: 2004/04/01 05:51:42 $
+;; Revised: $Date: 2004/10/28 08:39:10 $
 ;;
 
 ;;;
@@ -180,7 +180,7 @@ You can specify following symbols as a list.
 
 (defvar mhc-guess-location-regexp-list
   `(
-    (,(concat "場所[ 　]*[：:]*[\n 　]*\\([^\n 　]+\\)")
+    (,(concat "場[ 　]*所[ 　]*[：:]*[\n 　]*\\([^\n 　]+\\)")
      mhc-guess/make-location-from-string 1)
     (,(concat "於[ 　]*\\([^\n 　]+\\)")
      mhc-guess/make-location-from-string 1)
