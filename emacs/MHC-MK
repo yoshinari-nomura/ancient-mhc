@@ -3,7 +3,7 @@
 ;; Author:  TSUCHIYA Masatoshi <tsuchiya@pine.kuee.kyoto-u.ac.jp>,
 ;;          Yuuichi Teranishi <teranisi@quickhack.net>
 ;; Created: 2000/06/13
-;; Revised: $Date: 2000/07/28 00:28:06 $
+;; Revised: $Date: 2000/12/15 02:30:59 $
 
 ;;; Commentary:
 
@@ -72,6 +72,8 @@
     ("mhc-sync"     . t)
     ("mhc-vars"     . t)
     ("mhc-draft"    . t)
+    ("mhc-e21"      . (and (not (featurep 'xemacs))
+			   (>= emacs-major-version 21)))
     ("mhc-bm"       . (locate-library "bitmap"))
     ("mhc-xmas"     . (featurep 'xemacs))
     ("mhc-mew"      . (and (locate-library "mew") make-mhc/with-mew))

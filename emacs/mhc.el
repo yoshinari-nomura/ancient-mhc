@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1994/07/04
-;; Revised: $Date: 2000/10/10 01:05:36 $
+;; Revised: $Date: 2000/12/15 02:30:59 $
 
 ;;;
 ;;; Commentay:
@@ -42,6 +42,9 @@
 (require 'mhc-draft)
 
 (cond
+ ((eval-when-compile (and (not (featurep 'xemacs))
+			  (>= emacs-major-version 21)))
+  (require 'mhc-e21))
  ((eval-when-compile
     (condition-case nil
 	(require 'bitmap)

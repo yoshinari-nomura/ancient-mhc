@@ -3,7 +3,7 @@
 ;; Author:  Yuuichi Teranishi <teranisi@quickhack.net>
 ;;
 ;; Created: 2000/07/26
-;; Revised: $Date: 2000/12/14 10:39:55 $
+;; Revised: $Date: 2000/12/15 02:30:59 $
 
 ;;; Commentary:
 
@@ -21,7 +21,7 @@
 
 
 (defsubst mhc-mime-get-mime-structure ()
-  "Get raw buffer of the current message for `mhc-mime-get-import-buffer'."
+  "Get mime message structure of the current message."
   (let ((function (mhc-get-function 'mime-get-mime-structure)))
     (when function
       (funcall function))))

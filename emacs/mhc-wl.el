@@ -55,6 +55,11 @@
   (wl-message-get-original-buffer))
 
 
+(defun mhc-wl-mime-get-mime-structure ()
+  (wl-summary-set-message-buffer-or-redisplay)
+  (get-text-property (point) 'mime-view-entity))
+
+
 (defun mhc-wl-highlight-message (for-draft)
   (let ((wl-highlight-x-face-func (unless for-draft wl-highlight-x-face-func)))
     (wl-highlight-message (point-min) (point-max) t)))
@@ -151,6 +156,7 @@
 (put 'mhc-wl 'summary-mode-setup 'mhc-wl-summary-mode-setup)
 (put 'mhc-wl 'get-import-buffer 'mhc-mime-get-import-buffer)
 (put 'mhc-wl 'mime-get-raw-buffer 'mhc-wl-mime-get-raw-buffer)
+(put 'mhc-wl 'mime-get-mime-structure 'mhc-wl-mime-get-mime-structure)
 (put 'mhc-wl 'highlight-message 'mhc-wl-highlight-message)
 (put 'mhc-wl 'draft-setup-new 'mhc-mime-draft-setup-new)
 (put 'mhc-wl 'draft-reedit-buffer 'mhc-mime-draft-reedit-buffer)
