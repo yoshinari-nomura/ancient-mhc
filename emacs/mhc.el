@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@mew.org>
 ;;
 ;; Created: 1994/07/04
-;; Revised: $Date: 2000/06/12 15:09:45 $
+;; Revised: $Date: 2000/06/21 09:46:06 $
 
 ;;;
 ;;; Commentay:
@@ -41,7 +41,7 @@
 (require 'mhc-face)
 (provide 'mhc)
 
-(defconst mhc-version "mhc version 0.25pre4")
+(defconst mhc-version "mhc version 0.25")
 
 (if (fboundp 'defgroup)
     (defalias 'mhc-defgroup 'defgroup)
