@@ -434,8 +434,7 @@ If optional argument FOR-DRAFT is non-nil, Hilight message as draft message."
 
 (defvar mhc-summary/today nil)
 
-(defun mhc-summary/insert-dayinfo (mhc-tmp-dayinfo mailer category
-						   category-is-invert secret)
+(defun mhc-summary/insert-dayinfo (mhc-tmp-dayinfo mailer category-predicate secret)
   (let ((time-max -1)
 	(schedules (mhc-day-schedules mhc-tmp-dayinfo))
 	(mhc-tmp-first t)
@@ -450,12 +449,7 @@ If optional argument FOR-DRAFT is non-nil, Hilight message as draft message."
 			 t
 		       (not (mhc-schedule-in-category-p
 			     (car schedules) "todo")))
-		     (or (null category)
-			 (if category-is-invert
-			     (not (mhc-schedule-in-category-p
-				   (car schedules) category))
-			   (mhc-schedule-in-category-p
-			    (car schedules) category))))
+		     (funcall category-predicate (car schedules)))
 		(progn
 		  (setq mhc-tmp-begin (mhc-schedule-time-begin (car schedules))
 			mhc-tmp-end (mhc-schedule-time-end (car schedules))
@@ -489,19 +483,19 @@ If optional argument FOR-DRAFT is non-nil, Hilight message as draft message."
 
 
 (defun mhc-summary-make-contents
-  (from to mailer &optional category category-is-invert secret)
+  (from to mailer &optional category-predicate secret)
   (let ((dayinfo-list (mhc-db-scan from to)))
     (setq mhc-summary/today (mhc-date-now))
     (while dayinfo-list
       (mhc-summary/insert-dayinfo
-       (car dayinfo-list) mailer category category-is-invert secret)
+       (car dayinfo-list) mailer category-predicate secret)
       (and (eq (mhc-day-day-of-week (car dayinfo-list)) mhc-use-week-separator)
 	   (mhc-summary/insert-separator))
       (setq dayinfo-list (cdr dayinfo-list)))))
 
 
 (defun mhc-summary-make-todo-list
-  (day mailer &optional category category-is-invert secret)
+  (day mailer &optional category-predicate secret)
   (let ((schedules (mhc-db-scan-todo day))
 	(mhc-tmp-day day))
     (if schedules
@@ -513,12 +507,7 @@ If optional argument FOR-DRAFT is non-nil, Hilight message as draft message."
 	  (while schedules
 	    (if (and (if (mhc-schedule-in-category-p (car schedules) "done")
 			 mhc-todo-display-done t)
-		     (or (null category)
-			 (if category-is-invert
-			     (not (mhc-schedule-in-category-p
-				   (car schedules) category))
-			   (mhc-schedule-in-category-p
-			    (car schedules) category))))
+		     (funcall category-predicate (car schedules)))
 		(mhc-summary-insert-contents
 		 (car schedules)
 		 (and secret
