@@ -108,18 +108,23 @@ from 'month before last' to 'this month next year'."
 
 (defsubst mhc-cvs/backend (options)
   "指定されたオプションを付け加えて CVS を実行する関数"
-  (let ((buffer (mhc-get-buffer-create mhc-cvs/tmp-buffer-name))
-	(current-buffer (current-buffer)))
-    (unwind-protect
-	(progn
-	  (set-buffer buffer)
-	  (delete-region (point-min) (point-max))
-	  (let ((default-directory (file-name-as-directory mhc-cvs/default-directory))
-		(process-environment process-environment))
-	    (setenv "CVS_RSH" mhc-cvs-rsh)
-	    (apply #'call-process "cvs" nil t nil
-		   (append mhc-cvs-global-options options))))
-      (set-buffer current-buffer))))
+  (let* ((buffer (mhc-get-buffer-create mhc-cvs/tmp-buffer-name))
+	 (current-buffer (current-buffer))
+	 (ret
+	  (unwind-protect
+	      (progn
+		(set-buffer buffer)
+		(delete-region (point-min) (point-max))
+		(let ((default-directory (file-name-as-directory mhc-cvs/default-directory))
+		      (process-environment process-environment))
+		  (setenv "CVS_RSH" mhc-cvs-rsh)
+		  (apply #'call-process "cvs" nil t nil
+			 (append mhc-cvs-global-options options))))
+	    (set-buffer current-buffer))))
+    (if (numberp ret)
+	ret
+      (message "error: mhc-cvs/backend: %s" ret)
+      -1)))
 
 (defun mhc-cvs/open (&optional offline)
   "ネットワークの状態に依存する開始処理関数"

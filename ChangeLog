@@ -1,3 +1,8 @@
+2004-11-26  Yoichi NAKAYAMA  <yoichi@geiin.org>
+
+	* emacs/mhc-cvs.el (mhc-cvs/backend): Handle non-number return
+	value of call-process.
+
 2004-11-15  KOIE Hidetaka <hide@koie.org> / nom
 
 	* ruby-ext/mhc_pilib.c
