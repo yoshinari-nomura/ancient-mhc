@@ -141,10 +141,16 @@
 (defun mhc-file-sync ()
   "*Sync schedule files."
   (interactive)
-  (or mhc-file/offline
-      (prog1 (message "mhc file sync ...")
-	(mhc-file/sync)
-	(message "mhc file sync ... done."))))
+  (if mhc-file/offline
+      (message "\"M-x mhc-file-toggle-offline\" first.")
+    (message "mhc file sync ...")
+    (if (null (mhc-file/sync))
+	nil
+      (or (and (mhc-summary-buffer-p)
+	       (mhc-rescan-month mhc-default-hide-private-schedules))
+	  (and (mhc-calendar-p) (mhc-calendar-rescan)))
+      (message "mhc file sync ... done.")
+      t)))
 
 
 ;; almost same as (make-directory dirname t)

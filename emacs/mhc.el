@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1994/07/04
-;; Revised: $Date: 2000/08/03 13:23:03 $
+;; Revised: $Date: 2000/08/04 07:40:52 $
 
 ;;;
 ;;; Commentay:
@@ -73,6 +73,11 @@
 	["3 months Mini calendar" mhc-calendar t]
 	["Toggle 3 months calendar" mhc-calendar-toggle-insert-rectangle
 	 (mhc-summary-buffer-p)]
+	"----"
+	("Network"
+	 ["Online" mhc-file-toggle-offline mhc-file/offline]
+	 ["Offline" mhc-file-toggle-offline (not mhc-file/offline)]
+	 ["Sync" mhc-file-sync (not mhc-file/offline)])
 	"----"
 	("PostScript"
 	 ["Preview" mhc-ps-preview t]

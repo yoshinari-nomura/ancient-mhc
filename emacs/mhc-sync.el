@@ -63,11 +63,12 @@
     (message "another mhc-sync running.")
     nil)
    (t
-    (let ((buf (get-buffer-create "*mhc-sync*"))
+    (let ((buf (mhc-get-buffer-create " *mhc-sync*"))
 	  (ldir (expand-file-name (or mhc-sync-localdir "~/Mail/schedule"))))
+      (mhc-window-push)
       (pop-to-buffer buf)
       (setq buffer-read-only nil)
-      (delete-region (point-min) (point-max))
+      (erase-buffer)
       (setq buffer-read-only t)
       (message "mhc-sync ...")
       (setq mhc-sync/req-passwd t)
@@ -77,7 +78,15 @@
 		   (list "-x" mhc-sync-id "-r" ldir mhc-sync-remote)))
       (set-process-coding-system mhc-sync/process mhc-sync-coding-system)
       (set-process-filter mhc-sync/process 'mhc-sync/filter)
-      (set-process-sentinel mhc-sync/process 'mhc-sync/sentinel))
+      (set-process-sentinel mhc-sync/process 'mhc-sync/sentinel)
+      (if (featurep 'xemacs)
+	  (while mhc-sync/process
+	    (accept-process-output))
+	(while mhc-sync/process
+	  (sit-for 0.1)
+	  (discard-input)))
+      (sit-for 1)
+      (mhc-window-pop))
     t)))
 
 (defun mhc-sync/filter (process string)
@@ -106,9 +115,7 @@
     (let ((buffer-read-only nil))
       (goto-char (point-max))
       (insert "<<<transfer finish>>>")))
-  (setq mhc-sync/process nil)
-  (message "mhc-sync ... done."))
-
+  (setq mhc-sync/process nil))
 
 
 (provide 'mhc-sync)
