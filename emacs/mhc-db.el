@@ -40,7 +40,7 @@ FROM, TO は 1970/01/01 からの経過日数を用いて指定"
   (let (list new)
     (mhc-day-let from
       (let* ((day from)
-	     (week-of-month (/ (+ day-of-month day-of-week -8) 7))
+	     (week-of-month (/ (1- day-of-month) 7))
 	     ;; FIXME: mhc-date.el の内部関数を呼び出している。
 	     (last-day-of-month (mhc-date/last-day-of-month year month))
 	     (last-week (> 7 (- last-day-of-month day-of-month)))
@@ -67,8 +67,7 @@ FROM, TO は 1970/01/01 からの経過日数を用いて指定"
 		    last-day-of-month (mhc-date/last-day-of-month year month)
 		    sexp-list (mhc-db/get-sexp-list-for-month year month))
 	    ;; 週末毎の処理
-	    (if (zerop day-of-week)
-		(setq week-of-month (1+ week-of-month)))
+	    (setq week-of-month (/ (1- day-of-month) 7))
 	    (and (not last-week)
 		 (> 7 (- last-day-of-month day-of-month))
 		 (setq last-week t)))))
