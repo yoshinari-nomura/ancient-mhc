@@ -1,3 +1,19 @@
+2000-05-31  Yuuichi Teranishi  <teranisi@quickhack.net>
+
+	* emacs/mhc.el (toplevel): Require 'mhc-xmas on XEmacs.
+	Require 'mhc-bm if bitmap is installed.
+	(mhc-use-icon-p): New function.
+	(mhc-use-icon): New user option.
+	(mhc-icon-path): New user option.
+	(mhc-scan-month): Call `mhc-icon-setup' if `mhc-use-icon-p' returns t.
+	(mhc-sch-scan1): Display icon (Use `mhc-put-icon' and `mhc-get-icon').
+	(mhc-scan-month): Set `wl-summary-buffer-name' to avoid treating MHC
+	buffer as sticky.
+
+	* emacs/mhc-xmas.el: New module.
+
+	* emacs/mhc-bm.el: Ditto.
+
 2000-05-31  Hideyuki SHIRAI  <shirai@rdmg.mgcs.mei.co.jp>
 
 	* emacs/mhc-calendar.el: New file. MINI calender mode(like 'M-x calendar').
