@@ -5,9 +5,13 @@
 ;;          MIYOSHI Masanori <miyoshi@ask.ne.jp>
 ;;
 ;; Created: 05/12/2000
-;; Revised: 05/31/2000
+;; Revised: 06/01/2000
 
 (provide 'mhc-calendar)
+
+(condition-case nil
+    (require 'hnf-mode)
+  (error))
 
 (defcustom mhc-calendar-mode-hook nil
   "*Hook called in mhc-calendar-mode."
@@ -54,15 +58,18 @@
   :group 'mhc
   :type 'hook)
 
-(defvar mhc-calendar-hnf-face-alist
-  '((mhc-calendar-hnf-face-mark . (nil    "MediumSeaGreen" nil))
-    (mhc-calendar-hnf-face-tag  . (nil    "black" "paleturquoise"))
-    (mhc-calendar-hnf-face-new  . (bold   "DarkGreen" nil))
-    (mhc-calendar-hnf-face-uri  . (italic "blue" nil)))
+(defvar mhc-calendar-hnf-face-alist nil
   "*Alist of HNS faces. Each element should have the form
-  (FACE-SYMBOL . (PARENT FG BG UNDERLINED FONT STIPPLE)).")
+  (FACE-SYMBOL . (PARENT FG BG UNDERLINED FONT STIPPLE)).
+refer to mhc-calendar-hnf-face-alist-internal.")
 
 ;; internal variables
+(defconst mhc-calendar-hnf-face-alist-internal
+  '((mhc-calendar-hnf-face-mark . (nil    "MediumSeaGreen" nil))
+    (mhc-calendar-hnf-face-tag  . (italic "red" "paleturquoise"))
+    (mhc-calendar-hnf-face-new  . (bold   "DarkGreen" nil))
+    (mhc-calendar-hnf-face-uri  . (italic "blue" nil))))
+
 (defvar mhc-calendar-buffer "*mhc-calendar*")
 (defvar mhc-calendar-ddate '(1 1 1))
 (defvar mhc-calendar-view-ddate '(1 1 1))
@@ -254,7 +261,8 @@ The keys that are defined for mhc-calendar-mode are:
   (mhc-calendar-goto-day (or ddate (mhc-current-ddate) (ddate-now))))
 
 (defun mhc-calendar-goto-day (ddate)
-  (let (pos)
+  (let ((mhc-calendar-view-summary nil)
+	pos)
     (if (not (get-buffer mhc-calendar-buffer))
 	(mhc-calendar-create-buffer ddate))
     (set-buffer (get-buffer mhc-calendar-buffer))
@@ -264,16 +272,16 @@ The keys that are defined for mhc-calendar-mode are:
 				     'mhc-calendar-day-prop ddate))
       (or pos (mhc-calendar-create-buffer ddate)))
     (goto-char (1+ pos))
-    (setq mhc-calendar-view-ddate ddate)
-    (save-excursion
-      (mhc-calendar-view-summary-delete)
-      (if mhc-calendar-view-summary
-	  (progn
-	    (mhc-calendar-view-summary-insert)
-	    (if mhc-calendar-link-hnf
-		(mhc-calendar-hnf-summary-insert))
-	    (mhc-calendar-put-property-summary))))
-    (mhc-calendar-shrink-window)))
+    (setq mhc-calendar-view-ddate ddate))
+  (save-excursion
+    (mhc-calendar-view-summary-delete)
+    (if mhc-calendar-view-summary
+	(progn
+	  (mhc-calendar-view-summary-insert)
+	  (if mhc-calendar-link-hnf
+	      (mhc-calendar-hnf-summary-insert))
+	  (mhc-calendar-put-property-summary))))
+  (mhc-calendar-shrink-window))
 
 (defun mhc-calendar-tp-any (beg end prop value)
   "Modify text-property-any use 'equal' instated 'eq'."
@@ -322,13 +330,10 @@ The keys that are defined for mhc-calendar-mode are:
   (or (one-window-p t)
       (/= (frame-width) (window-width))
       (let ((winh (+ (count-lines (point-min) (point-max))
-		     (if (and (featurep 'xemacs) window-system) 4 1)))
-	    (half (/ (- (frame-height) 2) 2)))
+		     (if (and (featurep 'xemacs) window-system) 4 1))))
 	(cond
 	 ((< winh mhc-calendar-height)
 	  (setq winh mhc-calendar-height))
-	 ((> winh half)
-	  (setq winh half))
 	 ((< winh window-min-height)
 	  (setq winh window-min-height)))
 	(shrink-window (- (window-height) winh)))))
@@ -571,7 +576,11 @@ The keys that are defined for mhc-calendar-mode are:
 
 (defun mhc-calendar-day-position ()
   (interactive)
-  (mhc-calendar-goto-day (mhc-calendar-get-ddate)))
+  (mhc-calendar-goto-day (mhc-calendar-get-ddate))
+  (let ((pos (point)))
+    (goto-char (point-min))
+    (sit-for 0)
+    (goto-char pos)))
 
 (defun mhc-calendar-next-day (&optional arg)
   (interactive "p")
@@ -822,8 +831,12 @@ The keys that are defined for mhc-calendar-mode are:
 (defun mhc-calendar-hnf-edit ()
   (interactive)
   (if mhc-calendar-link-hnf
-      (find-file-other-window
-       (mhc-calendar-hnf-get-filename (mhc-calendar-get-ddate)))))
+      (let (find-file-not-found-hooks)
+	(if (functionp hnf-initial-function) ;; hns-mode require APEL :-)
+	    (add-hook 'find-file-not-found-hooks
+		      '(lambda () (funcall hnf-initial-function))))
+	(find-file-other-window
+	 (mhc-calendar-hnf-get-filename (mhc-calendar-get-ddate))))))
 
 (defun mhc-calendar-hnf-view ()
   (interactive)
@@ -837,12 +850,12 @@ The keys that are defined for mhc-calendar-mode are:
 	(edate (ddate-mm-last-day (ddate-mm-inc mhc-calendar-ddate)))
 	(flst (mhc-calendar-hnf-file-list mhc-calendar-ddate))
 	(mark "'") (spcchar (string-to-char " ")))
-    (put-text-property 0 (length mark) 'face 'mhc-calendar-hnf-face-mark mark)
+    (mhc-face-put mark 'mhc-calendar-hnf-face-mark)
     (while (ddate<= cdate edate)
       (if (member (format "d%s.hnf" (ddate-to-s cdate)) flst)
 	  (progn
-	    (mhc-calendar-goto-day cdate)
-	    (goto-char (1+ (point)))
+	    (goto-char (+ 2 (mhc-calendar-tp-any (point-min) (point-max)
+						 'mhc-calendar-day-prop cdate)))
 	    (insert mark)
 	    (if (eq (char-after (point)) spcchar)
 		(delete-char 1))))
@@ -852,30 +865,37 @@ The keys that are defined for mhc-calendar-mode are:
   (let* ((ddate mhc-calendar-view-ddate)
 	 (fname (mhc-calendar-hnf-get-filename ddate))
 	 (buffer-read-only nil)
-	 (header "HNS:")
-	 summary str uri)
+	 (headmark "#")
+	 (i 1)
+	 header summary str uri)
     (if (not (file-readable-p fname))
 	()
-      (put-text-property 0 (length header) 'face 'mhc-calendar-hnf-face-tag header)
       (goto-char (point-max))
       (insert "\n")
       (insert
        (with-temp-buffer ;; hnf-mode.el require APEL :-)
-	 (setq header (concat "     " header " "))
 	 (insert-file-contents fname)
 	 (goto-char (point-min))
 	 (while (not (eobp))
-	   (cond
+	   (cond  ;; NEW, LNEW adhoc suport
 	    ((looking-at "^NEW[ \t]+\\(.*\\)$")
 	     (setq str (buffer-substring (match-beginning 1) (match-end 1)))
-	     (put-text-property 0 (length str) 'face 'mhc-calendar-hnf-face-new str)
-	     (setq summary (concat summary header str "\n")))
-	    ((looking-at "^LNEW[ \t]+\\([^ \t]+\\)[ \t]+\\(.*\\)$") ;; adhoc uri cut
-	     (setq uri (concat "<" (buffer-substring (match-beginning 1) (match-end 1)) ">"))
+	     (mhc-face-put str 'mhc-calendar-hnf-face-new)
+	     (setq header (format "%s%d" headmark i))
+	     (mhc-face-put header 'mhc-calendar-hnf-face-tag)
+	     (setq i (1+ i))
+	     (setq summary (concat summary "     " header " " str "\n")))
+	    ((looking-at "^LNEW[ \t]+\\([^ \t]+\\)[ \t]+\\(.*\\)$")
+	     (setq uri (concat "<"
+			       (buffer-substring (match-beginning 1) (match-end 1))
+			       ">"))
+	     (mhc-face-put uri 'mhc-calendar-hnf-face-uri)
 	     (setq str (buffer-substring (match-beginning 2) (match-end 2)))
-	     (put-text-property 0 (length uri) 'face 'mhc-calendar-hnf-face-uri uri)
-	     (put-text-property 0 (length str) 'face 'mhc-calendar-hnf-face-new str)
-	     (setq summary (concat summary header str " " uri "\n"))))
+	     (mhc-face-put str 'mhc-calendar-hnf-face-new)
+	     (setq header (format "%s%d" headmark i))
+	     (mhc-face-put header 'mhc-calendar-hnf-face-tag)
+	     (setq i (1+ i))
+	     (setq summary (concat summary "     " header " " str " " uri "\n"))))
 	   (forward-line))
 	 (put-text-property 0 (length summary) 'mhc-calendar-summary-hnf-prop t summary)
 	 summary))
@@ -888,16 +908,7 @@ The keys that are defined for mhc-calendar-mode are:
     (if (or ow (not (mhc-facep 'mhc-calendar-hnf-face-mark)))
 	(progn
 	  (mhc-face-setup-internal mhc-calendar-hnf-face-alist ow)
-	  ;; xxx
-	  (or (mhc-facep 'mhc-calendar-hnf-face-mark)
-	      (copy-face 'default 'mhc-calendar-hnf-face-mark))
-	  (or (mhc-facep 'mhc-calendar-hnf-face-tag)
-	      (copy-face 'default 'mhc-calendar-hnf-face-tag))
-	  (or (mhc-facep 'mhc-calendar-hnf-face-new)
-	      (copy-face 'default 'mhc-calendar-hnf-face-new))
-	  (or (mhc-facep 'mhc-calendar-hnf-face-uri)
-	      (copy-face 'default 'mhc-calendar-hnf-face-uri))))))
-
+	  (mhc-face-setup-internal mhc-calendar-hnf-face-alist-internal nil)))))
 
 ;;; Copyright Notice:
 
