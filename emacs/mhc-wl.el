@@ -93,8 +93,6 @@
   (wl-summary-buffer-set-folder (mhc-wl/ddate-to-folder ddate))
   (make-local-variable 'wl-summary-highlight)
   (setq wl-summary-highlight nil)
-  (make-local-variable 'wl-summary-buffer-name)
-  (setq wl-summary-buffer-name (buffer-name))
   (setq wl-summary-buffer-number-regexp "[0-9]+")
   (setq wl-summary-buffer-msgdb '(nil)))
 
