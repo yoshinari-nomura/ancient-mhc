@@ -1,3 +1,11 @@
+2003-07-28  MIYOSHI Masanori  <miyoshi@boreas.dti.ne.jp>
+
+	* mhc2ol.in (Period.initialize): Carry over schedules which are
+	later than 24:00.
+	(Period.get_time): New method.
+	(Exporter.setup_ol_appointments): Derive stime and etime out of
+	period instead of sch.
+
 2003-06-16  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* emacs/mhc-file.el (mhc-file-make-directory): Remove trailing

@@ -8,7 +8,7 @@
 ##          
 ##
 ## Created: 2001/09/15
-## Revised: $Date: 2003/04/28 02:32:20 $
+## Revised: $Date: 2003/07/28 13:47:55 $
 ##
 
 $DEBUG = false
@@ -27,6 +27,22 @@ end
 module RepeatPattern
   class Period
     def initialize(sdate, edate, stime, etime)
+      if stime
+	v = stime .to_a()
+	if v[0] >= 24
+	  stime = MhcTime .new(v[0] - 24, v[1])
+	  sdate = sdate .succ(1)
+	end
+      end
+
+      if etime
+	v = etime . to_a()
+	if v[0] >= 24
+	  etime = MhcTime .new(v[0] - 24, v[1])
+	  edate = edate .succ(1)
+	end
+      end
+
       @sdate = sdate
       @edate = edate
       @stime = stime
@@ -43,6 +59,10 @@ module RepeatPattern
       else
 	60 * 24
       end
+    end
+
+    def get_time()
+      [@stime, @etime]
     end
 
     def handle_recurrence(ol_appoint)
@@ -417,7 +437,7 @@ class Exporter
       print "Time: ", sch .time_as_string(), "\n" if @@flag_verbose
       print "Path: ", sch .path(), "\n" if @@flag_verbose
 	
-      stime, etime = sch .time()
+      stime, etime = period .get_time()
       sdate += " " + stime .to_s if sdate && stime
       etime_tmp = if etime then etime else stime end
       edate += " " + etime_tmp .to_s if edate && etime_tmp
