@@ -1,3 +1,21 @@
+2002-01-08  Yuuichi Teranishi  <teranisi@gohome.org>
+
+	* emacs/mhc-wl.el (mhc-wl-summary-exit): Delete other windows
+	if exit buffer is folder mode.
+
+2001-12-25  Yuuichi Teranishi  <teranisi@gohome.org>
+
+	* emacs/mhc.el (mhc-minibuf): Changed order of `require'.
+
+	* emacs/mhc-wl.el (mhc-wl-summary-filename): Cause an error when
+	no message exists on buffer.
+
+	* emacs/mhc-e21.el (mhc-input-category): Define with
+	`completing-read-multiple'.
+
+	* emacs/mhc-minibuf.el (mhc-input-category): Define only when
+	it is not defined.
+
 2001-10-30  MIYOSHI Masanori  <miyoshi@boreas.dti.ne.jp>
 
 	* emacs/mhc.el: Use bitmap-mule on NTEmacs21.

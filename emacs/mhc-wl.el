@@ -140,7 +140,10 @@
       (if (get-buffer-window buffer)
 	  (unless (eq (current-buffer) buffer)
 	    (delete-window)))
-      (switch-to-buffer buffer))))
+      (switch-to-buffer buffer)
+      (if (eq (with-current-buffer buffer major-mode)
+	      'wl-folder-mode)
+	  (delete-other-windows)))))
 
 
 (defun mhc-wl-summary-next-message (num direction hereto)
