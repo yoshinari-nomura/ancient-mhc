@@ -2,19 +2,52 @@
 
 ;; Author:  TSUCHIYA Masatoshi <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 ;; Created: 2000/06/18
-;; Revised: $Date: 2000/06/18 15:58:36 $
+;; Revised: $Date: 2000/06/19 01:03:51 $
 
 
 ;;; Commentary:
 
 ;; This file is a part of MHC and includes functions to make
-;; PoscScrpit calendar.
+;; PostScrpit calendar.
 
 
 ;;; History:
 
-;; FIXME: 元々の PoscScrpit プログラムの著作者の変遷と、それを sh
-;; script に直した人の記述を追加すること。
+;; Original PostScript program was written
+;; by Patrick Wood <patwood@unirot.UUCP> in 1987.
+;;
+;; Shell stuff added by King Ables at Sep 3, 1987.
+;;
+;; Made pretty by tjt in 1988.
+;;
+;; Holiday and printer flag passing hacks added by
+;; smann@june.cs.washington.edu in Dec 1988.
+;;
+;; Used the better looking version with 5 rows of days rather than 6
+;; hacked together with holiday and banner/footnotes added
+;; by Joe Wood <jlw@lzga.ATT.COM> in Dec 1989.
+;;
+;; Fixed "-R" (didn't work at all; now it at least works on 8.5x11)
+;; and also fixed handling of unrecognized arguments
+;; by Jeff Mogul <mogul@decwrl.dec.com> in Jan 1990.
+;;
+;; Japanized and improved handling holidays
+;; by SUZUKI Shingo <ichimal@takopen.cs.uec.ac.jp> in Feb 2000.
+;;
+;; Rewritten stuffs with Emacs Lisp
+;; by TSUCHIYA Masatoshi <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+;; in Jun 2000.
+
+
+;;; Bugs:
+
+;; This program doesn't work for months before 1753 (weird stuff
+;; happened in September, 1752).
+
+
+;;; Code:
+
+(require 'mhc)
 
 
 ;;; Customize variables:
@@ -666,7 +699,6 @@ showpage
     ("@TRANSLATE@" . (if mhc-ps-paper-type "50 -120" "50 900"))))
 
 
-;;; Code:
 
 (defsubst mhc-ps/schedule-to-string (dayinfo schedule)
   (let ((begin (mhc-schedule-time-begin schedule))
@@ -723,6 +755,27 @@ showpage
       (buffer-substring (point-min) (point-max)))))
 
 
+(defun mhc-ps/start-process (command arguments year month category category-is-invert)
+  (mhc-setup)
+  (let ((contents
+	 (mhc-ps/make-contents year month category category-is-invert)))
+    (if contents
+	(let ((process
+	       (apply (function start-process)
+		      (format "mhc-ps-%s" command)
+		      (mhc-get-buffer-create (format " *mhc-ps-%s*" command))
+		      command
+		      arguments)))
+	  (if (fboundp 'set-process-coding-system)
+	      (set-process-coding-system
+	       process mhc-ps-coding-system mhc-ps-coding-system)
+	    (set-process-input-coding-system process mhc-ps-coding-system)
+	    (set-process-output-coding-system process mhc-ps-coding-system))
+	  (process-send-string process contents)
+	  (process-send-eof process)))))
+
+
+;;;###autoload
 (defun mhc-ps-preview (year month &optional category category-is-invert)
   "*Preview PostScript calendar."
   (interactive
@@ -733,23 +786,15 @@ showpage
       (mhc-date-mm date)
       (cdr category)
       (car category))))
-  (let ((contents
-	 (mhc-ps/make-contents year month category category-is-invert)))
-    (if contents
-	(let ((process
-	       (apply (function start-process)
-		      "mhc-ps-preview"
-		      (mhc-get-buffer-create " *mhc-ps-preview*")
-		      mhc-ps-preview-command
-		      mhc-ps-preview-command-arguments)))
-	  (if (fboundp 'set-process-coding-system)
-	      (set-process-coding-system process mhc-ps-coding-system mhc-ps-coding-system)
-	    (set-process-input-coding-system process mhc-ps-coding-system)
-	    (set-process-output-coding-system process mhc-ps-coding-system))
-	  (process-send-string process contents)
-	  (process-send-eof process)))))
+  (mhc-ps/start-process mhc-ps-preview-command
+			mhc-ps-preview-command-arguments
+			year
+			month
+			category
+			category-is-invert))
 
 
+;;;###autoload
 (defun mhc-ps-print (year month &optional category category-is-invert)
   "*Print PostScript calendar."
   (interactive
@@ -760,27 +805,26 @@ showpage
       (mhc-date-mm date)
       (cdr category)
       (car category))))
-  (let ((contents
-	 (mhc-ps/make-contents year month category category-is-invert)))
-    (if contents
-	(let ((process
-	       (apply (function start-process)
-		      "mhc-ps-print"
-		      (mhc-get-buffer-create " *mhc-ps-print*")
-		      mhc-ps-print-command
-		      mhc-ps-print-command-arguments)))
-	  (if (fboundp 'set-process-coding-system)
-	      (set-process-coding-system process mhc-ps-coding-system mhc-ps-coding-system)
-	    (set-process-input-coding-system process mhc-ps-coding-system)
-	    (set-process-output-coding-system process mhc-ps-coding-system))
-	  (process-send-string process contents)
-	  (process-send-eof process)))))
-
+  (mhc-ps/start-process mhc-ps-print-command
+			mhc-ps-print-command-arguments
+			year
+			month
+			category
+			category-is-invert))
 
 
 (provide 'mhc-ps)
 
-;;; Copyright Notice:
+
+;;; Copyright Notice of the PostScript programs.
+
+;; Copyright (C) 1987 by Pipeline Associates, Inc.
+;; Copyright (C) 2000 by SUZUKI Shingo <ichimal@takopen.cs.uec.ac.jp>.
+
+;; Permission is granted to modify and distribute this free of charge.
+
+
+;;; Copyright Notice of the Emacs Lisp programs.
 
 ;; Copyright (C) 2000 MHC developing team. All rights reserved.
 
