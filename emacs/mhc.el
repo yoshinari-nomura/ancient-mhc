@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1994/07/04
-;; Revised: $Date: 2000/06/28 01:31:15 $
+;; Revised: $Date: 2000/06/28 02:22:47 $
 
 ;;;
 ;;; Commentay:
@@ -286,7 +286,8 @@ If HIDE-PRIVATE, private schedules are suppressed."
 	  (mhc-summary-mode-setup date mailer)
 	  (mhc-mode 1)
 	  (setq inhibit-read-only nil)
-	  (setq buffer-read-only t)))
+	  (setq buffer-read-only t)
+	  (set-buffer-modified-p nil)))
     (message (mhc-date-format date "Scanning %04d/%02d ... done." yy mm))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
