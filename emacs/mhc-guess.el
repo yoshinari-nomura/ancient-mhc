@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1999/04/13
-;; Revised: $Date: 2000/06/23 08:29:17 $
+;; Revised: $Date: 2000/07/04 00:44:02 $
 ;;
 
 ;;;
@@ -59,15 +59,15 @@
 
 (defvar mhc-guess-date-regexp-list
   '(
-    ("\\(\\([来今０-９0-9]+\\)[\n ]*月\\)[\n ]*の?[\n ]*\\([０-９0-9]+\\)"
+    ("\\(\\([来今０-９0-9]+\\)[\n　 ]*月\\)[\n 　]*の?[\n 　]*\\([０-９0-9]+\\)"
      mhc-guess/make-date-from-mmdd 2 3)
-    ("\\([０-９0-9]+\\) *[／/] *\\([０-９0-9]+\\)"
+    ("\\([０-９0-9]+\\)[　 ]*[／/][　 ]*\\([０-９0-9]+\\)"
      mhc-guess/make-date-from-mmdd 1 2)
     throw
-    ("\\(今度\\|[今来次]週\\|再来週\\)[\n ]*の?[\n ]*\\([月火水木金土日]\\)曜"
+    ("\\(今度\\|[今来次]週\\|再来週\\)[\n 　]*の?[\n 　]*\\([月火水木金土日]\\)曜"
      mhc-guess/make-date-from-relative-week 1 2)
     throw
-    ("\\([０-９0-9]+\\)[\n ]*日"
+    ("\\([０-９0-9]+\\)[\n 　]*日"
      mhc-guess/make-date-from-mmdd nil 1)
     ("\\([月火水木金土日]\\)\n?曜"
      mhc-guess/make-date-from-relative-week nil 1)

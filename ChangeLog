@@ -1,3 +1,13 @@
+2000-07-04  Yuuichi Teranishi  <teranisi@quickhack.net>
+
+	* emacs/mhc-guess.el (mhc-guess-date-regexp-list): Added workaround
+	for zenkaku-space.
+
+	* emacs/mhc-wl.el (mhc-wl-exit-buffer): New buffer local variable.
+	(mhc-wl-generate-summary-buffer): Set `mhc-wl-exit-buffer'.
+	(mhc-wl-summary-exit): New function.
+	(toplevel): Eliminated `summary-search-date' setting.
+
 2000-07-04  MIYOSHI Masanori  <miyoshi@hrl.hitachi.co.jp>
 
 	* emacs/00usage.jis: Fix a typo.

@@ -86,6 +86,16 @@
 		   mm))
 
 
+(defvar mhc-wl-exit-buffer nil)
+(make-variable-buffer-local 'mhc-wl-exit-buffer)
+
+
+(defun mhc-wl-summary-exit ()
+  (kill-buffer (current-buffer))
+  (if mhc-wl-exit-buffer
+      (switch-to-buffer mhc-wl-exit-buffer)))
+
+
 (defun mhc-wl-summary-mode-setup (date)
   (wl-summary-mode)
   (wl-summary-buffer-set-folder (mhc-wl/date-to-folder date))
@@ -96,23 +106,27 @@
   (setq wl-summary-buffer-prev-folder-func
 	(lambda () (mhc-goto-prev-month 1)
 	  (goto-char (point-max))))
+  (setq wl-summary-buffer-exit-func 'mhc-wl-summary-exit)
   (setq wl-summary-buffer-target-mark-list '(nil))
   (setq wl-summary-buffer-number-regexp "[0-9]+")
   (setq wl-summary-buffer-msgdb '(nil)))
 
 
 (defun mhc-wl-generate-summary-buffer (date)
-  (switch-to-buffer
-   (set-buffer
-    (mhc-get-buffer-create
-     (mhc-date-format date "%s/%02d/%02d" mhc-base-folder yy mm))))
-  (setq inhibit-read-only t
-	buffer-read-only nil
-	selective-display t
-	selective-display-ellipses nil
-	indent-tabs-mode nil)
-  (widen)
-  (delete-region (point-min) (point-max)))
+  (wl-summary-toggle-disp-msg 'off)
+  (let ((original (or mhc-wl-exit-buffer (current-buffer))))
+    (switch-to-buffer
+     (set-buffer
+      (mhc-get-buffer-create
+       (mhc-date-format date "%s/%02d/%02d" mhc-base-folder yy mm))))
+    (setq mhc-wl-exit-buffer original)
+    (setq inhibit-read-only t
+	  buffer-read-only nil
+	  selective-display t
+	  selective-display-ellipses nil
+	  indent-tabs-mode nil)
+    (widen)
+    (delete-region (point-min) (point-max))))
 
 (provide 'mhc-wl)
 (put 'mhc-wl 'summary-filename 'mhc-wl-summary-filename)
@@ -120,7 +134,6 @@
 (put 'mhc-wl 'get-import-buffer 'mhc-wl-get-import-buffer)
 (put 'mhc-wl 'generate-summary-buffer 'mhc-wl-generate-summary-buffer)
 (put 'mhc-wl 'insert-summary-contents 'mhc-wl-insert-summary-contents)
-(put 'mhc-wl 'summary-search-date 'mhc-wl-summary-search-date)
 (put 'mhc-wl 'summary-mode-setup 'mhc-wl-summary-mode-setup)
 
 ;;; Copyright Notice:
