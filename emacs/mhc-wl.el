@@ -158,7 +158,9 @@
 
 
 (defun mhc-wl-summary-mode-setup (date)
-  (let ((original mhc-wl-exit-buffer))
+  (let ((original mhc-wl-exit-buffer)
+	wl-summary-lazy-highlight
+	wl-summary-lazy-update-mark)
     (wl-summary-mode) ; buffer local variables are killed.
     (setq mhc-wl-exit-buffer original)
     (wl-summary-buffer-set-folder (mhc-wl/date-to-folder date))
