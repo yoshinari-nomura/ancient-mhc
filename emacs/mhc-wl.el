@@ -59,16 +59,18 @@
 
 (defun mhc-wl-insert-summary-contents (schedule contents icon)
   (let (head path pos)
-    (setq path (mhc-record-name (mhc-schedule-record schedule)))
-    (cond
-     ((or (not path) (equal path mhc-schedule-file))
-      "100000")
-     ((string-match "/intersect/" path)
-      (format "1%05d" (string-to-number (file-name-nondirectory path))))
-     (t 
-      (format "2%05d" (string-to-number (file-name-nondirectory path)))))
-    (setq head (concat (mhc-wl/schedule-foldermsg schedule) (if path "*| "
-							      " | ")))
+    (setq path (mhc-record-name (mhc-schedule-record schedule))
+	  head
+	  (cond
+	   ((or (not path) (equal path mhc-schedule-file))
+	    "100000")
+	   ((string-match "/intersect/" path)
+	    (format "1%05d"
+		    (string-to-number (file-name-nondirectory path))))
+	   (t 
+	    (format "2%05d"
+		    (string-to-number (file-name-nondirectory path)))))
+	  head (concat head (if path "*| " " | ")))
     (put-text-property 0 (length head) 'invisible t head)
     (insert head)
     (setq pos (point))
