@@ -4,7 +4,7 @@
 ;;          TSUCHIYA Masatoshi <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 ;;
 ;; Created: 2000/06/14
-;; Revised: $Date: 2000/06/20 00:32:20 $
+;; Revised: $Date: 2000/06/20 06:12:50 $
 
 ;;;
 ;;; Commentary:
@@ -65,6 +65,7 @@
 	 (MM (nth 1 now)))
     (mhc-time-new HH MM)))
 
+;; xxx: use defmacro for speed !!
 (defalias 'mhc-time-max 'max)
 (defalias 'mhc-time-min 'min)
 (defalias 'mhc-time<    '<)
@@ -192,6 +193,35 @@
   `(string-to-int
     (substring ,str (match-beginning ,pos) (match-end ,pos))))
 
+;; according to our current time zone, 
+;; convert timezone string into offset minutes
+;;
+;;   for example, if current time zone is in Japan, 
+;;   convert "GMT" or "+0000" into 540.
+(defun mhc-date/string-to-timezone-offset (timezone)
+  (let ((tz (or (cdr (assoc timezone
+ 			    '(("PST" . "-0800") ("PDT" . "-0700")
+ 			      ("MST" . "-0700") ("MDT" . "-0600")
+ 			      ("CST" . "-0600") ("CDT" . "-0500")
+ 			      ("EST" . "-0500") ("EDT" . "-0400")
+ 			      ("AST" . "-0400") ("NST" . "-0300")
+ 			      ("UT"  . "+0000") ("GMT" . "+0000")
+ 			      ("BST" . "+0100") ("MET" . "+0100")
+ 			      ("EET" . "+0200") ("JST" . "+0900"))))
+ 		timezone))
+ 	min
+ 	offset)
+    (if (string-match "\\([-+]\\)\\([0-9][0-9]\\)\\([0-9][0-9]\\)" tz)
+ 	(progn
+ 	  (setq min (* (+ (* 60 (mhc-date/substring-to-int tz 2))
+ 			  (mhc-date/substring-to-int tz 3))
+ 		       (if (string= "+" 
+ 				    (substring tz 
+ 					       (match-beginning 1)
+ 					       (match-end 1)))
+ 			   1 -1))
+ 		offset (- (/ (car (current-time-zone)) 60) min))))))
+
 ;;
 ;; conversion.
 ;;
@@ -301,6 +331,55 @@
 	  ret
 	(error "mhc-date-new-from-string2: format error (%s)" str)))))
 
+;; regexp for rfc822 Date: field.
+(defconst mhc-date/rfc822-date-regex
+  ;; assuming  ``Tue,  9 May 2000 12:15:12 -0700 (PDT)''
+  (concat 
+   "\\([0-9]+\\)[ \t]+"                                   ;; day
+   "\\(Jan\\|Feb\\|Mar\\|Apr\\|May\\|Jun\\|"              ;;
+   "Jul\\|Aug\\|Sep\\|Oct\\|Nov\\|Dec\\)[ \t]+"           ;; month
+   "\\([0-9]+\\)[ \t]+"                                   ;; year
+   "\\([0-9]+\\):\\([0-9]+\\)\\(:\\([0-9]+\\)\\)?[ \t]*"  ;; hh:mm(:ss)?
+   "\\([A-Z][A-Z][A-Z]\\|[-+][0-9][0-9][0-9][0-9]\\)"     ;; JST or +0900
+   ))
+
+;; new from rfc822 Date: field.
+(defun mhc-date-new-from-string3 (string)
+  (if (and (stringp string) (string-match mhc-date/rfc822-date-regex string))
+      (let ((dd  (mhc-date/substring-to-int string 1))
+	    (mm  nil)
+ 	    (mon (substring string (match-beginning 2) (match-end 2)))
+ 	    (yy  (mhc-date-substring-to-int string 3))
+ 	    (MM  (+ (* 60 (mhc-date/substring-to-int string 4))
+ 		    (mhc-date/substring-to-int string 5)))
+ 	    (tz  (substring string (match-beginning 8) (match-end 8)))
+ 	    tz-offset)
+ 	(setq
+ 	 yy (cond
+	     ((< year 50)  (+ year 2000))
+	     ((< year 100) (+ year 1900))
+	     (t            year))
+ 	 mm (1+ (/ (string-match mon
+				 "JanFebMarAprMayJunJulAugSepOctNovDec") 3))
+ 	 tz-offset (mhc-date/string-to-timezone-offset tz)
+ 	 MM (+ MM tz-offset))
+ 	(car
+	 (cond
+	  ((< MM 0)
+	   (setq MM (+ MM 1440))
+	   (list (mhc-date--  (mhc-date-new yy mm dd))
+		 (mhc-time-new (/ MM 60) (% MM 60))
+		 tz-offset))
+	  ((>= MM 1440)
+	   (setq MM (- MM 1440))
+	   (list (mhc-date++ (mhc-date-new yy mm dd))
+		 (mhc-time-new (/ MM 60) (% MM 60))
+		 tz-offset))
+	  (t
+	   (list (mhc-date-new yy mm dd)
+		 (mhc-time-new (/ MM 60) (% MM 60))
+		 tz-offset)))))))
+
 ;;
 ;; manipulate yy, mm, dd.
 ;;
@@ -378,6 +457,14 @@
 (defmacro mhc-date-mm++ (date)   `(mhc-date-mm+ ,date 1))
 (defmacro mhc-date-mm-- (date)   `(mhc-date-mm- ,date 1))
 
+(defsubst mhc-date-yy+  (date c)
+  (mhc-date-let date
+    (mhc-date-new (+ yy c) mm dd)))
+
+(defmacro mhc-date-yy-  (date c) `(mhc-date-yy+ ,date (- ,c)))
+(defmacro mhc-date-yy++ (date)   `(mhc-date-yy+ ,date 1))
+(defmacro mhc-date-yy-- (date)   `(mhc-date-yy- ,date 1))
+
 ;;
 ;; get meaninful date.
 ;;
@@ -400,6 +487,10 @@
   (< (- (mhc-date/last-day-of-month 
 	 (mhc-date-yy date)
 	 (mhc-date-mm date)) 7) (mhc-date-dd date)))
+
+
+(defalias 'mhc-date-p 'integerp)
+
 
 ;;
 ;; to string.
