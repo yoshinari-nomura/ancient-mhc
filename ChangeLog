@@ -1,5 +1,11 @@
 2000-07-19  Hideyuki SHIRAI  <shirai@quickhack.net>
 
+	* emacs/mhc-face.el (mhc-face/make-face-bold):
+	New macro, fill the gap which Emacs and XEmacs.
+	(mhc-face/mhc-face-italic): Ditto.
+	(mhc-face/mhc-face-bold-italic): Ditto.
+	(mhc-face-get-effect): Use above macros. Make face name as mhc-effect-*-*.
+
 	* emacs/mhc-ps.el (mhc-ps-preview-command-arguments): Change default value.
 	(mhc-ps-paper-fill-print): New variable.
 	(mhc-ps/replace-table): Use mhc-ps-paper-fill-print.

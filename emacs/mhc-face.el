@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 2000/02/08
-;; Revised: $Date: 2000/07/18 09:16:14 $
+;; Revised: $Date: 2000/07/19 01:29:45 $
 
 ;;;
 ;;; Commentay:
@@ -66,6 +66,24 @@ refer to mhc-calendar-hnf-face-alist-internal.")
 (defmacro mhc-face-put (symbol face)
   (` (put-text-property 0 (length (, symbol)) 'face (, face) (, symbol))))
 
+(eval-when-compile
+  (cond
+   ((featurep 'xemacs)
+    ;; (make-face-bold FACE &optional LOCALE TAGS)
+    (defmacro mhc-face/make-face-bold (face)
+      (` (make-face-bold (, face) nil nil)))
+    (defmacro mhc-face/make-face-italic (face)
+      (` (make-face-italic (, face) nil nil)))
+    (defmacro mhc-face/make-face-bold-italic (face)
+      (` (make-face-bold-italic (, face) nil nil))))
+   (t
+    ;; (make-face-bold FACE &optional FRAME NOERROR)
+    (defmacro mhc-face/make-face-bold (face)
+      (` (make-face-bold (, face) nil t)))
+    (defmacro mhc-face/make-face-italic (face)
+      (` (make-face-italic (, face) nil t)))
+    (defmacro mhc-face/make-face-bold-italic (face)
+      (` (make-face-bold-italic (, face) nil t))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; make faces from string/symbol
@@ -111,7 +129,8 @@ refer to mhc-calendar-hnf-face-alist-internal.")
 ;; get decolated face from face and effect
 ;; ex. mhc-summary-face + today -> mhc-summary-face-today
 (defun mhc-face-get-effect (face effect)
-  (let ((new-face (intern (concat (symbol-name face) "-"
+  (let ((new-face (intern (concat "mhc-effect-"
+				  (symbol-name face) "-"
 				  (symbol-name effect))))
 	effect-list)
     (if (mhc-facep new-face)
@@ -127,11 +146,11 @@ refer to mhc-calendar-hnf-face-alist-internal.")
 	    (if bg (set-face-background  new-face bg))
 	    (if ul (set-face-underline-p new-face t))
 	    ;;
-	    (if bl (or (make-face-bold new-face nil t)
+	    (if bl (or (mhc-face/make-face-bold new-face)
 		       (and (fboundp 'set-face-bold-p)
 			    (set-face-bold-p new-face t))))
 	    ;;
-	    (if it (or (make-face-italic new-face nil t)
+	    (if it (or (make-face/make-face-italic new-face)
 		       (and (fboundp 'set-face-italic-p)
 			    (set-face-italic-p new-face t)))))))
     new-face))
@@ -190,7 +209,7 @@ refer to mhc-calendar-hnf-face-alist-internal.")
 	      (symbolp x) 
 	      (assq x (and (boundp 'global-face-data) global-face-data))))
 	 t))))
- 
+
 (provide 'mhc-face)
 
 ;;; Copyright Notice:
