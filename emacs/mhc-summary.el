@@ -180,28 +180,27 @@ third one is replaced with day of month."
 	'face mhc-tmp-day-face)
     (?W (mhc-summary/line-day-of-week-string)
 	'face mhc-tmp-day-face)
-    (?b (if (or (and mhc-tmp-private
-		     (string= (car (mhc-schedule-categories mhc-tmp-schedule))
-			      "private"))
+    (?b (if (or mhc-tmp-private
 		(null mhc-tmp-begin))
 	    (make-string 5 ? )
 	  (format "%02d:%02d" (/ mhc-tmp-begin 60) (% mhc-tmp-begin 60)))
 	'face 'mhc-summary-face-time)
-    (?e (if (or (and mhc-tmp-private
-		     (string= (car (mhc-schedule-categories mhc-tmp-schedule))
-			      "private"))
+    (?e (if (or mhc-tmp-private
 		(null mhc-tmp-end))
 	    (make-string 6 ? )
 	  (format "-%02d:%02d" (/ mhc-tmp-end 60) (% mhc-tmp-end 60)))
 	'face 'mhc-summary-face-time)
-    (?c (if mhc-tmp-conflict (or (mhc-use-icon-p) mhc-summary-string-conflict))
+    (?c (and (not mhc-tmp-private)
+	     (if mhc-tmp-conflict (or (mhc-use-icon-p)
+				      mhc-summary-string-conflict)))
 	(if (mhc-use-icon-p) 'icon 'face)
-	(if (mhc-use-icon-p) (list "Conflict")
-	  'mhc-summary-face-conflict))
-    (?i t 'icon (mhc-schedule-categories mhc-tmp-schedule))
+	(if (mhc-use-icon-p) (list "Conflict") 'mhc-summary-face-conflict))
+    (?i (not mhc-tmp-private) 'icon (mhc-schedule-categories mhc-tmp-schedule))
     (?s (mhc-summary/line-subject-string)
-	'face (mhc-face-category-to-face 
-	       (car (mhc-schedule-categories mhc-tmp-schedule))))
+	'face 
+	(if mhc-tmp-private (mhc-face-category-to-face "Private")
+	  (mhc-face-category-to-face 
+	   (car (mhc-schedule-categories mhc-tmp-schedule)))))
     (?l (mhc-summary/line-location-string)
 	'face 'mhc-summary-face-location))
   "An alist of format specifications that can appear in summary lines.
@@ -215,7 +214,7 @@ PROP-VALUE is the property value correspond to PROP-TYPE.
 ")
 
 (defvar mhc-summary-todo-line-format-alist
-  '((?i t 'icon (mhc-schedule-categories mhc-tmp-schedule))
+  '((?i (not mhc-tmp-private) 'icon (mhc-schedule-categories mhc-tmp-schedule))
     (?s (mhc-summary/line-subject-string)
 	'face
 	(mhc-face-category-to-face 
@@ -348,7 +347,9 @@ PROP-VALUE is the property value correspond to PROP-TYPE.
 		(if mhc-tmp-end (setq time-max (max mhc-tmp-end time-max)))
 		(mhc-summary-insert-contents
 		 (car schedules)
-		 secret
+		 (and secret
+		      (mhc-schedule-in-category-p
+		       (car schedules) "private"))
 		 'mhc-summary-line-insert
 		 mailer)
 		(setq mhc-tmp-first nil)))
@@ -390,7 +391,9 @@ PROP-VALUE is the property value correspond to PROP-TYPE.
 		      (mhc-schedule-in-category-p (car schedules) category)))
 		(mhc-summary-insert-contents
 		 (car schedules)
-		 secret
+		 (and secret
+		      (mhc-schedule-in-category-p
+		       (car schedules) "private"))
 		 'mhc-summary-todo-line-insert
 		 mailer))
 	    (setq schedules (cdr schedules)))))))
@@ -425,16 +428,15 @@ PROP-VALUE is the property value correspond to PROP-TYPE.
 
 
 (defun mhc-summary/line-subject-string ()
-  (if (and mhc-tmp-private
-	   (string= (car (mhc-schedule-categories mhc-tmp-schedule))
-		    "private"))
-      mhc-summary-string-secret
+  (if mhc-tmp-private
+      (and mhc-tmp-schedule mhc-summary-string-secret)
     (or (mhc-schedule-subject mhc-tmp-schedule) "")))
 
 
 (defun mhc-summary/line-location-string ()
   (let ((location (mhc-schedule-location mhc-tmp-schedule)))
-    (and location
+    (and (not mhc-tmp-private)
+	 location
 	 (> (length location) 0)
 	 (concat "[" location "]"))))
 

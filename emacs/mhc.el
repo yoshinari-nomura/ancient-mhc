@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1994/07/04
-;; Revised: $Date: 2000/06/30 01:26:09 $
+;; Revised: $Date: 2000/07/03 07:04:37 $
 
 ;;;
 ;;; Commentay:
@@ -463,7 +463,7 @@ Returns t if the importation was succeeded."
 	     (buffer (get-buffer name)))
 	(if (buffer-live-p buffer)
 	    (progn
-	      (message "Specified file(%s) has already been opened.")
+	      (message "Specified file(%s) has already been opened." file)
 	      (switch-to-buffer-other-window buffer))
 	  (mhc-window-push)
 	  (set-buffer (setq buffer (get-buffer-create name)))

@@ -1,5 +1,17 @@
 2000-07-03  Yuuichi Teranishi  <teranisi@quickhack.net>
 
+	* emacs/mhc.el (mhc-modify-file): Fixed problem when file is already
+	opened.
+
+	* emacs/mhc-summary.el (mhc-summary/insert-dayinfo):
+	Set `mhc-tmp-private'if `hide-private' mode.
+	(mhc-summary-make-todo-list): Ditto.
+	(mhc-summary-line-format-alist): Follow-up.
+	(mhc-summary-todo-line-format-alist): Ditto.
+	(mhc-summary/line-subject-string): Ditto.
+	(mhc-summary/line-location-string):
+	Don't display location when `hide-private' mode.
+
 	* emacs/mhc-xmas.el (mhc-put-icon): Fix problem
 	when glyph extent already exists.
 
