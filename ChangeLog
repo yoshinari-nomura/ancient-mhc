@@ -1,3 +1,8 @@
+2000-12-13  Yoshinari Nomura  <nom@quickhack.net>
+
+	* emacs/mhc-guess.el (mhc-guess/make-date-from-yyyymmdd):
+	New function to support new date format yyyy-mm-dd.
+
 2000-11-07  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* emacs/mhc-mew.el (mhc-mew-draft-translate): Fix, multipart message
