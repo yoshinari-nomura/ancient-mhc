@@ -3,7 +3,7 @@
 ## Author:  Yoshinari Nomura <nom@quickhack.net>
 ##
 ## Created: 1999/07/16
-## Revised: $Date: 2000/05/29 14:59:26 $
+## Revised: $Date: 2001/03/13 07:01:25 $
 ##
 
 ################################################################
@@ -35,7 +35,8 @@ class SignalConduit
 
   def signal_disconnect(sd)
     @proc_table .each_key{|sig|
-      @proc_table[sig][sd] = nil
+      # @proc_table[sig][sd] = nil
+      @proc_table[sig] .delete(sd)
     }
   end
 
