@@ -108,7 +108,7 @@
     (or (> (length schedules) 1)
 	(mhc-logic-occur-multiple-p (mhc-schedule-condition (car schedules))))))
 
-(defun mhc-record-write-buffer (record buffer)
+(defun mhc-record-write-buffer (record buffer &optional old-record)
   "Write BUFFER to RECORD."
   (let ((modify (file-exists-p (mhc-record-name record))))
     (save-excursion
@@ -120,10 +120,17 @@
 					 nil 'nomsg)
       (set-buffer-modified-p nil)
       (if modify
-	  (prog1 (mhc-file-modify (mhc-record-name record))
+	  (prog1
+	      (mhc-file-modify (mhc-record-name record))
 	    (mhc-record/append-log record 'modify))
-	(prog1 (mhc-file-add (mhc-record-name record))
-	  (mhc-record/append-log record 'add))))))
+	(if old-record
+	    (prog2
+		(mhc-file-remove (mhc-record-name old-record))
+		(mhc-file-add (mhc-record-name record))
+	      (mhc-record/append-log record 'modify))
+	  (prog1 
+	      (mhc-file-add (mhc-record-name record))
+	    (mhc-record/append-log record 'add)))))))
 
 (defun mhc-record-delete (record)
   (prog1 (mhc-file-remove (mhc-record-name record))

@@ -1,9 +1,15 @@
 2000-07-21  Hideyuki SHIRAI  <shirai@quickhack.net>
 
+	* emacs/mhc-db.el (mhc-db-add-record-from-buffer):
+	Apply [mhc-develop:00172]'s patch. (thanks to Tsuchiya-san)
+
+	* emacs/mhc-record.el (mhc-record-write-buffer): Ditto.
+
 	* emacs/mhc-face.el (mhc-symbol-face-alist-internal):
 	Add mhc-calendar-face-default and mhc-summary-face-default.
 	(mhc-face-get-effect): undo make new-face method to nom-san's way.
-
+	Typo fix, make-face/make-face-italic to mhc-face/make-face-italic.
+	
 	* emacs/mhc.el (mhc-cal-make-rectangle):
 	Use 'mhc-calendar-face-default face instead of 'default.
 

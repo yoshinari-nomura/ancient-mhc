@@ -168,10 +168,15 @@ FROM, TO は 1970/01/01 からの経過日数を用いて指定"
 			  (mhc-misc-sub (mhc-record-name record)
 					mhc-mail-path "+")))
 	(progn
-	  (mhc-record-write-buffer record buffer)
-	  (and old-record
-	       (not (eq record old-record))
-	       (mhc-db-delete-file old-record))
+	  (mhc-record-write-buffer record buffer old-record)
+	  (if (and old-record
+		   (not (eq record old-record)))
+	      (let* ((dir (file-name-directory
+			   (directory-file-name
+			    (mhc-record-name old-record))))
+		     (slot (mhc-slot-directory-to-key dir)))
+		(mhc-misc-touch-directory dir)
+		(mhc-slot-update-cache slot 'remove old-record)))
 	  (mhc-misc-touch-directory directory)
 	  (mhc-slot-update-cache slot 'add record)
 	  t))))

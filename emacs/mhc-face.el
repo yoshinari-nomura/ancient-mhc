@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 2000/02/08
-;; Revised: $Date: 2000/07/21 01:48:49 $
+;; Revised: $Date: 2000/07/21 05:15:08 $
 
 ;;;
 ;;; Commentay:
@@ -152,7 +152,7 @@ refer to mhc-calendar-hnf-face-alist-internal.")
 		       (and (fboundp 'set-face-bold-p)
 			    (set-face-bold-p new-face t))))
 	    ;;
-	    (if it (or (make-face/make-face-italic new-face)
+	    (if it (or (mhc-face/make-face-italic new-face)
 		       (and (fboundp 'set-face-italic-p)
 			    (set-face-italic-p new-face t)))))))
     new-face))
