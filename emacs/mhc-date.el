@@ -4,7 +4,7 @@
 ;;          TSUCHIYA Masatoshi <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 ;;
 ;; Created: 2000/06/14
-;; Revised: $Date: 2000/08/05 19:53:06 $
+;; Revised: $Date: 2000/12/14 10:39:55 $
 
 ;;;
 ;;; Commentary:
@@ -519,7 +519,7 @@
 (defun mhc-date-digit-to-ww-string (ww &optional long)
   (if long
       (aref ["Sunday" "Monday" "Tuesday" "Wednesday"
-	     "Thursday" "Friday" "Sataday"] ww)
+	     "Thursday" "Friday" "Saturday"] ww)
     (aref ["Sun" "Mon" "Tue" "Wed" "Thu" "Fri" "Sat"] ww)))
 
 (defun mhc-date-digit-to-ww-japanese-string (ww &optional long)

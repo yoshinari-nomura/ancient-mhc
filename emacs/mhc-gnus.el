@@ -145,6 +145,11 @@
   (let ((gnus-article-buffer (current-buffer)))
     (gnus-article-highlight)))
 
+(defun mhc-gnus-decode-header ()
+  "Alternative function of `decode-header-in-buffer' for pure Gnus."
+  (goto-char (point-min))
+  (when (re-search-forward "^$" nil t)
+    (rfc2047-decode-region (point-min) (point))))
 
 ;; modify Gnus original functions for cursor control.
 (eval-after-load "gnus"
@@ -195,6 +200,10 @@
   (put 'mhc-gnus 'mime-get-mime-structure 'mhc-gnus-mime-get-mime-structure)
   (put 'mhc-gnus 'draft-translate 'mhc-mime-draft-translate)
   (put 'mhc-gnus 'eword-decode-string 'mhc-mime-eword-decode-string))
+
+(if (featurep 'mhc-mime)
+    (put 'mhc-gnus 'decode-header 'mhc-mime-decode-header)
+  (put 'mhc-gnus 'decode-header 'mhc-gnus-decode-header))
 
 ;;; Copyright Notice:
 

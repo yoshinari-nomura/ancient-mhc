@@ -1,6 +1,7 @@
 ;;; -*- mode: Emacs-Lisp; coding: euc-japan -*-
 
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>,
+;;           Hideyuki SHIRAI <shirai@quickhack.net>
 ;; Created: 2000/05/10
 ;; Revised: $Date$
 
@@ -19,11 +20,14 @@
   ".*\r *\\+\\([^ \t]+\\)[ \t]+\\([^ \t\n]+\\)")
 
 (defconst mhc-mew/header-string
-  (let ((str "0 | ")) (put-text-property 0 (length str) 'invisible t str) str))
+  (let ((str "0 | "))
+    (put-text-property 0 (length str) 'invisible t str)
+    str))
 
 (defconst mhc-mew/header-string-review
   (let ((str (concat "0" (char-to-string mew-mark-review) "| ")))
-    (put-text-property 0 (length str) 'invisible t str) str))
+    (put-text-property 0 (length str) 'invisible t str)
+    str))
 
 (defconst mhc-mew/summary-message-alist
   '((mew-summary-mode . mew-message-mode)
@@ -360,6 +364,13 @@
 	(setq string tmpstr)))
     ret))
 
+
+(defun mhc-mew-decode-rfc822-header ()
+  (mew-decode-rfc822-header)
+  (mew-header-goto-end)
+  (mew-header-arrange (point-min) (point)))
+
+
 (provide 'mhc-mew)
 (put 'mhc-mew 'summary-filename 'mhc-mew-summary-filename)
 (put 'mhc-mew 'summary-display-article 'mhc-mew-summary-display-article)
@@ -375,6 +386,7 @@
 (put 'mhc-mew 'draft-reedit-file 'mhc-mew-draft-reedit-file)
 (put 'mhc-mew 'draft-translate 'mhc-mew-draft-translate)
 (put 'mhc-mew 'eword-decode-string 'mhc-mew-eword-decode-string)
+(put 'mhc-mew 'decode-header 'mhc-mew-decode-rfc822-header)
 
 ;;; Copyright Notice:
 

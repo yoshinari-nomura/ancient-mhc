@@ -1,3 +1,30 @@
+2000-12-14  Hideyuki SHIRAI  <shirai@quickhack.net>
+
+	* emacs/mhc-date.el (mhc-date-digit-to-ww-string): Typo fix.
+
+	* emacs/mhc-face.el (mhc-symbol-face-alist-internal): Add face
+	for mhc-calendar-face-duration.
+
+	* emacs/mhc-summary.el (mhc-decode-header): New function for all
+	header decoding.
+
+	* emacs/mhc-gnus.el (mhc-gnus-decode-header): New function.
+
+	* emacs/mhc-mew.el (mhc-mew-decode-rfc822-header): Ditto.
+
+	* emacs/mhc-mime.el (mhc-mime-decode-header): Ditto.
+
+	* emacs/mhc-wl.el (top level): Put mhc-mime-decode-header.
+
+	* emacs/mhc-calender (mhc-calendar-height-offset,
+	mhc-calendar-inserter-date-list, mhc-calendar-use-duration-show):
+	New customizable variables.
+	(mhc-calendar/inserter-type, mhc-calendar/inserter-for-minibuffer,
+	mhc-calendar/inserter-for-draft, mhc-calendar/mark-date):
+	New internal variables.
+	(All  ^^;): Renewal both a duration show method and a data selecting
+	method.
+
 2000-12-13  Keiichi Suzuki <keiichi@nanap.org> / nom@quickhack.net
 
 	* emacs/mhc-gnus.el, emacs/mhc-mime.el: some changes for Nana7.

@@ -157,6 +157,7 @@
 (put 'mhc-wl 'draft-reedit-file 'mhc-mime-draft-reedit-file)
 (put 'mhc-wl 'draft-translate 'mhc-mime-draft-translate)
 (put 'mhc-wl 'eword-decode-string 'mhc-mime-eword-decode-string)
+(put 'mhc-wl 'decode-header 'mhc-mime-decode-header)
 
 ;;; Copyright Notice:
 

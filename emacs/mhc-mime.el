@@ -3,7 +3,7 @@
 ;; Author:  Yuuichi Teranishi <teranisi@quickhack.net>
 ;;
 ;; Created: 2000/07/26
-;; Revised: $Date: 2000/12/13 04:34:07 $
+;; Revised: $Date: 2000/12/14 10:39:55 $
 
 ;;; Commentary:
 
@@ -46,6 +46,8 @@
 
 (defalias 'mhc-mime-eword-decode-string 'eword-decode-string)
 
+(defun mhc-mime-decode-header ()
+  (mime-decode-header-in-buffer 'decode))
 
 (defun mhc-mime-draft-translate ()
   (let (mime-edit-insert-user-agent-field)

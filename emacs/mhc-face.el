@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 2000/02/08
-;; Revised: $Date: 2000/08/04 10:57:07 $
+;; Revised: $Date: 2000/12/14 10:39:55 $
 
 ;;;
 ;;; Commentay:
@@ -40,6 +40,7 @@ refer to mhc-calendar-hnf-face-alist-internal.")
   '((mhc-calendar-face-default  . (nil nil           nil))
     (mhc-calendar-face-saturday . (nil "blue"        nil))
     (mhc-calendar-face-sunday   . (nil "red"         nil))
+    (mhc-calendar-face-duration . (nil nil           "gray"))
     ;;
     (mhc-summary-face-default   . (nil nil           nil))
     (mhc-summary-face-saturday  . (nil "blue"        nil))

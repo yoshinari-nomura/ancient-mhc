@@ -50,6 +50,9 @@
 ;;     (mhc-foo-eword-decode-string STRING)
 ;;         Decode encoded STRING.
 ;;
+;;     (mhc-foo-decode-header)
+;;         Decode encoded header.
+;;
 ;; Define these methods appropriately, and put definitions as follows:
 ;;
 ;;    (provide 'mhc-foo)
@@ -61,6 +64,7 @@
 ;;    (put 'mhc-foo 'summary-mode-setup      'mhc-foo-summary-mode-setup)
 ;;    (put 'mhc-foo 'highlight-message       'mhc-foo-highlight-message)
 ;;    (put 'mhc-foo 'eword-decode-string     'mhc-foo-eword-decode-string)
+;;    (put 'mhc-foo 'decode-header           'mhc-foo-decode-header)
 
 (require 'mhc-day)
 (require 'mhc-compat)
@@ -366,6 +370,10 @@ If optional argument FOR-DRAFT is non-nil, Hilight message as draft message."
 (defsubst mhc-eword-decode-string (string)
   "Decode encoded STRING."
   (funcall (mhc-get-function 'eword-decode-string) string))
+
+(defsubst mhc-decode-header ()
+  "Decode encoded header."
+  (funcall (mhc-get-function 'decode-header)))
 
 (defsubst mhc-summary-filename (&optional mailer)
   "Return file name of article on current line."
