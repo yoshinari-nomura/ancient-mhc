@@ -53,6 +53,11 @@
   :group 'mhc
   :type 'boolean)
 
+(defcustom mhc-vertical-calendar-length 3
+  "*Length of vertical calendar in summary buffer."
+  :group 'mhc
+  :type  'integer)
+
 (defcustom mhc-insert-todo-list t
   "*If non nil value, display TODO list."
   :group 'mhc

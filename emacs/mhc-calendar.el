@@ -5,7 +5,7 @@
 ;;          MIYOSHI Masanori <miyoshi@ask.ne.jp>
 ;;
 ;; Created: 05/12/2000
-;; Reviesd: $Date: 2001/03/10 12:19:52 $
+;; Reviesd: $Date: 2001/03/21 08:59:41 $
 
 ;;; Configration Variables:
 
@@ -331,23 +331,27 @@ ww-japanese-long => \"土曜日\"
 		    (if mhc-calendar/week-header " ") day))
       (setq i (1+ i)))))
 
-(defun mhc-calendar-insert-rectangle-at (date col)
-  (save-excursion
-    (setq date (mhc-date-mm-first date))
-    (put-text-property (point-min) (point-max) 'rear-nonsticky t)
-    (goto-char (point-min))
-    (when mhc-use-wide-scope
-      (mhc-summary-search-date date))
-    (beginning-of-line)
-    (mhc-misc-move-to-column col)
-    (mhc-misc-insert-rectangle
-     (nconc (mhc-calendar/make-rectangle (mhc-date-mm-- date)
-					 mhc-calendar/separator-str)
-	    (list (concat mhc-calendar/separator-str " "))
-	    (mhc-calendar/make-rectangle date mhc-calendar/separator-str)
-	    (list (concat mhc-calendar/separator-str " "))
-	    (mhc-calendar/make-rectangle (mhc-date-mm++ date)
-					 mhc-calendar/separator-str)))))
+(defun mhc-calendar-insert-rectangle-at (date col &optional months)
+  (let ((m nil) (rect nil) (center nil))
+    (save-excursion
+      (setq date (mhc-date-mm-first date))
+      (put-text-property (point-min) (point-max) 'rear-nonsticky t)
+      (goto-char (point-min))
+      (when mhc-use-wide-scope
+	(mhc-summary-search-date date))
+      (beginning-of-line)
+      (mhc-misc-move-to-column col)
+      (setq m (or months 3))
+      (setq center (/ (1+ m) 2))
+      (while (> m 0)
+	(setq rect
+	      (nconc 
+	       rect
+	       (mhc-calendar/make-rectangle
+		(mhc-date-mm- date (- m center)) mhc-calendar/separator-str)
+	       (if (> m 1) (list (concat mhc-calendar/separator-str " ")))))
+	(setq m (1- m)))
+      (mhc-misc-insert-rectangle rect))))
 
 (defun mhc-calendar-make-header (date)
   (mhc-date-format date "   %s %04d"

@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1994/07/04
-;; Revised: $Date: 2001/03/05 06:02:55 $
+;; Revised: $Date: 2001/03/21 08:59:41 $
 
 ;;;
 ;;; Commentay:
@@ -494,7 +494,11 @@ If HIDE-PRIVATE, private schedules are suppressed."
 	(mhc-summary-make-todo-list
 	 today mailer category-predicate secret))
       (if mhc-insert-calendar
-	  (mhc-calendar-insert-rectangle-at date (- (window-width) 24))) ;; xxx
+	  (mhc-calendar-insert-rectangle-at
+	   date
+	   (- (window-width) 24) ;; xxx
+	   mhc-vertical-calendar-length
+	   ))
       (mhc-summary-mode-setup date mailer)
       (mhc-mode 1)
       (setq inhibit-read-only nil)
