@@ -31,13 +31,17 @@
 (require 'nnmhc)
 
 ;; To suppress byte-compile warnings.
+(eval-when-compile
+  (defvar gnus-original-article-buffer))
 (eval-and-compile
-  (defvar gnus-original-article-buffer)
+  (autoload 'eword-encode-string "eword-encode")
+  (autoload 'gnus-backlog-remove-article "gnus-bcklg")
   (autoload 'gnus-copy-article-buffer "gnus-msg")
   (autoload 'mime-to-mml "mml")
   (autoload 'rfc2047-decode-region "rfc2047")
   (autoload 'rfc2047-decode-string "rfc2047")
-  (autoload 'rfc2047-encode-message-header "rfc2047"))
+  (autoload 'rfc2047-encode-message-header "rfc2047")
+  (autoload 'rfc2047-encode-string "rfc2047"))
 
 
 ;;; Internal Variables:
@@ -136,16 +140,27 @@ this function."
       (let ((num (get-text-property (point) 'gnus-number)))
 	(if num (gnus-data-set-pos (assoc num gnus-newsgroup-data) (point))))
       (forward-line 1)))
-  (let ((gnus-newsgroup-data))
-    (gnus-summary-mode (gnus-group-prefixed-name
-			(mhc-gnus/date-to-group-name date)
-			'(nnmhc))))
+  (let ((group (gnus-group-prefixed-name
+		(mhc-gnus/date-to-group-name date) '(nnmhc))))
+    ;; Reset all caches for this group.
+    (let ((i 0))
+      (while (<= (incf i) (length nnmhc-article-list))
+	(gnus-backlog-remove-article group i)))
+    ;; Reset an article kept in `gnus-original-article-buffer'.
+    (when (gnus-buffer-live-p gnus-original-article-buffer)
+      (with-current-buffer gnus-original-article-buffer
+	(setq gnus-original-article nil)))
+    (let ((gnus-newsgroup-data))
+      (gnus-summary-mode group)))
   (when (fboundp 'gnus-summary-setup-default-charset)
     (gnus-summary-setup-default-charset)) ; for Nana7
   (set (make-local-variable 'mhc-gnus/mhc-is-running) t)
   (set (make-local-variable 'gnus-visual) nil)
   (set (make-local-variable 'gnus-auto-extend-newsgroup) nil)
-  (setq gnus-newsgroup-begin 1
+  (setq gnus-article-current nil ; Reset structures of the current article.
+	gnus-current-article nil
+	gnus-current-headers nil
+	gnus-newsgroup-begin 1
 	gnus-newsgroup-end (length nnmhc-article-list)))
 
 (defun mhc-gnus-highlight-message (for-draft)
@@ -318,7 +333,6 @@ Note: This function is used only when using T-gnus."
 	   (string-match "SEMI" (symbol-value 'gnus-version)))
       (progn
 	(require 'mhc-mime)
-	(autoload 'eword-encode-string "eword-encode")
 	(defalias 'mhc-gnus/encode-string 'eword-encode-string)
 	(put 'mhc-gnus 'draft-setup-new 'mhc-mime-draft-setup-new)
 	(put 'mhc-gnus 'draft-reedit-buffer 'mhc-mime-draft-reedit-buffer)
@@ -329,7 +343,6 @@ Note: This function is used only when using T-gnus."
 	(put 'mhc-gnus 'eword-decode-string 'mhc-mime-eword-decode-string)
 	(put 'mhc-gnus 'mime-get-raw-buffer 'mhc-gnus-mime-get-raw-buffer)
 	(put 'mhc-gnus 'mime-get-mime-structure 'mhc-gnus-mime-get-mime-structure))
-    (autoload 'rfc2047-encode-string "rfc2047")
     (defalias 'mhc-gnus/encode-string 'rfc2047-encode-string)
     (put 'mhc-gnus 'draft-setup-new 'mhc-gnus-draft-setup-new)
     (put 'mhc-gnus 'draft-reedit-buffer 'mhc-gnus-draft-reedit-buffer)

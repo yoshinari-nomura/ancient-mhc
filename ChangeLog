@@ -1,3 +1,10 @@
+2004-05-05  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+
+	* emacs/mhc-gnus.el (mhc-gnus-summary-mode-setup): Reset caches
+	kept by backlog mechanism and `gnus-original-article-buffer', in
+	order to fix the problem that correct articles are not selected
+	after deleting a schedule.
+
 2004-05-04  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 
 	* emacs/mhc.el (toplevel): Add autoload of `easy-menu-add' to
