@@ -1,3 +1,16 @@
+2001-02-09  INOUE Tomonori <inouetom@brain.is.kyushu-u.ac.jp>
+
+	* emacs/mhc-bm.el (mhc-bm-icon-alist): fix typo.
+
+2001-02-09  Yoshinari Nomura  <nom@quickhack.net>
+
+	* experimental/my-meeting2000 (toplevel):
+		Add IPv6 localhost to the access list.
+
+	* palm2mhc.in (toplevel): Speak when connected.
+	            Change defalt directory for -a.
+	            Ether yes or y will do as an answer.
+
 2001-02-06  Yoshinari Nomura  <nom@quickhack.net>
 
 	* ruby-ext/lib/mhc-schedule.rb (MhcScheduleItem): 1.4/1.6 compliant.
