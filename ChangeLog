@@ -1,3 +1,7 @@
+2000-12-13  Keiichi Suzuki <keiichi@nanap.org> / nom@quickhack.net
+
+	* emacs/mhc-gnus.el, emacs/mhc-mime.el: some changes for Nana7.
+	
 2000-12-13  Yoshinari Nomura  <nom@quickhack.net>
 
 	* emacs/mhc-guess.el (mhc-guess/make-date-from-yyyymmdd):
