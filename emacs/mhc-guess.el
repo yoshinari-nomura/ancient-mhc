@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1999/04/13
-;; Revised: $Date: 2001/07/16 06:34:39 $
+;; Revised: $Date: 2001/10/17 08:07:51 $
 ;;
 
 ;;;
@@ -48,7 +48,8 @@
 ;;    のような条件と加点/減点を表す mhc-guess-keyword-score-alist に基
 ;;    づいて採点をする。
 ;;
-;; 3. 得点順に、sort して返す
+;; 3. 得点順 (得点が同じ場合は，日付や時間を表わす文字列が長い順)
+;;    に sort して返す
 
 ;;;
 ;;; Code:
@@ -184,9 +185,13 @@
 			  mhc-guess-keyword-score-alist
 			  hint1
 			  now)))
-    (sort score-list (function (lambda (a b) (< (mhc-guess-get-score b)
-						(mhc-guess-get-score a)))))))
-
+    (sort score-list 
+	  (function (lambda (a b) 
+		      (if (= (mhc-guess-get-score a) (mhc-guess-get-score b))
+			  (< (- (mhc-guess-get-end b) (mhc-guess-get-begin b))
+			     (- (mhc-guess-get-end a) (mhc-guess-get-begin a)))
+			(< (mhc-guess-get-score b)
+			   (mhc-guess-get-score a))))))))
 ;;
 ;; gather date/time.
 ;;
