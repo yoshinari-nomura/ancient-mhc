@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1994/07/04
-;; Revised: $Date: 2002/09/24 07:07:39 $
+;; Revised: $Date: 2002/09/25 03:41:01 $
 
 ;;;
 ;;; Commentay:
@@ -61,7 +61,7 @@
  ((eval-when-compile (featurep 'xemacs))
   (require 'mhc-xmas))
  (t (defun mhc-use-icon-p ())))
-  
+
 (require 'mhc-minibuf)
 (require 'mhc-summary)
 (provide 'mhc)
@@ -88,6 +88,7 @@
 	["Toggle 3 months calendar" mhc-calendar-toggle-insert-rectangle
 	 (mhc-summary-buffer-p)]
 	"----"
+	["Reset"        mhc-reset (mhc-summary-buffer-p)]
 	("Network"
 	 ["Online" mhc-file-toggle-offline mhc-file/offline]
 	 ["Offline" mhc-file-toggle-offline (not mhc-file/offline)]
@@ -132,6 +133,7 @@
   (define-key mhc-prefix-map "P" 'mhc-ps)
   (define-key mhc-prefix-map "T" 'mhc-file-toggle-offline)
   (define-key mhc-prefix-map "S" 'mhc-file-sync)
+  (define-key mhc-prefix-map "R" 'mhc-reset)
   (define-key mhc-mode-map mhc-prefix-key mhc-prefix-map))
 
 (defvar mhc-mode nil "Non-nil when in mhc-mode.")
@@ -146,7 +148,7 @@
 
 (defun mhc-mode (&optional arg) "\
 \\<mhc-mode-map>
-   MHC is the mode for registering schdule directly from email.  
+   MHC is the mode for registering schdule directly from email.
    Requres Mew or Wanderlust or Gnus.
 
    Key assinment on mhc-mode.
@@ -165,6 +167,7 @@
 \\[mhc-set-default-category]	Change default category
 \\[mhc-calendar]	Display 3 months mini calendar
 \\[mhc-calendar-toggle-insert-rectangle]	Toggle 3 months calendar
+\\[mhc-reset]	Reset MHC
 
    '\\[universal-argument]' prefix is available on using '\\[mhc-rescan-month]', '\\[mhc-goto-this-month]', '\\[mhc-goto-month]'
   , it works to assign the category (see below).
@@ -174,7 +177,7 @@
 
    Field names using by MHC.
 
-   X-SC-Category: 
+   X-SC-Category:
    Space-seperated Keywords. You can set default category to scan.
    You can also indicate keywords by typing C-cs C-c. C-cg with C-u.
 "
@@ -326,7 +329,7 @@
 
 (defun mhc-set-default-category ()
   (interactive)
-  (setq mhc-default-category 
+  (setq mhc-default-category
 	(read-from-minibuffer "Default Category: "
 			      (or mhc-default-category "")
 			      nil nil 'mhc-default-category-hist))
@@ -372,7 +375,7 @@ If HIDE-PRIVATE, private schedules are suppressed."
 
 (defun mhc-goto-next-month (&optional arg)
   (interactive "p")
-  (mhc-goto-month (mhc-date-mm+ 
+  (mhc-goto-month (mhc-date-mm+
 		   (or (mhc-current-date-month) (mhc-date-now)) arg)
 		  mhc-default-hide-private-schedules))
 
@@ -405,7 +408,7 @@ Unless NO-DISPLAY, display it."
 		    (recenter))
 		(or no-display
 		    (mhc-summary-display-article)))))))))
-		
+
 
 (defun mhc-rescan-month (&optional hide-private)
   "*Rescan schedules of this buffer.
@@ -572,7 +575,7 @@ Returns t if the importation was succeeded."
 					   (mhc-minibuf-candidate-nth-begin))))
 		    ;; input subject
 		    (setq subject
-			  (mhc-input-subject 
+			  (mhc-input-subject
 			   "Subject: "
 			   (mhc-misc-sub
 			    (or (mhc-record-subject original)
@@ -582,17 +585,17 @@ Returns t if the importation was succeeded."
 			    "")))
 		    ;; input location
 		    (setq location
-			  (mhc-input-location 
+			  (mhc-input-location
 			   "Location: "
 			   (mhc-schedule-location schedule)))
 		    ;; input category
 		    (setq category
-			  (mhc-input-category 
+			  (mhc-input-category
 			   "Category: "
 			   (mhc-schedule-categories-as-string schedule)))
 		    (setq priority (mhc-schedule-priority schedule))
 		    (mhc-header-narrowing
-		      (mhc-header-delete-header 
+		      (mhc-header-delete-header
 		       (concat "^\\("
 			       (mhc-regexp-opt (mhc-header-list))
 			       "\\)")
@@ -639,11 +642,11 @@ Returns t if the importation was succeeded."
 		   (lambda (day)
 		     (mhc-date-format day "%04d%02d%02d" yy mm dd))
 		   date " ")
-		  "\nX-SC-Time: " 
+		  "\nX-SC-Time: "
 		  (if time
 		      (let ((begin (car time))
 			    (end (nth 1 time)))
-			(concat 
+			(concat
 			 (if begin (mhc-time-to-string begin) "")
 			 (if end (concat "-" (mhc-time-to-string end)) "")))
 		    "")
@@ -681,12 +684,12 @@ Returns t if the importation was succeeded."
 	(message "Never mind..")
       (if (and
 	   (mhc-record-occur-multiple-p record)
-	   (not (y-or-n-p 
+	   (not (y-or-n-p
 		 (format
 		  "%s has multiple occurrences. Delete all(=y) or one(=n) ?"
 		  (mhc-record-subject-as-string record)))))
-	  (mhc-db-add-exception-rule 
-	   record 
+	  (mhc-db-add-exception-rule
+	   record
 	   (or (mhc-current-date)
 	       (mhc-calendar-view-date)))
 	(mhc-db-delete-file record))
@@ -786,12 +789,12 @@ Returns t if the importation was succeeded."
 ;; manipulate data from mhc-summary-buffer.
 
 (defconst mhc-summary-day-regex  "\\([^|]+| +\\)?[0-9]+/\\([0-9]+\\)")
-(defconst mhc-summary-buf-regex   
+(defconst mhc-summary-buf-regex
   (concat mhc-base-folder "/\\([0-9]+\\)/\\([0-9]+\\)"))
 
 ;(defun mhc-summary-buffer-p (&optional buffer)
-;  (string-match mhc-summary-buf-regex 
-;		(buffer-name 
+;  (string-match mhc-summary-buf-regex
+;		(buffer-name
 ;		 (or buffer (current-buffer)))))
 
 (defun mhc-summary-buffer-p (&optional buffer)
@@ -884,7 +887,7 @@ Returns t if the importation was succeeded."
 	  (or (featurep 'easymenu) (require 'easymenu))
 	  (easy-menu-define mhc-mode-menu
 			    mhc-mode-map
-			    "Menu used in mhc mode." 
+			    "Menu used in mhc mode."
 			    mhc-mode-menu-spec)
 	  (easy-menu-define mhc-calendar-mode-menu
 			    mhc-calendar-mode-map
@@ -896,7 +899,7 @@ Returns t if the importation was succeeded."
 	      (cons (list 'mhc-mode (mhc-file-line-status))
 		    minor-mode-alist)))
     (or (assq 'mhc-mode minor-mode-map-alist)
-	(setq minor-mode-map-alist 
+	(setq minor-mode-map-alist
 	      (cons (cons 'mhc-mode mhc-mode-map)
 		    minor-mode-map-alist)))
     (mhc-face-setup)
@@ -914,7 +917,22 @@ Returns t if the importation was succeeded."
     (autoload 'mhc-ps-insert-buffer "mhc-ps" "*Insert PostScript calendar." t)
     (setq mhc-setup-p t)
     (run-hooks 'mhc-setup-hook)))
-  
+
+(defun mhc-reset ()
+  "Reset MHC."
+  (interactive)
+  (message "MHC resetting...")
+  (mhc-slot-clear-cache)
+  (mhc-face-setup)
+  (mhc-calendar-setup)
+  (and (mhc-use-icon-p) (mhc-icon-setup))
+  (and mhc-calendar-link-hnf (mhc-calendar-hnf-face-setup))
+  (mhc-summary-line-inserter-setup)
+  (or (and (mhc-summary-buffer-p)
+	   (mhc-rescan-month mhc-default-hide-private-schedules))
+      (and (mhc-calendar-p) (mhc-calendar-rescan)))
+  (message "MHC resetting...done"))
+
 (defcustom mhc-exit-hook nil
   "Run hook after mhc-exit."
   :group 'mhc
@@ -936,7 +954,7 @@ Returns t if the importation was succeeded."
 ;; Redistribution and use in source and binary forms, with or without
 ;; modification, are permitted provided that the following conditions
 ;; are met:
-;; 
+;;
 ;; 1. Redistributions of source code must retain the above copyright
 ;;    notice, this list of conditions and the following disclaimer.
 ;; 2. Redistributions in binary form must reproduce the above copyright
@@ -945,7 +963,7 @@ Returns t if the importation was succeeded."
 ;; 3. Neither the name of the team nor the names of its contributors
 ;;    may be used to endorse or promote products derived from this software
 ;;    without specific prior written permission.
-;; 
+;;
 ;; THIS SOFTWARE IS PROVIDED BY THE TEAM AND CONTRIBUTORS ``AS IS''
 ;; AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 ;; LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS

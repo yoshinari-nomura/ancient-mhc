@@ -5,7 +5,7 @@
 ;;          MIYOSHI Masanori <miyoshi@quickhack.net>
 ;;
 ;; Created: 05/12/2000
-;; Reviesd: $Date: 2002/09/23 04:08:58 $
+;; Reviesd: $Date: 2002/09/25 03:41:01 $
 
 ;;; Configration Variables:
 
@@ -199,8 +199,7 @@ ww-japanese-long => \"土曜日\"
   :group 'mhc
   :type 'integer)
 
-(defvar mhc-calendar-width
-  (if (mhc-calendar/cw-week) 28 24))
+(defvar mhc-calendar-width (if (mhc-calendar/cw-week) 28 24))
 
 (defmacro mhc-calendar/cw-string (cw)
   `(let (ret)
@@ -258,6 +257,7 @@ ww-japanese-long => \"土曜日\"
   (define-key mhc-calendar-mode-map "."    'mhc-calendar-goto-today)
   (define-key mhc-calendar-mode-map "g"    'mhc-calendar-goto-month)
   (define-key mhc-calendar-mode-map "r"    'mhc-calendar-rescan)
+  (define-key mhc-calendar-mode-map "R"    'mhc-reset)
   (define-key mhc-calendar-mode-map "="    'mhc-calendar-get-day)
   (define-key mhc-calendar-mode-map " "    'mhc-calendar-get-day-insert)
   (define-key mhc-calendar-mode-map "\C-m" 'mhc-calendar-get-day-insert-quit)
@@ -336,6 +336,7 @@ ww-japanese-long => \"土曜日\"
 		     (mhc-calendar/in-summary-hnf-p)))])
 	  "----"
 	  ("Misc"
+	   ["Reset" mhc-reset t]
 	   ["Quit" mhc-calendar-quit t]
 	   ["Kill" mhc-calendar-exit t]
 	   ["Help" describe-mode t]))))
@@ -353,6 +354,12 @@ ww-japanese-long => \"土曜日\"
   (setq mhc-calendar/week-header nil)
   (setq mhc-calendar/separator-str (char-to-string mhc-calendar-separator))
   (mhc-face-put mhc-calendar/separator-str 'mhc-summary-face-separator)
+  (if (mhc-calendar/cw-week)
+      (when (< mhc-calendar-next-offset 27)
+	(setq mhc-calendar-next-offset 27))
+    (when (< mhc-calendar-next-offset 23)
+      (setq mhc-calendar-next-offset 23)))
+  (setq mhc-calendar-width (if (mhc-calendar/cw-week) 28 24))
   (when (mhc-calendar/cw-week)
     (setq mhc-calendar/week-header
 	  (mhc-calendar/cw-string
@@ -392,7 +399,7 @@ ww-japanese-long => \"土曜日\"
 	(setq center (/ (1+ m) 2)))
       (while (> m 0)
 	(setq rect
-	      (nconc 
+	      (nconc
 	       rect
 	       (mhc-calendar/make-rectangle
 		(mhc-date-mm- date (- m center)) mhc-calendar/separator-str)
@@ -417,7 +424,7 @@ ww-japanese-long => \"土曜日\"
       (mhc-face-put ret 'mhc-calendar-face-saturday))
     (concat "  " (if (mhc-calendar/cw-week) "   " "")
 	    ret cw)))
-  
+
 (defun mhc-calendar-make-header-ja (date)
   (let ((ret (mhc-date-format date "%04d年%2d月" yy mm))
 	(cw ""))
@@ -533,6 +540,7 @@ The keys that are defined for mhc-calendar-mode are:
 \\[mhc-calendar-delete]	Delete the schdule on the cursor point.
 \\[mhc-calendar-hnf-edit] Edit the Hyper Nikki File.
 
+\\[mhc-reset]	Reset MHC.
 \\[mhc-calendar-quit]	Quit and calendar buffer bury.
 \\[mhc-calendar-exit]	Quit and calendar buffer kill.
 \\[describe-mode]	Show mode help.

@@ -1,3 +1,15 @@
+2002-09-25  Hideyuki SHIRAI  <shirai@quickhack.net>
+
+	* emacs/mhc.el (mhc-mode-menu-spec): Bind `mhc-reset'.
+	(mhc-mode-map): Ditto.
+	(mhc-mode): Add doc-sting for `mhc-reset'.
+	(mhc-reset): New function.
+
+	* emacs/mhc-calendar.el (mhc-calendar-mode-map): Bind `mhc-reset'.
+	(mhc-calendar-mode-menu-spec): Ditto.
+	(mhc-calendar-mode): Add doc-sting for `mhc-reset'.
+	(mhc-calendar-setup): Guard from illegal value.
+
 2002-09-24  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* emacs/mhc.el (mhc-scan-month): Use `frame-width' instead of
