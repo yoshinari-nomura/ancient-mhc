@@ -139,7 +139,7 @@
 (defcustom mhc-summary-line-format
   (if (eq mhc-summary-language 'japanese)
       "%M%月%D%日%(%曜%) %b%e %c%i%s %p%l"
-    "%M%/%D %W %b%e %c%i%s %p%l")
+    "%M%/%D%S%W %b%e %c%i%s %p%l")
   "*A format string for summary line of MHC.
 It may include any of the following format specifications
 which are replaced by the given information:
@@ -159,6 +159,7 @@ which are replaced by the given information:
 %/ A slash character if first line of the day.
 %( A left parenthesis character if first line of the day.
 %) A right parenthesis character if first line of the day.
+%S A space with face.
 
 %年 The '年' of the line if first line of the day.
 %月 The '月' of the line if first line of the day.
@@ -207,7 +208,7 @@ which are replaced by the given information:
   :type 'string)
 
 (defcustom mhc-todo-string-excess-day
-    (if (eq mhc-summary-language 'japanese) "(%d 日超過)" "(%d days overdue )")
+    (if (eq mhc-summary-language 'japanese) "(%d 日超過)" "(%d days overdue)")
   "*String format which is displayed in TODO entry.
 '%d' is replaced with excess days."
   :group 'mhc
@@ -300,6 +301,7 @@ which are replaced by the given information:
 	'face mhc-tmp-day-face)
     (?/ (if mhc-tmp-first "/" " ")
 	'face mhc-tmp-day-face)
+    (?S " " 'face mhc-tmp-day-face)
     (?M (mhc-summary/line-month-string)
 	'face mhc-tmp-day-face)
     (?D (mhc-summary/line-day-string)

@@ -1,3 +1,10 @@
+2002-09-26  Hideyuki SHIRAI  <shirai@quickhack.net>
+
+	* emacs/mhc-summary.el (mhc-summary-line-format): Change default
+	value for 'english. 
+	(mhc-summary-line-format-alist): Add `S' rule.
+	(mhc-todo-string-deadline-day): Remove no good space.
+
 2002-09-25  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* emacs/mhc.el (mhc-mode-menu-spec): Bind `mhc-reset'.
