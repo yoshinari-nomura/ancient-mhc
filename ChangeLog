@@ -1,3 +1,8 @@
+2000-07-07  Hideyuki SHIRAI  <shirai@quickhack.net>
+
+	* emacs/mhc-vars.el (mhc-default-coding-system):
+	Changed default value from 'iso-2022jp' to 'iso-2022-7bit-ss2'.
+
 2000-07-07  Yuuichi Teranishi  <teranisi@quickhack.net>
 
 	* emacs/mhc-summary.el (mhc-summary-line-format-alist):
