@@ -5,7 +5,7 @@
 ;;          MIYOSHI Masanori <miyoshi@quickhack.net>
 ;;
 ;; Created: 05/12/2000
-;; Reviesd: $Date: 2002/09/05 04:28:23 $
+;; Reviesd: $Date: 2002/09/19 03:26:56 $
 
 ;;; Configration Variables:
 
@@ -14,7 +14,33 @@
   :group 'mhc
   :type 'character)
 
-(defcustom mhc-calendar-day-strings ["Su" "Mo" "Tu" "We" "Th" "Fr" "Sa"]
+(defcustom mhc-calendar-start-day-of-week 0
+  "*Day of the week as the start of the week."
+  :group 'mhc
+  :type '(choice (const :tag "Sunday" 0)
+		 (const :tag "Monday" 1)
+		 (const :tag "Tuesday" 2)
+		 (const :tag "Wednesday" 3)
+		 (const :tag "Thursday" 4)
+		 (const :tag "Friday" 5)
+		 (const :tag "Saturday" 6)))
+
+(defcustom mhc-calendar-day-strings
+  (cond
+   ((= mhc-calendar-start-day-of-week 0)
+    ["Su" "Mo" "Tu" "We" "Th" "Fr" "Sa"])
+   ((= mhc-calendar-start-day-of-week 1)
+    ["Mo" "Tu" "We" "Th" "Fr" "Sa" "Su"])
+   ((= mhc-calendar-start-day-of-week 2)
+    ["Tu" "We" "Th" "Fr" "Sa" "Su" "Mo"])
+   ((= mhc-calendar-start-day-of-week 3)
+    ["We" "Th" "Fr" "Sa" "Su" "Mo" "Tu"])
+   ((= mhc-calendar-start-day-of-week 4)
+    ["Th" "Fr" "Sa" "Su" "Mo" "Tu" "We"])
+   ((= mhc-calendar-start-day-of-week 5)
+    ["Fr" "Sa" "Su" "Mo" "Tu" "We" "Th"])
+   (t
+    ["Sa" "Su" "Mo" "Tu" "We" "Th" "Fr"]))
   "*Vector of \"day of week\" for 3-month calendar header.
 This vector must have seven elements
 and each element must have \"strings of two columns\".
@@ -357,9 +383,14 @@ ww-japanese-long => \"土曜日\"
       (mhc-misc-insert-rectangle rect))))
 
 (defun mhc-calendar-make-header (date)
-  (mhc-date-format date "   %s %04d"
-		   (mhc-date-digit-to-mm-string mm t) yy))
-
+  (let ((ret (mhc-date-format date "%s %04d"
+			      (mhc-date-digit-to-mm-string mm t) yy)))
+    (if (mhc-date-yymm= (mhc-date-now) date)
+	(mhc-face-put
+	 ret (mhc-face-get-today-face 'mhc-calendar-face-saturday))
+      (mhc-face-put ret 'mhc-calendar-face-saturday))
+    (concat "   " ret)))
+  
 (defun mhc-calendar-make-header-ja (date)
   (let ((ret (mhc-date-format date "%04d年%2d月" yy mm)))
     (if (mhc-date-yymm= (mhc-date-now) date)
@@ -377,11 +408,16 @@ ww-japanese-long => \"土曜日\"
 		      (concat separator " "
 			      (funcall mhc-calendar-header-function
 				       (or date today)))))
-	 (i (mhc-day-day-of-week (car days)))
-	 week color)
-    (while (> i 0)
-      (setq week (cons "  " week)
-	    i (1- i)))
+	 (endday (nth mhc-calendar-start-day-of-week '(6 0 1 2 3 4 5)))
+	 (start (mhc-day-day-of-week (car days)))
+	 (i 0) week color)
+    (unless (= endday 6)
+      (setq start (+ start 6))
+      (when (> start 6)
+	(setq start (- start 7))))
+    (while (< i start)
+      (setq week (cons "  " week))
+      (setq i (1+ i)))
     (while days
       (setq color
 	    (cond
@@ -398,7 +434,7 @@ ww-japanese-long => \"土曜日\"
 	(setq color (mhc-face-get-busy-face color)))
       (setq week (cons (format "%2d" (mhc-day-day-of-month (car days))) week))
       (when color (mhc-face-put (car week) color))
-      (when (= 6 (mhc-day-day-of-week (car days)))
+      (when (= endday (mhc-day-day-of-week (car days)))
 	(setq month (cons (mapconcat
 			   (function identity)
 			   (cons separator (nreverse week))
