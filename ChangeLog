@@ -1,3 +1,16 @@
+2002-11-11 Yoichi NAKAYAMA <yoichi@eken.phys.nagoya-u.ac.jp> / nom
+
+	* emacs/mhc-cvs.el, emacs/mhc-e21.el, emacs/mhc-file.el,
+	  emacs/mhc-ps.el, emacs/mhc-sync.el, emacs/mhc-xmas.el,
+	  emacs/mhc.el, emacs/mhc-bm.el, emacs/mhc-calendar.el:
+
+	  Support the following coding convention:
+	    Many commands that take a long time to execute display a message
+	    that says something like `Operating...' when they start, and
+	    change it to `Operating...done' when they finish.  Please keep the
+	    style of these messages uniform: _no_ space around the ellipsis,
+	    and _no_ period after `done'.
+
 2002-11-09  MIYOSHI Masanori  <miyoshi@boreas.dti.ne.jp>
 
 	* mhc2ol.in: Remove an irrelevant substitution of DayOfMonth in
