@@ -5,7 +5,7 @@
 ## Author:  Yoshinari Nomura <nom@quickhack.net>
 ##
 ## Created: 1999/10/08
-## Revised: $Date: 2000/06/23 07:07:51 $
+## Revised: $Date: 2000/06/26 07:32:33 $
 ##
 
 $DEBUG = false
@@ -126,9 +126,10 @@ pdb .each_record{|rec|
 ## close palm & exit
 ##
 
-if !$flag_noharm
-  
-  if yes_no("Do you clear dirty flag of the palm ")
+if $flag_noharm
+  ## do nothing
+else
+  if !$flag_interactive or yes_no("Do you clear dirty flag of the palm ")
     pdb .reset_sync_flags  ## remove all dirty flag in palm.
     print "Dirty flag cleared.\n"
   else
