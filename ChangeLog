@@ -1,3 +1,20 @@
+2002-12-03  Hideyuki SHIRAI  <shirai@quickhack.net>
+
+	* emacs/mhc-mew.el (mhc-mew-redisplay-import): New user variable.
+	(mhc-mew-get-import-buffer): If `mhc-mew-redisplay-import' is
+	non-nil, re-display message with no hooks and no X-Face.
+
+2002-12-01  Hideyuki SHIRAI  <shirai@quickhack.net>
+
+	* emacs/mhc.el (mhc-scan-month): Use `mhc-misc-get-width'.
+
+	* emacs/mhc-summary.el (mhc-summary/insert-separator): Use `mhc-misc-get-width'.
+
+	* emacs/mhc-misc.el (mhc-misc-get-width): New function.
+
+	* emacs/mhc-calendar.el (mhc-calendar/view-summary-insert): Call
+	`mhc-summary/insert-separator' with fix width.
+
 2002-11-21  Yoshinari NOMURA  <nom@quickhack.net>
 
 	* ruby-ext/mhc_pilib.c (rldp_ReadAppBlock):

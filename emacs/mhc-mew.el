@@ -14,6 +14,11 @@
 
 (require 'mew)
 
+(defcustom mhc-mew-redisplay-import nil
+  "*If non-nil, re-display  with no hooks and no x-face when a message imports"
+  :group 'mhc
+  :type 'boolean)
+
 ;; Internal Variables:
 (defvar mhc-mew-new-virtual-type (boundp 'mew-regex-summary2)
   "*Mew virtual format type. Non-nil means Mew 3.0.55 or later.")
@@ -77,10 +82,21 @@
 
 
 (defun mhc-mew-get-import-buffer (get-original)
-  (if get-original
-      (condition-case nil
-	  (mew-summary-display-asis t)
-	(error (mew-summary-display-asis))))
+  (let (mew-use-highlight-x-face
+	mew-opt-highlight-x-face
+	mew-message-hook
+	mew-summary-display-message-filter-hook)
+    (if get-original
+	(condition-case nil
+	    (mew-summary-display-asis t)
+	  (error (mew-summary-display-asis)))
+      (if mhc-mew-redisplay-import
+	  (cond
+	   ((fboundp 'mew-summary-analyze-again)
+	    (mew-summary-analyze-again))
+	   ((fboundp 'mew-summary-display-command)
+	    (mew-summary-display-command))
+	   (t (mew-summary-display))))))
   (save-window-excursion
     (if (eq (cdr (assq major-mode mhc-mew/summary-message-alist))
 	    (progn (other-window 1) major-mode))
