@@ -1,3 +1,9 @@
+2002-03-28  Hideyuki SHIRAI  <shirai@quickhack.net>
+
+	* emacs/mhc-mew.el (mhc-mew/match-string): New aliase symbol.
+	(mhc-mew-draft-translate, mhc-mew-eword-decode-string): Use
+	`mhc-mew/match-string' instead of `mew-match'.
+
 2002-03-15  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* emacs/mhc-mew.el (mhc-mew-new-virtual-type): New variable.

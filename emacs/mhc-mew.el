@@ -54,6 +54,9 @@
   (add-hook 'mew-virtual-mode-hook 'mhc-mode)
   (add-hook 'mew-quit-hook 'mhc-exit))
 
+(if (fboundp 'mew-match)
+    (defalias 'mhc-mew/match-string 'mew-match)
+  (defalias 'mhc-mew/match-string 'match-string))
 
 ;; Backend methods:
 
@@ -271,7 +274,7 @@
 	  (when (and ct (string-match "^multipart/" ct)
 		     (or (string-match "boundary=\"\\([^\"]+\\)\"" ct)
 			 (string-match "boundary=\\(.+\\)" ct)))
-	    (setq boundary (regexp-quote (mew-match 1 ct)))
+	    (setq boundary (regexp-quote (mhc-mew/match-string 1 ct)))
 	    (let ((case-fold-search nil))
 	      (unless (and boundary
 			   (re-search-forward (concat "^--" boundary "$") nil t)
@@ -383,9 +386,9 @@
 	(setq tmpstr (substring string (match-end 0)))
 	(setq ret (concat ret
 			  (substring string 0 (match-beginning 0))
-			  (mew-header-decode (mew-match 1 string)
-					     (mew-match 2 string)
-					     (mew-match 3 string))))
+			  (mew-header-decode (mhc-mew/match-string 1 string)
+					     (mhc-mew/match-string 2 string)
+					     (mhc-mew/match-string 3 string))))
 	(setq string tmpstr)))
     ret))
 
