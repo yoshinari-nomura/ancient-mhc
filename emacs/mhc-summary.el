@@ -180,13 +180,11 @@ third one is replaced with day of month."
 	'face mhc-tmp-day-face)
     (?W (mhc-summary/line-day-of-week-string)
 	'face mhc-tmp-day-face)
-    (?b (if (or mhc-tmp-private
-		(null mhc-tmp-begin))
+    (?b (if (null mhc-tmp-begin)
 	    (make-string 5 ? )
 	  (format "%02d:%02d" (/ mhc-tmp-begin 60) (% mhc-tmp-begin 60)))
 	'face 'mhc-summary-face-time)
-    (?e (if (or mhc-tmp-private
-		(null mhc-tmp-end))
+    (?e (if (null mhc-tmp-end)
 	    (make-string 6 ? )
 	  (format "-%02d:%02d" (/ mhc-tmp-end 60) (% mhc-tmp-end 60)))
 	'face 'mhc-summary-face-time)
@@ -281,11 +279,13 @@ PROP-VALUE is the property value correspond to PROP-TYPE.
 
 (defsubst mhc-summary-search-date (date)
   "Search day in the current buffer."
-  (goto-char (point-min))
-  (while (and (not (eobp))
-	      (not (eq (mhc-day-date
-			(get-text-property (point) 'mhc-dayinfo)) date)))
-    (goto-char (next-single-property-change (point) 'mhc-dayinfo))))
+  (let (dayinfo)
+    (goto-char (point-min))
+    (while (and (not (eobp))
+		(or (null (setq dayinfo
+				(get-text-property (point) 'mhc-dayinfo)))
+		    (not (eq (mhc-day-date dayinfo) date))))
+      (goto-char (next-single-property-change (point) 'mhc-dayinfo)))))
 
 (defsubst mhc-summary-mode-setup (date &optional mailer)
   "Setup buffer as summary mode of MAILER."
@@ -325,35 +325,41 @@ PROP-VALUE is the property value correspond to PROP-TYPE.
 	mhc-tmp-begin mhc-tmp-end
 	mhc-tmp-location mhc-tmp-schedule
 	mhc-tmp-conflict
-	next-begin)
+	next-begin displayed)
     (if schedules
-	(while schedules
-	  (if (or (null category)
-		  (if category-is-invert
-		      (not (mhc-schedule-in-category-p
-			    (car schedules) category))
-		    (mhc-schedule-in-category-p
-		     (car schedules) category)))
-	      (progn
-		(setq mhc-tmp-begin (mhc-schedule-time-begin (car schedules))
-		      mhc-tmp-end (mhc-schedule-time-end (car schedules))
-		      next-begin (if (car (cdr schedules))
-				     (mhc-schedule-time-begin
-				      (car (cdr schedules))))
-		      mhc-tmp-conflict (or (and mhc-tmp-end next-begin
-						(< next-begin mhc-tmp-end))
-					   (and mhc-tmp-begin time-max 
-						(< mhc-tmp-begin time-max))))
-		(if mhc-tmp-end (setq time-max (max mhc-tmp-end time-max)))
-		(mhc-summary-insert-contents
-		 (car schedules)
-		 (and secret
+	(progn
+	  (while schedules
+	    (if (or (null category)
+		    (if category-is-invert
+			(not (mhc-schedule-in-category-p
+			      (car schedules) category))
 		      (mhc-schedule-in-category-p
-		       (car schedules) "private"))
-		 'mhc-summary-line-insert
-		 mailer)
-		(setq mhc-tmp-first nil)))
-	  (setq schedules (cdr schedules)))
+		       (car schedules) category)))
+		(progn
+		  (setq mhc-tmp-begin (mhc-schedule-time-begin (car schedules))
+			mhc-tmp-end (mhc-schedule-time-end (car schedules))
+			next-begin (if (car (cdr schedules))
+				       (mhc-schedule-time-begin
+					(car (cdr schedules))))
+			mhc-tmp-conflict (or (and mhc-tmp-end next-begin
+						  (< next-begin mhc-tmp-end))
+					     (and mhc-tmp-begin time-max 
+						  (< mhc-tmp-begin time-max))))
+		  (if mhc-tmp-end (setq time-max (max mhc-tmp-end time-max)))
+		  (setq displayed t)
+		  (mhc-summary-insert-contents
+		   (car schedules)
+		   (and secret
+			(mhc-schedule-in-category-p
+			 (car schedules) "private"))
+		   'mhc-summary-line-insert
+		   mailer)
+		  (setq mhc-tmp-first nil)))
+	    (setq schedules (cdr schedules)))
+	  (if (not displayed)
+	      (mhc-summary-insert-contents nil secret
+					   'mhc-summary-line-insert
+					   mailer)))
       (mhc-summary-insert-contents nil secret
 				   'mhc-summary-line-insert
 				   mailer))))

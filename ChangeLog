@@ -1,3 +1,12 @@
+2000-07-07  Yuuichi Teranishi  <teranisi@quickhack.net>
+
+	* emacs/mhc-summary.el (mhc-summary-line-format-alist):
+	Display begin and end time in `hide-private' mode.
+	(mhc-summary/insert-dayinfo): Display day info even when
+	all schedules are not displayed.
+	(mhc-summary-search-date): Fixed problem when there's no property in
+	beginning of buffer.
+
 2000-07-06  MIYOSHI Masanori  <miyoshi@ask.ne.jp>
 
 	* 00readme.w32.jis: New file for Windows users.
