@@ -1,78 +1,31 @@
 # -*- Makefile -*-
 
-### Common Macros
-EMACS = emacs
-OPT   = -batch -q -no-site-file -eval '(setq load-path (cons "'`pwd`'" load-path))'
-SRC   = mhc.el mhc-compat.el mhc-cvs.el mhc-date.el mhc-day.el mhc-db.el mhc-face.el \
-	mhc-file.el mhc-guess.el mhc-header.el mhc-logic.el mhc-minibuf.el mhc-misc.el \
-	mhc-parse.el mhc-record.el mhc-schedule.el mhc-slot.el mhc-summary.el \
-	mhc-vars.el mhc-bm.el mhc-xmas.el mhc-calendar.el mhc-sync.el
-ELC   = $(SRC:.el=.elc)
+# MEW_OPTS  = --with-mew
+# WL_OPTS   = --with-wl
+# GNUS_OPTS = --with-gnus
 
-### For Mew
-MEW_DIR =
-MEW_OPT = -eval '(setq load-path (cons "$(MEW_DIR)" load-path))'
-MEW_SRC = mhc-mew.el
-MEW_ELC = $(MEW_SRC:.el=.elc)
+## To change install directory.
+# INST_OPTS = --with-lispdir=/usr/local/share/emacs/site-lisp/mhc
 
-### For Wanderlust
-WL_DIR =
-WL_OPT = -eval '(setq load-path (cons "$(WL_DIR)" load-path))'
-WL_SRC = mhc-wl.el
-WL_ELC = $(WL_SRC:.el=.elc)
+## To add paths of additional emacs-lisp libraries.
+# INST_OPTS = --with-addpath=/foo:/bar:/baz
 
-### For Gnus
-GNUS_DIR =
-GNUS_OPT = -eval '(setq load-path (cons "$(GNUS_DIRECTORY)" load-path))'
-GNUS_SRC = mhc-gnus.el nnmhc.el
-GNUS_ELC = $(GNUS_SRC:.el=.elc)
+EMACS  = emacs
+XEMACS = xemacs
+FLAGS  = -batch -q -no-site-file -l MHC-MK
+OPTS   = $(INST_OPTS) $(MEW_OPTS) $(WL_OPTS) $(GNUS_OPTS)
 
+elc:
+	$(EMACS) $(FLAGS) -f make-mhc-compile $(OPTS)
 
-### Suffix rules
-.SUFFIXES: .elc .el
+install:
+	$(EMACS) $(FLAGS) -f make-mhc-install $(OPTS) # $(MAKE)
 
-.el.elc:
-	-rm -f $<c
-	$(EMACS) $(OPT) -l mhc.el -f batch-byte-compile $<
+package:
+	$(XEMACS) $(FLAGS) -f make-mhc-compile-package
 
-
-### For main program
-default: $(ELC)
-
-mhc-record.elc: mhc-record.el
-	rm -f $@
-	$(EMACS) $(OPT) -l mhc.el -l mhc-file.el -f batch-byte-compile $?
-
-
-### For mew
-mew: $(MEW_ELC)
-
-mhc-mew.elc: mhc-mew.el
-	rm -f $@
-	$(EMACS) $(OPT) $(MEW_OPT) -l mhc.el -f batch-byte-compile $?
-
-
-### For Wanderlust
-wl: $(WL_ELC)
-
-mhc-wl.elc: mhc-wl.el
-	rm -f $@
-	$(EMACS) $(OPT) $(WL_OPT) -l mhc.el -f batch-byte-compile $?
-
-
-### For Gnus
-gnus: $(GNUS_ELC)
-
-mhc-gnus.elc: mhc-gnus.el
-	rm -f $@
-	$(EMACS) $(OPT) $(GNUS_OPT) -l mhc.el -f batch-byte-compile $?
-
-nnmhc.elc: nnmhc.el
-	rm -f $@
-	$(EMACS) $(OPT) $(GNUS_OPT) -l mhc.el -f batch-byte-compile $?
-
-
-all: default mew wl gnus
+install-package:
+	$(XEMACS) $(FLAGS) -f make-mhc-install-package # $(MAKE)
 
 clean:
-	rm -f *~ *.elc
+	-rm -f *.elc

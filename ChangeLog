@@ -1,3 +1,9 @@
+2000-06-13  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+
+	* emacs/Makefile: Make a change in using MHC-MK.
+
+	* emacs/MHC-MK: New file.
+
 2000-06-13  MIYOSHI Masanori  <miyoshi@ask.ne.jp>
 
 	* emacs/mhc-gnus.el (mhc-gnus-generate-summary-buffer): Set
@@ -29,8 +35,6 @@
 	* emacs/mhc-sync.el: New file for ruby sync script.
 
 	* emacs/Makefile: Include mhc-bm.el, mhc-xmas.el, mhc-calendar.el and mhc-sync.el.
-
-	* emacs/Makefile.w32: New file.
 
 2000-06-12  Yoshinari Nomura  <nom@quickhack.net>
 
