@@ -163,10 +163,12 @@ $ ruby make.rb install
 
 (*)オプションの詳細は、`ruby configure.rb --help' を実行して調べてく
    ださい。Meadow 1.15 が \usr\local\Meadow にインストールされて
-   いる場合は、次のように指定すればよいでしょう。
+   いて、MUA として gnus を使う場合は、次のように指定すればよいでしょう。
+   MUA として Mew や Wanderlust を使う場合は、--with-gnus の代わりに、
+   --with-mew, --with-wl を指定します。
    `ruby configure.rb --with-emacs=/usr/local/Meadow/1.15/bin/meadownt\
                       --with-lispdir=/usr/local/Meadow/site-lisp/mhc\
-                      --disable-palm'
+                      --disable-palm --with-gnus'
 
 *** mhc2palm, palm2mhc の利用方法
 
@@ -277,9 +279,13 @@ $ ./make.rb install
 
 (*)オプションの詳細は、`ruby configure.rb --help' を実行して調べてく
    ださい。Meadow 1.15 が /usr/local/Meadow にインストールされて
-   いる場合は、次のように指定すればよいでしょう。
+   いて、MUA として gnus を使う場合は、次のように指定すればよいでしょう。
+   MUA として Mew や Wanderlust を使う場合は、--with-gnus の代わりに、
+   --with-mew, --with-wl を指定します。
+
    `ruby configure.rb --with-emacs=/usr/local/Meadow/1.15/bin/meadownt\
-                       --with-lispdir=/usr/local/Meadow/site-lisp/mhc'
+                      --with-lispdir=/usr/local/Meadow/site-lisp/mhc\
+		      --with-gnus'
 
 *** mhc2palm, palm2mhc のインストール
 
