@@ -4,7 +4,7 @@
                         Yoshinari Nomura
 
 Created: 1999/09/01
-Revised: $Date: 2000/05/29 15:08:23 $
+Revised: $Date: 2000/06/22 00:43:55 $
 
 
 ** はじめに:
@@ -14,7 +14,7 @@ MHC は、ほとんどの予定を電子メールで受け取るような人のためにデザインさ
 できます。
 
 最新版のパッケージは、以下から入手できます:
- http://www.swlab.csce.kyushu-u.ac.jp/~nom/prj/mhc/
+ http://www.quickhack.net/mhc/
 
 MHC は以下のような特長をもっています:
 
@@ -75,7 +75,7 @@ ruby-ext/     -- MHC 形式の予定を扱うライブラリ
 		 (gemcal, palm2mhc, mhc2palm からも使用)
 xpm/          -- gemcal で使っているボタンの絵。
 experimental/ -- 実験コード
-00readme.jp   -- このファイル
+00readme.jis  -- このファイル
 00copyright   -- 著作権表示
 00changes     -- 更新履歴
 
@@ -88,22 +88,21 @@ experimental/ -- 実験コード
 
 MHC に関するお話をするメイリングリストを上げました。
 (議論は日本語で交されています。)
-mhc-ctl@swlab.csce.kyushu-u.ac.jp に
+mhc-ctl@quickhack.net に
 
     subscribe Your Name (例: subscribe Yoshinari Nomura)
 
 のように書いたメールを送って下さい。(入会の確認メールが来ます)
 コメント・バグレポート等は、
 
-    mhc@swlab.csce.kyushu-u.ac.jp
+    mhc@quickhack.net
 
-宛てか nom@mew.org に下さい。また、iij の大原さんが、mhc の CGI インター
+宛てか nom@quickhack.net に下さい。また、iij の大原さんが、mhc の CGI インター
 フェースと、mhc のページを作成されています。合せて御覧下さい。
 
-    mhc.el  紹介ページ http://mhc.hauN.org/
     web-mhc 置場   http://mhc.hauN.org/web-mhc/
 
 MHC の最新版は、下記から入手できます:
-  http://www.swlab.csce.kyushu-u.ac.jp/~nom/prj/mhc/
+  http://www.quickhack.net/mhc/
 
 -- 00readme.jis ends here.
