@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1999/04/13
-;; Revised: $Date: 2000/07/04 00:44:02 $
+;; Revised: $Date: 2000/08/05 19:54:40 $
 ;;
 
 ;;;
@@ -16,18 +16,22 @@
 ;; 返す。
 ;;
 ;; 以下のような GUESS-CANDIDATE のリストを返す
-;;   ([mhc-date point-begin point-end score]..)
-;;    
+;;   ([mhc-{date,time} mhc-{date,time}-end point-begin point-end score]..)
+;;
+;; mhc-{date,time}:     予定の開始 {日, 時間}
+;; mhc-{date,time}-end  予定の終了 {日, 時間} or nil
+;;
 ;; 日付推測の手順
 ;;
 ;; 1. 日付/時刻を表すキーワード見付けて、発見個所リストを作る。
 ;;
-;;    (mhc-guess/gather-date-list mhc-guess-date-regexp-list)
-;;    (mhc-guess/gather-time-list mhc-guess-time-regexp-list)
+;;    (mhc-guess/gather-candidate mhc-guess-date-regexp-list now)
+;;    (mhc-guess/gather-candidate mhc-guess-time-regexp-list now)
 ;;
 ;;    の 2つの関数で、
 ;;  
-;;    ([found-date found-point-begin found-point-end nil] ...)
+;;    ([found-date found-date-end found-point-begin found-point-end nil] ...)
+;;    ([found-time found-time-end found-point-begin found-point-end nil] ...)
 ;;
 ;;    のような candidate-list を得る。
 ;;
@@ -35,14 +39,14 @@
 ;;
 ;;    (mhc-guess/score candidate-list mhc-guess-keyword-score-alist)
 ;;
-;;    ([found-date found-point-begin found-point-end score] ...)
+;;    ([found-date found-date-end found-point-begin found-point-end score] ...)
 ;;
-;;      キーワードが引用行中にある、
-;;      同一行に特定の文字列がある、
-;;      ある範囲の前方/後方に特定の文字列がある。
+;;      キーワードが引用行中にある
+;;      同一行に特定の文字列がある
+;;      ある範囲の前方/後方に特定の文字列がある
 ;;
-;;    のような条件と得点を表す mhc-guess-keyword-score-alist に基づいて
-;;    採点をする。
+;;    のような条件と加点/減点を表す mhc-guess-keyword-score-alist に基
+;;    づいて採点をする。
 ;;
 ;; 3. 得点順に、sort して返す
 
@@ -57,37 +61,63 @@
 ;; regexp for get date strings.
 ;;
 
-(defvar mhc-guess-date-regexp-list
-  '(
-    ("\\(\\([来今０-９0-9]+\\)[\n　 ]*月\\)[\n 　]*の?[\n 　]*\\([０-９0-9]+\\)"
-     mhc-guess/make-date-from-mmdd 2 3)
-    ("\\([０-９0-9]+\\)[　 ]*[／/][　 ]*\\([０-９0-9]+\\)"
-     mhc-guess/make-date-from-mmdd 1 2)
+(setq mhc-guess-date-regexp-list
+  `(
+    (,(concat "\\([来今０-９0-9]+\\)[\n　 ]*月[\n 　]*の?[\n 　]*"
+	      "\\([０-９0-9]+\\)日?"
+	      "\\([（）()月火水木金土日曜\n 　 ]*"
+	           "\\([〜−-，,、]\\|から\\|より\\)[\n 　]*"
+		   "\\(\\([来今０-９0-9]+\\)[\n　 ]*月\\)?[\n 　]*の?[\n 　]*"
+		   "\\([０-９0-9]+\\)日?\\(間\\)?"
+	       "\\)?")
+     mhc-guess/make-date-from-mmdd 1 2 6 7 8)
+
+    (,(concat "\\([０-９0-9]+[　 ]*[／/][　 ]*\\)?"
+	      "\\([０-９0-9]+\\)[　 ]*[／/][　 ]*\\([０-９0-9]+\\)"
+	      "\\([（）()月火水木金土日曜\n 　 ]*"
+ 	           "\\([〜−，,、-]\\|から\\|より\\)[\n 　]*"
+		   "\\([０-９0-9]+[　 ]*[／/][　 ]*\\)?"
+ 		   "\\(\\([０-９0-9]+\\)[　 ]*[／/][　 ]*\\)?"
+ 		   "\\([０-９0-9]+\\)日?\\(間\\)?"
+	      "\\)?")
+     mhc-guess/make-date-from-mmdd 2 3 8 9 10)
+    
     throw
-    ("\\(今度\\|[今来次]週\\|再来週\\)[\n 　]*の?[\n 　]*\\([月火水木金土日]\\)曜"
+
+    (,(concat "\\(今度\\|[今来次]週\\|再来週\\)[\n 　]*の?[\n 　]*"
+	     "\\([月火水木金土日]\\)曜")
      mhc-guess/make-date-from-relative-week 1 2)
+
     throw
+
     ("\\([０-９0-9]+\\)[\n 　]*日"
      mhc-guess/make-date-from-mmdd nil 1)
-    ("\\([月火水木金土日]\\)\n?曜"
+
+    ("[^\(（]\\([月火水木金土日]\\)\n?曜"
      mhc-guess/make-date-from-relative-week nil 1)
+
     ("\\(本日\\|今日\\|あす\\|あした\\|あさって\\|明日\\|明後日\\)"
      mhc-guess/make-date-from-relative-day 1)
     ))
 
 (defvar mhc-guess-time-regexp-list
-  '("\\([０-９0-9]+\\) *[：:時] *\\([０-９0-9]+\\|半\\)?"))
+  `(
+    (,(concat "\\([０-９0-9]+\\) *[：:時] *\\([０-９0-9]+\\|半\\)?分?"
+	     "\\([\n 　]*\\([〜−-]\\|から\\|より\\)[\n 　午前後]*"
+	     "\\([０-９0-9]+\\) *[：:時]\\(間\\)? *\\([０-９0-9]+\\|半\\)?\\)?")
+     mhc-guess/make-time-from-hhmm 1 2 5 7 6)
+    ))
 
 ;; keyword to score-alist:
 ;;    each element consists of (regexp relative-boundary sameline? score)
-(defvar mhc-guess-keyword-score-alist
+(setq mhc-guess-keyword-score-alist
   '(
     ;; positive factor
-    ("^[\t ][\t ]+"                                 -200 t   +5)
+    ("^[\t ]+"                                      -200 t   +5)
     ("次回"                                         -200 nil +10)
-    ("\\(日程\\|時間帯\\|日時\\|開始時間\\)"        -150 nil +5)
-    ("\\(日程\\|時間帯\\|日時\\|開始時間\\)[:：]"   -150 t   +5)
-    ("\\(から\\|〜\\|変更\\|延期\\|順延\\|開始\\)"   +80 nil +5)
+    ("\\(期間\\|月日\\|日程\\|時間帯\\|日時\\|開始時間\\)"        -150 nil +5)
+    ("\\(期間\\|月日\\|日程\\|時間帯\\|日時\\|開始時間\\)[:：]"   -150 t   +5)
+    ("\\(から\\|〜\\|変更\\|延期\\|順延\\|開始\\)"   +80 nil +4)
     ;; negative factor
     ("\\(休み\\|除く\\|中止\\|までに\\)"             +80 t   -10)
     ("出欠"                                          -80 nil -5)
@@ -101,116 +131,77 @@
 ;; manipulate guess-candidate structure.
 ;;
 
-(defmacro mhc-guess-get-date          (obj)   `(aref ,obj 0))
-(defmacro mhc-guess-get-time          (obj)   `(aref ,obj 0))
-(defmacro mhc-guess-get-date-or-time  (obj)   `(aref ,obj 0))
-(defmacro mhc-guess-get-begin         (obj)   `(aref ,obj 1))
-(defmacro mhc-guess-get-end           (obj)   `(aref ,obj 2))
-(defmacro mhc-guess-get-score         (obj)   `(aref ,obj 3))
+(defmacro mhc-guess-get-date             (obj)   `(aref ,obj 0))
+(defmacro mhc-guess-get-time             (obj)   `(aref ,obj 0))
+(defmacro mhc-guess-get-date-or-time     (obj)   `(aref ,obj 0))
 
-(defmacro mhc-guess-set-date  (obj val) `(aset ,obj 0 ,val))
-(defmacro mhc-guess-set-time  (obj val) `(aset ,obj 0 ,val))
-(defmacro mhc-guess-set-begin (obj val) `(aset ,obj 1 ,val))
-(defmacro mhc-guess-set-end   (obj val) `(aset ,obj 2 ,val))
-(defmacro mhc-guess-set-score (obj val) `(aset ,obj 3 ,val))
+(defmacro mhc-guess-get-date-end         (obj)   `(aref ,obj 1))
+(defmacro mhc-guess-get-time-end         (obj)   `(aref ,obj 1))
+(defmacro mhc-guess-get-date-or-time-end (obj)   `(aref ,obj 1))
 
-(defun mhc-guess/new (&optional date-or-time begin end score)
-  (vector date-or-time begin end score))
+(defmacro mhc-guess-get-begin         (obj)   `(aref ,obj 2))
+(defmacro mhc-guess-get-end           (obj)   `(aref ,obj 3))
+(defmacro mhc-guess-get-score         (obj)   `(aref ,obj 4))
+
+(defmacro mhc-guess-set-date      (obj val) `(aset ,obj 0 ,val))
+(defmacro mhc-guess-set-time      (obj val) `(aset ,obj 0 ,val))
+
+(defmacro mhc-guess-set-date-end  (obj val) `(aset ,obj 1 ,val))
+(defmacro mhc-guess-set-time-end  (obj val) `(aset ,obj 1 ,val))
+
+(defmacro mhc-guess-set-begin     (obj val) `(aset ,obj 2 ,val))
+(defmacro mhc-guess-set-end       (obj val) `(aset ,obj 3 ,val))
+(defmacro mhc-guess-set-score     (obj val) `(aset ,obj 4 ,val))
+
+(defun mhc-guess/new (&optional date-or-time date-or-time-end begin end score)
+  (vector date-or-time date-or-time-end begin end score))
 
 ;;
-;; public entry
+;; pulic entry
 ;;
 
-;; returns nil or list of guess-candidate.
-;;
 (defun mhc-guess-date (&optional hint1)
-  (let ((score-list (mhc-guess/score
-		     (mhc-guess/gather-date-list  mhc-guess-date-regexp-list)
-		     mhc-guess-keyword-score-alist
-		     hint1)))
-    (sort score-list (function (lambda (a b) (< (mhc-guess-get-score b)
-						(mhc-guess-get-score a)))))))
-
-;; returns nil or list of guess-candidate.
-;;
+  (let ((now (or (mhc-date-new-from-string3 (mhc-header-get-value "Date"))
+		 (mhc-date-now))))
+    (mhc-guess/guess mhc-guess-date-regexp-list hint1 now)))
 
 (defun mhc-guess-time (&optional hint1)
-  (let ((score-list (mhc-guess/score
-		     (mhc-guess/gather-time-list mhc-guess-time-regexp-list)
-		     mhc-guess-keyword-score-alist
-		     hint1)))
+  (mhc-guess/guess mhc-guess-time-regexp-list hint1))
+
+
+(defun mhc-guess/guess (control-regexp-lst &optional hint1 now)
+  (let ((score-list
+	 (mhc-guess/score (mhc-guess/gather-candidate control-regexp-lst now)
+			  mhc-guess-keyword-score-alist
+			  hint1
+			  now)))
     (sort score-list (function (lambda (a b) (< (mhc-guess-get-score b)
 						(mhc-guess-get-score a)))))))
 
 ;;
-;; gather time
+;; gather date/time.
 ;;
 
-;; return a list of guess-candidate
-;;
-(defun mhc-guess/gather-time-list (regexp-lst)
-  (let ((ret nil))
-    (while regexp-lst
-      (setq ret (nconc ret (mhc-guess/gather-time-list2 (car regexp-lst))))
-      (setq regexp-lst (cdr regexp-lst)))
-    ret))
-
-;; return a list of guess-candidate
-(defun mhc-guess/gather-time-list2 (regexp)
-  (let* (lst xHH xMM time)
-    (save-excursion
-      ;; skip Header
-      (goto-char (point-min))
-      (re-search-forward "^-*$" nil t)
-      ;; search candities.
-      (while (re-search-forward regexp nil t)
-	(setq xHH (mhc-guess/string-to-int
-		   (buffer-substring (match-beginning 1) (match-end 1))))
-	(if (< xHH 8) (setq xHH (+ xHH 12))) ;; 8 depends on my life style.
-	(setq xMM 
-	      (cond
-	       ((not (match-beginning 2))
-		0)
-	       ((string= 
-		 (buffer-substring (match-beginning 2) (match-end 2)) "半")
-		30)
-	       (t
-		(mhc-guess/string-to-int
-		 (buffer-substring (match-beginning 2) (match-end 2))))))
-	(if (setq time (mhc-time-new xHH xMM t)) ;; noerror is t
-	    (setq lst
-		  (cons 
-		   (mhc-guess/new time (match-beginning 0) (match-end 0) nil)
-		   lst)))))
-    (nreverse lst)))
-
-;;
-;; gather date
-;;
-
-(defun mhc-guess/gather-date-list (regexp-lst)
-  (let ((ret nil)
- 	(now (or (mhc-date-new-from-string3 (mhc-header-get-value "Date:"))
- 		 (mhc-date-now)))
- 	date-list)
-    (while regexp-lst
+(defun mhc-guess/gather-candidate (control-regexp-lst &optional now)
+  (let ((ret nil) cand-lst)
+    (while control-regexp-lst
       (cond
-       ((listp (car regexp-lst))
- 	(if (setq date-list
- 		  (mhc-guess/gather-date-list2
- 		   (car (car regexp-lst))       ;; regexp
+       ((listp (car control-regexp-lst))
+ 	(if (setq cand-lst
+ 		  (mhc-guess/gather-candidate2
+ 		   (car (car control-regexp-lst))       ;; regexp
+ 		   (car (cdr (car control-regexp-lst))) ;; convfunc
+ 		   (cdr (cdr (car control-regexp-lst))) ;; posision list
  		   now                          ;; current date
- 		   (car (cdr (car regexp-lst))) ;; convfunc
- 		   (cdr (cdr (car regexp-lst))) ;; posision list
  		   ))
- 	    (setq ret (nconc ret date-list))))
-       ((and (string= "throw" (symbol-name (car regexp-lst))) ret)
- 	(setq regexp-lst nil)))
-      (setq regexp-lst (cdr regexp-lst)))
+ 	    (setq ret (nconc ret cand-lst))))
+       ((and (string= "throw" (symbol-name (car control-regexp-lst))) ret)
+ 	(setq control-regexp-lst nil)))
+      (setq control-regexp-lst (cdr control-regexp-lst)))
     ret))
 
-(defun mhc-guess/gather-date-list2 (regexp now convfunc pos-list)
-  (let* (lst date param-list p)
+(defun mhc-guess/gather-candidate2 (regexp convfunc pos-list &optional now)
+  (let* (lst duration param-list p)
     (save-excursion
       ;; skip Header
       (goto-char (point-min))
@@ -228,10 +219,15 @@
  		   nil)
  		 param-list))
  	  (setq p (cdr p)))
- 	(if (setq date (apply 'funcall convfunc now (nreverse param-list)))
- 	    (setq lst 
+ 	(setq duration (apply 'funcall convfunc now (nreverse param-list)))
+	(if (car duration)
+	    (setq lst 
 		  (cons 
-		   (mhc-guess/new date(match-beginning 0) (match-end 0) nil)
+		   (mhc-guess/new (car duration)
+				  (cdr duration)
+				  (match-beginning 0)
+				  (match-end 0)
+				  nil)
 		   lst)))))
     (nreverse lst)))
 
@@ -239,7 +235,24 @@
 ;; make date from string.
 ;;
 
-(defun mhc-guess/make-date-from-mmdd (now mm-str dd-str)
+
+(defun mhc-guess/make-date-from-mmdd
+  (now mm-str dd-str &optional mm-str2 dd-str2 relative)
+  (let* ((start nil) (end nil))
+    (setq start (mhc-guess/make-date-from-mmdd2 now mm-str dd-str))
+    (if start
+	(setq end (mhc-guess/make-date-from-mmdd2 start mm-str2 dd-str2)))
+    (cond
+     ((null start)
+      nil)
+     ((null end)
+      (cons start nil))
+     (relative
+      (cons start (mhc-date+ start end)))
+     (t
+      (cons start end)))))
+
+(defun mhc-guess/make-date-from-mmdd2 (now mm-str dd-str)
   (let ((data (match-data))
  	(mm (if mm-str (mhc-guess/string-to-int mm-str) 0))
  	(dd (if dd-str (mhc-guess/string-to-int dd-str) 0))
@@ -271,14 +284,14 @@
    ((null rel-word)
     nil)
    ((or (string= rel-word "今日") (string= rel-word "本日"))
-    now)
+    (cons now nil))
    ((or (string= rel-word "あす")
  	(string= rel-word "あした")
  	(string= rel-word "明日"))
-    (mhc-date++ now))
+    (cons (mhc-date++ now) nil))
    ((or (string= rel-word "あさって")
  	(string= rel-word "明後日"))
-    (mhc-date+ now 2))))
+    (cons (mhc-date+ now 2) nil))))
 
 (defun mhc-guess/make-date-from-relative-week (now rel-word week)
   (let ((data (match-data))
@@ -299,20 +312,55 @@
  	   ((string= rel-word "再来週")
  	    (+ off 14))))
     (store-match-data data)
-    (mhc-date+ date off)
+    (cons (mhc-date+ date off) nil)
     ))
+
+;;
+;; make time from string.
+;;
+
+(defun mhc-guess/make-time-from-hhmm 
+  (now hh-str mm-str hh-str2 mm-str2 &optional relative)
+  (let ((start (mhc-guess/make-time-from-hhmm2 hh-str mm-str))
+	(end   (mhc-guess/make-time-from-hhmm2 hh-str2 mm-str2 relative)))
+    (cond
+     ((null start)
+      nil)
+     ((null end)
+      (cons start nil))
+     (relative
+      (cons start (mhc-time+ start end)))
+     (t
+      (cons start end)))))
+
+(defun mhc-guess/make-time-from-hhmm2 (hh-str mm-str &optional relative)
+  (let (xHH xMM)
+    (if (null hh-str)
+	nil  ;; retun value
+
+      (setq xHH (mhc-guess/string-to-int hh-str))
+      (if (and (not relative) (< xHH 8)) ;; 8 depends on my life style.
+	  (setq xHH (+ xHH 12)))
+      (setq xMM 
+	    (cond
+	     ((not mm-str)	     0)
+	   ((string= mm-str "半")    30)
+	   (t                        (mhc-guess/string-to-int mm-str))))
+      (mhc-time-new xHH xMM t))))
 
 ;;
 ;; scoring
 ;;
 
-(defun mhc-guess/score (candidate-lst score-alist &optional hint1)
+(defun mhc-guess/score (candidate-lst score-alist &optional hint1 now)
   (let ((clist candidate-lst)
 	total-score candidate regexp boundary sameline score slist)
     (while clist
       (setq candidate   (car clist)
 	    slist       score-alist
 	    total-score 0)
+
+      ;; set score using score-alist
       (while slist
 	(setq regexp   (nth 0 (car slist))
 	      boundary (nth 1 (car slist))
@@ -324,11 +372,18 @@
 	     boundary 
 	     sameline)
 	    (setq total-score (+ total-score score)))
-	(if (and hint1
-		 (<  hint1 (mhc-guess-get-begin candidate))
-		 (<  (- (mhc-guess-get-begin candidate) hint1) 40))
-	    (setq total-score (+ total-score 10)))
 	(setq slist (cdr slist)))
+
+      ;; hint1 is a position hint to encourage the near one.
+      (if (and hint1
+	       (<  hint1 (mhc-guess-get-begin candidate))
+	       (<  (- (mhc-guess-get-begin candidate) hint1) 100))
+	  (setq total-score (+ total-score 10)))
+
+      ;; now is a date hint to discourage a past date.
+      (if (and now (mhc-date<= (mhc-guess-get-date candidate) now))
+	  (setq total-score (- total-score 5)))
+
       (mhc-guess-set-score candidate total-score)
       (setq clist (cdr clist)))
     candidate-lst))
