@@ -4,7 +4,7 @@
 ;; Author:  Hideyuki SHIRAI <shirai@quickhack.net>
 ;;
 ;; Created: 2000/06/12
-;; Revised: $Date: 2001/01/31 11:26:37 $
+;; Revised: $Date: 2002/11/11 05:27:15 $
 
 ;;; Commentary:
 
@@ -70,7 +70,7 @@
       (setq buffer-read-only nil)
       (erase-buffer)
       (setq buffer-read-only t)
-      (message "mhc-sync ...")
+      (message "mhc-sync...")
       (setq mhc-sync/req-passwd t)
       (setq mhc-sync/process
 	    (apply (function start-process)

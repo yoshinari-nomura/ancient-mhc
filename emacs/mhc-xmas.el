@@ -3,7 +3,7 @@
 ;; Author:  Yuuichi Teranishi <teranisi@gohome.org>
 ;;
 ;; Created: 1999/12/02
-;; Revised: $Date: 2000/08/10 03:58:02 $
+;; Revised: $Date: 2002/11/11 05:27:15 $
 
 (defcustom mhc-xmas-icon-alist 
   '(("Conflict"   . "Conflict.xpm")
@@ -98,7 +98,7 @@ icon line."
 	(message "Initializing MHC icons...")
 	(mhc-xmas/setup-icons)
 	(run-hooks 'mhc-icon-setup-hook)
-	(message "Initializing MHC icons...done."))))
+	(message "Initializing MHC icons...done"))))
 
 (defun mhc-use-icon-p ()
   "Returns t if MHC displays icon."

@@ -5,7 +5,7 @@
 ;;          MIYOSHI Masanori <miyoshi@quickhack.net>
 ;;
 ;; Created: 05/12/2000
-;; Reviesd: $Date: 2002/10/03 03:53:41 $
+;; Reviesd: $Date: 2002/11/11 05:27:14 $
 
 ;;; Configration Variables:
 
@@ -663,7 +663,7 @@ The keys that are defined for mhc-calendar-mode are:
     (mhc-calendar/delete-overlay)
     (set-text-properties (point-min) (point-max) nil)
     (erase-buffer)
-    (message "mhc-calendar create ...")
+    (message "mhc-calendar create...")
     (while (> i 0)
       (goto-char (point-min))
       (mhc-misc-move-to-column col)
@@ -680,7 +680,7 @@ The keys that are defined for mhc-calendar-mode are:
     (and mhc-calendar-link-hnf (mhc-calendar/hnf-mark-diary-entries))
     (run-hooks 'mhc-calendar-create-buffer-hook)
     (set-buffer-modified-p nil)
-    (message "mhc-calendar create ... done.")))
+    (message "mhc-calendar create...done")))
 
 (defun mhc-calendar/put-property-date ()
   (condition-case nil

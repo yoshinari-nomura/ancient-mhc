@@ -3,7 +3,7 @@
 ;; Author:  TSUCHIYA Masatoshi <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 ;;          Hideyuki SHIRAI <shirai@quickhack.net>
 ;; Created: 2000/06/18
-;; Revised: $Date: 2001/02/01 10:15:47 $
+;; Revised: $Date: 2002/11/11 05:27:15 $
 
 
 ;;; Commentary:
@@ -971,7 +971,7 @@ showpage
 (defun mhc-ps/process (command arguments file buffer year month
 			       category-predicate)
   (mhc-setup)
-  (message "PostScript creating ...")
+  (message "PostScript creating...")
   (let ((contents
 	 (mhc-ps/make-contents file year month category-predicate)))
     (if (null contents)
@@ -989,9 +989,9 @@ showpage
 	  (setq mhc-ps/process-file-alist
 		(cons (cons process (expand-file-name file))
 		      mhc-ps/process-file-alist))
-	  (message "PostScript creating ... done.")))
+	  (message "PostScript creating...done")))
        ((eq command 'save)
-	(message "PostScript saving ... (%s) done." file))
+	(message "PostScript saving (%s)...done" file))
        ((eq command 'buffer)
 	(pop-to-buffer (get-buffer-create buffer))
 	(kill-new contents)

@@ -464,7 +464,7 @@ from 'month before last' to 'this month next year'."
 	    (mhc-record/append-log record 'add)
 	    (and (= 0 (mhc-cvs/backend (list "add" file)))
 		 (mhc-cvs/modify expf))
-	    (message (format "[file: %s]  Add CVS repository... done." file)))
+	    (message (format "[file: %s]  Add CVS repository...done" file)))
 	   ((memq char '(?r ?R))
 	    (setq loop nil)
 	    (message "")

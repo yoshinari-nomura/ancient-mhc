@@ -166,9 +166,9 @@
   (interactive "P")
   (if (and mhc-file/offline (not mhc-file-sync-enable-offline))
       (message "\"M-x mhc-file-toggle-offline\" first.")
-    (message "mhc file sync ...")
+    (message "mhc file sync...")
     (when (mhc-file/sync full)
-      (message "mhc file sync ... done."))))
+      (message "mhc file sync...done"))))
 
 
 ;; almost same as (make-directory dirname t)

@@ -3,7 +3,7 @@
 ;; Author:  Yuuichi Teranishi <teranisi@gohome.org>
 ;;
 ;; Created: 2000/11/21
-;; Revised: $Date: 2002/10/15 12:02:22 $
+;; Revised: $Date: 2002/11/11 05:27:15 $
 
 (defcustom mhc-e21-icon-alist 
   '(("Conflict"   . "Conflict.xpm")
@@ -98,7 +98,7 @@ icon line."
 	(message "Initializing MHC icons...")
 	(mhc-e21/setup-icons)
 	(run-hooks 'mhc-icon-setup-hook)
-	(message "Initializing MHC icons...done."))))
+	(message "Initializing MHC icons...done"))))
 
 (defun mhc-use-icon-p ()
   "Returns t if MHC displays icon."
