@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1994/07/04
-;; Revised: $Date: 2002/12/01 03:55:06 $
+;; Revised: $Date: 2003/05/12 00:55:37 $
 
 ;;;
 ;;; Commentay:
@@ -484,7 +484,7 @@ If HIDE-PRIVATE, private schedules are suppressed."
 	    (setq ato (mhc-date+ to 7))
 	  (setq ato (mhc-date+ to (mhc-date- wweek2 (mhc-date-ww to) 1))))
 	(setq afrom (mhc-date-mm-first ato)))))
-    (message (mhc-date-format date "Scanning %04d/%02d..." yy mm))
+    (message "%s" (mhc-date-format date "Scanning %04d/%02d..." yy mm))
     (unless (eq 'direct mailer)
       (when (and (eq mhc-todo-position 'top)
 		 (or mhc-insert-todo-list mhc-insert-memo-list))
@@ -521,7 +521,7 @@ If HIDE-PRIVATE, private schedules are suppressed."
       (setq mhc-summary-buffer-current-date-month
 	    (mhc-date-mm-first date))
       (mhc-goto-today t)
-      (message (mhc-date-format date "Scanning %04d/%02d...done" yy mm)))))
+      (message "%s" (mhc-date-format date "Scanning %04d/%02d...done" yy mm)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; import, edit, delete, modify

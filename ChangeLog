@@ -1,5 +1,8 @@
 2003-05-12  Hideyuki SHIRAI  <shirai@quickhack.net>
 
+	* emacs/mhc.el (mhc-scan-month): Use format-string. Thanks to
+	Yoichi NAKAYAMA <yoichi@geiin.org> for his suggestion.
+	
 	* emacs/mhc-cvs.el (mhc-cvs/unknown-file): Correct the wrong use
 	of `message'.  Thanks to Yoichi NAKAYAMA <yoichi@geiin.org> for
 	his suggestion.
