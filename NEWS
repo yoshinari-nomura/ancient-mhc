@@ -59,9 +59,16 @@ MHC NEWS -- User-visible changes in MHC.
     Please carefully read descriptions contained in the mhc-sync
     script itself.
 
+*** adb2mhc is available.
+    adb2mhc convert adb file which is  appointment DB of HP200LX.
+
 *** palm2mhc now has interactive option -i.
     Before import schedule articles from your Palm, palm2mhc 
     makes some confirmations.
+
+*** today can create PostScript calenar.
+    ``today --date=200007 --format=ps'' creates one month calendar
+    in PostScript.
 
 * For details of changes, see the file ChangeLog.
 

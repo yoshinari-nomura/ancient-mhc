@@ -64,8 +64,14 @@ MHC NEWS -- User-visible changes in MHC. (written in Japanese)
     同期を取る前に準備が必要ですので、mhc-sync スクリプトの中に書いてあ
     る説明を良く読んでバックアップを取ってから実行して下さい。
 
+*** HP200LX の adb ファイルから MHC 形式に変換する adb2mhc を追加しました。
+
 *** palm2mhc に interactive option -i を追加しました。
     Palm で入力したデータを MHC に取り込む前にユーザに確認を促します。
+
+*** today コマンドに --format=ps が追加されました。
+    today --date=200007 --format=ps で、ポストスクリプト形式の
+    一ヶ月カレンダーを生成します。
 
 * For details of changes, see the file ChangeLog.
 
