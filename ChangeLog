@@ -1,3 +1,9 @@
+2002-02-02  Yoshinari Nomura  <nom@quickhack.net>
+
+	* ruby-ext/lib/mhc-schedule.rb 
+	(MhcScheduleItem#todo?): New function.
+	(MhcScheduleItem#sch_to_slot): Change for TODO articles.
+
 2002-01-16  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* emacs/mhc-mew.el (mhc-mew-get-import-buffer): Support Mew 3.0 or
