@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1994/07/04
-;; Revised: $Date: 2003/11/05 01:12:43 $
+;; Revised: $Date: 2003/12/19 01:16:36 $
 
 ;;;
 ;;; Commentay:
@@ -623,7 +623,9 @@ Returns t if the importation was succeeded."
 		time (mhc-input-time "Time: ")
 		subject (mhc-input-subject "Subject: ")
 		location (mhc-input-location "Location: ")
-		category (mhc-input-category "Category: ")))
+		category (mhc-input-category "Category: "))
+	  (if mhc-ask-alarm
+	      (setq alarm (mhc-input-alarm "Alarm: " mhc-default-alarm))))
       ;; Quit.
       (quit
        (and (interactive-p)

@@ -1,3 +1,8 @@
+2003-12-19  Hideyuki SHIRAI  <shirai@quickhack.net>
+
+	* emacs/mhc.el (mhc-edit): Ask Alarm when direct input.
+	(TNX, Mr. Toshihiko SHIMOKAWA <toshi@is.kyusan-u.ac.jp>)
+
 2003-11-05  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* emacs/mhc-guess.el (mhc-guess-location-list): New user option.
