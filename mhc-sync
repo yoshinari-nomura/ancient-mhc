@@ -5,7 +5,7 @@
 ## Author:  Yoshinari Nomura <nom@mew.org>
 ##
 ## Created: 2000/04/26
-## Revised: 2000/05/22 11:48:07
+## Revised: $Date: 2000/05/25 16:55:43 $
 ##
 
 ## mhc-sync [-n] [-x exchange_id] [-r local_dir] [user@]remote.host[:dir]
@@ -55,8 +55,8 @@ end
 
 $SSH           = 'ssh'
 $CMD           = 'mhc-sync'
-$DELIMITOR     = "\x1\x1\x1\x1\n"
-$DELIMITOR2    = "\x1\x1\x1\x1\x1\x1\x1\x1\n"
+$DELIMITER     = "\x1\x1\x1\x1\n"
+$DELIMITER2    = "\x1\x1\x1\x1\x1\x1\x1\x1\n"
 $CONFLICT_INFO = "-- conflict --" * 5 + "\n"
 
 ##
@@ -193,14 +193,14 @@ if $flag_serverp
   ##
   ## M 2000-05-22 13:45:43 ... (1)
   ## M 2000-05-22 13:45:43 ... (2)
-  ## DELIMITOR
+  ## DELIMITER
   ## contents of (1)
-  ## DELIMITOR
+  ## DELIMITER
   ## contents of (2)
   ## :
-  ## DELIMITOR
+  ## DELIMITER
   ## contents of (n)
-  ## DELIMITOR2
+  ## DELIMITER2
 
   log_entry .each{|e|
     print e .to_s, "\n"
@@ -208,7 +208,7 @@ if $flag_serverp
 
   log_entry .each{|e|
     if e .status == 'M'
-      print $DELIMITOR
+      print $DELIMITER
       sch = db .get_record_by_id(e .rec_id)
       if sch
 	print sch .dump
@@ -217,33 +217,31 @@ if $flag_serverp
       end
     end
   }
-  print $DELIMITOR2
+  print $DELIMITER2
 
   lines = ''
-  got_delimitor = false
+  got_delimiter = false
   while line = STDIN .gets
-    if line =~ /^#{$DELIMITOR2}/
-      got_delimitor = true
+    if line =~ /^#{$DELIMITER2}/
+      got_delimiter = true
       break 
     end
     lines += line
   end
 
-  if got_delimitor
-    commands = lines .split($DELIMITOR)
+  if got_delimiter
+    commands = lines .split($DELIMITER)
     commands .each{|command|
       if command =~ /^DELETE\s+(\S+)/
 	rec_id = $1
 	sch = db .get_record_by_id(rec_id)
 	if sch
 	  STDERR .print "server: deleting #{sch .info}\n"
-	else
-	  ## STDERR .print "server: not found deleting #{rec_id}\n"
-	end
-	if sch and !$flag_noharm
-	  db .del_sch(sch) 
-	else
-	  STDERR .print "S:deleting #{sch .info}\n"
+	  if !$flag_noharm
+	    db .del_sch(sch) 
+	  else
+	    STDERR .print "S:deleting #{sch .info}\n"
+	  end
 	end
       elsif command =~ /^MODIFY/
 	dummy, sch_string = command .split("\n", 2)
@@ -286,11 +284,11 @@ else
   cli_log_entry = {}
 
   while line = inout .gets
-    break if line =~ /^#{$DELIMITOR2}/
+    break if line =~ /^#{$DELIMITER2}/
     lines += line
   end
 
-  log_lines, sch_lines = lines .split($DELIMITOR, 2)
+  log_lines, sch_lines = lines .split($DELIMITER, 2)
 
   if log_lines
     log_lines .split("\n") .each{|line|
@@ -301,7 +299,7 @@ else
   end
 
   if sch_lines
-    sch_lines .split($DELIMITOR) .each{|sch_article|
+    sch_lines .split($DELIMITER) .each{|sch_article|
       sch = MhcScheduleItem .new(sch_article, false)
       svr_sch_entry[sch .rec_id] = sch
     }
@@ -366,7 +364,7 @@ else
       STDERR .print "---------------------------------------------------\n"
       STDERR .print "Delete remote #{rec_id}\n"
       inout .print "DELETE #{rec_id}\n"
-      inout .print $DELIMITOR
+      inout .print $DELIMITER
 
     when 'MD' # conflict
       ## add the remote article to the local and inform it.
@@ -399,7 +397,7 @@ else
       STDERR .print "Transfer local to remote #{l_sch .info}\n"
       inout .print "MODIFY\n"
       inout .print "#{l_sch .dump}"
-      inout .print $DELIMITOR
+      inout .print $DELIMITER
 
     when '-D' # delete local
       if l_sch
@@ -424,7 +422,7 @@ else
       ;;
     end
   }
-  inout .print $DELIMITOR2
+  inout .print $DELIMITER2
   logent = MhcLogEntry .new('S', Time .now, $flag_syncid)
   if !$flag_noharm
     log .add_entry(logent)
