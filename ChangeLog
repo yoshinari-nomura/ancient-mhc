@@ -1,5 +1,9 @@
 2000-07-28  Yoshinari Nomura  <nom@quickhack.net>
 
+	* emacs/mhc-db.el (mhc-db-add-exception-rule):
+	delete white space between `!' and a digit.
+        (Patch is from Hideyuki SHIRAI  <shirai@quickhack.net>)
+	
 	* ruby-ext/lib/mhc-schedule.rb (parse_xsc_headers):
 	Allow white spaces after `!' in a Day: field.
 
