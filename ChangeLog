@@ -1,3 +1,9 @@
+2000-06-21  Yoshinari Nomura  <nom@quickhack.net>
+
+	* ruby-ext/lib/mhc-schedule.rb (MhcScheduleItem::initializse):
+	  add record-id correctly.
+	* adb2mhc (to_mhc): ignore cron job '|', support daily schedule.
+
 2000-06-21  Hideyuki SHIRAI  <shirai@rdmg.mgcs.mei.co.jp>
 
 	* emacs/mhc-calendar.el (all :-): Follow reconstruction of mhc-date.el.
