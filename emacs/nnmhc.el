@@ -36,8 +36,11 @@
 
 (nnoo-define-basics nnmhc)
 
-(defsubst nnmhc-get-article (num)
-  (nth (1- num) nnmhc-article-list))
+(defmacro nnmhc-get-article (num)
+  `(car (nth (1- ,num) nnmhc-article-list)))
+
+(defmacro nnmhc-get-subject (num)
+  `(cdr (nth (1- ,num) nnmhc-article-list)))
 
 (deffoo nnmhc-retrieve-headers (sequence &optional group server fetch-old)
   (when (integerp (car sequence))
@@ -67,9 +70,9 @@
   t)
 
 (deffoo nnmhc-request-article (id &optional group server buffer)
-  (let* ((nntp-server-buffer (or buffer nntp-server-buffer))
-	 (pathname-coding-system 'binary)
-	 path)
+  (let ((nntp-server-buffer (or buffer nntp-server-buffer))
+	(pathname-coding-system 'binary)
+	path)
     (when (integerp id)
       (setq path (nnmhc-get-article id))
       (cond
@@ -85,6 +88,15 @@
 		 (nnmail-find-file path))))
 	(nnheader-report 'nnmhc "Couldn't read file: %s" path))
        (t
+	(save-excursion
+	  (set-buffer nntp-server-buffer)
+	  (mhc-header-narrowing
+	    (mhc-header-delete-header "xref")
+	    (goto-char (point-max))
+	    (insert (format "Xref: %s %s\n" (system-name) path))
+	    (unless (mhc-header-get-value "subject")
+	      (goto-char (point-min))
+	      (insert "Subject: " (nnmhc-get-subject id) "\n"))))
 	(nnheader-report 'nnmhc "Article %s retrieved" id)
 	(cons group id))))))
 

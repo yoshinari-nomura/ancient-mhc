@@ -84,19 +84,21 @@
 				     t)
     (gnus-group-read-group 0 t vgroup)
     (gnus-summary-make-local-variables)
-    (setq inhibit-read-only t)
+    (setq inhibit-read-only t
+	  nnmhc-article-list nil)
     (delete-region (point-min) (point-max))))
 
 
 (defun mhc-gnus-insert-summary-contents (schedule contents icon)
   (let ((x (mhc-record-name (mhc-schedule-record schedule)))
+	(subject (mhc-gnus-encode-string
+		  (mhc-schedule-subject-as-string schedule)))
 	(pos (point)))
     (when x
-      (push x nnmhc-article-list)
+      (push (cons x subject) nnmhc-article-list)
       (setq x (length nnmhc-article-list)))
     (if x
-	(let ((header (make-full-mail-header x (mhc-gnus-encode-string
-						(mhc-schedule-subject-as-string schedule)))))
+	(let ((header (make-full-mail-header x subject)))
 	  (put-text-property 0 (length contents) 'gnus-number x contents)
 	  (push (gnus-data-make x 0 0 header 0) gnus-newsgroup-data))
       (remove-text-properties 0 (length contents) '(gnus-number nil) contents))
@@ -122,6 +124,7 @@
     (gnus-summary-setup-default-charset)) ; for Nana7
   (set (make-local-variable 'mhc-gnus/mhc-is-running) t)
   (set (make-local-variable 'gnus-visual) nil)
+  (set (make-local-variable 'gnus-auto-extend-newsgroup) nil)
   (setq gnus-newsgroup-begin 1
 	gnus-newsgroup-end (length nnmhc-article-list)))
 

@@ -86,27 +86,6 @@
 		(const :tag "Lazy check" 0)
 		(const :tag "No use" nil)))
 
-(defcustom mhc-sync-id nil
-  "*Identical id of mhc-sync (-x option)."
-  :group 'mhc
-  :type 'string)
-
-(defcustom mhc-sync-remote nil
-  "*Remote server repository of mhc-sync ([user@]remote.host[:dir])."
-  :group 'mhc
-  :type 'string)
-  
-(defcustom mhc-sync-localdir nil
-  "*Local repository directory of mhc-sync (-r option)."
-  :group 'mhc
-  :type 'string)
-
-(defcustom mhc-sync-coding-system
-  (if (>= emacs-major-version 20) 'undecided '*autoconv*)
-  "*Default coding system for process of mhc-sync."
-  :group 'mhc
-  :type 'symbol)
-
 (defcustom mhc-calendar-mode-hook nil
   "*Hook called in mhc-calendar-mode."
   :group 'mhc

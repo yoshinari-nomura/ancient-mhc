@@ -6,36 +6,81 @@
 ;; Created: 06/12/2000
 ;; Revised: 06/12/2000
 
-;;; interanal variabile
-(defconst mhc-sync-passwd-regex "password:\\|passphrase:\\|Enter passphrase")
-(defvar mhc-sync-process nil)
-(defvar mhc-sync-req-passwd nil)
+;;; Commentary:
 
-;;; function
-(defun mhc-sync ()
-  "Execute mhc-sync."
-  (interactive)
-  (if (and (stringp mhc-sync-remote) (stringp mhc-sync-id))
-      (if (processp mhc-sync-process)
-	  (message "another mhc-sync running.")
-	(let ((buf (get-buffer-create "*mhc-sync*"))
-	      (ldir (expand-file-name (or mhc-sync-localdir "~/Mail/schedule"))))
-	  (pop-to-buffer buf)
-	  (setq buffer-read-only nil)
-	  (erase-buffer)
-	  (setq buffer-read-only t)
-	  (message "mhc-sync ...")
-	  (setq mhc-sync-req-passwd t)
-	  (setq mhc-sync-process
-		(apply (function start-process)
-		       "mhc-sync" buf "mhc-sync"
-		       (list "-x" mhc-sync-id "-r" ldir mhc-sync-remote)))
-	  (set-process-coding-system mhc-sync-process mhc-sync-coding-system)
-	  (set-process-filter mhc-sync-process 'mhc-sync-filter)
-	  (set-process-sentinel mhc-sync-process 'mhc-sync-sentinel)))
-    (message "No remote server specified.")))
+;; This file is a part of MHC, includes backend functions to
+;; manipulate schedule files.
 
-(defun mhc-sync-filter (process string)
+
+;;; Customize Variables:
+(defcustom mhc-sync-id nil
+  "*Identical id of mhc-sync (-x option)."
+  :group 'mhc
+  :type 'string)
+
+(defcustom mhc-sync-remote nil
+  "*Remote server repository of mhc-sync ([user@]remote.host[:dir])."
+  :group 'mhc
+  :type 'string)
+  
+(defcustom mhc-sync-localdir nil
+  "*Local repository directory of mhc-sync (-r option)."
+  :group 'mhc
+  :type 'string)
+
+(defcustom mhc-sync-coding-system
+  (if (>= emacs-major-version 20) 'undecided '*autoconv*)
+  "*Default coding system for process of mhc-sync."
+  :group 'mhc
+  :type 'symbol)
+
+
+;;; Interanal variabiles:
+(defconst mhc-sync/passwd-regexp "password:\\|passphrase:\\|Enter passphrase")
+
+(defvar mhc-sync/process nil)
+
+(defvar mhc-sync/req-passwd nil)
+
+
+;;; Code:
+(defun mhc-sync/backup-and-remove (file &optional offline)
+  "Backend function to remove FILE."
+  (let ((file (expand-file-name file))
+	(new-path (expand-file-name
+		   "trash"
+		   (mhc-summary-folder-to-path mhc-base-folder))))
+    (or (file-directory-p new-path)
+	(make-directory new-path))
+    (rename-file file (mhc-misc-get-new-path new-path))))
+
+(defun mhc-sync/start-process ()
+  (cond
+   ((not (and (stringp mhc-sync-remote) (stringp mhc-sync-id)))
+    (message "No remote server specified.")
+    nil)
+   ((processp mhc-sync/process)
+    (message "another mhc-sync running.")
+    nil)
+   (t
+    (let ((buf (get-buffer-create "*mhc-sync*"))
+	  (ldir (expand-file-name (or mhc-sync-localdir "~/Mail/schedule"))))
+      (pop-to-buffer buf)
+      (setq buffer-read-only nil)
+      (delete-region (point-min) (point-max))
+      (setq buffer-read-only t)
+      (message "mhc-sync ...")
+      (setq mhc-sync/req-passwd t)
+      (setq mhc-sync/process
+	    (apply (function start-process)
+		   "mhc-sync" buf "mhc-sync"
+		   (list "-x" mhc-sync-id "-r" ldir mhc-sync-remote)))
+      (set-process-coding-system mhc-sync/process mhc-sync-coding-system)
+      (set-process-filter mhc-sync/process 'mhc-sync/filter)
+      (set-process-sentinel mhc-sync/process 'mhc-sync/sentinel))
+    t)))
+
+(defun mhc-sync/filter (process string)
   (if (bufferp (process-buffer process))
       (let ((obuf (buffer-name)))
 	(unwind-protect
@@ -46,30 +91,32 @@
 		(goto-char (point-max))
 		(insert string)
 		(cond
-		 ((and mhc-sync-req-passwd
-		       (string-match mhc-sync-passwd-regex string))
+		 ((and mhc-sync/req-passwd
+		       (string-match mhc-sync/passwd-regexp string))
 		  (setq passwd (mhc-misc-read-passwd string))
 		  (process-send-string process (concat passwd "\n")))
 		 ((string-match "---------------------" string)
-		  (setq mhc-sync-req-passwd nil)))))
+		  (setq mhc-sync/req-passwd nil)))))
 	  (if (get-buffer obuf)
 	      (set-buffer obuf))))))
 
-(defun mhc-sync-sentinel (process event)
-  (if (bufferp (process-buffer process))
-      (progn
-	(pop-to-buffer (process-buffer process))
-	(let ((buffer-read-only nil))
-	  (goto-char (point-max))
-	  (insert "<<<transfer finish>>>"))))
-  (setq mhc-sync-process nil)
+(defun mhc-sync/sentinel (process event)
+  (when (bufferp (process-buffer process))
+    (pop-to-buffer (process-buffer process))
+    (let ((buffer-read-only nil))
+      (goto-char (point-max))
+      (insert "<<<transfer finish>>>")))
+  (setq mhc-sync/process nil)
   (message "mhc-sync ... done."))
 
+
+
 (provide 'mhc-sync)
+(put 'mhc-sync 'remove 'mhc-sync/backup-and-remove)
+(put 'mhc-sync 'sync   'mhc-sync/start-process)
 
 ;;; Copyright Notice:
 
-;; Copyright (C) 1999, 2000 Yoshinari Nomura. All rights reserved.
 ;; Copyright (C) 2000 MHC developing team. All rights reserved.
 
 ;; Redistribution and use in source and binary forms, with or without
@@ -98,4 +145,4 @@
 ;; ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 ;; OF THE POSSIBILITY OF SUCH DAMAGE.
 
-;; mhc-calendar.el ends here
+;; mhc-sync.el ends here

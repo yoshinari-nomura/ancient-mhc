@@ -98,13 +98,16 @@ If REGEXP, HEADER is a regular expression."
 
 (defun mhc-header-get-value (header &optional repeat)
   "Return value of HEADER in the narrowed buffer."
-  (let ((case-fold-search t)
+  (let ((point (point))
+	(case-fold-search t)
 	(regexp (concat "^" (regexp-quote header) ":[ \t]*"))
 	value)
+    (goto-char (point-min))
     (while (and (not value)
 		(re-search-forward regexp nil t repeat))
       (mhc-header-goto-end)
       (setq value (buffer-substring-no-properties (match-end 0) (1- (point)))))
+    (goto-char point)
     value))
 
 

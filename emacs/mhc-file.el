@@ -70,10 +70,10 @@
 
 
 ;;; Global Variables
-(defcustom mhc-file-method 'mhc-file
+(defcustom mhc-file-method 'mhc-sync
   "*Variable to specify the method to control schdule files."
   :group 'mhc
-  :type '(radio (const :tag "Backup and remove" mhc-file)
+  :type '(radio (const :tag "Backup and remove" mhc-sync)
 		(const :tag "CVS" mhc-cvs)
 		(symbol :tag "Other")))
 
@@ -159,20 +159,8 @@
 	  t))))
 
 
-;;; Simplest backend:
-(defun mhc-file/backup-and-remove (file &optional offline)
-  "Simplest backend function to remove FILE."
-  (let ((file (expand-file-name file))
-	(new-path (expand-file-name
-		   "trash"
-		   (mhc-summary-folder-to-path mhc-base-folder))))
-    (or (file-directory-p new-path)
-	(make-directory new-path))
-    (rename-file file (mhc-misc-get-new-path new-path))))
-
 
 (provide 'mhc-file)
-(put 'mhc-file 'remove 'mhc-file/backup-and-remove)
 
 ;;; Copyright Notice:
 

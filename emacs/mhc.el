@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1994/07/04
-;; Revised: $Date: 2000/06/16 07:15:30 $
+;; Revised: $Date: 2000/06/16 19:46:23 $
 
 ;;;
 ;;; Commentay:
@@ -37,7 +37,6 @@
 (require 'mhc-minibuf)
 (require 'mhc-face)
 (require 'mhc-calendar)
-(require 'mhc-sync)
 
 (cond
  ((eval-when-compile
@@ -436,25 +435,43 @@ Returns t if the importation was succeeded."
   (interactive)
   (mhc-modify-file (mhc-summary-filename)))
 
-(defun mhc-modify-file (filename)
-  (if (not (and (stringp filename) (file-exists-p filename)))
-      (message "File does not exist (%s)." filename)
-    (mhc-window-push)
-    (find-file-other-window filename)
-    (mhc-draft-mode)))
+(defun mhc-modify-file (file)
+  (if (and (stringp file) (file-exists-p file))
+      (let* ((name (format
+		    "*mhc draft %s/%s*"
+		    mhc-base-folder
+		    (file-relative-name
+		     file
+		     (file-name-as-directory
+		      (mhc-summary-folder-to-path mhc-base-folder)))))
+	     (buffer (get-buffer name)))
+	(if (buffer-live-p buffer)
+	    (progn
+	      (message "Specified file(%s) has already been opened.")
+	      (switch-to-buffer-other-window buffer))
+	  (mhc-window-push)
+	  (set-buffer (setq buffer (get-buffer-create name)))
+	  (mhc-insert-file-contents-as-coding-system mhc-default-coding-system file)
+	  (set-buffer-modified-p nil)
+	  (switch-to-buffer-other-window buffer)
+	  (mhc-draft-mode)
+	  (set (make-local-variable 'mhc-draft-buffer-file-name) file)))
+    (message "Specified file(%s) does not exist." file)))
+
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; draft
 ;;
 
-(defconst mhc-draft-buffer-name "mhc-draft")
+(defconst mhc-draft-buffer-name "*mhc draft*")
 
 (defcustom mhc-draft-unuse-hdr-list
-  '("Return-Path:" "Received:" "X-Dispatcher:"
-    "Lines:" "X-Filter:" "Replied:" "X-Mailer:"
-    "Errors-To:" "Sender:" "X-Seqno:" "X-Received:"
-    "X-Sender:" "From " ">From " "Precedence:" "Posted:")
+  '(">From " "From " "Delivered-To:" "Errors-To:" "Lines:"
+    "Posted:" "Precedence:" "Received:" "Replied:" "Return-Path:"
+    "Sender:" "User-Agent:" "X-Dispatcher:" "X-Filter:"
+    "X-Gnus-Mail-Source:" "X-Mailer:" "X-Received:" "X-Sender:"
+    "X-Seqno:" "Xref:")
   "*These headers are removed when article is imported."
   :group 'mhc
   :type '(repeat string))
@@ -465,6 +482,8 @@ Returns t if the importation was succeeded."
   :type 'hook)
 
 ;; Avoid warning of byte-compiler.
+(defvar mhc-draft-buffer-file-name nil)
+
 (defvar mhc-draft-mode-map)
 
 (define-derived-mode mhc-draft-mode
@@ -508,7 +527,7 @@ C-c ?    mhc-draft-insert-calendar
 
 (defun mhc-draft-finish ()
   (interactive)
-  (let ((record (mhc-parse-buffer)))
+  (let ((record (mhc-parse-buffer (mhc-record-new mhc-draft-buffer-file-name))))
     (setq mhc-calendar-separator nil)
     (setq mhc-calendar-call-buffer nil)
     (mhc-header-delete-separator)

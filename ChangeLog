@@ -1,3 +1,38 @@
+2000-06-17  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+
+	* emacs/mhc.el: Removed dependency declaration above mhc-sync.el.
+	(mhc-modify-file): Alter the file opening codes, removed `find-file-other-window'.
+	(mhc-draft-buffer-file-name): New internal variable to keep file name.
+	(mhc-draft-finish): Refer `mhc-draft-buffer-file-name' to decide
+	original schedule file.
+	(mhc-draft-unuse-hdr-list): Add some headers.
+
+	* emacs/mhc-sync.el: Reconstruct as the backend of mhc-file.el and
+	adopt coding conventions.
+
+	* emacs/mhc-file.el: Removed definitions as the simplest backend.
+	(mhc-file-method): Changed default value from `mhc-file' to `mhc-sync'.
+	(mhc-file/backup-and-remove): Removed.
+
+	* emacs/mhc-vars.el: Moved mhc-sync-* variables to mhc-sync.el.
+
+	* emacs/nnmhc.el (nnmhc-get-article): Change the data format of
+	`nnmhc-article-list'.
+	(nnmhc-get-subject): New macro.
+	(nnmhc-request-article): Fix `let'.  Add the string of
+	X-SC-Subject header as a subject, in the case of lack of Subject
+	header.
+
+	* emacs/mhc-gnus.el (mhc-gnus-generate-summary-buffer): Reset
+	`nnmhc-article-list'.
+	(mhc-gnus-insert-summary-contents): Store schedule subjects to
+	`nnmhc-article-list'.
+	(mhc-gnus-summary-mode-setup): Disable auto extension of newsgroup
+	in the MHC summary buffer.
+
+	* emacs/mhc-header.el (mhc-header-get-value): Move point to the
+	top of this narrowed buffer, in order to search specified header.
+
 2000-06-16  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 
 	* emacs/mhc.el (mhc-goto-month): Refer `mhc-default-hide-private-schedules'
