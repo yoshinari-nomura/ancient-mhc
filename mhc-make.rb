@@ -3,7 +3,7 @@
 ## Author:  MIYOSHI Masanori <miyoshi@quickhack.net>
 ##          Yoshinari Nomura <nom@quickhack.net>
 ## Created: 2000/7/12
-## Revised: $Date: 2000/12/19 02:06:17 $
+## Revised: $Date: 2001/01/22 09:06:25 $
 
 require 'rbconfig'
 require 'mkmf'
@@ -416,7 +416,7 @@ class MhcConfigure
     src_contents = src_file .gets(nil); src_file .close
     keywords .each{|key, val| src_contents .gsub!(key, val)}
 
-    if src_contents =~ /(@@MHC_[a-z\d_]+@@)/pin
+    if src_contents =~ /(@@MHC_[a-z\d_]+@@)/in
       STDERR .print "Warn: keyword #{$1} was remiained in #{dst_file_name}.\n"
     end
 

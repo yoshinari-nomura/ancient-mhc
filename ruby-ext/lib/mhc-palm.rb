@@ -3,7 +3,7 @@
 ## Author:  Yoshinari Nomura <nom@quickhack.net>
 ##
 ## Created: 1999/09/01
-## Revised: $Date: 2000/08/03 07:46:44 $
+## Revised: $Date: 2001/01/22 09:06:25 $
 ##
 
 require 'mhc-date'
@@ -99,6 +99,7 @@ class PilotDB
   end
 
   def write_record(rec)
+    
     rec_array = rec .to_a
     new_id = PiLib .dlp_WriteRecord(@sd, @db, rec_array)
     return new_id
@@ -256,6 +257,40 @@ class PilotFile
   end
 end
     
+################################################################
+##
+## classes for Memo
+##
+class PilotMemoDB < PilotDB
+  def initialize(pi, dbname)
+    super
+    @recClass = PilotMemoRecord
+  end
+end
+
+class PilotMemoRecord < PilotRecord
+  undef set_data
+  
+  def set_memo_data(string)
+    @memo_data = string
+    return self
+  end
+
+  def memo_data
+    return @memo_data
+  end
+
+  def unpack
+    @memo_data = @data .sub(/\0$/, '')
+    return self
+  end
+
+  def pack
+    @data = Kconv::tosjis(@memo_data || '') + "\0"
+    return self
+  end
+end
+
 ################################################################
 ##
 ## classes for Datebook
@@ -610,7 +645,7 @@ class PilotApptRecord < PilotRecord
 
   ## Palm のノート -> mhc の body と X-SC-* 以外のヘッダ部分に変換
   def conv_note(string)
-    if string =~ /^(\#\#@@@.@@@)\n(.*)/np
+    if string =~ /^(\#\#@@@.@@@)\n(.*)/nm
       datebk3_icon, string = $1, $2
     end
 

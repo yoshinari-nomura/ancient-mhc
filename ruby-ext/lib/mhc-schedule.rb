@@ -3,7 +3,7 @@
 ## Author:  Yoshinari Nomura <nom@quickhack.net>
 ##
 ## Created: 1999/07/16
-## Revised: $Date: 2000/07/28 04:42:57 $
+## Revised: $Date: 2001/01/22 09:06:25 $
 ##
 
 ################################################################
@@ -435,21 +435,21 @@ class MhcScheduleItem
   end
 
   def dump_without_xsc_header
-    hdrs = non_xsc_header .to_s .sub(/\n+$/np, '')
+    hdrs = non_xsc_header .to_s .sub(/\n+$/nm, '')
     hdrs += "\n" if hdrs != ''
 
     desc = description .to_s
-    desc += "\n" if desc != '' and desc !~ /\n$/np
+    desc += "\n" if desc != '' and desc !~ /\n$/nm
 
     return hdrs + (desc != '' ? "\n" : '') + desc
   end
 
   def dump
-    hdrs = non_xsc_header .to_s .sub(/\n+$/np, '')
+    hdrs = non_xsc_header .to_s .sub(/\n+$/nm, '')
     hdrs += "\n" if hdrs != ''
 
     desc = description .to_s
-    desc += "\n" if desc != '' and desc !~ /\n$/np
+    desc += "\n" if desc != '' and desc !~ /\n$/nm
 
     return dump_header + hdrs + "\n" + desc
   end
@@ -834,7 +834,7 @@ class MhcScheduleItem
       datebk3_icon = cat if cat =~ /^\#\#@@@.@@@$/
     }
     contents = dump_without_xsc_header
-    contents = '' if contents =~ /^\s+$/np   ## \s includes \n
+    contents = '' if contents =~ /^\s+$/nm   ## \s includes \n
     contents = datebk3_icon + "\n" + contents if datebk3_icon
     pi_rec .set_note(contents)
 
@@ -1204,7 +1204,7 @@ class MhcScheduleDB
 	}
       }
       num .each{|num|
-	_regist(slot, mon + format("%02d", num), o)
+	_regist(slot, mon + format("%02d", num .to_i), o)
       }
     }
   end

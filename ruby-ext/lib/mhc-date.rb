@@ -3,7 +3,7 @@
 ## Author:  Yoshinari Nomura <nom@quickhack.net>
 ##
 ## Created: 1999/07/16
-## Revised: $Date: 2000/06/28 13:58:41 $
+## Revised: $Date: 2001/01/22 09:06:25 $
 ##
 
 require 'mhc-kconv'
@@ -158,13 +158,21 @@ class MhcDate
   end
 
   def m_succ!(n = 1)
-    xx = @m + n
-    pp = 0 < xx ? (xx - 1) / 12 : (xx - 12) / 12
-    @y += pp
-    @m = xx - (pp * 12)
+    months = (@y - 1) * 12 + @m + n
+    @y = (months - 1) / 12 + 1
+    @m = (months - 1) % 12 + 1
     @d = 1
     return self
   end
+
+#    def m_succ!(n = 1)
+#      xx = @m + n
+#      pp = 0 < xx ? (xx - 1) / 12 : (xx - 12) / 12
+#      @y += pp
+#      @m = xx - (pp * 12)
+#      @d = 1
+#      return self
+#    end
 
   def m_first_day
     return MhcDate .new(@y, @m, 1)
