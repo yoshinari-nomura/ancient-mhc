@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 2000/02/08
-;; Revised: $Date: 2002/09/24 05:03:40 $
+;; Revised: $Date: 2004/05/04 13:48:31 $
 
 ;;;
 ;;; Commentay:
@@ -210,12 +210,14 @@ refer to mhc-calendar-hnf-face-alist-internal.")
  (t
   ;; Introduced in Emacs 19.29.
   (defun mhc-facep (x)
-    "Return t if X is a face name or an internal face vector."
-    (and (or (and (fboundp 'internal-facep) (internal-facep x))
-	     (and 
-	      (symbolp x) 
-	      (assq x (and (boundp 'global-face-data) global-face-data))))
-	 t))))
+    "Return non-nil if X is a face name or an internal face vector."
+    (or (and (fboundp 'internal-facep)
+	     (let ((fn 'internal-facep))
+	       ;; Avoid compile warning under old Emacsen.
+	       (funcall fn x)))
+	(and (symbolp x)
+	     (assq x (and (boundp 'global-face-data)
+			  (symbol-value 'global-face-data))))))))
 
 (provide 'mhc-face)
 

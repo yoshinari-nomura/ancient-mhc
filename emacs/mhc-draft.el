@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>,
 ;;          Yuuichi Teranishi <teranisi@quickhack.net>
 ;; Created: 2000/07/25
-;; Revised: $Date: 2004/05/01 17:14:28 $
+;; Revised: $Date: 2004/05/04 13:48:31 $
 
 ;;; Commentary:
 
@@ -84,11 +84,6 @@ If optional argument ORIGINAL is non-nil, BUFFER is raw buffer."
   (funcall (mhc-get-function 'draft-translate)))
 
 
-(defsubst mhc-draft-highlight ()
-  "Highlight draft buffer."
-  (funcall (mhc-get-function 'draft-highlight)))
-
-
 (define-derived-mode mhc-draft-mode
   text-mode
   "MHC-Draft"
@@ -114,6 +109,7 @@ C-c ?    mhc-draft-insert-calendar
   (setq adaptive-fill-first-line-regexp
 	(concat "[ \t]*[-a-z0-9A-Z]*\\(>[ \t]*\\)+[ \t]*\\|"
 		adaptive-fill-first-line-regexp))
+  (mhc-highlight-message t)
   (set (make-local-variable 'indent-tabs-mode) nil))
 
 (defun mhc-draft-kill (&optional no-confirm)

@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1994/07/04
-;; Revised: $Date: 2004/05/01 16:13:25 $
+;; Revised: $Date: 2004/05/04 13:48:31 $
 
 ;;;
 ;;; Commentay:
@@ -150,6 +150,8 @@
 
 ;; Avoid warning of byte-compiler.
 (defvar mhc-mode-menu)
+(eval-and-compile
+  (autoload 'easy-menu-add "easymenu"))
 
 (defun mhc-mode (&optional arg) "\
 \\<mhc-mode-map>
@@ -192,7 +194,8 @@
 	(if (null arg)
 	    (not mhc-mode)
 	  (> (prefix-numeric-value arg) 0)))
-  (if (featurep 'xemacs) (easy-menu-add mhc-mode-menu))
+  (when (featurep 'xemacs)
+    (easy-menu-add mhc-mode-menu))
   (force-mode-line-update)
   (run-hooks 'mhc-mode-hook))
 
@@ -553,6 +556,7 @@ Returns t if the importation was succeeded."
 		     (mhc-regexp-opt mhc-draft-unuse-hdr-list)
 		     "\\)")
 	     'regexp))
+	  (mhc-highlight-message)
 	  (switch-to-buffer draft-buffer t)))
     (condition-case ()
 	(if import-buffer
@@ -674,18 +678,32 @@ Returns t if the importation was succeeded."
 		  "\nX-SC-Alarm: " (or alarm "")
 		  "\nX-SC-Record-Id: " (mhc-record-create-id) "\n")
 	  (mhc-draft-mode)
-	  (mhc-highlight-message 'for-draft)
 	  (goto-char (point-min))
 	  succeed))))
 
+(defcustom mhc-default-import-original-article nil
+  "*If non-nil value, import a schedule with MIME attachements."
+  :group 'mhc
+  :type 'boolean)
+
 (defun mhc-import (&optional get-original)
-  (interactive "P")
+  "Import a schedule from the current article.
+The default action of this command is to import a schedule from the
+current article without MIME attachements.  If you want to import a
+schedule including MIME attachements, call this command with a prefix
+argument.  Set non-nil to `mhc-default-import-original-article', and
+the default action of this command is changed to the latter."
+  (interactive
+   (list (if mhc-default-import-original-article
+	     (not current-prefix-arg)
+	   current-prefix-arg)))
   (mhc-window-push)
   (unless (mhc-edit (mhc-summary-get-import-buffer get-original))
     ;; failed.
     (mhc-window-pop)))
 
 (defun mhc-delete ()
+  "Delete the current schedule."
   (interactive)
   (mhc-delete-file (mhc-summary-record)))
 
@@ -712,6 +730,7 @@ Returns t if the importation was succeeded."
 	  (and (mhc-calendar-p) (mhc-calendar-rescan))))))
 
 (defun mhc-modify ()
+  "Modify the current schedule."
   (interactive)
   (mhc-modify-file (mhc-summary-filename)))
 
@@ -770,8 +789,8 @@ Returns t if the importation was succeeded."
 	  (mhc-draft-reedit-file file)
 	  (set-buffer-modified-p nil)
 	  (switch-to-buffer-other-window buffer)
-	  (mhc-highlight-message)
 	  (mhc-draft-mode)
+	  (goto-char (point-min))
 	  (set (make-local-variable 'mhc-draft-buffer-file-name) file)))
     (message "Specified file(%s) does not exist." file)))
 

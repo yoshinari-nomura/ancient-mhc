@@ -5,7 +5,7 @@
 ;;          MIYOSHI Masanori <miyoshi@quickhack.net>
 ;;
 ;; Created: 05/12/2000
-;; Reviesd: $Date: 2003/01/21 03:39:19 $
+;; Reviesd: $Date: 2004/05/04 13:48:31 $
 
 ;;; Configration Variables:
 
@@ -164,11 +164,6 @@ ww-japanese-long => \"土曜日\"
 (defvar mhc-calendar/inserter-for-draft '(((yy mm02 dd02) . "-")))
 (defvar mhc-calendar/mark-date nil)
 
-;; requires
-(eval-and-compile
-  (when (locate-library "hnf-mode")
-    (require 'hnf-mode)))
-
 ;; mhc-calendar functions
 ;; macros
 (defmacro mhc-calendar-p ()
@@ -225,11 +220,13 @@ ww-japanese-long => \"土曜日\"
   (defvar mm)
   (defvar dd)
   (defvar ww)
+  (defvar hnf-diary-dir)
+  (defvar hnf-diary-year-directory-flag)
   (defvar view-exit-action)
-  (defvar mhc-calendar-mode-menu)
-  (or (fboundp 'easy-menu-add)
-      (condition-case nil (require 'easymenu) (error nil))
-      (defun easy-menu-add (&rest args) ())))
+  (defvar mhc-calendar-mode-menu))
+(eval-and-compile
+  (autoload 'easy-menu-add "easymenu")
+  (autoload 'hnf-mode "hnf-mode"))
 
 ;; Compatibilities between emacsen
 (if (fboundp 'text-property-any)

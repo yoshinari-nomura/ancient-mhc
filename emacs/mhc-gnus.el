@@ -105,7 +105,7 @@ this function."
     (delete-region (point-min) (point-max))))
 
 ;; This is a trick to suppress byte-compile of the inline function
-;; `mail-full-mail-header' defined by `defsubst'.  Cf. (ELF:01937)
+;; `make-full-mail-header' defined by `defsubst'.  Cf. (ELF:01937)
 (defalias 'mhc-gnus/make-full-mail-header 'make-full-mail-header)
 (defalias 'mhc-gnus/encode-string 'identity)
 
@@ -163,15 +163,22 @@ If FOR-DRAFT is non-nil, Hilight message as draft message."
 
 (defalias 'mhc-gnus-decode-string 'rfc2047-decode-string)
 
+(defun mhc-gnus/decode-buffer ()
+  (goto-char (point-min))
+  (skip-chars-forward "[ \t\r\f\n\x20-\x7e]")
+  (unless (eobp)
+    (decode-coding-region (point-min) (point-max) mhc-default-coding-system)))
+
 (defun mhc-gnus-decode-header ()
   "Decode MIME-encoded headers.
 
 NOTE: This function designed for original Gnus, not for T-gnus.  When
 using T-gnus, `mhc-mime-decode-header' must be used instead of this
 function."
-  (goto-char (point-min))
-  (when (re-search-forward "^$" nil t)
-    (rfc2047-decode-region (point-min) (point))))
+  (save-restriction
+    (mail-narrow-to-head)
+    (mhc-gnus/decode-buffer)
+    (rfc2047-decode-region (point-min) (point-max))))
 
 
 ;;; Draft APIs (mhc-draft.el):
@@ -198,21 +205,28 @@ this function."
     (erase-buffer)
     (insert-buffer buffer))
   (if original
-      (progn
-	(if (mhc-header-narrowing (mhc-header-valid-p "Content-Type"))
-	    (mime-to-mml)
-	  (decode-coding-region (point-min) (point-max) 'undecided))
-	(mhc-header-narrowing
-	  (mhc-header-delete-header
-	   (concat "^\\(" (mhc-regexp-opt mhc-draft-unuse-hdr-list) "\\)")
-	   'regexp)))
+      (save-restriction
+	(mail-narrow-to-head)
+	(mhc-gnus/decode-buffer)
+	(if (mhc-header-valid-p "Content-Type")
+	    (progn
+	      (widen)
+	      (mime-to-mml))
+	  (rfc2047-decode-region (point-min) (point-max))
+	  (goto-char (point-max))
+	  (widen)
+	  (decode-coding-region (point) (point-max)
+				mhc-default-coding-system))
+	(mail-narrow-to-head)
+	(mhc-header-delete-header
+	 (concat "^\\(" (mhc-regexp-opt mhc-draft-unuse-hdr-list) "\\)")
+	 'regexp))
     (mhc-header-narrowing
       (mhc-header-delete-header
        "^\\(Content-.*\\|Mime-Version\\|User-Agent\\):" 'regexp)))
   (goto-char (point-min))
-  (when (re-search-forward "^$" nil t)
-    (insert mail-header-separator)
-    (forward-char 1)))
+  (when (re-search-forward "^\r?$" nil t)
+    (insert mail-header-separator)))
 
 (defun mhc-gnus-draft-reedit-file (file)
   "Prepare a draft from the FILE.
@@ -250,13 +264,13 @@ function."
 ;;; MIME APIs (mhc-mime.el):
 (defun mhc-gnus-mime-get-raw-buffer ()
   "Get raw buffer of the current message.
-Note: This function is only used when using T-gnus."
+Note: This function is used only when using T-gnus."
   (gnus-summary-select-article)
   gnus-original-article-buffer)
 
 (defun mhc-gnus-mime-get-mime-structure ()
   "Get mime message structure of the current message.
-Note: This function is only used when using T-gnus."
+Note: This function is used only when using T-gnus."
   (gnus-summary-select-article)
   gnus-current-headers)
 

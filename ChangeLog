@@ -1,3 +1,34 @@
+2004-05-04  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+
+	* emacs/mhc.el (toplevel): Add autoload of `easy-menu-add' to
+	suppress a byte-compile warning.
+	(mhc-edit): Highlight an import buffer before confirmation.  Do
+	not call `mhc-highlight-message' by itself.
+	(mhc-default-import-original-article): New option.
+	(mhc-import): Check the above option.
+	(mhc-modify-file): Do not call `mhc-highlight-message' by itself.
+	Move the cursor to the top of the draft buffer.
+
+	* emacs/mhc-calendar.el (toplevel): Add autoload of `hnf-mode' and
+	bindings of `hnf-diary-year-directory-flag' and `hnf-diary-dir' to
+	suppress byte-compile warnings.
+
+	* emacs/mhc-draft.el (mhc-draft-highlight): Abolished.
+	(mhc-draft-mode): Call `mhc-highlight-message'.
+
+	* emacs/mhc-face.el (mhc-facep): Modified to suppress byte-compile
+	warning.
+
+	* emacs/mhc-gnus.el (mhc-gnus/decode-buffer): New function.
+	(mhc-gnus-decode-header): Call the above function to decode
+	headers that are not encoded in MIME format.
+	(mhc-gnus-draft-reedit-buffer): Ditto.  Decode MIME-encoded
+	headers even if Content-Type header is not found.
+
+	* emacs/mhc-logic.el (toplevel): Add bindings of `day-list',
+	`duration-begin', `duration-end', `month-list' and
+	`require-duration' to suppress byte-compile warnings.
+
 2004-05-02  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 
 	* emacs/MHC-MK (make-mhc/module-alist): Check that mime-edit.el is

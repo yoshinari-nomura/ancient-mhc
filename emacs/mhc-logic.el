@@ -447,6 +447,13 @@
       duration-begin)))
 
 
+(eval-when-compile
+  (defvar day-list)
+  (defvar duration-begin)
+  (defvar duration-end)
+  (defvar month-list)
+  (defvar require-duration))
+
 (defun mhc-logic/check-sexp-range-internal (sexp)
   "Recursive subroutine of mhc-logic/check-sexp-range."
   (if (listp sexp)
