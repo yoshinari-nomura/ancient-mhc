@@ -1,5 +1,7 @@
 2000-07-18  Yoshinari Nomura  <nom@quickhack.net>
 
+	* configure.rb: more simple error message.
+
 	* emacs/mhc-cmail.el: New file.
 
 	* emacs/mhc.el (mhc-current-date-month):
