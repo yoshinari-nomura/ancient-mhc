@@ -541,7 +541,7 @@ PROP-VALUE is the property value correspond to PROP-TYPE.
 			   (t 'default)))
 	(pos (point)))
     (if (mhc-date= (mhc-day-date mhc-tmp-dayinfo) (mhc-date-now))
-	(setq mhc-tmp-day-face (mhc-face-get-gray-face mhc-tmp-day-face)))
+	(setq mhc-tmp-day-face (mhc-face-get-today-face mhc-tmp-day-face)))
     (funcall mhc-summary/line-inserter)
     (put-text-property pos (point) 'mhc-dayinfo mhc-tmp-dayinfo)))
 
