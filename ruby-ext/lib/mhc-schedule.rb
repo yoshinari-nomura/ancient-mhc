@@ -3,7 +3,7 @@
 ## Author:  Yoshinari Nomura <nom@quickhack.net>
 ##
 ## Created: 1999/07/16
-## Revised: $Date: 2001/09/12 03:44:56 $
+## Revised: $Date: 2002/02/02 10:20:46 $
 ##
 
 ################################################################
@@ -665,6 +665,10 @@ class MhcScheduleItem
     end
   end
 
+  def todo?
+    return /todo/i =~ category_as_string
+  end
+
   def occur_multiple?
     if occur_min && occur_max
       return true if occur_min != occur_max
@@ -1314,7 +1318,7 @@ class MhcScheduleDB
   end
 
   def sch_to_slot(sch)
-    if sch .occur_inter_month?
+    if sch .occur_inter_month? or sch .todo?
       return @basedir + '/intersect'
     else
       date = sch .occur_min
