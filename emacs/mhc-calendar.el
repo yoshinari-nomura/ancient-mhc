@@ -5,7 +5,7 @@
 ;;          MIYOSHI Masanori <miyoshi@ask.ne.jp>
 ;;
 ;; Created: 05/12/2000
-;; Reviesd: $Date: 2000/06/28 03:32:06 $
+;; Reviesd: $Date: 2000/06/30 01:26:08 $
 
 ;; internal variables
 (defvar mhc-calendar/buffer "*mhc-calendar*")
@@ -25,18 +25,20 @@
 (defmacro  mhc-calendar-p ()
   (` (eq major-mode 'mhc-calendar-mode)))
 
-(defmacro mhc-calendar/in-day-p () ;; return 'day from 01/01/1970'
-  (` (get-text-property (point) 'mhc-calendar/day-prop)))
+(defmacro mhc-calendar/in-date-p () ;; return 'date from 01/01/1970'
+  (` (get-text-property (point) 'mhc-calendar/date-prop)))
 
 (defmacro mhc-calendar/in-summary-p () ;; return 'schedule filename'
-  (` (save-excursion
-       (beginning-of-line)
-       (get-text-property (point) 'mhc-calendar/summary-prop))))
+  (` (or (get-text-property (point) 'mhc-calendar/summary-prop)
+	 (save-excursion
+	   (beginning-of-line)
+	   (get-text-property (point) 'mhc-calendar/summary-prop)))))
 
 (defmacro mhc-calendar/in-summary-hnf-p () ;; return 'title count'
-  (` (save-excursion
-       (beginning-of-line)
-       (get-text-property (point) 'mhc-calendar/summary-hnf-prop))))
+  (` (or (get-text-property (point) 'mhc-calendar/summary-hnf-prop)
+	 (save-excursion
+	   (beginning-of-line)
+	   (get-text-property (point) 'mhc-calendar/summary-hnf-prop)))))
 
 (defmacro mhc-calendar/get-date-colnum (col)
   (` (cond
@@ -149,12 +151,12 @@
 	   (or (mhc-calendar/in-summary-p) (mhc-calendar/in-summary-hnf-p))]
 	  ("Schedule edit"
 	   ["Schedule addition" mhc-calendar-edit
-	    (or (mhc-calendar/in-day-p) (mhc-calendar/in-summary-p))]
+	    (or (mhc-calendar/in-date-p) (mhc-calendar/in-summary-p))]
 	   ["Schedule modify" mhc-calendar-modify (mhc-calendar/in-summary-p)]
 	   ["Schedule delete" mhc-calendar-delete (mhc-calendar/in-summary-p)]
 	   ["HNF file edit" mhc-calendar-hnf-edit
 	    (and mhc-calendar-link-hnf
-		 (or (mhc-calendar/in-day-p) (mhc-calendar/in-summary-p)
+		 (or (mhc-calendar/in-date-p) (mhc-calendar/in-summary-p)
 		     (mhc-calendar/in-summary-hnf-p)))])
 	  "----"
 	  ("Misc"
@@ -248,7 +250,7 @@ The keys that are defined for mhc-calendar-mode are:
     (pop-to-buffer mhc-calendar/buffer)
     (while (not pos)
       (setq pos (mhc-calendar/tp-any (point-min) (point-max)
-				     'mhc-calendar/day-prop date))
+				     'mhc-calendar/date-prop date))
       (or pos (mhc-calendar/create-buffer date)))
     (goto-char (1+ pos))
     (setq mhc-calendar-view-date date))
@@ -358,7 +360,7 @@ The keys that are defined for mhc-calendar-mode are:
 	  (setq yymm (mhc-date-mm+
 		      cdate
 		      (mhc-calendar/get-date-colnum (current-column))))
-	  (put-text-property beg end 'mhc-calendar/day-prop (+ yymm dd))
+	  (put-text-property beg end 'mhc-calendar/date-prop (+ yymm dd))
 	  (if mhc-calendar-use-mouse-highlight
 	      (put-text-property beg end 'mouse-face 'highlight)))
 	(setq beg (- (point) 2) end (point))
@@ -367,14 +369,14 @@ The keys that are defined for mhc-calendar-mode are:
 	(setq yymm (mhc-date-mm+
 		    cdate
 		    (mhc-calendar/get-date-colnum (current-column))))
-	(put-text-property beg end 'mhc-calendar/day-prop (+ yymm dd))
+	(put-text-property beg end 'mhc-calendar/date-prop (+ yymm dd))
 	(if mhc-calendar-use-mouse-highlight
 	    (put-text-property beg end 'mouse-face 'highlight)))
     (error nil)))
 
 (defun mhc-calendar-edit ()
   (interactive)
-  (if (or (mhc-calendar/in-day-p)
+  (if (or (mhc-calendar/in-date-p)
 	  (mhc-calendar/in-summary-p))
       (progn
 	(mhc-window-push)
@@ -623,8 +625,8 @@ The keys that are defined for mhc-calendar-mode are:
 
 (defun mhc-calendar-get-date ()
   (when (mhc-calendar-p)
-    (if (mhc-calendar/in-day-p)
-	(mhc-calendar/in-day-p)
+    (if (mhc-calendar/in-date-p)
+	(mhc-calendar/in-date-p)
       (if (or (mhc-calendar/in-summary-p) (mhc-calendar/in-summary-hnf-p))
 	  mhc-calendar-view-date
 	(let* ((pos (point))
@@ -639,21 +641,21 @@ The keys that are defined for mhc-calendar-mode are:
 	   ((< line 3) date1)
 	   ((> line 9) datelast)
 	   (t
-	    (setq daypos (next-single-property-change (point) 'mhc-calendar/day-prop))
+	    (setq daypos (next-single-property-change (point) 'mhc-calendar/date-prop))
 	    (if daypos
 		(progn
 		  (goto-char daypos)
 		  (if (= colnum (mhc-calendar/get-date-colnum (current-column)))
-		      (mhc-calendar/in-day-p)
+		      (mhc-calendar/in-date-p)
 		    (goto-char pos)
 		    (if (or (and (goto-char (previous-single-property-change
-					     (point) 'mhc-calendar/day-prop))
-				 (mhc-calendar/in-day-p))
+					     (point) 'mhc-calendar/date-prop))
+				 (mhc-calendar/in-date-p))
 			    (and (goto-char (previous-single-property-change
-					     (point) 'mhc-calendar/day-prop))
-				 (mhc-calendar/in-day-p)))
+					     (point) 'mhc-calendar/date-prop))
+				 (mhc-calendar/in-date-p)))
 			(if (= colnum (mhc-calendar/get-date-colnum (current-column)))
-			    (mhc-calendar/in-day-p)
+			    (mhc-calendar/in-date-p)
 			  datelast)
 		      datelast)))
 	      datelast))))))))
@@ -668,7 +670,7 @@ The keys that are defined for mhc-calendar-mode are:
   (pop-to-buffer (mhc-calendar/event-buffer event))
   (goto-char (mhc-calendar/event-point event))
   (cond
-   ((mhc-calendar/in-day-p)
+   ((mhc-calendar/in-date-p)
     (mhc-calendar-day-position))
    ((mhc-calendar/in-summary-p)
     (mhc-calendar/view-file (mhc-calendar/in-summary-p)))
@@ -825,7 +827,7 @@ The keys that are defined for mhc-calendar-mode are:
       (if (member (mhc-date-format cdate "d%04d%02d%02d.hnf" yy mm dd) flst)
 	  (progn
 	    (goto-char (+ 2 (mhc-calendar/tp-any (point-min) (point-max)
-						 'mhc-calendar/day-prop cdate)))
+						 'mhc-calendar/date-prop cdate)))
 	    (insert mark)
 	    (if (eq (char-after (point)) spcchar)
 		(delete-char 1))))

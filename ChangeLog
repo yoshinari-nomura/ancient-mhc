@@ -1,3 +1,9 @@
+2000-06-30  Hideyuki SHIRAI  <shirai@rdmg.mgcs.mei.co.jp>
+
+	* emacs/mhc.el (mhc-current-date): Get dayinfo property safe. (thanks to Teranishi-san)
+
+	* emacs/mhc-calendar.el (mhc-calendar/in-date-p): Renamed 'mhc-calendar/in-day-p'.
+
 2000-06-28  MIYOSHI Masanori  <miyoshi@ask.ne.jp>
 
 	* ruby-ext/lib/mhc-kconv.rb: New file.

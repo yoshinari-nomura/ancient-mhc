@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1994/07/04
-;; Revised: $Date: 2000/06/28 02:22:47 $
+;; Revised: $Date: 2000/06/30 01:26:09 $
 
 ;;;
 ;;; Commentay:
@@ -634,7 +634,15 @@ C-c ?    mhc-draft-insert-calendar
 
 (defun mhc-current-date ()
   (when (string-match mhc-summary-buf-regex (buffer-name))
-    (mhc-day-date (get-text-property (point) 'mhc-dayinfo))))
+    (let ((dayinfo (get-text-property (point) 'mhc-dayinfo)))
+      (or (and dayinfo (mhc-day-date dayinfo))
+	  (save-excursion
+	    (end-of-line)
+	    (while (and (not (bobp))
+			(null dayinfo))
+	      (or (setq dayinfo (get-text-property (point) 'mhc-dayinfo))
+		  (forward-char -1)))
+	    (and dayinfo (mhc-day-date dayinfo)))))))
 
 (defun mhc-current-date-month ()
   (let ((buf (buffer-name)) yy mm dd)
