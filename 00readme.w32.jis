@@ -165,7 +165,8 @@ $ ruby make.rb install
    ださい。Meadow 1.15 が \usr\local\Meadow にインストールされて
    いる場合は、次のように指定すればよいでしょう。
    `ruby configure.rb --with-emacs=/usr/local/Meadow/1.15/bin/meadownt\
-                       --with-lispdir=/usr/local/Meadow/site-lisp/mhc'
+                      --with-lispdir=/usr/local/Meadow/site-lisp/mhc\
+                      --disable-palm'
 
 *** mhc2palm, palm2mhc の利用方法
 
