@@ -1,3 +1,7 @@
+2002-09-17  Yuuichi Teranishi  <teranisi@quickhack.net>
+
+	* emacs/mhc.el (mhc-scan-month): Fixed parenthesis.
+
 2002-09-11  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* emacs/mhc.el (mhc-scan-month): Call
