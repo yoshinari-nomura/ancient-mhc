@@ -3,7 +3,7 @@
 ** Author:  Yoshinari Nomura <nom@quickhack.net>
 **
 ** Created: 1999/09/01
-** Revised: $Date: 2000/05/29 14:59:25 $
+** Revised: $Date: 2002/06/21 00:57:00 $
 **
 */
 
@@ -24,6 +24,20 @@
 #include "pi-address.h"
 #include "pi-appinfo.h"
 
+/* Try to determine if version of pilot-link > 0.9.x */
+#ifdef USB_PILOT_LINK
+# undef USB_PILOT_LINK
+#endif
+
+#if PILOT_LINK_VERSION > 0
+# define USB_PILOT_LINK
+#else
+# if PILOT_LINK_MAJOR > 9
+#  define USB_PILOT_LINK
+# endif
+#endif
+
+
 VALUE mPiLib;
 
 /*************************************************************/
@@ -34,7 +48,10 @@ VALUE mPiLib;
 static VALUE rpi_sock_open(VALUE obj, VALUE dev)
 {
   int sd;
+  int i, ret;
+  int dev_usb;
   struct pi_sockaddr addr;
+  char link[256], dev_str[256], dev_dir[256], *Pc;
 
   Check_Type(dev, T_STRING);
 
@@ -42,13 +59,78 @@ static VALUE rpi_sock_open(VALUE obj, VALUE dev)
     return Qnil;
 
   strcpy(addr.pi_device, STR2CSTR(dev));
-  addr.pi_family = PI_AF_SLP;
 
+  /* pilot-link > 0.9.5 needed for many USB devices */
+#ifdef USB_PILOT_LINK
+  /* Newer pilot-link */
+  addr.pi_family = PI_AF_PILOT;
+  if (!(sd = pi_socket(PI_AF_PILOT, PI_SOCK_STREAM, PI_PF_DLP)))
+    return Qnil;
+#else
+  /* 0.9.5 or older */
+  addr.pi_family = PI_AF_SLP;
   if (!(sd = pi_socket(PI_AF_SLP, PI_SOCK_STREAM, PI_PF_PADP)))
     return Qnil;
+#endif
 
-  if (pi_bind(sd, (struct sockaddr*)&addr, sizeof(addr)) < 0)
-    return Qnil;
+  /* This is for USB, whose device doesn't exist until the cradle is pressed
+   * We will give them 5 seconds */
+  dev_str[0]='\0';
+  link[0]='\0';
+  strncpy(dev_str, STR2CSTR(dev), 255);
+  strncpy(dev_dir, STR2CSTR(dev), 255);
+  dev_str[255]='0';
+  dev_dir[255]='0';
+  dev_usb=0;
+  for (Pc=&dev_dir[strlen(dev_dir)-1]; Pc>dev_dir; Pc--) {
+	if (*Pc=='/') *Pc='\0';
+	else break;
+  }
+  Pc = strrchr(dev_dir, '/');
+  if(Pc) {
+    *Pc = '\0';
+  }
+  for (i=10; i>0; i--) {
+   	  ret = readlink(dev_str, link, 256);
+	  if (ret>0) {
+		  link[ret]='\0';
+      } else {
+     if (strstr(dev_str, "usb") || strstr(dev_str, "USB")) {
+        dev_usb=1;
+     }
+     break;
+      }
+      if (link[0]=='/') {
+     strcpy(dev_str, link);
+     strcpy(dev_dir, link);
+     for (Pc=&dev_dir[strlen(dev_dir)-1]; Pc>dev_dir; Pc--) {
+        if (*Pc=='/') *Pc='\0';
+        else break;
+     }
+     Pc = strrchr(dev_dir, '/');
+     if (Pc) {
+        *Pc = '\0';
+     }
+      } else {
+     snprintf(dev_str, 255, "%s/%s", dev_dir, link);
+     dev_str[255]='\0';
+      }
+      if (strstr(link, "usb") || strstr(link, "USB")) {
+     dev_usb=1;
+     break;
+      }
+   }
+
+  if (dev_usb) {
+	  for (i=7; i>0; i--) {
+		  ret = pi_bind(sd, (struct sockaddr*)&addr, sizeof(addr));
+		  if (ret!=-1) break;
+		  sleep(1);
+	  }
+  } else {
+	  ret = pi_bind(sd, (struct sockaddr*)&addr, sizeof(addr));
+  }
+  if (ret == -1) return Qnil;
 
   return INT2FIX(sd);
 }
