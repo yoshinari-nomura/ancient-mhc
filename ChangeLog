@@ -1,3 +1,7 @@
+2004-10-28  NOGUCHI Yusuke <nogunogu@mva.biglobe.ne.jp> / nom
+
+	* emacs/mhc-guess.el: improvement of mhc-guess-location-regexp-list
+
 2004-10-25  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
 	* ruby-ext/lib/mhc-schedule.rb (MON_LONG_REGEX, WEK_LONG_REGEX):
