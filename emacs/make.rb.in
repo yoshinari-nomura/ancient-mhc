@@ -3,14 +3,15 @@
 
 $LOAD_PATH .unshift('@@MHC_TOPDIR@@')
 
-OPT = ''
-OPT += '--with-lispdir=@@MHC_LISPDIR@@' if '@@MHC_LISPDIR@@' != ''
-OPT += '--with-packagedir=@@MHC_XEMACS_PACKAGE_DIR@@' if '@@MHC_XEMACS_PACKAGE_DIR@@' != ''
-OPT += '--with-addpath=@@MHC_EMACS_ADD_PATH@@' if '@@MHC_EMACS_ADD_PATH@@' != ''
-OPT += '--with-mew=@@MHC_WITH_MEW@@' if '@@MHC_WITH_MEW@@' != ''
-OPT += '--with-wl=@@MHC_WITH_WL@@' if '@@MHC_WITH_WL@@' != ''
-OPT += '--with-gnus=@@MHC_WITH_GNUS@@' if '@@MHC_WITH_GNUS@@' != ''
-OPT += '--with-gnus=@@MHC_WITH_CMAIL@@' if '@@MHC_WITH_CMAIL@@' != ''
+opt = ''
+opt += ' --with-lispdir=@@MHC_LISPDIR@@' if '@@MHC_LISPDIR@@' != ''
+opt += ' --with-packagedir=@@MHC_XEMACS_PACKAGE_DIR@@' if '@@MHC_XEMACS_PACKAGE_DIR@@' != ''
+opt += ' --with-addpath=@@MHC_EMACS_ADD_PATH@@' if '@@MHC_EMACS_ADD_PATH@@' != ''
+opt += ' --with-mew=@@MHC_WITH_MEW@@' if '@@MHC_WITH_MEW@@' != ''
+opt += ' --with-wl' if '@@MHC_WITH_WL@@' != ''
+opt += ' --with-gnus' if '@@MHC_WITH_GNUS@@' != ''
+opt += ' --with-cmail' if '@@MHC_WITH_CMAIL@@' != ''
+OPT = opt
 
 require 'mhc-make'
 include MhcMake
@@ -19,12 +20,14 @@ EMACS  = '@@MHC_EMACS_PATH@@'
 XEMACS = '@@MHC_XEMACS_PATH@@'
 OPTION = '-batch -q -no-site-file -l MHC-MK'
 
+ENV['PWD'] = Dir .pwd() if /cygwin|mingw32/ =~ RUBY_PLATFORM
+
 def default
-  make_system("#{EMACS} #{OPTION} -f make-mhc-compile")
+  make_system("#{EMACS} #{OPTION} -f make-mhc-compile", OPT)
 end
 
 def package
-  make_system("#{XEMACS} #{OPTION} -f make-mhc-compile-package")
+  make_system("#{XEMACS} #{OPTION} -f make-mhc-compile-package", OPT)
 end
 
 def clean
@@ -35,7 +38,7 @@ def clean
 end
 
 def install
-  make_system("#{EMACS} #{OPTION} -f make-mhc-install")
+  make_system("#{EMACS} #{OPTION} -f make-mhc-install", OPT)
 end
 
 doit()
