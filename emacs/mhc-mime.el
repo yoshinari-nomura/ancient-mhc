@@ -3,7 +3,7 @@
 ;; Author:  Yuuichi Teranishi <teranisi@quickhack.net>
 ;;
 ;; Created: 2000/07/26
-;; Revised: $Date: 2000/12/15 02:30:59 $
+;; Revised: $Date: 2001/04/05 07:38:43 $
 
 ;;; Commentary:
 
@@ -47,7 +47,33 @@
 (defalias 'mhc-mime-eword-decode-string 'eword-decode-string)
 
 (defun mhc-mime-decode-header ()
-  (mime-decode-header-in-buffer 'decode))
+  (mhc-header-narrowing
+    (while (not (eobp))
+      (if (looking-at "X-SC-Schedule:")
+	  (save-restriction
+	    (narrow-to-region (point) (progn (mhc-header-goto-end) (point)))
+	    (goto-char (point-min))
+	    (while (search-forward "\\" nil t)
+	      (insert "\\"))
+	    (goto-char (point-min))
+	    (while (search-forward "\n" nil t)
+	      (goto-char (match-beginning 0))
+	      (delete-region (match-beginning 0) (match-end 0))
+	      (insert "\\n"))
+	    (goto-char (point-max)))
+	(mhc-header-goto-end)))
+    (mime-decode-header-in-region (point-min) (point-max) 'decode)
+    (goto-char (point-min))
+    (while (not (eobp))
+      (when (looking-at "X-SC-Schedule:")
+	(save-restriction
+	  (narrow-to-region (point) (progn (end-of-line) (point)))
+	  (goto-char (point-min))
+	  (while (re-search-forward "\\(\\\\\\\\\\)\\|\\\\n" nil t)
+	    (goto-char (match-beginning 0))
+	    (delete-region (match-beginning 0) (match-end 0))
+	    (insert (if (match-beginning 1) "\\" "\n")))))
+      (forward-line 1))))
 
 (defun mhc-mime-draft-translate ()
   (let (mime-edit-insert-user-agent-field)
@@ -80,7 +106,7 @@
 		 (mhc-regexp-opt mhc-draft-unuse-hdr-list)
 		 "\\)")
 	 'regexp)
-	(mime-decode-header-in-buffer 'decode)
+	(mhc-mime-decode-header)
 	(setq ct (std11-fetch-field "content-type")
 	      cte (std11-fetch-field "content-transfer-encoding"))
 	(mhc-header-delete-header

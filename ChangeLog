@@ -1,3 +1,9 @@
+2001-04-05  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+
+	* emacs/mhc-mime.el (mhc-mime-decode-header): Ad-hoc fix for
+	`X-SC-Schedule' header.
+	(mhc-mime/draft-reedit): Use `mhc-mime-decode-header'.
+
 2001-03-21  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* emacs/mhc-vars.el (mhc-vertical-calendar-length): Allow cons of
