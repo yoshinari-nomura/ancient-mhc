@@ -22,10 +22,10 @@ install:
 	$(EMACS) $(FLAGS) -f make-mhc-install $(OPTS) # $(MAKE)
 
 package:
-	$(XEMACS) $(FLAGS) -f make-mhc-compile-package
+	$(XEMACS) $(FLAGS) -f make-mhc-compile-package $(OPTS)
 
 install-package:
-	$(XEMACS) $(FLAGS) -f make-mhc-install-package # $(MAKE)
+	$(XEMACS) $(FLAGS) -f make-mhc-install-package $(OPTS) # $(MAKE)
 
 clean:
 	-rm -f *.elc

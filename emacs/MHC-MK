@@ -130,7 +130,12 @@
 		  (let ((flag (getenv "MAKEFLAGS"))
 			(case-fold-search nil))
 		    (if flag
-			(string-match "^\\(\\(--[^ ]+ \\)+-\\|[^ =-]\\)*n" flag))))))))
+			(string-match "^\\(\\(--[^ ]+ \\)+-\\|[^ =-]\\)*n" flag)))))
+	(if (featurep 'xemacs)
+	    (setq make-mhc/lisp-directory
+		  (expand-file-name
+		   make-mhc/module-prefix
+		   (expand-file-name "lisp" make-mhc/package-directory)))))))
 
 (defun make-mhc-compile ()
   (make-mhc/configure)
@@ -197,10 +202,6 @@
 ;; For XEmacs package system.
 (defun make-mhc-compile-package ()
   (make-mhc/configure)
-  (setq make-mhc/lisp-directory
-	(expand-file-name
-	 make-mhc/module-prefix
-	 (expand-file-name "lisp" make-mhc/package-directory)))
   (make-mhc-compile))
 
 (defun make-mhc/update-package-files (package dir)
@@ -229,6 +230,6 @@
 (defun make-mhc-install-package ()
   (make-mhc-compile-package)
   (make-mhc-install)
-  (make-mhc/update-package-files make-mhc/module-prefix dir just-print))
+  (make-mhc/update-package-files make-mhc/module-prefix dir))
 
 ;;; MHC-MK ends here
