@@ -1,3 +1,11 @@
+2000-10-04  Toshihiko SHIMOKAWA  <toshi@tea.forus.or.jp>
+
+	* emacs/00usage.jis: Untabified. Move some descriptions to
+	../00usage.jis.  Delete some obsolete descrptions.
+	
+	* 00usage.jis: Merge descrption from emacs/00usage.jis. Change an
+	order of descrption.
+
 2000-10-04  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* emacs/00usage.jis: Change key bind in mhc-mode. Account for
