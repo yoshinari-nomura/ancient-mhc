@@ -1,5 +1,10 @@
 2000-07-18  Yoshinari Nomura  <nom@quickhack.net>
 
+	* ruby-ext/lib/mhc-schedule.rb (MhcScheduleItem#to_palm):
+	support 1st 3rd Tue.
+
+	* mhc2palm.in: add verbose mode -v.
+
 	* emacs/mhc.el:
 	Use (mhc-face-get-today-face) instead of (mhc-face-get-gray-face).
 	Use (mhc-face-get-busy-face)  instead of (mhc-face-get-underline-face).
