@@ -1,3 +1,27 @@
+2000-06-18  Yoshinari Nomura  <nom@quickhack.net>
+
+	* emacs/mhc.el (mhc-input-month):
+	fix to set default month correctly.
+
+	* emacs/mhc-record.el (mhc-record/append-log):
+	Add seconds into log string (%H:%M -> %T).
+
+	* emacs/mhc-misc.el (mhc-misc-substring-to-int): New function.
+
+	* emacs/mhc-minibuf.el (mhc-minibuf-date-to-s): fix typo.
+
+	* emacs/mhc-logic.el (mhc-logic/month-alist):
+	correct number for "aug" 9 -> 8.
+
+	* emacs/mhc-db.el (mhc-db/eval-for-month):
+	calculate last day of a month without timezone.el.
+
+	* emacs/mhc-day.el (mhc-day-let):
+	fix for date before 1970.
+
+	* emacs/mhc-date.el (mhc-date/to-list2):
+	fix for `ww' before 1970.
+
 2000-06-18  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 
 	* emacs/mhc.el: Follow reconstruction of mhc-date.el.
