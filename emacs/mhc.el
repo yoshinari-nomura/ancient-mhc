@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1994/07/04
-;; Revised: $Date: 2000/10/03 14:52:06 $
+;; Revised: $Date: 2000/10/03 14:57:37 $
 
 ;;;
 ;;; Commentay:
@@ -309,7 +309,9 @@
 			      (or mhc-default-category "")
 			      nil nil 'mhc-default-category-hist))
   (setq mhc-default-category-predicate-sexp
-	(mhc-expr-compile mhc-default-category)))
+	(mhc-expr-compile mhc-default-category))
+  (if (mhc-summary-buffer-p)
+      (mhc-rescan-month)))
 
 ; (defun mhc-category-convert (lst)
 ;   (let (ret inv)
