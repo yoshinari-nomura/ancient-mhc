@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1994/07/04
-;; Revised: $Date: 2000/05/30 15:04:57 $
+;; Revised: $Date: 2000/05/31 00:46:50 $
 
 ;;;
 ;;; Commentay:
@@ -53,6 +53,16 @@
 (require 'mhc-schedule)
 (require 'mhc-minibuf)
 (require 'mhc-face)
+
+(condition-case nil
+    (require 'bitmap)
+  (error))
+(if (featurep 'xemacs)
+    (require 'mhc-xmas)
+  (if (featurep 'bitmap)
+      (require 'mhc-bm)
+    (defun mhc-use-icon-p ())))
+
 (require 'mhc-calendar)
 (provide 'mhc)
 
@@ -68,6 +78,19 @@
   :type '(choice (const :tag "Mew" mew)
 		 (const :tag "Wanderlust" wl)
 		 (const :tag "Gnus" gnus)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Icon
+;;
+(defcustom mhc-use-icon t
+  "*If non-nil, schedule icon is used."
+  :group 'mhc
+  :type 'boolean)
+
+(defcustom mhc-icon-path "~/icons"
+  "*Icon path for MHC."
+  :group 'mhc
+  :type 'directory)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Menu setup
@@ -279,7 +302,8 @@
 	(category (car (mhc-sch-category sch)))
 	date-color week-color insert
 	head-string date-string week-string time-string
-	conf-string subj-string foot-string location-string)
+	conf-string subj-string foot-string location-string
+	pos len icon space)
     (setq week-color
 	  (cond
 	   ((mhc-sch-in-category-p sch "Holiday") 'mhc-category-face-holiday)
@@ -341,7 +365,20 @@
 		  head-string
 		  date-string " "
 		  week-string " "
-		  time-string " "
+		  time-string " "))
+    (if (mhc-use-icon-p)
+	(progn
+	  ;; XX icon must have 2 character width.
+	  (setq space "  ")
+	  (put-text-property 0 2 'invisible
+			     (and category
+				  (setq icon (mhc-get-icon category))
+				  t)
+			     space)
+	  (setq insert (concat insert space))))
+    (setq len (length insert))
+    (setq insert (concat
+		  insert
 		  conf-string (if conf-string " ")
 		  subj-string " "
 		  location-string
@@ -364,8 +401,11 @@
 				  '(gnus-number nil) insert))))
      ((eq type 'calendar)
       (put-text-property 0 (length insert) 'mhc-calendar-summary-prop
- 			 (if (mhc-sch-path sch) (mhc-sch-path sch) "Dummy") insert)))
+ 			 (if (mhc-sch-path sch)
+			     (mhc-sch-path sch) "Dummy") insert)))
+    (setq pos (point))
     (insert insert)
+    (and icon (mhc-put-icon icon (+ pos len)))    
     (set-buffer-modified-p nil)))
 
 (defun mhc-sch-scan-date (date type &optional cat inv-cat secret update)
@@ -450,6 +490,7 @@
     (kill-region (point-min) (point-max))))
 
 (defun mhc-scan-month (ddate type cat inv-cat secret)
+  (and (mhc-use-icon-p) (mhc-icon-setup))  
   (let ((buffer) (insert-current (not (memq type '(mew wl gnus)))))
     (or insert-current
 	(if (eq mhc-mailer-package 'gnus)
@@ -495,6 +536,7 @@
 	(wl-summary-buffer-set-folder (mhc-wl-ddate-to-folder ddate))
 	(make-local-variable 'wl-summary-highlight)
 	(setq wl-summary-highlight nil)
+	(setq wl-summary-buffer-name (buffer-name))
 	(setq wl-summary-buffer-number-regexp "[0-9]+")
 	(setq wl-summary-buffer-msgdb '(nil)))
        ((eq type 'gnus)
