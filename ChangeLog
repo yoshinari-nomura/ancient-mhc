@@ -1,3 +1,8 @@
+2001-03-21  Yoshinari Nomura  <nom@quickhack.net>
+
+	* emacs/mhc-calendar.el, emacs/mhc-vars.el, emacs/mhc.el:
+	mhc-vertical-calendar-length: New variable.
+
 2001-03-13  Yoshinari Nomura  <nom@quickhack.net>
 
 	* ruby-ext/lib/mhc-signal.rb (signal_disconnect):
