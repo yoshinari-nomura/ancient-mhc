@@ -1,3 +1,9 @@
+2000-06-05  Hideyuki SHIRAI  <shirai@rdmg.mgcs.mei.co.jp>
+
+	* emacs/mhc-calendar.el (mhc-calendar-hnf-summary-insert): 'SUB', 'LSUB' suport.
+	(mhc-calendar-hnf-search-title): New function.
+	(mhc-calendar-hnf-edit, mhc-calendar-hnf-view): Goto TITLE position.
+
 2000-06-05  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 
 	* emacs/mhc.el (mhc-eword-encode-string): New function.

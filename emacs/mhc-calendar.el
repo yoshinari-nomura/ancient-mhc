@@ -5,7 +5,7 @@
 ;;          MIYOSHI Masanori <miyoshi@ask.ne.jp>
 ;;
 ;; Created: 05/12/2000
-;; Revised: 06/01/2000
+;; Revised: 06/05/2000
 
 (provide 'mhc-calendar)
 
@@ -66,9 +66,11 @@ refer to mhc-calendar-hnf-face-alist-internal.")
 ;; internal variables
 (defconst mhc-calendar-hnf-face-alist-internal
   '((mhc-calendar-hnf-face-mark . (nil    "MediumSeaGreen" nil))
-    (mhc-calendar-hnf-face-tag  . (italic "red" "paleturquoise"))
+    (mhc-calendar-hnf-face-newtag  . (italic "red" "paleturquoise"))
+    (mhc-calendar-hnf-face-subtag  . (italic "blue" nil))
     (mhc-calendar-hnf-face-cat  . (nil    "DarkGreen" nil))
     (mhc-calendar-hnf-face-new  . (bold   "DarkGreen" nil))
+    (mhc-calendar-hnf-face-sub  . (nil   "DarkGreen" nil))
     (mhc-calendar-hnf-face-uri  . (italic "blue" nil))))
 
 (defvar mhc-calendar-buffer "*mhc-calendar*")
@@ -81,15 +83,15 @@ refer to mhc-calendar-hnf-face-alist-internal.")
 
 ;; mhc-calendar functions
 ;; macros
-(defmacro mhc-calendar-in-day-p ()
+(defmacro mhc-calendar-in-day-p () ;; ddate
   (` (get-text-property (point) 'mhc-calendar-day-prop)))
 
-(defmacro mhc-calendar-in-summary-p ()
+(defmacro mhc-calendar-in-summary-p () ;; schedule filename
   (` (save-excursion
        (beginning-of-line)
        (get-text-property (point) 'mhc-calendar-summary-prop))))
 
-(defmacro mhc-calendar-in-summary-hnf-p ()
+(defmacro mhc-calendar-in-summary-hnf-p () ;; title count
   (` (save-excursion
        (beginning-of-line)
        (get-text-property (point) 'mhc-calendar-summary-hnf-prop))))
@@ -705,6 +707,7 @@ The keys that are defined for mhc-calendar-mode are:
 (defun mhc-calendar-day-at-mouse(event)
   (interactive "e")
   (set-buffer (event-buffer event))
+  (pop-to-buffer (event-buffer event))
   (goto-char (event-point event))
   (cond
    ((mhc-calendar-in-day-p)
@@ -833,18 +836,31 @@ The keys that are defined for mhc-calendar-mode are:
 (defun mhc-calendar-hnf-edit ()
   (interactive)
   (if mhc-calendar-link-hnf
-      (let (find-file-not-found-hooks)
+      (let ((find-file-not-found-hooks nil)
+	    (count (mhc-calendar-in-summary-hnf-p)))
 	(if (functionp hnf-initial-function) ;; hns-mode require APEL :-)
 	    (add-hook 'find-file-not-found-hooks
 		      '(lambda () (funcall hnf-initial-function))))
 	(find-file-other-window
-	 (mhc-calendar-hnf-get-filename (mhc-calendar-get-ddate))))))
+	 (mhc-calendar-hnf-get-filename (mhc-calendar-get-ddate)))
+	(and (integerp count) (mhc-calendar-hnf-search-title count)))))
 
 (defun mhc-calendar-hnf-view ()
   (interactive)
-  (let ((fname (mhc-calendar-hnf-get-filename (mhc-calendar-get-ddate))))
+  (let ((fname (mhc-calendar-hnf-get-filename (mhc-calendar-get-ddate)))
+	(count (mhc-calendar-in-summary-hnf-p)))
     (if (file-readable-p fname)
-      (view-file-other-window fname))))
+	(progn
+	  (view-file-other-window fname)
+	  (and (integerp count) (mhc-calendar-hnf-search-title count))))))
+
+(defun mhc-calendar-hnf-search-title (count)
+  (goto-char (point-min))
+  (while (and (> count 0) (not (eobp)))
+    (re-search-forward "^\\(L?NEW\\|L?SUB\\)[ \t]+" nil t)
+    (setq count (1- count)))
+  (beginning-of-line)
+  (recenter (/ (window-height) 4)))
 
 (defun mhc-calendar-hnf-mark-diary-entries ()
   (interactive)
@@ -867,18 +883,19 @@ The keys that are defined for mhc-calendar-mode are:
   (let* ((ddate mhc-calendar-view-ddate)
 	 (fname (mhc-calendar-hnf-get-filename ddate))
 	 (buffer-read-only nil)
-	 (headmark "#")
-	 (cat "")
-	 (i 1)
-	 header summary str uri)
+	 (newmark "#") (sub "＠") (cat "")
+	 (count 1) (ncount 1)
+	 new summary str uri)
     (if (not (file-readable-p fname))
 	()
       (goto-char (point-max))
-      (with-temp-buffer;; hnf-mode.el require APEL :-)
+      (with-temp-buffer              ;; hnf-mode.el require APEL :-)
 	(insert-file-contents fname)
 	(goto-char (point-min))
+	(mhc-face-put sub 'mhc-calendar-hnf-face-subtag)
 	(while (not (eobp))
-	  (cond    ;; CAT, NEW, LNEW adhoc suport
+	  (cond
+	   ;; CAT
 	   ((looking-at "^CAT[ \t]+\\(.*\\)$")
 	    (setq cat (buffer-substring (match-beginning 1) (match-end 1)))
 	    (while (string-match "[ \t]+" cat)
@@ -888,13 +905,19 @@ The keys that are defined for mhc-calendar-mode are:
 	    (setq cat (concat "[" cat "]"))
 	    (mhc-face-put cat 'mhc-calendar-hnf-face-cat)
 	    (setq cat (concat cat " ")))
+	   ;; NEW
 	   ((looking-at "^NEW[ \t]+\\(.*\\)$")
 	    (setq str (buffer-substring (match-beginning 1) (match-end 1)))
 	    (mhc-face-put str 'mhc-calendar-hnf-face-new)
-	    (setq header (format "%s%d" headmark i))
-	    (mhc-face-put header 'mhc-calendar-hnf-face-tag)
-	    (setq summary (concat summary "     " header " " cat str "\n"))
-	    (setq i (1+ i) cat ""))
+	    (setq new (format "%s%d" newmark ncount))
+	    (mhc-face-put new 'mhc-calendar-hnf-face-newtag)
+	    (setq str (concat "     " new " " cat str "\n"))
+	    (put-text-property 0 (length str) 'mhc-calendar-summary-hnf-prop count str)
+	    (setq summary (concat summary str)
+		  count (1+ count)
+		  ncount (1+ ncount)
+		  cat ""))
+	   ;; LNEW
 	   ((looking-at "^LNEW[ \t]+\\([^ \t]+\\)[ \t]+\\(.*\\)$")
 	    (setq uri (concat "<"
 			      (buffer-substring (match-beginning 1) (match-end 1))
@@ -902,15 +925,38 @@ The keys that are defined for mhc-calendar-mode are:
 	    (mhc-face-put uri 'mhc-calendar-hnf-face-uri)
 	    (setq str (buffer-substring (match-beginning 2) (match-end 2)))
 	    (mhc-face-put str 'mhc-calendar-hnf-face-new)
-	    (setq header (format "%s%d" headmark i))
-	    (mhc-face-put header 'mhc-calendar-hnf-face-tag)
-	    (setq summary (concat summary "     " header " " cat str " " uri "\n"))
-	    (setq i (1+ i) cat "")))
+	    (setq new (format "%s%d" newmark ncount))
+	    (mhc-face-put new 'mhc-calendar-hnf-face-newtag)
+	    (setq str (concat "     " new " " cat str " " uri "\n"))
+	    (put-text-property 0 (length str) 'mhc-calendar-summary-hnf-prop count str)
+	    (setq summary (concat summary str)
+		  count (1+ count)
+		  ncount (1+ ncount)
+		  cat ""))
+	   ;; SUB
+	   ((looking-at "^SUB[ \t]+\\(.*\\)$")
+	    (setq str (buffer-substring (match-beginning 1) (match-end 1)))
+	    (mhc-face-put str 'mhc-calendar-hnf-face-sub)
+	    (setq str (concat "       " sub " " cat str "\n"))
+	    (put-text-property 0 (length str) 'mhc-calendar-summary-hnf-prop count str)
+	    (setq summary (concat summary str)
+		  count (1+ count)
+		  cat ""))
+	   ;; LSUB
+	   ((looking-at "^LSUB[ \t]+\\([^ \t]+\\)[ \t]+\\(.*\\)$")
+	    (setq uri (concat "<"
+			      (buffer-substring (match-beginning 1) (match-end 1))
+			      ">"))
+	    (mhc-face-put uri 'mhc-calendar-hnf-face-uri)
+	    (setq str (buffer-substring (match-beginning 2) (match-end 2)))
+	    (mhc-face-put str 'mhc-calendar-hnf-face-sub)
+	    (setq str (concat "       " sub " " cat str " " uri "\n"))
+	    (put-text-property 0 (length str) 'mhc-calendar-summary-hnf-prop count str)
+	    (setq summary (concat summary str)
+		  count (1+ count)
+		  cat "")))
 	  (forward-line)))
-      (if summary
-	  (progn
-	    (put-text-property 0 (length summary) 'mhc-calendar-summary-hnf-prop t summary)
-	    (insert "\n" summary)))
+      (if summary (insert "\n" summary))
       (delete-char -1)
       (set-buffer-modified-p nil))))
 
@@ -930,7 +976,7 @@ The keys that are defined for mhc-calendar-mode are:
 ;; Redistribution and use in source and binary forms, with or without
 ;; modification, are permitted provided that the following conditions
 ;; are met:
-;; 
+;;
 ;; 1. Redistributions of source code must retain the above copyright
 ;;    notice, this list of conditions and the following disclaimer.
 ;; 2. Redistributions in binary form must reproduce the above copyright
@@ -939,7 +985,7 @@ The keys that are defined for mhc-calendar-mode are:
 ;; 3. Neither the name of the team nor the names of its contributors
 ;;    may be used to endorse or promote products derived from this software
 ;;    without specific prior written permission.
-;; 
+;;
 ;; THIS SOFTWARE IS PROVIDED BY THE TEAM AND CONTRIBUTORS ``AS IS''
 ;; AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 ;; LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
