@@ -1,14 +1,22 @@
+2000-06-23  Yoshinari Nomura  <nom@quickhack.net>
+
+	* 00todo.jis: updated.
+	* 00readme.jis: change file kanji code euc to jis.
+
 2000-06-22  Hideyuki SHIRAI  <shirai@rdmg.mgcs.mei.co.jp>
 
-	* emacs/mhc-calendar.el (mhc-calendar): Requested month displays center position.
+	* emacs/mhc-calendar.el (mhc-calendar): Requested month displays
+		  center position. 
 	(mhc-calendar-goto-today): New function.
 
 	* emacs/mhc.el (mhc-input-month): Treat default date option.
 
-	* emacs/mhc-date.el (mhc-date-yymm=): Fix mhc-date-mm's option. (d1, d2)
+	* emacs/mhc-date.el (mhc-date-yymm=): Fix mhc-date-mm's
+		  option. (d1, d2) 
 	(mhc-date-yymm<): Ditto.
 
-	* emacs/mhc-record.el (mhc-record-write-buffer): Add 'nomsg option when write-region.
+	* emacs/mhc-record.el (mhc-record-write-buffer): Add 'nomsg option
+		  when write-region. 
 	(mhc-record/append-log): Ditto.
 
 	* emacs/MHC-MK (comment): Change exemplum for Meadow.
@@ -26,7 +34,8 @@
 	(mhc-summary/insert-dayinfo-internal): Refer `mhc-summary/today'.
 	(mhc-summary-make-contents): Set `mhc-summary/today'.
 
-	* emacs/mhc-db.el (mhc-db/eval-for-duration): Follow changes in mhc-day.el.
+	* emacs/mhc-db.el (mhc-db/eval-for-duration): Follow changes in
+		  mhc-day.el. 
 	Dependency above timezone.el removed.
 
 	* emacs/mhc-day.el: Reconstruction of data structure.
