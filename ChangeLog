@@ -1,3 +1,8 @@
+2004-10-07  Hideyuki SHIRAI  <shirai@quickhack.net>
+
+	* emacs/mhc.el (mhc-scan-month): Insert a weekly separator instead
+	a monthly separator when don't use monthly separator.
+
 2004-09-16  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* emacs/make.rb.in: Fix '--with-mew' option.

@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1994/07/04
-;; Revised: $Date: 2004/09/13 05:17:46 $
+;; Revised: $Date: 2004/10/07 05:21:46 $
 
 ;;;
 ;;; Commentay:
@@ -498,12 +498,24 @@ If HIDE-PRIVATE, private schedules are suppressed."
 	    (mhc-date-mm-first date)))
     (when (and bfrom bto)
       (mhc-summary-make-contents bfrom bto mailer category-predicate secret)
-      (when mhc-use-month-separator
-	(mhc-summary/insert-separator 'wide)))
+      (if mhc-use-month-separator
+	  (mhc-summary/insert-separator 'wide)
+	(if (and mhc-use-week-separator
+		 (eq (mhc-end-day-of-week) (mhc-date-ww bto)))
+	    (mhc-summary/insert-separator
+	     nil
+	     (when mhc-summary/cw-separator
+	       (format " CW %d " (mhc-date-cw (mhc-date++ bto))))))))
     (mhc-summary-make-contents from to mailer category-predicate secret)
     (when (and afrom ato)
-      (when mhc-use-month-separator
-	(mhc-summary/insert-separator 'wide))
+      (if mhc-use-month-separator
+	  (mhc-summary/insert-separator 'wide)
+	(if (and mhc-use-week-separator
+		 (eq mhc-start-day-of-week (mhc-date-ww afrom)))
+	    (mhc-summary/insert-separator
+	     nil
+	     (when mhc-summary/cw-separator 
+		   (format " CW %d " (mhc-date-cw afrom))))))
       (mhc-summary-make-contents afrom ato mailer category-predicate secret))
     (unless (eq 'direct mailer)
       (when (and (eq mhc-todo-position 'bottom)
