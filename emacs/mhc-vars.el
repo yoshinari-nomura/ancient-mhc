@@ -92,6 +92,11 @@
   :group 'mhc
   :type 'boolean)
 
+(defcustom mhc-category-as-private '("private")
+  "*String list of private categories."
+  :group 'mhc
+  :type '(repeat (string :tag "Category")))
+
 (defcustom mhc-default-network-status t
   "*Flag of the default network status."
   :group 'mhc
