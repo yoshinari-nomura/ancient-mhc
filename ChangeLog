@@ -1,3 +1,8 @@
+2005-01-27  Yoichi NAKAYAMA  <yoichi@geiin.org>
+
+	* emacs/mhc-wl.el (mhc-wl-summary-mode-setup): Bind
+	elmo-localdir-folder-path to mhc-mail-path.
+
 2005-01-27  Hideyuki SHIRAI  <shirai@rdmg.mgcs.mei.co.jp>
 
 	* emacs/mhc-mew.el (mhc-mew-highlight-message): Highlight headers
