@@ -3,7 +3,7 @@
 ## Author:  Yoshinari Nomura <nom@quickhack.net>
 ##
 ## Created: 1999/07/16
-## Revised: $Date: 2000/06/21 08:46:07 $
+## Revised: $Date: 2000/06/26 06:19:55 $
 ##
 
 #$DEBUG = true
@@ -249,7 +249,10 @@ class GtkTimeRangeEdit < Gtk::VBox
 
     @hbx = Gtk::HBox .new(false, 0)
     @b   = GtkTimeEdit .new(b){
-      @e .set_min(@b .dump)
+      hh, mm = @b .dump .to_a
+      @e .set_min(MhcTime .new(hh + 1, 0))
+      # @e .set_min(@b .dump)
+
       p .call(@b .dump, @e .dump)
     }
     @e   = GtkTimeEdit .new(e){p .call(@b .dump, @e .dump)}

@@ -11,5 +11,7 @@ if ver >= "010300"
 end
 
 if have_library("pisock", "pi_socket")
-  create_makefile("mhc_pilib")
+  if have_header("pi-dlp.h")
+    create_makefile("mhc_pilib")
+  end
 end

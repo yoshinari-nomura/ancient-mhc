@@ -1,9 +1,9 @@
 ### mhc-palm.rb
 ##
-## Author:  Yoshinari Nomura <nom@quickhack.net>
+## Author:  Yoshinari Nomura <nom@mew.org>
 ##
 ## Created: 1999/09/01
-## Revised: $Date: 2000/05/29 14:59:26 $
+## Revised: $Date: 2000/06/26 06:19:56 $
 ##
 
 require 'mhc-date'
@@ -595,7 +595,12 @@ class PilotApptRecord < PilotRecord
       end
     }
     x = MhcScheduleItem .new(str, false)
-    x .set_description(note)
+
+    note_hdr, note_desc, datebk3_icon = conv_note(note)
+    x .set_non_xsc_header(note_hdr)
+    x .set_description(note_desc)
+    x .add_category(datebk3_icon) if datebk3_icon
+
     x .set_pilot_id([@id])
     return x
   end
@@ -603,6 +608,35 @@ class PilotApptRecord < PilotRecord
   ################################################################
   ## private
 
+  ## Palm のノート -> mhc の body と X-SC-* 以外のヘッダ部分に変換
+  def conv_note(string)
+    if string =~ /^(\#\#@@@.@@@)\n(.*)/np
+      datebk3_icon, string = $1, $2
+    end
+
+    part1_is_header = true
+
+    part1, part2 = string .split("\n\n", 2)
+
+    if !(part1 =~ /^[ \t]+/ or part1 =~ /^[A-Za-z0-9_-]+:/)
+      part1_is_header = false
+    end
+
+    part1 .split("\n") .each{|line|
+      if !(string =~ /^[ \t]+/ or string =~ /^[A-Za-z0-9_-]+:/)
+	part1_is_header = false
+      end
+    }
+
+    if part1_is_header
+      header, body = part1, part2
+    else
+      header, body = nil, string
+    end
+
+    return header, body, datebk3_icon
+  end
+    
   ## Time クラスインスタンスの 時間部分だけを置き換える
   def replace_time(time, hour, min)
     return Time .local(*time .to_a .indexes(5, 4, 3) + [hour, min])
@@ -750,8 +784,8 @@ end
 
 ### Copyright Notice:
 
-## Copyright (C) 1999, 2000 Yoshinari Nomura. All rights reserved.
-## Copyright (C) 2000 MHC developing team. All rights reserved.
+## Copyright (C) 1999, 2000 Yoshinari Nomura.
+## All rights reserved.
 
 ## Redistribution and use in source and binary forms, with or without
 ## modification, are permitted provided that the following conditions
@@ -766,11 +800,11 @@ end
 ##    may be used to endorse or promote products derived from this software
 ##    without specific prior written permission.
 ## 
-## THIS SOFTWARE IS PROVIDED BY THE TEAM AND CONTRIBUTORS ``AS IS''
+## THIS SOFTWARE IS PROVIDED BY Yoshinari Nomura AND CONTRIBUTORS ``AS IS''
 ## AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 ## LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
 ## FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL
-## THE TEAM OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+## Yoshinari Nomura OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 ## INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 ## (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
 ## SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
