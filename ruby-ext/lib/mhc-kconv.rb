@@ -6,14 +6,27 @@
 
 require 'kconv'
 
-class MhcKconv
+module MhcKconv
   DISP_CODE = (RUBY_PLATFORM =~ 'cygwin') ? Kconv::SJIS : Kconv::EUC
-  def MhcKconv.todisp(string)
-    Kconv::kconv(string, DISP_CODE, true)
+  def todisp(string)
+    Kconv::kconv(string, DISP_CODE, Kconv::AUTO)
   end
-  def MhcKconv.tomail(string)
-    Kconv::kconv(string, 'JIS', true)
+  module_function :todisp
+
+  def tomail(string)
+    Kconv::tojis(string)
   end
+  module_function :tomail
+
+  def tohtml(string)
+    Kconv::tojis(string)
+  end
+  module_function :tohtml
+
+  def tops(string)
+    Kconv::toeuc(string)
+  end
+  module_function :tops
 end
 
 ### Copyright Notice:

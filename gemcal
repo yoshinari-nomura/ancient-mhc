@@ -5,7 +5,7 @@
 ## Author:  Yoshinari Nomura <nom@quickhack.net>
 ##
 ## Created: 1999/09/01
-## Revised: $Date: 2000/06/28 13:58:40 $
+## Revised: $Date: 2000/07/10 10:13:48 $
 ##
 
 # $DEBUG = 1
@@ -665,26 +665,26 @@ end
 
 if repository
   if file
-    $db = MhcScheduleDB .new(repository, file)
+    db = MhcScheduleDB .new(repository, file)
   else
-    $db = MhcScheduleDB .new(repository)
+    db = MhcScheduleDB .new(repository)
   end
 else
-  $db = MhcScheduleDB .new
+  db = MhcScheduleDB .new
 end
 
-d   = MhcDate .new
+d = MhcDate .new
 if dx
-  daybook = MhcDayBook .new(d, $db, dx, dy)
+  daybook = MhcDayBook .new(d, db, dx, dy)
 end
-MhcCalendar .new(d, $db, daybook, x, y)
+MhcCalendar .new(d, db, daybook, x, y)
 
-$alarm = MhcAlarm .new($db)
-$alarm .signal_connect('time-arrived'){|date, sch|
+alarm = MhcAlarm .new(db)
+alarm .signal_connect('time-arrived'){|date, sch|
   GtkConfirm .new("#{date .to_js} #{sch .time_b} " +
 		  "#{MhcKconv::todisp(sch .subject)}\n")
 }
-$alarm .check
+alarm .check
 Gtk .main
 
 ### Copyright Notice:

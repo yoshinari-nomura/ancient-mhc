@@ -5,7 +5,7 @@
 ## Author:  Yoshinari Nomura <nom@quickhack.net>
 ##
 ## Created: 1999/11/11
-## Revised: $Date: 2000/07/07 06:27:22 $
+## Revised: $Date: 2000/07/10 10:13:48 $
 ##
 ## today was originally written in perl.
 ## This  is a ruby version of it. Original authors were
@@ -49,7 +49,7 @@ def usage(do_exit = true)
   STDERR .print "usage: today [options]
   Show your today's schedules.
   --help               show this message.
-  --format             change output format 'html' or 'ps'.
+  --format=FORMAT      change output format to one of: ps, html
   --category=CATEGORY  pick only in CATEGORY. 
                        '!' and space separated multiple values are allowed.
   --date=strig[+n]     set a period of date.
@@ -143,7 +143,7 @@ formatter_ps = Proc .new{|date, items|
 	     sch .time_b .to_s,
 	     sch .subject .digest(15) .gsub(/([()])/, '\\\\\1'))
   }
-  MhcKconv::todisp(ret)
+  MhcKconv::tops(ret)
 }
 
 formatter_html = Proc .new{|date, items|
@@ -163,7 +163,7 @@ formatter_html = Proc .new{|date, items|
   end
   buffer += format("%02d/%02d(%s)", date .m, date .d, week) + " "
   buffer += string .digest(buffer_max) + "<BR>\n"
-  MhcKconv::todisp(buffer)
+  MhcKconv::tohtml(buffer)
 }
 
 ################################################################
@@ -263,8 +263,7 @@ if mail_address
     }
   end
 else
-  print MhcKconv::todisp(get_schedule(db, date_from, date_to,
-				      category, formatter, hook_proc))
+  print get_schedule(db, date_from, date_to, category, formatter, hook_proc)
 end
 
 ################################################################
