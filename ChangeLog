@@ -1,3 +1,8 @@
+2003-10-10  Yoshinari Nomura  <nom@quickhack.net>
+
+	* emacs/mhc-guess.el, emacs/mhc-minibuf.el:
+	Experimental implementation of guess-location.
+
 2003-07-28  MIYOSHI Masanori  <miyoshi@boreas.dti.ne.jp>
 
 	* mhc2ol.in (Period.initialize): Carry over schedules which are
