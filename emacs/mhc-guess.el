@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1999/04/13
-;; Revised: $Date: 2000/06/20 06:14:15 $
+;; Revised: $Date: 2000/06/23 08:29:17 $
 ;;
 
 ;;;
@@ -171,7 +171,8 @@
 	      (cond
 	       ((not (match-beginning 2))
 		0)
-	       ((eq (buffer-substring (match-beginning 2) (match-end 2)) "半")
+	       ((string= 
+		 (buffer-substring (match-beginning 2) (match-end 2)) "半")
 		30)
 	       (t
 		(mhc-guess/string-to-int
