@@ -1,3 +1,10 @@
+2000-07-28  Yoshiaki Kasahara  <kasahara@nc.kyushu-u.ac.jp>
+
+	* emacs/mhc-date.el (mhc-date-digit-to-oo-string): Fix a typo.
+
+	* emacs/mhc-logic.el (mhc-logic-day-as-string-list):
+	remove a space after '!'.
+	
 2000-07-28  Yoshinari Nomura  <nom@quickhack.net>
 
 	* emacs/mhc-db.el (mhc-db-add-exception-rule):
