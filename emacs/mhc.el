@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1994/07/04
-;; Revised: $Date: 2003/10/10 11:18:07 $
+;; Revised: $Date: 2003/10/10 12:02:34 $
 
 ;;;
 ;;; Commentay:
@@ -536,7 +536,7 @@ Returns t if the importation was succeeded."
   (let ((draft-buffer (generate-new-buffer mhc-draft-buffer-name))
 	(current-date (or (mhc-current-date) (mhc-calendar-get-date)))
 	(succeed t)
-	msgp date time subject location category priority)
+	msgp date time subject location category priority alarm)
     (and (interactive-p)
 	 (mhc-window-push))
     (set-buffer draft-buffer)
@@ -598,6 +598,13 @@ Returns t if the importation was succeeded."
 			  (mhc-input-category
 			   "Category: "
 			   (mhc-schedule-categories-as-string schedule)))
+		    ;; input alarm
+		    (if mhc-ask-alarm
+			(setq alarm
+			      (mhc-input-alarm
+			       "Alarm: "
+			       mhc-default-alarm)))
+		    ;;
 		    (setq priority (mhc-schedule-priority schedule))
 		    (mhc-header-narrowing
 		      (mhc-header-delete-header
@@ -662,7 +669,7 @@ Returns t if the importation was succeeded."
 					"")
 		  "\nX-SC-Cond: "
 		  "\nX-SC-Duration: "
-		  "\nX-SC-Alarm: "
+		  "\nX-SC-Alarm: " (or alarm "")
 		  "\nX-SC-Record-Id: " (mhc-record-create-id) "\n")
 	  (mhc-highlight-message 'for-draft)
 	  (goto-char (point-min))
