@@ -16,7 +16,7 @@
 
 (require 'mhc-day)
 (require 'mhc-slot)
-
+(require 'mhc-schedule)
 
 (defun mhc-db/get-sexp-list-for-month (year month)
   "指定された月のスケジュールを探索するときに、評価するべきS式のリストを得る"
@@ -141,13 +141,21 @@ FROM, TO は 1970/01/01 からの経過日数を用いて指定"
   (mapcar 'cdr
 	  (sort (mapcar
 		 (lambda (schedule)
-		   (cons (mhc-schedule-todo-lank schedule)
+		   (cons (mhc-schedule-priority schedule)
 			 schedule))
 		 (mhc-day-schedules
 		  (mhc-logic-eval-for-date
-		   (mhc-day-let day (mhc-db/get-sexp-list-for-month year month))
+		   (mhc-day-let day
+		     (mhc-db/get-sexp-list-for-month year month))
 		   day 'todo)))
-		(lambda (a b) (> (car a) (car b))))))
+		(lambda (a b)
+		  (if (and (null (car a)) (car b))
+		      nil
+		    (if (and (null (car b)) (car a))
+			t
+		      (if (and (null (car b)) (null (car a)))
+			  nil
+			(> (car a) (car b)))))))))
 
 
 (defun mhc-db-add-record-from-buffer (record buffer &optional force-refile)
@@ -167,12 +175,14 @@ FROM, TO は 1970/01/01 からの経過日数を用いて指定"
 	  (mhc-record-set-name record (mhc-misc-get-new-path directory)))
       ;; 新規のスケジュールを保存する場合
       (mhc-record-set-name record (mhc-misc-get-new-path directory)))
-    (if (y-or-n-p (format "Refile %s to %s "
-			  (mhc-misc-sub (if old-record
-					    (mhc-record-name old-record) "")
-					mhc-mail-path "+")
-			  (mhc-misc-sub (mhc-record-name record)
-					mhc-mail-path "+")))
+    (if (or force-refile
+	    (y-or-n-p (format
+		       "Refile %s to %s "
+		       (mhc-misc-sub (if old-record
+					 (mhc-record-name old-record) "")
+				     mhc-mail-path "+")
+		       (mhc-misc-sub (mhc-record-name record)
+				     mhc-mail-path "+"))))
 	(progn
 	  (mhc-record-write-buffer record buffer old-record)
 	  (if (and old-record

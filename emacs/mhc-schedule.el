@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>,
 ;;          TSUCHIYA Masatoshi <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 ;; Created: 1997/10/12
-;; Revised: $Date: 2000/07/28 00:28:06 $
+;; Revised: $Date: 2000/08/02 02:30:15 $
 
 
 ;;; Commentary:
@@ -17,15 +17,16 @@
 ;; Each MHC-SCHEDULE structure is a vector has a construction as
 ;; follows:
 ;;
-;;     MHC-SCHEDULE ::= [ RECORD SUBJECT LOCATION TIME ALARM CATEGORIES CONDITION REGION ]
+;;     MHC-SCHEDULE ::= [ RECORD CONDITION SUBJECT LOCATION TIME ALARM CATEGORIES PRIORITY REGION ]
 ;;     RECORD       ::= MHC-RECORD
+;;     CONDITION    ::= MHC-LOGIC
 ;;     SUBJECT      ::= string ( represents subject of schedule )
 ;;     LOCATION     ::= string ( represents location of schedule )
 ;;     TIME         ::= integer ( represents minutes of day from midnight )
 ;;     ALARM        ::= string
 ;;     CATEGORIES   ::= CATEGORY*
 ;;     CATEGORY     ::= string ( represents category of schedule )
-;;     CONDITION    ::= MHC-LOGIC
+;;     PRIORITY     ::= integer
 ;;     REGION       ::= ( START . END )
 ;;     START        ::= integer ( represents start point of headers of schedule )
 ;;     END          ::= integer ( represents end point of headers of schedule )
@@ -33,7 +34,7 @@
 
 ;;; Codes:
 (defun mhc-schedule-new
-  (record &optional condition subject location time alarm categories region)
+  (record &optional condition subject location time alarm categories priority region)
   "Constructor of MHC-SCHEDULE structure."
   (let ((new (vector record
 		     (or condition (mhc-logic-new))
@@ -42,6 +43,7 @@
 		     time
 		     alarm
 		     categories
+		     priority
 		     (or region (cons nil nil)))))
     (mhc-record-set-schedules record (cons new (mhc-record-schedules record)))
     new))
@@ -62,8 +64,10 @@
   (if schedule (aref schedule 5)))
 (defsubst mhc-schedule-categories (schedule)
   (if schedule (aref schedule 6)))
-(defsubst mhc-schedule-region (schedule)
+(defsubst mhc-schedule-priority (schedule)
   (if schedule (aref schedule 7)))
+(defsubst mhc-schedule-region (schedule)
+  (if schedule (aref schedule 8)))
 
 (defmacro mhc-schedule-time-begin (schedule)
   `(car (mhc-schedule-time ,schedule)))
@@ -74,16 +78,22 @@
 (defmacro mhc-schedule-region-end (schedule)
   `(cdr (mhc-schedule-region ,schedule)))
 
+;; Need to be deleted.
 (defsubst mhc-schedule-todo-lank (schedule)
   (if schedule
       (mhc-logic-todo (mhc-schedule-condition schedule))))
 
 (defsubst mhc-schedule-todo-deadline (schedule)
   (and schedule
-       (cadr (assq 
-	      'mhc-logic/condition-duration-end
-	      (mhc-logic/and
-	       (mhc-schedule-condition schedule))))))
+       (or (car (mhc-logic/day (mhc-schedule-condition schedule)))
+	   (nth 2 (assq
+		   'mhc-logic/condition-duration
+		   (mhc-logic/and
+		    (mhc-schedule-condition schedule))))
+	   (cadr (assq 
+		  'mhc-logic/condition-duration-end
+		  (mhc-logic/and
+		   (mhc-schedule-condition schedule)))))))
 
 (defmacro mhc-schedule/set-subject (schedule subject)
   `(aset ,schedule 2 ,subject))
@@ -95,10 +105,12 @@
   `(aset ,schedule 5 ,alarm))
 (defmacro mhc-schedule/set-categories (schedule categories)
   `(aset ,schedule 6 ,categories))
+(defmacro mhc-schedule/set-priority (schedule priority)
+  `(aset ,schedule 7 ,priority))
 (defmacro mhc-schedule/set-region-start (schedule start)
-  `(setcar (aref ,schedule 7) ,start))
+  `(setcar (aref ,schedule 8) ,start))
 (defmacro mhc-schedule/set-region-end (schedule end)
-  `(setcdr (aref ,schedule 7) ,end))
+  `(setcdr (aref ,schedule 8) ,end))
 
 
 (defun mhc-schedule-append-default (schedule default)

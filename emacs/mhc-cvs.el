@@ -63,6 +63,22 @@
 
 
 ;;; Codes:
+
+(defconst mhc-cvs/tmp-buffer-name " *mhc-cvs*")
+
+(defsubst mhc-cvs/backend (&rest options)
+  "指定されたオプションを付け加えて CVS を実行する関数"
+  (let ((buffer (mhc-get-buffer-create mhc-cvs/tmp-buffer-name))
+	(current-buffer (current-buffer)))
+    (unwind-protect
+	(progn
+	  (set-buffer buffer)
+	  (delete-region (point-min) (point-max))
+	  (let ((default-directory (file-name-as-directory mhc-cvs/default-directory)))
+	    (apply #'call-process "cvs" nil t nil
+		   (append mhc-cvs-global-options options))))
+      (set-buffer current-buffer))))
+
 (defun mhc-cvs/open (&optional offline)
   "ネットワークの状態に依存する開始処理関数"
   (setq mhc-cvs/default-directory (mhc-summary-folder-to-path mhc-base-folder))
@@ -187,20 +203,6 @@
 
 
 ;;; CVS Backend Function
-(defconst mhc-cvs/tmp-buffer-name " *mhc-cvs*")
-
-(defsubst mhc-cvs/backend (&rest options)
-  "指定されたオプションを付け加えて CVS を実行する関数"
-  (let ((buffer (mhc-get-buffer-create mhc-cvs/tmp-buffer-name))
-	(current-buffer (current-buffer)))
-    (unwind-protect
-	(progn
-	  (set-buffer buffer)
-	  (delete-region (point-min) (point-max))
-	  (let ((default-directory (file-name-as-directory mhc-cvs/default-directory)))
-	    (apply #'call-process "cvs" nil t nil
-		   (append mhc-cvs-global-options options))))
-      (set-buffer current-buffer))))
 
 (defsubst mhc-cvs/touch-directory (directory)
   (mhc-misc-touch-directory directory)

@@ -3,9 +3,14 @@
 ;; Author:  Yuuichi Teranishi <teranisi@gohome.org>
 ;;
 ;; Created: 1999/12/02
-;; Revised: $Date: 2000/07/27 04:16:10 $
+;; Revised: $Date: 2000/08/02 02:30:15 $
 
-(defcustom mhc-xmas-icon-alist nil
+(defcustom mhc-xmas-icon-alist 
+  '(("Conflict"   . "Conflict.xpm")
+    ("Private"    . "Private.xpm")
+    ("Holiday"    . "Holiday.xpm")
+    ("Todo"       . "CheckBox.xpm")
+    ("Done"       . "CheckedBox.xpm"))
   "*Alist to define icons.
 Each element should have the form
  (NAME . ICON-FILE)
@@ -17,6 +22,8 @@ Example:
     (\"Anniversary\" . \"Anniversary.xpm\")
     (\"Birthday\"    . \"Birthday.xpm\")
     (\"Other\"       . \"Other.xpm\")
+    (\"Todo\"        . \"CheckBox.xpm\")
+    (\"Done\"        . \"CheckedBox.xpm\")
     (\"Conflict\"    . \"Conflict.xpm\"))"
   :group 'mhc
   :type '(repeat 
@@ -24,14 +31,45 @@ Example:
 	  (cons (string :tag "Icon Name")
 		(string :tag "XPM File Name"))))
 
+(defcustom mhc-icon-function-alist
+  '(("Todo" . mhc-todo-set-as-done)
+    ("Done" . mhc-todo-set-as-not-done))
+  "*Alist to define callback function for icons.
+Each element should have the form
+ (NAME . FUNCTION)
+If the icon named NAME is clicked, then FUNCTION is invoked at
+icon line."
+  :group 'mhc
+  :type '(repeat
+	  :inline t
+	  (cons (string :tag "Icon Name")
+		(function :tag "Function"))))
+
+(defvar mhc-xmas-icon-keymap nil)
+(if (null mhc-xmas-icon-keymap)
+    (setq mhc-xmas-icon-keymap (make-sparse-keymap)))
+(define-key mhc-xmas-icon-keymap 'button1 'mhc-xmas-icon-call-function)
+(define-key mhc-xmas-icon-keymap 'button2 'mhc-xmas-icon-call-function)
+
+(defun mhc-xmas-icon-call-function (event)
+  (interactive "e")
+  (save-excursion
+    (goto-char (extent-start-position (event-glyph-extent event)))
+    (if (extent-property (event-glyph-extent event)
+			 'mhc-xmas-icon-function)
+	(call-interactively
+	 (extent-property (event-glyph-extent event)
+			  'mhc-xmas-icon-function)))))
+
 ;; internal variable.
-(defvar mhc-xmas/glyph-alist nil)
+(defvar mhc-xmas/icon-glyph-alist nil)
+(defvar mhc-xmas/icon-function-alist nil)
 
 (defsubst mhc-xmas/setup-icons ()
   (let ((alist mhc-xmas-icon-alist))
-    (setq mhc-xmas/glyph-alist nil)
+    (setq mhc-xmas/icon-glyph-alist nil)
     (while alist
-      (setq mhc-xmas/glyph-alist
+      (setq mhc-xmas/icon-glyph-alist
 	    (cons
 	     (cons (downcase (car (car alist)))
 		   (make-glyph 
@@ -40,16 +78,20 @@ Example:
 			     (expand-file-name (cdr (car alist))
 					       mhc-icon-path))
 		     nil nil 'no-error)))
-	     mhc-xmas/glyph-alist))
-      (setq alist (cdr alist)))))
+	     mhc-xmas/icon-glyph-alist))
+      (setq alist (cdr alist)))
+    (setq mhc-xmas/icon-function-alist
+	  (mapcar (lambda (pair)
+		    (cons (downcase (car pair)) (cdr pair)))
+		  mhc-icon-function-alist))))
 
 ;; Icon interface
 (defun mhc-icon-setup ()
   "Initialize MHC icons."
   (interactive)
   (if (interactive-p)
-      (setq mhc-xmas/glyph-alist nil))
-  (or mhc-xmas/glyph-alist
+      (setq mhc-xmas/icon-glyph-alist nil))
+  (or mhc-xmas/icon-glyph-alist
       (progn
 	(message "Initializing MHC icons...")
 	(mhc-xmas/setup-icons)
@@ -63,35 +105,50 @@ Example:
 
 (defun mhc-icon-exists-p (name)
   "Returns non-nil if icon with NAME exists."
-  (cdr (assoc (downcase name) mhc-xmas/glyph-alist)))
+  (cdr (assoc (downcase name) mhc-xmas/icon-glyph-alist)))
 
 (defun mhc-put-icon (icons)
   "Put ICONS on current buffer.
 Icon is decided by `mhc-xmas-icon-alist'."
-  (let (start space extent glyphs)
+  (let (start space extent glyph glyphs)
     (setq icons
 	  (delq nil
 		(mapcar (lambda (icon)
-			  (cdr (assoc (downcase icon) mhc-xmas/glyph-alist)))
+			  (setq glyph (cdr (assoc (downcase icon)
+						  mhc-xmas/icon-glyph-alist)))
+			  (and glyph (cons
+				      glyph
+				      (cdr (assoc
+					    (downcase icon)
+					    mhc-xmas/icon-function-alist)))))
 			icons)))
     (when icons
       (setq space (make-string (length icons) ? ))
       (setq start (point))
       (while (setq extent (extent-at (point) nil 'mhc-icon extent 'at))
-	(setq glyphs (cons (extent-end-glyph extent) glyphs)))
+	(setq glyphs (cons (cons (extent-end-glyph extent)
+				 (extent-property extent
+						  'mhc-xmas-icon-function))
+			   glyphs)))
       (insert space space)
       (setq extent (make-extent start (point)))
-      (set-extent-property extent 'invisible t))
+      (set-extent-property extent 'invisible 'mhc-icon))
     (setq icons (nreverse icons))
     (while icons
       (setq extent (make-extent (point) (point)))
-      (set-extent-properties extent '(mhc-icon t))
-      (set-extent-end-glyph extent (car icons))
+      (set-extent-properties extent 
+			     (list 'mhc-icon t
+				   'keymap mhc-xmas-icon-keymap
+				   'mhc-xmas-icon-function (cdr (car icons))))
+      (set-extent-end-glyph extent (car (car icons)))
       (setq icons (cdr icons)))
     (while glyphs
       (setq extent (make-extent (point)(point)))
-      (set-extent-properties extent '(mhc-icon t))
-      (set-extent-end-glyph extent (car glyphs))
+      (set-extent-properties extent 
+			     (list 'mhc-icon t
+				   'keymap mhc-xmas-icon-keymap
+				   'mhc-xmas-icon-function (cdr (car glyphs))))
+      (set-extent-end-glyph extent (car (car glyphs)))
       (setq glyphs (cdr glyphs)))))
 
 (provide 'mhc-xmas)

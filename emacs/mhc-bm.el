@@ -3,12 +3,17 @@
 ;; Author:  Yuuichi Teranishi <teranisi@gohome.org>
 ;;
 ;; Created: 2000/05/27
-;; Revised: $Date: 2000/07/27 04:16:10 $
+;; Revised: $Date: 2000/08/02 02:30:15 $
 
 (require 'bitmap)
 (require 'mhc-face)
 
-(defcustom mhc-bm-icon-alist nil
+(defcustom mhc-bm-icon-alist
+  '(("Holiday"     . ("Holiday.xbm" "OrangeRed" "White"))
+    ("Private"     . ("Private.xbm" "HotPink"))
+    ("Todo"         .("CheckBox.xbm" "Red"))
+    ("Done"        . ("CheckedBox.xbm" "Red"))
+    ("Conflict"    . ("Conflict.xpm" "Yellow")))
   "*Alist to define icons.
 Each element should have the form
  (NAME . (ICON-FILE FG BG))
@@ -21,6 +26,8 @@ Example:
     (\"Anniversary\" . (\"Anniversary.xbm\" \"SkyBlue\"))
     (\"Birthday\"    . (\"Birthday.xbm\"))
     (\"Other\"       . (\"Other.xbm\" \"Red\"))
+    (\"Todo\"         .(\"CheckBox.xbm\" \"Red\"))
+    (\"Done\"        . (\"CheckedBox.xbm\" \"Red\"))
     (\"Conflict\"    . (\"Conflict.xpm\" \"Yellow\")))"
   :group 'mhc
   :type '(repeat
@@ -32,8 +39,37 @@ Example:
 		      (choice (string :tag "Set BG Color")
 			      (const :tag "Default BG Color" nil))))))
 
+(defcustom mhc-icon-function-alist
+  '(("Todo" . mhc-todo-set-as-done)
+    ("Done" . mhc-todo-set-as-not-done))
+  "*Alist to define callback function for icons.
+Each element should have the form
+ (NAME . FUNCTION)
+If the icon named NAME is clicked, then FUNCTION is invoked at
+icon line."
+  :group 'mhc
+  :type '(repeat
+	  :inline t
+	  (cons (string :tag "Icon Name")
+		(function :tag "Function"))))
+
 ;; internal variable.
-(defvar mhc-bm/bmstr-alist nil)
+(defvar mhc-bm/icon-bmstr-alist nil)
+(defvar mhc-bm/icon-function-alist nil)
+
+(defvar mhc-bm-icon-keymap nil)
+(if (null mhc-bm-icon-keymap)
+    (setq mhc-bm-icon-keymap (make-sparse-keymap)))
+(define-key mhc-bm-icon-keymap [mouse-1] 'mhc-bm-icon-call-function)
+(define-key mhc-bm-icon-keymap [mouse-2] 'mhc-bm-icon-call-function)
+
+(defun mhc-bm-icon-call-function (event)
+  (interactive "e")
+  (save-excursion
+    (mouse-set-point event)
+    (if (get-text-property (point) 'mhc-bm-icon-function)
+	(call-interactively
+	 (get-text-property (point) 'mhc-bm-icon-function)))))
 
 (defun mhc-bm/create-rectangle (file)
   (with-temp-buffer
@@ -65,20 +101,24 @@ Example:
 				(nth 0 (cdr (cdr (car alist))))
 				(nth 1 (cdr (cdr (car alist))))))
 			 bmstr)
-      (setq mhc-bm/bmstr-alist
+      (setq mhc-bm/icon-bmstr-alist
 	    (cons
 	     (cons (downcase (car (car alist)))
 		   bmstr)
-	     mhc-bm/bmstr-alist))
-      (setq alist (cdr alist)))))
+	     mhc-bm/icon-bmstr-alist))
+      (setq alist (cdr alist)))
+    (setq mhc-bm/icon-function-alist
+	  (mapcar (lambda (pair)
+		    (cons (downcase (car pair)) (cdr pair)))
+		  mhc-icon-function-alist))))
        
 ;; Icon interface
 (defun mhc-icon-setup ()
   "Initialize MHC icons."
   (interactive)
   (if (interactive-p)
-      (setq mhc-bm/bmstr-alist nil))
-  (or mhc-bm/bmstr-alist
+      (setq mhc-bm/icon-bmstr-alist nil))
+  (or mhc-bm/icon-bmstr-alist
       (progn
 	(message "Initializing MHC icons...")
 	(mhc-bm/setup-icons)
@@ -90,16 +130,23 @@ Example:
 
 (defun mhc-icon-exists-p (name)
   "Returns non-nil if icon with NAME exists."
-  (cdr (assoc (downcase name) mhc-bm/bmstr-alist)))
+  (cdr (assoc (downcase name) mhc-bm/icon-bmstr-alist)))
 
 (defun mhc-put-icon (icons)
   "Put ICONS on current buffer.
 Icon is defined by `mhc-bm-icon-alist'."  
-  (let (icon)
+  (let (icon pos)
     (while icons
       (setq icon (cdr (assoc (downcase (car icons))
-			     mhc-bm/bmstr-alist)))
+			     mhc-bm/icon-bmstr-alist)))
+      (setq pos (point))
       (and icon (insert icon))
+      (put-text-property pos (point)
+			 'mhc-bm-icon-function
+			 (cdr (assoc (downcase (car icons))
+				     mhc-bm/icon-function-alist)))
+      (put-text-property pos (point) 'local-map mhc-bm-icon-keymap)
+;      (put-text-property pos (point) 'mouse-face 'highlight)
       (setq icons (cdr icons)))))
 
 (provide 'mhc-bm)

@@ -287,7 +287,8 @@
     (while (not (eobp))
       (setq sexp
 	    (cons (cond
-		   ((mhc-logic/looking-at mhc-logic/day-regexp "-" mhc-logic/day-regexp)
+		   ((mhc-logic/looking-at mhc-logic/day-regexp
+					  "-" mhc-logic/day-regexp)
 		    (list 'mhc-logic/condition-duration
 			  (mhc-date-new (string-to-number (match-string 1))
 					(string-to-number (match-string 2))
@@ -315,11 +316,12 @@
 					     (cons 'or (nreverse sexp)))
 					   (mhc-logic/and logicinfo))))))
 
-
+;; Need to be deleted.
 (defun mhc-logic-parse-todo (logicinfo)
   (if (looking-at mhc-logic/space-regexp)
       (goto-char (match-end 0)))
-  (let ((content (buffer-substring (point) (progn (skip-chars-forward "0-9") (point)))))
+  (let ((content (buffer-substring
+		  (point) (progn (skip-chars-forward "0-9") (point)))))
     (if (looking-at mhc-logic/space-regexp)
 	(goto-char (match-end 0)))
     (if (eobp)
@@ -373,7 +375,7 @@
  		       (cons 'cond sexp)))
 	  ;; TODOに基づく条件を加える
 	  (setq sexp (if (mhc-logic-todo logicinfo)
-			 `(and todo ,sexp)
+			 `(if todo t ,sexp)
 		       `(if todo nil ,sexp))))
       (if (mhc-logic-todo logicinfo)
 	  (setq sexp 'todo)))
@@ -403,8 +405,10 @@
   (let ((schedules (mhc-record-schedules record))
 	pre-month cur-month)
     (while (and schedules
+		(not (mhc-logic-todo (mhc-schedule-condition (car schedules))))
 		(setq cur-month
-		      (mhc-logic/check-sexp-range (mhc-schedule-condition (car schedules))))
+		      (mhc-logic/check-sexp-range 
+		       (mhc-schedule-condition (car schedules))))
 		(if pre-month
 		    (equal pre-month cur-month)
 		  (setq pre-month cur-month)))

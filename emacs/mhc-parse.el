@@ -45,8 +45,25 @@
   (mhc-logic-parse-duration (mhc-schedule-condition schedule))
   schedule)
 
+;; FIXME: Need to be deleted. 
 (defun mhc-parse/todo (record schedule)
   (mhc-logic-parse-todo (mhc-schedule-condition schedule))
+  schedule)
+
+(defun mhc-parse/priority (record schedule)
+  (if (looking-at mhc-logic/space-regexp)
+      (goto-char (match-end 0)))
+  (let ((content (buffer-substring
+		  (point)
+		  (progn (skip-chars-forward "0-9") (point)))))
+    (if (looking-at mhc-logic/space-regexp)
+	(goto-char (match-end 0)))
+    (if (eobp)
+	(mhc-schedule/set-priority schedule
+				   (if (eq (length content) 0)
+				       nil
+				     (string-to-number content)))
+      (error "Parse ERROR !!!")))
   schedule)
 
 (defun mhc-parse/subject (record schedule)
@@ -94,6 +111,8 @@
 				(if (stringp s) (downcase s)))
 			      (mhc-misc-split category "[ \t]+")))
 	    (mhc-schedule-categories schedule))))
+  (mhc-logic/set-todo (mhc-schedule-condition schedule)
+		      (mhc-schedule-in-category-p schedule "todo"))
   schedule)
 
 ;; FIXME: Í×ºï½ü

@@ -1,3 +1,119 @@
+2000-08-02  Yuuichi Teranishi  <teranisi@quickhack.net>
+
+	* icons/CheckBox.xpm: New file.
+
+	* icons/CheckBox.xbm: Ditto.
+
+	* icons/CheckedBox.xpm: Ditto.
+
+	* icons/CheckedBox.xbm: Ditto.
+
+	* emacs/mhc.el (mhc-scan-month): Use `mhc-todo-position'.
+	(mhc-todo-set-as-done): New command.
+	(mhc-todo-set-as-not-done): Ditto.
+	(mhc-edit): Insert "X-SC-Priority".
+
+	* emacs/mhc-summary.el (mhc-summary-display-todo): New user option.
+	(mhc-summary-line-format): Added '%p'.
+	(mhc-summary-todo-line-format): Eliminated (Renamed to
+	`mhc-todo-line-format').
+	All other related portions are changed.
+	(mhc-todo-line-format): New user option.
+	(mhc-todo-position): Ditto.
+	(mhc-todo-string-excess-day): Ditto.
+	(mhc-todo-string-done): Ditto.
+	(mhc-todo-string-not-done): Ditto.
+	(mhc-todo-display-done): Ditto.
+	(mhc-tmp-private): New variable.
+	(mhc-tmp-lank): Eliminated.
+	(mhc-summary-todo/line-inserter): Eliminated (Renamed to
+	`mhc-todo/line-inserter').
+	All other related portions are changed.
+	(mhc-todo/line-inserter): New variable.
+	(mhc-summary-line-format-alist): Added 'p'.
+	Changed 'i' (Don't display "todo" icon if "done" is included).
+	(mhc-summary-todo-line-format-alist): Eliminated (Renamed to
+	`mhc-todo-line-format-alist').
+	All other related portions are changed.
+	(mhc-todo-line-format-alist): New variable.
+	(mhc-summary/insert-dayinfo): Don't display TODO if
+	`mhc-summary-display-todo' is nil.
+	Set `mhc-tmp-priority'.
+	(mhc-summary-make-todo-list): Don't display 'Done' TODO if
+	`mhc-todo-display-done' is nil.
+	(mhc-summary/line-insert): Eliminated (Renamed to
+	`mhc-line-insert'.
+	(mhc-line-insert): New function.
+	(mhc-todo/line-deadline-string): Use `mhc-todo-string-excess-day'.
+	(mhc-todo/line-deadline-face): Use default face only before deadline.
+	(mhc-summary/line-parse-format): Eliminated (Renamed to
+	All other related portions are changed.
+	`mhc-line-parse-format').
+	(mhc-line-parse-format): New function.
+	(mhc-summary/line-inserter-setup-internal): Eliminated (Renamed to
+	`mhc-line-inserter-setup').
+	All other related portions are changed.
+	(mhc-line-inserter-setup): New macro.
+
+	* emacs/mhc-schedule.el (mhc-schedule-new): Added priority argument.
+	(mhc-schedule-priority): New defsubst.
+	(mhc-schedule-region): Changed slot.
+	(mhc-schedule-todo-deadline): Changed logic.
+	(mhc-schedule/set-priority): New macro.
+	(mhc-schedule/set-region-start): Changed slot.
+	(mhc-schedule/set-region-end): Ditto.
+
+	* emacs/mhc-parse.el (mhc-parse/priority): New function.
+	(mhc-parse/category): Set as todo if "todo" is included in category.
+
+	* emacs/mhc-logic.el (mhc-logic/compile-schedule): If todo,
+	always display.
+	(mhc-logic-record-to-slot): If schedule is todo, treat as no slot.
+
+	* emacs/mhc-header.el (mhc-header-table): Eliminated `x-sc-priority'
+	and added `x-sc-todo'.
+
+	* emacs/mhc-draft.el (mhc-draft-set-as-done): New command.
+	(mhc-draft-set-as-not-done): Ditto.
+	(mhc-draft-append-category): New function.
+	(mhc-draft-in-category-p): Ditto.
+	(mhc-draft-delete-category): Ditto.
+	(mhc-draft-finish): Set `force-refile' argument as non-nil
+	if not interactive.
+
+	* emacs/mhc-db.el (toplevel): Require 'mhc-schedule.
+	(mhc-db-scan-todo): Use `mhc-schedule-priority' instead of
+	`mhc-schedule-todo-lank'.
+	Changed sort function (nil is lower).
+	(mhc-db-add-record-from-buffer): Use `force-refile'.
+
+	* emacs/mhc-cvs.el (mhc-cvs/backend): Moved define position
+	(to reduce byte-compile warnings).
+
+	* emacs/mhc-bm.el (mhc-bm-icon-alist): Changed default and docstring.
+	(mhc-icon-function-alist): New variable.
+	(mhc-bm/bmstr-alist): Eliminated(Renamed to `mhc-bm/icon-bmstr-alist').
+	(mhc-bm/icon-bmstr-alist): New variable.
+	All other related portions are changed.
+	(mhc-bm/icon-call-function): New variable.
+	(mhc-bm-icon-keymap): New variable.
+	(mhc-bm-icon-call-function): New function.
+	(mhc-bm/setup-icons): Setup `mhc-bm/icon-call-function'.
+	(mhc-put-icon): Set icon's local-map as `mhc-bm-icon-keymap'.
+
+	* emacs/mhc-xmas.el (mhc-xmas-icon-alist): Set default.
+	(mhc-icon-function-alist): New variable.
+	(mhc-xmas-icon-call-function): New function.
+	(mhc-xmas/glyph-alist): Eliminated (Renamed to
+	`mhc-xmas/icon-glyph-alist').
+	All other related portions are changed.
+	(mhc-xmas/icon-glyph-alist): New variable.
+	(mhc-xmas/icon-function-alist): Ditto.
+	(mhc-xmas/setup-icons): Setup `mhc-xmas/icon-function-alist'.
+	(mhc-put-icon): Put keymap extent property.
+
+	* 00usage.jis (mhc2palm): Fixed typo.
+
 2000-07-31  Yuuichi Teranishi  <teranisi@quickhack.net>
 
 	* emacs/mhc-mime.el (mhc-mime-draft-reedit-file):

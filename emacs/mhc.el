@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1994/07/04
-;; Revised: $Date: 2000/07/28 00:50:18 $
+;; Revised: $Date: 2000/08/02 02:30:15 $
 
 ;;;
 ;;; Commentay:
@@ -283,25 +283,31 @@ If HIDE-PRIVATE, private schedules are suppressed."
     (or (eq 'direct mailer)
 	(mhc-summary-generate-buffer date mailer))
     (message (mhc-date-format date "Scanning %04d/%02d ..." yy mm))
+    (unless (eq 'direct mailer)
+      (when (and (eq mhc-todo-position 'top)
+		 mhc-insert-todo-list)
+	(mhc-summary-make-todo-list
+	 today mailer cat inv-cat secret)
+	(insert (make-string mhc-todo-mergin ?\n))
+	(mhc-summary/insert-separator)))
     (mhc-summary-make-contents from to mailer cat inv-cat secret)
-    (or (eq 'direct mailer)
-	(progn
-	  (if mhc-insert-todo-list
-	      (mhc-summary-make-todo-list
-	       (if (and (>= today from) (<= today to))
-		   today
-		 from)
-	       mailer cat inv-cat secret))
-	  (if mhc-insert-calendar
-	      (mhc-calendar-insert-rectangle-at date (- (window-width) 24))) ;; xxx
-	  (mhc-summary-mode-setup date mailer)
-	  (mhc-mode 1)
-	  (setq inhibit-read-only nil)
-	  (setq buffer-read-only t)
-	  (set-buffer-modified-p nil)
-	  (setq mhc-summary-buffer-current-date-month
-		(mhc-date-mm-first date))
-	  (mhc-goto-today t)))
+    (unless (eq 'direct mailer)
+      (when (and (eq mhc-todo-position 'bottom)
+		 mhc-insert-todo-list)
+	(mhc-summary/insert-separator)
+	(insert (make-string mhc-todo-mergin ?\n))
+	(mhc-summary-make-todo-list
+	 today mailer cat inv-cat secret))
+      (if mhc-insert-calendar
+	  (mhc-calendar-insert-rectangle-at date (- (window-width) 24))) ;; xxx
+      (mhc-summary-mode-setup date mailer)
+      (mhc-mode 1)
+      (setq inhibit-read-only nil)
+      (setq buffer-read-only t)
+      (set-buffer-modified-p nil)
+      (setq mhc-summary-buffer-current-date-month
+	    (mhc-date-mm-first date))
+      (mhc-goto-today t))
     (message (mhc-date-format date "Scanning %04d/%02d ... done." yy mm))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -322,7 +328,7 @@ Returns t if the importation was succeeded."
   (let ((draft-buffer (generate-new-buffer mhc-draft-buffer-name))
 	(current-date (or (mhc-current-date) (mhc-calendar-get-date)))
 	(succeed t)
-	date time subject location category)
+	date time subject location category priority)
     (and (interactive-p)
 	 (mhc-window-push))
     (set-buffer draft-buffer)
@@ -382,6 +388,7 @@ Returns t if the importation was succeeded."
 			  (mhc-input-category 
 			   "Category: "
 			   (mhc-schedule-categories-as-string schedule)))
+		    (setq priority (mhc-schedule-priority schedule))
 		    (mhc-header-narrowing
 		      (mhc-header-delete-header 
 		       (concat "^\\("
@@ -401,7 +408,7 @@ Returns t if the importation was succeeded."
 		location (mhc-input-location "Location: ")
 		category (mhc-input-category "Category: ")))
       ;; Quit.
-      (quit 
+      (quit
        (and (interactive-p)
 	    (mhc-window-pop))
        (setq succeed nil)
@@ -441,6 +448,9 @@ Returns t if the importation was succeeded."
 		    "")
 		  "\nX-SC-Category: "
 		  (mapconcat (function capitalize) category " ")
+		  "\nX-SC-Priority: " (if priority
+					  (number-to-string priority)
+					"")
 		  "\nX-SC-Cond: "
 		  "\nX-SC-Duration: "
 		  "\nX-SC-Alarm: "
@@ -486,6 +496,22 @@ Returns t if the importation was succeeded."
 (defun mhc-modify ()
   (interactive)
   (mhc-modify-file (mhc-summary-filename)))
+
+(defun mhc-todo-set-as-done ()
+  "Set TODO as DONE."
+  (interactive)
+  (mhc-modify-file (mhc-summary-filename))
+  (mhc-draft-set-as-done)
+  (mhc-draft-finish)
+  (message ""))
+
+(defun mhc-todo-set-as-not-done ()
+  "Set TODO as NOT-DONE."
+  (interactive)
+  (mhc-modify-file (mhc-summary-filename))
+  (mhc-draft-set-as-not-done)
+  (mhc-draft-finish)
+  (message ""))
 
 (defun mhc-modify-file (file)
   (if (and (stringp file) (file-exists-p file))

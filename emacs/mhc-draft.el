@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>,
 ;;          Yuuichi Teranishi <teranisi@quickhack.net>
 ;; Created: 2000/07/25
-;; Revised: $Date: 2000/07/28 00:28:06 $
+;; Revised: $Date: 2000/08/02 02:30:15 $
 
 ;;; Commentary:
 
@@ -130,6 +130,43 @@ If optional argument NO-CONFIRM is non-nil, kill without confirmation."
 (defvar mhc-draft-finish-hook nil
   "Hook run after `mhc-draft-finish'.")
 
+(defun mhc-draft-set-as-done ()
+  "Set current draft as DONE."
+  (interactive)
+  (if (mhc-draft-in-category-p "todo")
+      (mhc-draft-append-category "Done")))
+
+(defun mhc-draft-set-as-not-done ()
+  "Set current draft as NOT-DONE."
+  (interactive)
+  (if (mhc-draft-in-category-p "todo")
+      (mhc-draft-delete-category "done")))
+
+(defun mhc-draft-append-category (category)
+  "Append CATEGORY if it is not contained yet."
+  (mhc-header-narrowing
+    (let ((categories (mhc-header-get-value "x-sc-category")))
+      (unless (string-match category categories)
+	(mhc-header-put-value "x-sc-category" 
+			      (concat categories " " category))))))
+
+(defun mhc-draft-in-category-p (category)
+  (mhc-header-narrowing
+    (string-match (concat "[ \t]*" category)
+		  (mhc-header-get-value "x-sc-category"))))
+
+(defun mhc-draft-delete-category (category)
+  "Delete CATEGORY if it is contained."
+  (mhc-header-narrowing
+    (let ((categories (mhc-header-get-value "x-sc-category")))
+      (when (string-match (concat "[ \t]*" category) categories)
+	(setq categories (concat
+			  (substring categories 0 (match-beginning 0))
+			  (substring categories (match-end 0))))
+	(when (string-match "[ \t]+$" categories)
+	  (setq categories (substring categories 0 (match-beginning 0))))
+	(mhc-header-put-value "X-SC-Category" categories)))))
+
 (defun mhc-draft-finish ()
   "Add current draft as a schedule."
   (interactive)
@@ -138,7 +175,8 @@ If optional argument NO-CONFIRM is non-nil, kill without confirmation."
     (setq mhc-calendar-date-separator nil)
     (setq mhc-calendar-call-buffer nil)
     ;(mhc-header-delete-separator)
-    (if (mhc-db-add-record-from-buffer record (current-buffer))
+    (if (mhc-db-add-record-from-buffer record (current-buffer)
+				       (not (interactive-p)))
 	(progn
 	  (kill-buffer (current-buffer))
 	  (mhc-window-pop)
