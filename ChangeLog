@@ -1,3 +1,7 @@
+2000-06-17  Yoshinari Nomura  <nom@quickhack.net>
+
+	* /cvsroot/mhc/emacs/mhc-date2.el: Temporary file.
+
 2000-06-17  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 
 	* emacs/nnmhc.el (nnmhc-request-article): Hack for
