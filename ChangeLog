@@ -1,3 +1,10 @@
+2000-08-03  Hideyuki SHIRAI  <shirai@quickhack.net>
+
+	* emacs/mhc-mew.el (mhc-mew-draft-translate):
+	Execute mew-header-encode-region() safer.
+
+	* emacs/mhc.el (mhc-edit): Ensure reedit when imported buffer is schedule.
+	
 2000-08-03  Yoshinari NOMURA  <nom@quickhack.net>
 
 	* ruby-ext/lib/mhc-gtk.rb.in (toplevel):

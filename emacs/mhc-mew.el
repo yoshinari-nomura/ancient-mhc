@@ -198,9 +198,11 @@
   (mhc-header-narrowing
     (mhc-header-delete-header "x-mew"))
   (goto-char (point-min))
-  (and (re-search-forward "^$" nil t)
-       (mew-header-set mew-header-separator)))
-
+  (re-search-forward "^$" nil 'limit)
+  (or (= (current-column) 0) (insert "\n"))
+  (mew-header-set mew-header-separator)
+  (goto-char (point-min)))
+    
 
 (defun mhc-mew-draft-reedit-file (file)
   (erase-buffer)
@@ -218,8 +220,9 @@
   (mhc-header-narrowing
     (mhc-header-delete-header "x-mew"))
   (goto-char (point-min))
-  (and (re-search-forward "^$" nil t)
-       (mew-header-set mew-header-separator))
+  (re-search-forward "^$" nil 'limit)
+  (or (= (current-column) 0) (insert "\n"))
+  (mew-header-set mew-header-separator)
   (goto-char (point-min)))
 
 
@@ -248,9 +251,12 @@
 		     (re-search-forward (concat "^--" boundary "--$") nil t))
 	  ;; looks like Broken multi-part message.
 	  (setq boundary nil))))
-    (mew-header-encode-region (point-min) (mew-header-end))
-    (mew-header-clear)
-    (insert "\n")
+    (if (null (mew-header-end))
+	(mhc-header-narrowing
+	  (mew-header-encode-region (point-min) (point-max)))
+      (mew-header-encode-region (point-min) (mew-header-end))
+      (mew-header-clear)
+      (insert "\n"))
     (if (null boundary)
 	;; text/plain
 	(progn

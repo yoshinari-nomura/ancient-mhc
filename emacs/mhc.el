@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1994/07/04
-;; Revised: $Date: 2000/08/02 06:11:09 $
+;; Revised: $Date: 2000/08/03 13:23:03 $
 
 ;;;
 ;;; Commentay:
@@ -312,11 +312,6 @@ If HIDE-PRIVATE, private schedules are suppressed."
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; import, edit, delete, modify
-(defun mhc/buffer-message-p ()
-  "Return non-nil if current buffer looks like message."
-  (mhc-header-narrowing
-    (mhc-header-get-value "from")))
-
 (defun mhc-edit (&optional import-buffer)
   "Edit a new schedule.
 If optional argument IMPORT-BUFFER is specified, import its content.
@@ -328,7 +323,7 @@ Returns t if the importation was succeeded."
   (let ((draft-buffer (generate-new-buffer mhc-draft-buffer-name))
 	(current-date (or (mhc-current-date) (mhc-calendar-get-date)))
 	(succeed t)
-	date time subject location category priority)
+	msgp date time subject location category priority)
     (and (interactive-p)
 	 (mhc-window-push))
     (set-buffer draft-buffer)
@@ -338,6 +333,8 @@ Returns t if the importation was succeeded."
 			     (cdr import-buffer)
 			   import-buffer))
 	  (mhc-header-narrowing
+	    (setq msgp (or (mhc-header-get-value "from")
+			   (mhc-header-get-value "x-sc-subject")))
 	    (mhc-header-delete-header
 	     (concat "^\\("
 		     (mhc-regexp-opt mhc-draft-unuse-hdr-list)
@@ -417,8 +414,7 @@ Returns t if the importation was succeeded."
 	(progn
 	  (switch-to-buffer draft-buffer t)
 	  (set-buffer draft-buffer)
-	  (if (and import-buffer
-		   (mhc/buffer-message-p))
+	  (if (and import-buffer msgp)
 	      (if (consp import-buffer)
 		  (mhc-draft-reedit-buffer (car import-buffer) 'original)
 		;; Delete candidate overlay if exists.
