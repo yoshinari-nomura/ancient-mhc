@@ -1,3 +1,8 @@
+2000-10-21  Hideyuki SHIRAI  <shirai@quickhack.net>
+
+	* emacs/mhc-cvs.el (mhc-cvs/add, mhc-cvs/remove): Do not shrink
+	filename when call mhc-cvs/modify(). 	
+
 2000-10-20  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* emacs/mhc-cvs.el (mhc-cvs/modify): Exec CVS use relative path.

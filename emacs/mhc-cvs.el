@@ -224,8 +224,7 @@
     (if offline
 	(not (copy-file filename added t))
       (if (file-exists-p added) (delete-file added))
-      (setq filename (mhc-cvs/shrink-file-name filename))
-      (and (= 0 (mhc-cvs/backend "add" filename))
+      (and (= 0 (mhc-cvs/backend "add" (mhc-cvs/shrink-file-name filename)))
 	   (mhc-cvs/modify filename)))))
 
 (defun mhc-cvs/remove (filename &optional offline)
@@ -239,8 +238,7 @@
       (if (file-exists-p added) (delete-file added))
       (if (file-exists-p removed) (delete-file removed))
       (if (file-exists-p filename) (delete-file filename))
-      (setq filename (mhc-cvs/shrink-file-name filename))
-      (and (= 0 (mhc-cvs/backend "remove" filename))
+      (and (= 0 (mhc-cvs/backend "remove" (mhc-cvs/shrink-file-name filename)))
 	   (mhc-cvs/modify filename)))))
 
 (defun mhc-cvs/modify (filename &optional offline)
