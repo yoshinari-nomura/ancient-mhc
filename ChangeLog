@@ -1,3 +1,11 @@
+2003-04-15  Hideyuki SHIRAI  <shirai@quickhack.net>
+
+	* emacs/mhc-mew.el (mhc-mew/header-string)
+	(mhc-mew/header-string-review): Use 'mhc of invisible property
+	value.
+	(mhc-mew-summary-mode-setup): Exec mew-summary-set-count-line()
+	if exist this.
+
 2003-03-07  MIYOSHI Masanori  <miyoshi@boreas.dti.ne.jp>
 
 	* mhc2ol.in (usage): New options `-m' and `-d'.
