@@ -3,7 +3,7 @@
 ## Author:  MIYOSHI Masanori <miyoshi@quickhack.net>
 ##          Yoshinari Nomura <nom@quickhack.net>
 ## Created: 2000/7/12
-##
+## Revised: $Date: 2000/07/13 17:42:10 $
 
 require 'ftools'
 require 'kconv'
