@@ -313,7 +313,7 @@
     (apply 'format "%04d%02d%02d" d2))))
 
 (defmacro ddate-yy< (d1 d2)
-  `(< (ddate-yy ,d1) (ddate-yy ,d2)))
+  (` (< (ddate-yy (, d1)) (ddate-yy (, d2)))))
 
 (defmacro ddate-yymm< (d1 d2) 
   (` (string< (apply (quote format) "%04d%02d" (, d1))

@@ -1,9 +1,9 @@
 ;;; mhc-guess.el -- Guess the important date from a Japanese mail article.
 
-;; Author:  Yoshinari Nomura <nom@quickhack.net>
+;; Author:  Yoshinari Nomura <nom@mew.org>
 ;;
 ;; Created: 1999/04/13
-;; Revised: $Date: 2000/05/30 15:04:57 $
+;; Revised: 2000/03/07 17:01:43
 ;;
 
 ;;;
@@ -324,8 +324,8 @@
 
 ;;; Copyright Notice:
 
-;; Copyright (C) 1999, 2000 Yoshinari Nomura. All rights reserved.
-;; Copyright (C) 2000 MHC developing team. All rights reserved.
+;; Copyright (C) 1999, 2000 Yoshinari Nomura.
+;; All rights reserved.
 
 ;; Redistribution and use in source and binary forms, with or without
 ;; modification, are permitted provided that the following conditions
@@ -340,11 +340,11 @@
 ;;    may be used to endorse or promote products derived from this software
 ;;    without specific prior written permission.
 ;; 
-;; THIS SOFTWARE IS PROVIDED BY THE TEAM AND CONTRIBUTORS ``AS IS''
+;; THIS SOFTWARE IS PROVIDED BY Yoshinari Nomura AND CONTRIBUTORS ``AS IS''
 ;; AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 ;; LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
 ;; FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL
-;; THE TEAM OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+;; Yoshinari Nomura OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 ;; INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 ;; (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
 ;; SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
