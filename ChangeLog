@@ -1,3 +1,9 @@
+2000-08-04  Yuuichi Teranishi  <teranisi@quickhack.net>
+
+	* emacs/mhc-mime.el (mhc-mime/draft-reedit): Delete header separator
+	if already exists.
+	Assume text/plain if there is no 'Content-Type' header.
+
 2000-08-03  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* emacs/mhc-mew.el (mhc-mew-draft-translate):

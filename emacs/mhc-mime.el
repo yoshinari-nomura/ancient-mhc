@@ -3,7 +3,7 @@
 ;; Author:  Yuuichi Teranishi <teranisi@quickhack.net>
 ;;
 ;; Created: 2000/07/26
-;; Revised: $Date: 2000/07/31 11:35:54 $
+;; Revised: $Date: 2000/08/04 02:02:58 $
 
 ;;; Commentary:
 
@@ -54,6 +54,12 @@
 (defsubst mhc-mime/draft-reedit ()
   (save-excursion
     (let (ct cte start)
+      (save-excursion
+	(goto-char (point-min))
+	(if (re-search-forward
+	     (concat "^" (regexp-quote mail-header-separator) "$")
+	     nil t)
+	    (replace-match "")))
       (mhc-header-narrowing
 	(mhc-header-delete-header
 	 (concat "^\\("
@@ -69,13 +75,13 @@
       (goto-char (point-min))
       (when (re-search-forward "^$" nil t)
 	(setq start (point))
-	(and ct (insert "Content-type: " ct "\n"))
+	(insert "Content-type: " (or ct "text/plain") "\n")
 	(and cte (insert "Content-Transfer-Encoding: " cte "\n")))
       (save-restriction
-	(narrow-to-region start (point-max))
+	(narrow-to-region (or start (point-min)) (point-max))
 	(mime-edit-decode-message-in-buffer)
 	(widen)
-	(goto-char start)
+	(goto-char (or start (point-min)))
 	(insert mail-header-separator "\n")))))
 
 
