@@ -1,3 +1,7 @@
+2000-06-06  Hideyuki SHIRAI  <shirai@rdmg.mgcs.mei.co.jp>
+
+	* emacs/Makefile.w32: New file. Makefile for Meadow.
+
 2000-06-06  Yoshinari Nomura  <nom@quickhack.net>
 
 	* emacs/mhc-minibuf.el (mhc-input-day): 
