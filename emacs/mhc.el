@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@mew.org>
 ;;
 ;; Created: 1994/07/04
-;; Revised: $Date: 2000/06/11 09:25:31 $
+;; Revised: $Date: 2000/06/12 15:09:45 $
 
 ;;;
 ;;; Commentay:
@@ -442,7 +442,7 @@
     (gnus-group-read-ephemeral-group
      vgroup `(nnvirtual ,vgroup (nnvirtual-component-groups ,groups))
      t
-     (if (bufferp gnus-summary-buffer)
+     (if (buffer-live-p gnus-summary-buffer)
 	 (cons gnus-summary-buffer 'summary)
        (cons (current-buffer) 'group))
      t)
