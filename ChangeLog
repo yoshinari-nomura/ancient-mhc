@@ -1,3 +1,9 @@
+2000-06-07  Yuuichi Teranishi  <teranisi@quickhack.net>
+
+	* emacs/mhc.el (mhc-scan-month):
+	Make `wl-summary-buffer-name' local variable and bind it to
+	current buffer name to avoid treating MHC buffer as sticky.
+
 2000-06-06  Hideyuki SHIRAI  <shirai@rdmg.mgcs.mei.co.jp>
 
 	* emacs/mhc-date.el (ddate-yy<): NEW backquote style to OLD backquote style.
