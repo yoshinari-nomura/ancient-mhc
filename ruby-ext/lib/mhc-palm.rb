@@ -3,7 +3,7 @@
 ## Author:  Yoshinari Nomura <nom@quickhack.net>
 ##
 ## Created: 1999/09/01
-## Revised: $Date: 2004/06/15 13:44:53 $
+## Revised: $Date: 2004/06/22 10:09:15 $
 ##
 
 require 'mhc-date'
@@ -517,7 +517,7 @@ class PilotApptRecord < PilotRecord
     set_frequency(freq)    ## freq     の型チェックもする
 
     ## beg の日付が ord, week を満たしているかのチェックが必要
-    msg = "Type/ange error: (0< ord <4, 0< wek <6) required. (#{ord}, #{wek})"
+    msg = "Type/Range error: (0< ord <4, 0< wek <6) required. (#{ord}, #{wek})"
     raise msg if !(ord .is_a?(Integer) && 0 <= ord && ord <= 4)
     raise msg if !(wek .is_a?(Integer) && 0 <= wek && wek <= 6)
     raise msg if !((ord == 4 && beg .o_last?) || (ord < 4  && beg .o == ord))
