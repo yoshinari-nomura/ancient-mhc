@@ -1,3 +1,8 @@
+2000-06-05  Yoshinari Nomura  <nom@quickhack.net>
+
+	* emacs/00usage.jis, 00readme.jis: 
+	Change ML address and Web addresses. (again)
+
 2000-06-02  Yoshinari Nomura  <nom@quickhack.net>
 
 	* 00readme, 00readme.jis, emacs/00usage.jis:
