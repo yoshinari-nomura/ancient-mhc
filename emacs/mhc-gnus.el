@@ -229,7 +229,7 @@ function."
   (message-encode-message-body)
   (save-restriction
     (message-narrow-to-headers)
-    (message-generate-headers '(Lines))
+    (message-generate-headers '(Date From Lines))
     (message-remove-header message-ignored-mail-headers t)
     (let ((mail-parse-charset message-default-charset))
       (rfc2047-encode-message-header)))
