@@ -122,11 +122,11 @@ This special form converts DAY, as the number of days since
           stands for Sunday.
 "
   (let ((tempvar (make-symbol "decode-time")))
-    `(let* ((,tempvar (decode-time (mhc-day-encode-time ,day)))
-	    (day-of-month (nth 3 ,tempvar))
-	    (month (nth 4 ,tempvar))
-	    (year (nth 5 ,tempvar))
-	    (day-of-week (nth 6 ,tempvar)))
+    `(let* ((,tempvar (mhc-date-to-list , day))
+	    (day-of-month (nth 2 ,tempvar))
+	    (month (nth 1 ,tempvar))
+	    (year (nth 0 ,tempvar))
+	    (day-of-week (nth 3 ,tempvar)))
        ,@form)))
 (put 'mhc-day-let 'lisp-indent-function 1)
 (put 'mhc-day-let 'edebug-form-spec '(form body))
