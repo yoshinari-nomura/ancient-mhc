@@ -5,7 +5,7 @@
 ## Author:  Yoshinari Nomura <nom@quickhack.net>
 ##
 ## Created: 2000/04/26
-## Revised: $Date: 2000/05/29 14:59:24 $
+## Revised: $Date: 2000/06/12 02:01:04 $
 ##
 
 ## mhc-sync [-n] [-x exchange_id] [-r local_dir] [user@]remote.host[:dir]
@@ -207,7 +207,7 @@ if $flag_serverp
   }
 
   log_entry .each{|e|
-    if e .status == 'M'
+    if e .status == 'M' or e .status == 'A'
       print $DELIMITER
       sch = db .get_record_by_id(e .rec_id)
       if sch
@@ -334,6 +334,9 @@ else
 
     r_status = r_val .status if r_val
     l_status = l_val .status if l_val
+
+    r_status = 'M' if r_status == 'A'
+    l_status = 'M' if l_status == 'A'
 
     lr_status = l_status + r_status
 
