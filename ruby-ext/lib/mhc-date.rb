@@ -3,7 +3,7 @@
 ## Author:  Yoshinari Nomura <nom@quickhack.net>
 ##
 ## Created: 1999/07/16
-## Revised: $Date: 2004/01/12 10:24:38 $
+## Revised: $Date: 2004/06/22 10:07:40 $
 ##
 
 require 'mhc-kconv'
@@ -59,7 +59,7 @@ class MhcDate
   include Comparable
 
   D_TABLE  = [0, 306, 337, 0, 31, 61, 92, 122, 153, 184, 214, 245, 275]
-  O_LABEL  = %w(1st 2nd 3rd 4th 5th last)
+  O_LABEL  = %w(1st 2nd 3rd 4th 5th Last)
   M_LABEL  = %w(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec)
   W_LABEL  = %w(Sun Mon Tue Wed Thu Fri Sat)
   W_JLABEL = %w(日 月 火 水 木 金 土)
