@@ -10,12 +10,6 @@
 ;; This file is a part of MHC, includes MUA backend methods for
 ;; Wanderlust.
 
-
-;;; TODO:
-
-;; (1) Define mhc-wl-summary-display-article.
-
-
 ;;; Code:
 
 (require 'wl-summary)
@@ -49,6 +43,9 @@
      (elmo-localdir-get-folder-directory
       (elmo-folder-get-spec fld)))))
 
+(defun mhc-wl-summary-display-article ()
+  "Display the article on the current."
+  (wl-summary-redisplay))
 
 (defun mhc-wl-get-import-buffer (get-original)
   (save-excursion
@@ -60,20 +57,18 @@
     (current-buffer)))
 
 
-(defsubst mhc-wl/schedule-foldermsg (schedule)
-  (let ((path (mhc-record-name (mhc-schedule-record schedule))))
+(defun mhc-wl-insert-summary-contents (schedule contents icon)
+  (let (head path pos)
+    (setq path (mhc-record-name (mhc-schedule-record schedule)))
     (cond
      ((or (not path) (equal path mhc-schedule-file))
       "100000")
      ((string-match "/intersect/" path)
       (format "1%05d" (string-to-number (file-name-nondirectory path))))
      (t 
-      (format "2%05d" (string-to-number (file-name-nondirectory path)))))))
-
-
-(defun mhc-wl-insert-summary-contents (schedule contents icon)
-  (let ((head (concat (mhc-wl/schedule-foldermsg schedule) " | "))
-	pos)
+      (format "2%05d" (string-to-number (file-name-nondirectory path)))))
+    (setq head (concat (mhc-wl/schedule-foldermsg schedule) (if path "*| "
+							      " | ")))
     (put-text-property 0 (length head) 'invisible t head)
     (insert head)
     (setq pos (point))
@@ -89,11 +84,11 @@
 
 (defsubst mhc-wl/date-to-folder (date)
   (mhc-date-format date
-		   "*%s/intersect,%s/%04d/%02"
+		   "*%s/intersect,%s/%04d/%02d"
 		   mhc-base-folder
 		   mhc-base-folder
 		   yy
-		   dd))
+		   mm))
 
 
 (defun mhc-wl-summary-mode-setup (date)
@@ -101,6 +96,7 @@
   (wl-summary-buffer-set-folder (mhc-wl/date-to-folder date))
   (make-local-variable 'wl-summary-highlight)
   (setq wl-summary-highlight nil)
+  (setq wl-summary-buffer-target-mark-list '(nil))
   (setq wl-summary-buffer-number-regexp "[0-9]+")
   (setq wl-summary-buffer-msgdb '(nil)))
 
@@ -120,6 +116,7 @@
 
 (provide 'mhc-wl)
 (put 'mhc-wl 'summary-filename 'mhc-wl-summary-filename)
+(put 'mhc-wl 'summary-display-article 'mhc-wl-summary-display-article)
 (put 'mhc-wl 'get-import-buffer 'mhc-wl-get-import-buffer)
 (put 'mhc-wl 'generate-summary-buffer 'mhc-wl-generate-summary-buffer)
 (put 'mhc-wl 'insert-summary-contents 'mhc-wl-insert-summary-contents)
