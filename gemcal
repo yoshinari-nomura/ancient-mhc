@@ -5,7 +5,7 @@
 ## Author:  Yoshinari Nomura <nom@quickhack.net>
 ##
 ## Created: 1999/09/01
-## Revised: $Date: 2000/06/23 07:07:51 $
+## Revised: $Date: 2000/06/26 04:16:56 $
 ##
 
 # $DEBUG = 1
@@ -318,7 +318,11 @@ class MhcScheduleEdit < GtkToplevel
 	  GtkConfirm .new("#{msg} (Nothing was done).\n")
 	else
 	  update_desc_box
-	  @sch .set_description(Kconv::tojis(@desc_box .dump))
+
+	  header, body = conv_description(Kconv::tojis(@desc_box .dump))
+	  @sch .set_non_xsc_header(header .to_s)
+	  @sch .set_description(body .to_s)
+
 	  @desc_box .set_modified(false, 'saved')
 	  @db .add_sch(@sch)
 	  update_desc_box
@@ -389,6 +393,30 @@ class MhcScheduleEdit < GtkToplevel
 
   def modified_any?
     return (@sch && @sch .modified?) || (@desc_box && @desc_box .modified?)
+  end
+
+  def conv_description(string)
+    part1_is_header = true
+
+    part1, part2 = string .split("\n\n", 2)
+
+    if !(part1 =~ /^[ \t]+/ or part1 =~ /^[A-Za-z0-9_-]+:/)
+      part1_is_header = false
+    end
+
+    part1 .split("\n") .each{|line|
+      if !(string =~ /^[ \t]+/ or string =~ /^[A-Za-z0-9_-]+:/)
+	part1_is_header = false
+      end
+    }
+
+    if part1_is_header
+      header, body = part1, part2
+    else
+      header, body = nil, string
+    end
+
+    return header, body
   end
 end
 
