@@ -72,8 +72,7 @@ FROM, TO は 1970/01/01 からの経過日数を用いて指定"
 (defun mhc-db/eval-for-month (year month &optional todo)
   "指定された月のスケジュールを探索"
   (let ((from (mhc-date-new year month 1)))
-    (mhc-db/eval-for-duration from (+ from (timezone-last-day-of-month month year) -1) todo)))
-
+    (mhc-db/eval-for-duration from (mhc-date-mm-last from) todo)))
 
 (defun mhc-db/holiday-p (dayinfo)
   (catch 'holiday
