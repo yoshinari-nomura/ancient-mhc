@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1999/04/13
-;; Revised: $Date: 2000/05/29 14:59:25 $
+;; Revised: $Date: 2000/05/30 15:04:57 $
 ;;
 
 ;;;
@@ -11,7 +11,7 @@
 ;;;
 
 ;;
-;; gdate-guess-{time,date}: 日付、時間をを推測する:
+;; gdate-guess-{time,date}: 日付、時間を推測する:
 ;;
 ;;  ( (score (point-begin . point-end)  yy mm dd)
 ;;    (score (point-begin . point-end)  yy mm dd) ...)

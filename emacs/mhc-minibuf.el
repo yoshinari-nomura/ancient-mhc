@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1999/12/10
-;; Revised: $Date: 2000/05/29 14:59:25 $
+;; Revised: $Date: 2000/05/30 15:04:57 $
 
 ;;;
 ;;; Commentay:
@@ -125,6 +125,7 @@
 (if mhc-minibuf-map
     ()
   (setq mhc-minibuf-map (copy-keymap minibuffer-local-map))
+  (define-key mhc-minibuf-map "\C-c?" 'mhc-minibuf-insert-calendar)
   (define-key mhc-minibuf-map "\C-n"  'mhc-minibuf-next-candidate)
   (define-key mhc-minibuf-map "\C-p"  'mhc-minibuf-prev-candidate)
   (define-key mhc-minibuf-map "\C-v"  'scroll-other-window)
@@ -240,6 +241,8 @@
 	  (setq error t)))
 	(setq str-list (cdr str-list)))
       (if error (beep)))
+    (setq mhc-calendar-separator nil)
+    (setq mhc-calendar-call-buffer nil)
     (ddate-sort ret)))
 
 (defun mhc-input-time (&optional prompt default candidate)

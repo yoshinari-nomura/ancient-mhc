@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1994/07/04
-;; Revised: $Date: 2000/05/29 14:59:25 $
+;; Revised: $Date: 2000/05/30 15:04:57 $
 
 ;;;
 ;;; Commentay:
@@ -17,6 +17,7 @@
 ;; for Mew user:
 ;;   (setq mhc-mailer-package 'mew)
 ;;   (autoload 'mhc-mode "mhc" nil t)
+;;   (autoload 'mhc-calendar "mhc" nil t)
 ;;   (add-hook 'mew-summary-mode-hook 'mhc-mode)
 ;;   (add-hook 'mew-virtual-mode-hook 'mhc-mode)
 ;;   (add-hook 'mew-message-hook      'mhc-misc-hdr-decode)
@@ -24,14 +25,27 @@
 ;; for Wanderlust user:
 ;;   (setq mhc-mailer-package 'wl)
 ;;   (autoload 'mhc-mode "mhc" nil t)
+;;   (autoload 'mhc-calendar "mhc" nil t)
 ;;   (add-hook 'wl-summary-mode-hook 'mhc-mode)
 ;;   (add-hook 'wl-folder-mode-hook 'mhc-mode)
 ;;
 ;; for Gnus user:
 ;;   (setq mhc-mailer-package 'gnus)
 ;;   (autoload 'mhc-mode "mhc" nil t)
+;;   (autoload 'mhc-calendar "mhc" nil t)
 ;;   (add-hook 'gnus-summary-mode-hook 'mhc-mode)
 ;;   (add-hook 'gnus-group-mode-hook 'mhc-mode)
+
+(if (not (fboundp 'defgroup))
+    (defmacro defgroup (&rest args)))
+
+(if (not (fboundp 'defcustom))
+    (defmacro defcustom (symbol value doc &rest args)
+      "Empty replacement for defcustom when not supplied."
+      (` (defvar (, symbol) (, value) (, doc)))))
+
+(if (not (featurep 'easymenu))
+    (require 'easymenu))
 
 (require 'mhc-misc)
 (require 'mhc-date)
@@ -39,24 +53,21 @@
 (require 'mhc-schedule)
 (require 'mhc-minibuf)
 (require 'mhc-face)
+(require 'mhc-calendar)
 (provide 'mhc)
 
 (defconst mhc-version "mhc version 0.25pre3")
 
-(if (fboundp 'defgroup)
-    (defgroup mhc nil
-      "Various sorts of MH Calender."
-      :group 'mail))
+(defgroup mhc nil
+  "Various sorts of MH Calender."
+  :group 'mail)
 
-(if (fboundp 'defcustom)
-    (defcustom mhc-mailer-package 'mew
-      "*Variable to set your favorite mailer."
-      :group 'mhc
-      :type '(choice (const :tag "Mew" mew)
-		     (const :tag "Wanderlust" wl)
-		     (const :tag "Gnus" gnus)))
-  (defvar mhc-mailer-package 'mew) ;; select 'mew, 'wl or 'gnus
-  )
+(defcustom mhc-mailer-package 'mew
+  "*Variable to set your favorite mailer."
+  :group 'mhc
+  :type '(choice (const :tag "Mew" mew)
+		 (const :tag "Wanderlust" wl)
+		 (const :tag "Gnus" gnus)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Menu setup
@@ -76,6 +87,7 @@
 	["Rescan"       mhc-rescan-month (mhc-summary-buffer-p)]
 	["Delete"       mhc-delete (mhc-summary-buffer-p)]
 	["Insert Schedule" mhc-insert-schedule (not buffer-read-only)]
+ 	["3 months Mini calendar" mhc-calendar t]
 	["Toggle 3 months calendar" mhc-cal-toggle-insert-rectangle
 	 (mhc-summary-buffer-p)]))
 
@@ -93,13 +105,14 @@
     (define-key map "\C-cd" 'mhc-delete)
     (define-key map "\C-cc" 'mhc-set-default-category)
     (define-key map "\C-ci" 'mhc-insert-schedule)
+    (define-key map "\C-c?" 'mhc-calendar)
     (define-key map "\C-ct" 'mhc-cal-toggle-insert-rectangle)
     map)
   "Keymap for `mhc-mode'.")
 
 (easy-menu-define mhc-mode-menu
 		  mhc-mode-map
-		  "Menu used in mhc mode." 
+		  "Menu used in mhc mode."
 		  mhc-mode-menu-spec)
 
 (defvar mhc-mode nil
@@ -112,11 +125,11 @@
 	  (cons '(mhc-mode " mhc") minor-mode-alist)))
 
 (or (assq 'mhc-mode minor-mode-map-alist)
-    (setq minor-mode-map-alist 
+    (setq minor-mode-map-alist
 	  (cons (cons 'mhc-mode mhc-mode-map) minor-mode-map-alist)))
 
 (defun mhc-mode (&optional arg)
-  "MHC is the mode for registering schdule directly from email.  
+  "MHC is the mode for registering schdule directly from email.
    Requres Mew or Wanderlust or Gnus.
 
    Key assinment on mhc-mode.
@@ -132,6 +145,8 @@
    C-c m  Edit the schdule on the cursor line
    C-c e  Create new schdule file
    C-c c  Change default category
+   C-c ?  Display 3 months mini calendar
+   C-c t  Toggle 3 months calendar
 
    C-u prefix is available on using C-cs C-c. C-cg, it works to
    assign the category (see below)
@@ -141,7 +156,7 @@
 
    Field names using by MHC.
 
-   X-SC-Category: 
+   X-SC-Category:
    Space-seperated Keywords. You can set default category to scan.
    You can also indicate keywords by typing C-cs C-c. C-cg with C-u.
    "
@@ -180,7 +195,7 @@
 (defun mhc-input-month (prompt)
   (let ((ret nil) (month-str (ddate-yymm-s1 (ddate-now) "/")))
     (while (null ret)
-      (setq month-str 
+      (setq month-str
 	    (read-from-minibuffer
 	     (concat prompt "(yyyy/mm) : ") month-str nil nil 'mhc-month-hist))
       (if (string-match "\\([0-9]+\\)/\\([0-9]+\\)" month-str)
@@ -191,7 +206,7 @@
 (defun mhc-goto-month (&optional date hide-private)
   (interactive)
   (let ((category (mhc-category-convert mhc-default-category)))
-    (mhc-scan-month 
+    (mhc-scan-month
      (if (ddate-p date) date (mhc-input-month "Month "))
      mhc-mailer-package
      (cdr category)
@@ -221,7 +236,7 @@
 	     (re-search-forward
 	      (format "^\\([0-9]+\\)? | %s" (ddate-mmdd-s1 (ddate-now) "/"))
 	      nil t))
-	(progn 
+	(progn
 	  (beginning-of-line)
 	  (if (not (pos-visible-in-window-p (point)))
 	      (recenter)))
@@ -262,7 +277,7 @@
 (defun mhc-sch-scan1 (sch type &optional date conf secret first)
   (let ((subject  (mhc-sch-subject sch))
 	(category (car (mhc-sch-category sch)))
-	date-color week-color insert 
+	date-color week-color insert
 	head-string date-string week-string time-string
 	conf-string subj-string foot-string location-string)
     (setq week-color
@@ -280,6 +295,7 @@
 	   ((eq type 'mew)  mhc-header-string-mew)
 	   ((eq type 'wl)  (concat (mhc-sch-foldermsg-wl sch) " | "))
 	   ((eq type 'gnus) " | ")	; dummy for regexp
+ 	   ((eq type 'calendar) "")
 	   (t               "")))
     (put-text-property 0 (length head-string) 'invisible t head-string)
     (setq date-string
@@ -319,6 +335,7 @@
 	   ((eq type 'mew) (concat "\r " (mhc-sch-foldermsg sch)))
 	   ((eq type 'wl)   "")
 	   ((eq type 'gnus) "")
+ 	   ((eq type 'calendar) "")
 	   (t               "")))
     (setq insert (concat
 		  head-string
@@ -344,7 +361,10 @@
 					      (mhc-sch-subject sch))))
 	      (push (gnus-data-make num 0 0 header 0) gnus-newsgroup-data))
 	  (remove-text-properties 0 (length insert)
-				  '(gnus-number nil) insert)))))
+				  '(gnus-number nil) insert))))
+     ((eq type 'calendar)
+      (put-text-property 0 (length insert) 'mhc-calendar-summary-prop
+ 			 (if (mhc-sch-path sch) (mhc-sch-path sch) "Dummy") insert)))
     (insert insert)
     (set-buffer-modified-p nil)))
 
@@ -372,7 +392,7 @@
       ;; If today is free, insert only date headings.
       (mhc-sch-scan1 nil type date conf secret first)
       nil)))
-      
+
 (defvar mhc-use-week-separator 6
   "*if number 0 .. 6, insert separator in summary buffer.")
 
@@ -497,10 +517,10 @@
 (defun mhc-sch-foldermsg (sch)
   (let ((path (mhc-sch-path sch)) fld-msg)
     (setq fld-msg
-	  (if (and path 
-		   (string-match 
+	  (if (and path
+		   (string-match
 		    (concat
-		     "^" 
+		     "^"
 		     (regexp-quote
 		      (file-name-as-directory mhc-mail-path))) path))
 	      (concat "+" (substring path (match-end 0)))
@@ -516,11 +536,11 @@
       "100000")
      ((string-match "/intersect/" path)
       (format "1%05d" (string-to-int (file-name-nondirectory path))))
-     (t 
+     (t
       (format "2%05d" (string-to-int (file-name-nondirectory path)))))))
 
 (defun mhc-wl-ddate-to-folder (ddate)
-  (concat "*" 
+  (concat "*"
 	  mhc-base-folder "/intersect"
 	  ","
 	  mhc-base-folder "/" (ddate-yymm-s1 ddate "/")))
@@ -531,7 +551,7 @@
 	(nnvirtual-reverse-map-article
 	 (concat "nndir:" (file-name-directory path))
 	 (string-to-int (file-name-nondirectory path))))))
-		 
+
 (defun mhc-gnus-ddate-to-folder (ddate)
   (expand-file-name
    (ddate-yymm-s1 ddate "/")
@@ -546,17 +566,17 @@
 
 
 
-(defun mhc-edit (&optional import-buffer)
+(defun mhc-edit (&optional import-buffer calendar)
   "Edit a new schedule.
 If optional argument IMPORT-BUFFER is specified, import its content.
 Returns t if the importation was succeeded."
   (interactive (if current-prefix-arg
 		   (list (get-buffer (read-buffer
-				      (format 
+				      (format
 				       "Import buffer: ")
 				      (current-buffer))))))
   (let ((draft-buffer (generate-new-buffer mhc-draft-buffer-name))
-	(current-date (mhc-current-ddate))
+ 	(current-date (if calendar (mhc-calendar-get-ddate) (mhc-current-ddate)))
 	(succeed t)
 	sch old)
     (and (interactive-p)
@@ -592,7 +612,7 @@ Returns t if the importation was succeeded."
 			     )))
 		    ;; input subject
 		    (mhc-sch-set-subject sch
-					 (mhc-input-subject 
+					 (mhc-input-subject
 					  "Subject: "
 					  (mhc-misc-sub
 					   (or (mhc-sch-subject old)
@@ -601,13 +621,13 @@ Returns t if the importation was succeeded."
 					   "")))
 		    ;; input location
 		    (mhc-sch-set-location sch
-					  (mhc-input-location 
+					  (mhc-input-location
 					   "Location: "
 					   (mhc-sch-location old)))
 		    ;; input category
 		    (mhc-sch-set-category
 		     sch
-		     (mhc-input-category 
+		     (mhc-input-category
 		      "Category: "
 		      (mhc-sch-category old)))
 		    (mhc-misc-hdr-delete-list mhc-sch-header-list))
@@ -620,11 +640,12 @@ Returns t if the importation was succeeded."
 	  ;; No import (it succeeds).
 	  (mhc-sch-set-day  sch (mhc-input-day "Date: " current-date))
 	  (apply 'mhc-sch-set-time sch (mhc-input-time "Time: "))
+ 	  (if calendar (mhc-calendar-quit))
 	  (mhc-sch-set-subject sch (mhc-input-subject "Subject: "))
 	  (mhc-sch-set-location sch (mhc-input-location "Location: "))
 	  (mhc-sch-set-category sch (mhc-input-category "Category: ")))
       ;; Quit.
-      (quit 
+      (quit
        (and (interactive-p)
 	    (mhc-window-pop))
        (setq succeed nil)
@@ -688,7 +709,7 @@ Returns t if the importation was succeeded."
   (if (not (mhc-edit (current-buffer)))
       ;; failed.
       (mhc-window-pop)))
-   
+
 
 (defun mhc-import-old (&optional get-original)
   (interactive "P")
@@ -733,7 +754,7 @@ Returns t if the importation was succeeded."
 		       )))
 	      ;; input subject
 	      (mhc-sch-set-subject sch
-				   (mhc-input-subject 
+				   (mhc-input-subject
 				    "Subject: "
 				    (mhc-misc-sub
 				     (or (mhc-sch-subject old)
@@ -742,13 +763,13 @@ Returns t if the importation was succeeded."
 				     "")))
 	      ;; input location
 	      (mhc-sch-set-location sch
-				    (mhc-input-location 
+				    (mhc-input-location
 				     "Location: "
 				     (mhc-sch-location old)))
 	      ;; input category
 	      (mhc-sch-set-category
 	       sch
-	       (mhc-input-category 
+	       (mhc-input-category
 		"Category: "
 		(mhc-sch-category old)))
 	      ;; prepare new draft
@@ -759,7 +780,10 @@ Returns t if the importation was succeeded."
 
 (defun mhc-delete ()
   (interactive)
-  (let ((filename (mhc-summary-filename)) sch)
+  (mhc-delete-file (mhc-summary-filename)))
+
+(defun mhc-delete-file (filename)
+  (let (sch)
     (if (not (and (stringp filename) (file-exists-p filename)))
 	(message "File does not exist (%s)." filename)
       (setq sch (mhc-sch-new-from-file filename))
@@ -768,7 +792,7 @@ Returns t if the importation was succeeded."
 	  (message "Never mind..")
 	(if (and (mhc-sch-occur-multiple-p sch)
 		 (not
-		  (y-or-n-p 
+		  (y-or-n-p
 		   (format
 		    "%s has multiple occurrences. Delete all(=y) or one(=n) ?"
 		    (mhc-sch-subject-as-string sch)))))
@@ -795,14 +819,13 @@ Returns t if the importation was succeeded."
       (find-file-other-window filename)
       (mhc-draft-mode))))
 
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; draft
 ;;
 
 (defvar mhc-draft-mode-map nil)
 (defvar mhc-draft-buffer-name  "mhc-draft")
-(defvar mhc-draft-unuse-hdr-list 
+(defvar mhc-draft-unuse-hdr-list
   '(
     "Return-Path:" "Received:" "X-Dispatcher:"
     "Lines:" "X-Filter:" "Replied:" "X-Mailer:"
@@ -813,6 +836,7 @@ Returns t if the importation was succeeded."
 (if mhc-draft-mode-map
     ()
   (setq mhc-draft-mode-map (make-sparse-keymap))
+  (define-key mhc-draft-mode-map "\C-c?" 'mhc-draft-insert-calendar)
   (define-key mhc-draft-mode-map "\C-c\C-c" 'mhc-draft-finish)
   (define-key mhc-draft-mode-map "\C-c\C-q" 'mhc-draft-kill))
 
@@ -830,6 +854,8 @@ Returns t if the importation was succeeded."
   (interactive)
   (if (y-or-n-p "Kill draft buffer ?")
       (progn (kill-buffer (current-buffer))
+ 	     (setq mhc-calendar-separator nil)
+ 	     (setq mhc-calendar-call-buffer nil)
 	     (mhc-window-pop))))
 
 (defun mhc-prepare-draft-old (&optional sch import-buffer)
@@ -851,6 +877,8 @@ Returns t if the importation was succeeded."
 
 (defun mhc-draft-finish (&optional intersect)
   (interactive "P")
+  (setq mhc-calendar-separator nil)
+  (setq mhc-calendar-call-buffer nil)
   (let (folder sch conflicts)
     (setq sch  (mhc-sch-new-from-buffer))
     (if (or (not sch) (mhc-sch-error-p sch))
@@ -860,7 +888,7 @@ Returns t if the importation was succeeded."
       (if (or (not (and (ddate= (mhc-sch-occur-min sch)
 				(mhc-sch-occur-max sch))
 			(mhc-sch-time-b sch)
-			(setq conflicts (mhc-db-busy-on-p 
+			(setq conflicts (mhc-db-busy-on-p
 					 (mhc-sch-occur-min sch)
 					 (mhc-sch-time-b sch)
 					 (mhc-sch-time-e sch)
@@ -919,7 +947,7 @@ Returns t if the importation was succeeded."
   (let (in)
     (if (and default (listp default))
 	(setq default (mhc-misc-join default " ")))
-    (if (string= "" (setq in (read-from-minibuffer 
+    (if (string= "" (setq in (read-from-minibuffer
 			      (or prompt "Category: ")
 			      (or default "")
 			      nil nil 'mhc-category-hist)))
@@ -936,7 +964,7 @@ Returns t if the importation was succeeded."
 	(setq str (read-from-minibuffer
 		   (concat (or prompt "") "Date: ")
 		   str nil nil 'mhc-duration-hist))
-	(cond 
+	(cond
 	 ((and (string-match
 		"^\\([0-9]+/[0-9]+/[0-9]+\\)-\\([0-9]+/[0-9]+/[0-9]+\\)$" str)
 	       (setq date-b (ddate-new-from-string
@@ -991,14 +1019,14 @@ Returns t if the importation was succeeded."
   "* mhc DB file which contains holiday and anniversary settings.")
 
 (defconst mhc-summary-day-regex  "^[^|]+| +[0-9]+/\\([0-9]+\\)")
-(defconst mhc-summary-buf-regex   
+(defconst mhc-summary-buf-regex
   (concat mhc-base-folder "/\\([0-9]+\\)/\\([0-9]+\\)"))
-(defconst mhc-summary-filename-regex 
+(defconst mhc-summary-filename-regex
   ".*\r *\\+\\([^ \t]+\\)[ \t]+\\([^ \t\n]+\\)")
 
 (defun mhc-summary-buffer-p (&optional buffer)
-  (string-match mhc-summary-buf-regex 
-		(buffer-name 
+  (string-match mhc-summary-buf-regex
+		(buffer-name
 		 (or buffer (current-buffer)))))
 
 (defun mhc-current-ddate ()
@@ -1163,7 +1191,7 @@ Returns t if the importation was succeeded."
   (interactive "P")
   (set-mark (point))
   (let ((category (mhc-category-convert mhc-default-category)))
-    (mhc-scan-month 
+    (mhc-scan-month
      (mhc-input-month "Month ")
      'normal ;; insert into current buffer.
      (cdr category)
@@ -1191,7 +1219,7 @@ Returns t if the importation was succeeded."
       (ddate-new (ddate-substring-to-int in 1)
 		 (ddate-substring-to-int in 2)
 		 (ddate-substring-to-int in 3)))))
-  
+
 (defun mhc-view-file ()
   (interactive)
   (let ((path (mhc-summary-filename)))
@@ -1210,7 +1238,7 @@ Returns t if the importation was succeeded."
 ;; Redistribution and use in source and binary forms, with or without
 ;; modification, are permitted provided that the following conditions
 ;; are met:
-;; 
+;;
 ;; 1. Redistributions of source code must retain the above copyright
 ;;    notice, this list of conditions and the following disclaimer.
 ;; 2. Redistributions in binary form must reproduce the above copyright
@@ -1219,7 +1247,7 @@ Returns t if the importation was succeeded."
 ;; 3. Neither the name of the team nor the names of its contributors
 ;;    may be used to endorse or promote products derived from this software
 ;;    without specific prior written permission.
-;; 
+;;
 ;; THIS SOFTWARE IS PROVIDED BY THE TEAM AND CONTRIBUTORS ``AS IS''
 ;; AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 ;; LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS

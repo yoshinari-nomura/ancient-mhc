@@ -1,3 +1,11 @@
+2000-05-31  Hideyuki SHIRAI  <shirai@rdmg.mgcs.mei.co.jp>
+
+	* emacs/mhc-calendar.el: New file. MINI calender mode(like 'M-x calendar').
+
+	* emacs/mhc.el, mhc-minibuf.el: adapt to mhc-calendar.el 
+
+	* emacs/mhc-guess.el: tiny typo fix.
+
 2000-05-29  Yoshinari NOMURA  <nom@quickhack.net>
 
 	* 00readme.jis, 00todo.jis, emacs/00usage.jis,
