@@ -1,14 +1,18 @@
+2004-10-24  Fumihiro Kato  <fumihiro@sfc.keio.ac.jp>
+
+	* ruby-ext/lib/mhc-schedule.rb (MhcScheduleItem#select_headers):
+	Initialize headers with null strings instead of undefined values.
+
 2004-10-07  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* emacs/mhc-summary.el (mhc-use-month-separator): Support number
 	of width.
 	(mhc-summary/insert-separator): Display 'cw' number on monthly
-	separator if it start of week. 
-	
+	separator if it start of week.
+
 	* emacs/mhc.el (mhc-scan-month): Insert a weekly separator instead
 	a monthly separator when don't use monthly separator.
 	Display 'cw' number on monthly separator if it start of week.
-	
 
 2004-09-16  Hideyuki SHIRAI  <shirai@quickhack.net>
 

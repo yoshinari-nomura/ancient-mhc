@@ -3,7 +3,7 @@
 ## Author:  Yoshinari Nomura <nom@quickhack.net>
 ##
 ## Created: 1999/07/16
-## Revised: $Date: 2004/06/22 10:06:04 $
+## Revised: $Date: 2004/10/24 12:07:27 $
 ##
 
 ################################################################
@@ -1045,7 +1045,7 @@ class MhcScheduleItem
 	  key, val = line .split(':', 2)
 	  if (key =~ /^X-SC-(.*)/ni)
 	    xsc_key = $1 .downcase + ':'
-	    xsc[xsc_key] = val .strip if (val != '')
+	    xsc[xsc_key] = (val != '') ? val .strip : ''
 	  else
 	    xsc_key = nil
 	    non_xsc += line + "\n"
