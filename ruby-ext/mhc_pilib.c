@@ -3,7 +3,7 @@
 ** Author:  Yoshinari Nomura <nom@quickhack.net>
 **
 ** Created: 1999/09/01
-** Revised: $Date: 2002/06/21 00:57:00 $
+** Revised: $Date: 2002/11/21 00:04:17 $
 **
 */
 
@@ -246,6 +246,23 @@ static VALUE rdlp_CloseDB(VALUE obj, VALUE sd, VALUE db)
 {
   dlp_CloseDB(FIX2INT(sd), FIX2INT(db));
   return Qnil;
+}
+
+/****************************************************************/
+/******************** Application Info       ********************/
+/****************************************************************/
+
+static VALUE rdlp_ReadAppBlock(VALUE obj, VALUE sd, VALUE db)
+{
+  int len;
+  unsigned char buffer[0xffff];
+
+  len = dlp_ReadAppBlock(FIX2INT(sd), FIX2INT(db), 0, buffer, 0xffff);
+
+  if (len <= 0)
+    return Qnil;
+  else
+    return str_new(buffer, len);
 }
 
 /****************************************************************/
@@ -645,6 +662,9 @@ void Init_mhc_pilib()
   /* open, close DB */
   mfunc(mPiLib, "dlp_OpenDB",           rdlp_OpenDB,  2);
   mfunc(mPiLib, "dlp_CloseDB",          rdlp_CloseDB, 2);
+
+  /* App info */
+  mfunc(mPiLib, "dlp_ReadAppBlock",      rdlp_ReadAppBlock,      2);
 
   /* record manipulation */
   mfunc(mPiLib, "dlp_ReadRecordByIndex", rdlp_ReadRecordByIndex, 3);
