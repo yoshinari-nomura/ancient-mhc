@@ -3,7 +3,7 @@
 ;; Author:  Yuuichi Teranishi <teranisi@gohome.org>
 ;;
 ;; Created: 1999/12/02
-;; Revised: $Date: 2000/07/03 05:38:04 $
+;; Revised: $Date: 2000/07/03 05:49:52 $
 
 (defcustom mhc-xmas-icon-alist nil
   "*Alist to define icons.
@@ -76,17 +76,17 @@ Icon is decided by `mhc-xmas-icon-alist'."
       (insert space space)
       (setq extent (make-extent start (point)))
       (set-extent-property extent 'invisible t))
-    (while glyphs
-      (setq extent (make-extent (point)(point)))
-      (set-extent-properties extent '(mhc-icon t))
-      (set-extent-end-glyph extent (car glyphs))
-      (setq glyphs (cdr glyphs)))
     (setq icons (nreverse icons))
     (while icons
       (setq extent (make-extent (point) (point)))
       (set-extent-properties extent '(mhc-icon t))
       (set-extent-end-glyph extent (car icons))
-      (setq icons (cdr icons)))))
+      (setq icons (cdr icons)))
+    (while glyphs
+      (setq extent (make-extent (point)(point)))
+      (set-extent-properties extent '(mhc-icon t))
+      (set-extent-end-glyph extent (car glyphs))
+      (setq glyphs (cdr glyphs)))))
 
 (provide 'mhc-xmas)
 
