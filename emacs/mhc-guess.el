@@ -211,7 +211,8 @@
 	      (cond
 	       ((not (match-beginning 2)) 
 		0)
-	       ((eq (buffer-substring (match-beginning 2) (match-end 2)) "半")
+	       ((string=
+		 (buffer-substring (match-beginning 2) (match-end 2)) "半")
 		30)
 	       (t
 		(gdate-string-to-int
