@@ -1,7 +1,26 @@
+2000-06-20  Yoshinari Nomura  <nom@quickhack.net>
+
+	* today: Change Author's mail address.
+	* emacs/mhc.el:	Change interfaces to guess functions. 
+	       Change indent fitting to 80 columns. 
+	* emacs/mhc-minibuf.el: Change interfaces to guess functions.
+	* emacs/mhc-guess.el: drastically changed: data structure,
+		  function names, algorithms.
+	* emacs/mhc-date.el:
+	(mhc-date/string-to-timezone-offset)
+	(mhc-date-new-from-string3)
+	(mhc-date-yy+)
+	(mhc-date-yy-)
+	(mhc-date-yy++)
+	(mhc-date-yy--),
+	(mhc-date-p): New functions to support new mhc-guess.
+
 2000-06-20  Hideyuki SHIRAI  <shirai@rdmg.mgcs.mei.co.jp>
 
-	* emacs/mhc-date.el (mhc-date-mm+): If check is nil, return last-day instead of '1'.
-	(mhc-date-digit-to-ww-japanese-string): New function, return japanese day of week.
+	* emacs/mhc-date.el (mhc-date-mm+): If check is nil, return
+		  last-day instead of '1'. 
+	(mhc-date-digit-to-ww-japanese-string): New function, return
+		japanese day of week. 
 
 2000-06-19  Hideyuki SHIRAI  <shirai@rdmg.mgcs.mei.co.jp>
 
@@ -33,16 +52,19 @@
 	with `mhc-summary-search-date'.
 	* emacs/mhc-wl.el (mhc-wl-search-date): Renamed `mhc-wl-search-day'.
 	* emacs/mhc-mew.el (mhc-mew-search-date): Renamed `mhc-mew-search-day'.
-	* emacs/mhc-gnus.el (mhc-gnus-search-date): Renamed `mhc-gnus-search-day'.
+	* emacs/mhc-gnus.el (mhc-gnus-search-date): Renamed
+		  `mhc-gnus-search-day'. 
 
 2000-06-19  Hideyuki SHIRAI  <shirai@rdmg.mgcs.mei.co.jp>
 
 	* emacs/mhc.el (mhc-goto-today): Use mhc-summary-search-day().
-	* emacs/mhc-summary.el (mhc-summary-search-day): New function, for search YY MM DD in summary-buffer.
+	* emacs/mhc-summary.el (mhc-summary-search-day): New function, for
+		  search YY MM DD in summary-buffer. 
 	* emacs/mhc-wl.el (mhc-wl-summary-search-day): Ditto.
 	* emacs/mhc-gnus.el (mhc-gnus-summary-search-day): Ditto.
 	* emacs/mhc-mew.el (mhc-mew-summary-search-day): Ditto.
-	(mhc-mew/header-string-review): New constant, header-string when schedule exist.
+	(mhc-mew/header-string-review): New constant, header-string when
+		schedule exist. 
 	(mhc-mew-insert-summary-contents): If shedule exist, put review mark.
 	
 2000-06-19  Yoshinari Nomura  <nom@quickhack.net>
@@ -113,7 +135,8 @@
 	* emacs/mhc-record.el: Ditto.
 	* emacs/mhc-wl.el: Ditto.
 	* emacs/mhc-date.el: Some bug fixes.
-	* emacs/mhc-calendar.el: Quick hack to follow reconstruction of mhc-date.el.
+	* emacs/mhc-calendar.el: Quick hack to follow reconstruction of
+		  mhc-date.el. 
 	* emacs/ddate.el: Ditto.
 	* emacs/Makefile: Add suffix rule.
 	
@@ -137,7 +160,8 @@
 2000-06-17  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 
 	* emacs/mhc.el: Removed dependency declaration above mhc-sync.el.
-	(mhc-modify-file): Alter the file opening codes, removed `find-file-other-window'.
+	(mhc-modify-file): Alter the file opening codes, removed
+		`find-file-other-window'. 
 	(mhc-draft-buffer-file-name): New internal variable to keep file name.
 	(mhc-draft-finish): Refer `mhc-draft-buffer-file-name' to decide
 	original schedule file.
@@ -171,7 +195,8 @@
 
 2000-06-16  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 
-	* emacs/mhc.el (mhc-goto-month): Refer `mhc-default-hide-private-schedules'
+	* emacs/mhc.el (mhc-goto-month): Refer
+		  `mhc-default-hide-private-schedules' 
 	to decide which action is suitable as default, display private
 	schedules or not.
 	(mhc-goto-this-month): Ditto.
@@ -247,7 +272,8 @@
 2000-06-12  Hideyuki SHIRAI  <shirai@rdmg.mgcs.mei.co.jp>
 
 	* emacs/mhc.el (toplevel): Require mhc-calendar, mhc-sync.
-	(mhc-delete-file, mhc-modify-file): New functions to call from mhc and mhc-calendar.
+	(mhc-delete-file, mhc-modify-file): New functions to call from mhc
+		and mhc-calendar. 
 	(mhc-edit): Support mhc-calendar-mode.
 	(mhc-setup-p): New variable.
 	(mhc-setup): Add in mhc-calendar's setup funciton.
@@ -260,15 +286,18 @@
 
 	* emacs/mhc-mew.el: (require 'mew) instead of mew-vars.
 
-	* emacs/mhc-logic.el: (require 'bytecomp) in top level, for byte-compile-wanings.
+	* emacs/mhc-logic.el: (require 'bytecomp) in top level, for
+		  byte-compile-wanings. 
 	
-	* emacs/mhc-face.el (mhc-calendar-hnf-face-*): New variable form mhc-calendar.
+	* emacs/mhc-face.el (mhc-calendar-hnf-face-*): New variable form
+		  mhc-calendar. 
 
 	* emacs/mhc-calendar.el: Sync up to main trunk.
 
 	* emacs/mhc-sync.el: New file for ruby sync script.
 
-	* emacs/Makefile: Include mhc-bm.el, mhc-xmas.el, mhc-calendar.el and mhc-sync.el.
+	* emacs/Makefile: Include mhc-bm.el, mhc-xmas.el, mhc-calendar.el
+		  and mhc-sync.el. 
 
 2000-06-12  Yoshinari Nomura  <nom@quickhack.net>
 
@@ -311,7 +340,8 @@
 
 2000-06-05  Hideyuki SHIRAI  <shirai@rdmg.mgcs.mei.co.jp>
 
-	* emacs/mhc-calendar.el (mhc-calendar-hnf-summary-insert): 'SUB', 'LSUB' suport.
+	* emacs/mhc-calendar.el (mhc-calendar-hnf-summary-insert): 'SUB',
+		  'LSUB' suport. 
 	(mhc-calendar-hnf-search-title): New function.
 	(mhc-calendar-hnf-edit, mhc-calendar-hnf-view): Goto TITLE position.
 
@@ -346,7 +376,8 @@
 
 2000-06-02  Hideyuki SHIRAI  <shirai@rdmg.mgcs.mei.co.jp>
 
-	* emacs/mhc-calendar.el (mhc-calendar-hnf-summary-insert): hnf's 'CAT' support.
+	* emacs/mhc-calendar.el (mhc-calendar-hnf-summary-insert): hnf's
+		  'CAT' support. 
 
 2000-06-01  MIYOSHI Masanori  <miyoshi@ask.ne.jp>
 
@@ -355,10 +386,12 @@
 
 2000-06-01  Hideyuki SHIRAI  <shirai@rdmg.mgcs.mei.co.jp>
 
-	* emacs/mhc-calendar.el (mhc-calendar-hnf-face-setup): Do ditto mhc-face-setup.
+	* emacs/mhc-calendar.el (mhc-calendar-hnf-face-setup): Do ditto
+		  mhc-face-setup. 
 	(mhc-calendar-hnf-edit): Call hnf-initial-function like hns.
 	(mhc-calendar-hnf-mark-diary-entries): Fatal bug fix ^^;
-	(mhc-calendar-hnf-summary-insert): More colorful, but i have no knowledge of hnf.
+	(mhc-calendar-hnf-summary-insert): More colorful, but i have no
+		knowledge of hnf. 
 	
 2000-06-01  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 
@@ -386,7 +419,8 @@
 	* emacs/mhc.el (mhc-sync): New function.
 	Bind mhc-sync process coding-system. Ignore illegal passwd request.
 
-	* emacs/mhc-calendar.el: Display Hyper Nikki System's title in summary view.
+	* emacs/mhc-calendar.el: Display Hyper Nikki System's title in
+		  summary view.
 
 2000-05-31  Yuuichi Teranishi  <teranisi@quickhack.net>
 
@@ -479,8 +513,9 @@
 
 2000-05-31  Hideyuki SHIRAI  <shirai@rdmg.mgcs.mei.co.jp>
 
-	* emacs/mhc-calendar.el: New file. MINI calender mode(like 'M-x calendar').
-
+	* emacs/mhc-calendar.el: New file. MINI calender mode(like 'M-x
+		  calendar').
+ 
 	* emacs/mhc.el, mhc-minibuf.el: adapt to mhc-calendar.el 
 
 	* emacs/mhc-guess.el: tiny typo fix.
