@@ -1,9 +1,9 @@
 ### mhc-gtk.rb
 ##
-## Author:  Yoshinari Nomura <nom@mew.org>
+## Author:  Yoshinari Nomura <nom@quickhack.net>
 ##
 ## Created: 1999/07/16
-## Revised: 2000/02/09 08:43:13
+## Revised: $Date: 2000/05/29 14:59:25 $
 ##
 
 #$DEBUG = true
@@ -1092,8 +1092,8 @@ end
 
 ### Copyright Notice:
 
-## Copyright (C) 1999, 2000 Yoshinari Nomura.
-## All rights reserved.
+## Copyright (C) 1999, 2000 Yoshinari Nomura. All rights reserved.
+## Copyright (C) 2000 MHC developing team. All rights reserved.
 
 ## Redistribution and use in source and binary forms, with or without
 ## modification, are permitted provided that the following conditions
@@ -1108,11 +1108,11 @@ end
 ##    may be used to endorse or promote products derived from this software
 ##    without specific prior written permission.
 ## 
-## THIS SOFTWARE IS PROVIDED BY Yoshinari Nomura AND CONTRIBUTORS ``AS IS''
+## THIS SOFTWARE IS PROVIDED BY THE TEAM AND CONTRIBUTORS ``AS IS''
 ## AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 ## LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
 ## FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL
-## Yoshinari Nomura OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+## THE TEAM OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 ## INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 ## (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
 ## SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)

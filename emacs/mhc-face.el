@@ -1,9 +1,9 @@
 ;;; mhc-face.el
 
-;; Author:  Yoshinari Nomura <nom@mew.org>
+;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 2000/02/08
-;; Revised: 2000/02/29 15:21:25
+;; Revised: $Date: 2000/05/29 14:59:24 $
 
 ;;;
 ;;; Commentay:
@@ -171,8 +171,8 @@ in setup time.")
 
 ;;; Copyright Notice:
 
-;; Copyright (C) 1999, 2000 Yoshinari Nomura.
-;; All rights reserved.
+;; Copyright (C) 1999, 2000 Yoshinari Nomura. All rights reserved.
+;; Copyright (C) 2000 MHC developing team. All rights reserved.
 
 ;; Redistribution and use in source and binary forms, with or without
 ;; modification, are permitted provided that the following conditions
@@ -187,11 +187,11 @@ in setup time.")
 ;;    may be used to endorse or promote products derived from this software
 ;;    without specific prior written permission.
 ;; 
-;; THIS SOFTWARE IS PROVIDED BY Yoshinari Nomura AND CONTRIBUTORS ``AS IS''
+;; THIS SOFTWARE IS PROVIDED BY THE TEAM AND CONTRIBUTORS ``AS IS''
 ;; AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 ;; LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
 ;; FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL
-;; Yoshinari Nomura OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+;; THE TEAM OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 ;; INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 ;; (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
 ;; SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)

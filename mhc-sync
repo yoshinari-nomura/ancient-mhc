@@ -2,10 +2,10 @@
 
 ### mhc-sync -- Data synchronization tool for MHC.
 ##
-## Author:  Yoshinari Nomura <nom@mew.org>
+## Author:  Yoshinari Nomura <nom@quickhack.net>
 ##
 ## Created: 2000/04/26
-## Revised: $Date: 2000/05/25 16:55:43 $
+## Revised: $Date: 2000/05/29 14:59:24 $
 ##
 
 ## mhc-sync [-n] [-x exchange_id] [-r local_dir] [user@]remote.host[:dir]
@@ -433,8 +433,8 @@ end
 
 ### Copyright Notice:
 
-## Copyright (C) 1999, 2000 Yoshinari Nomura.
-## All rights reserved.
+## Copyright (C) 1999, 2000 Yoshinari Nomura. All rights reserved.
+## Copyright (C) 2000 MHC developing team. All rights reserved.
 
 ## Redistribution and use in source and binary forms, with or without
 ## modification, are permitted provided that the following conditions

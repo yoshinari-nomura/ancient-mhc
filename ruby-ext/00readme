@@ -1,6 +1,6 @@
 
 Created: 2000/02/09
-Revised: 2000/02/09 09:07:12
+Revised: $Date: 2000/05/29 14:59:25 $
 
 This directory contains some libraries required by Ruby staffs
 of the MHC -- gemcal, palm2mhc, mhc2palm and so on.
@@ -39,4 +39,4 @@ Install:
 
 If you have comments or questions, please feel free to email me.
 --
-Y. Nomura. <nom@Mew.org>
+Yoshinari Nomura. <nom@quickhack.net>
