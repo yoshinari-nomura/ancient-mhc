@@ -52,7 +52,7 @@ mhc-mew.elc: mhc-mew.el
 
 
 ### For Wanderlust
-wl: $(WL_ELC) mew
+wl: $(WL_ELC)
 
 mhc-wl.elc: mhc-wl.el
 	rm -f $@

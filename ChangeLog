@@ -1,3 +1,7 @@
+2000-06-07  Taiji Can <Taiji.Can@atesoft.advantest.co.jp>
+
+	* emacs/Makefile (WL): Removed dependecy above MEW.
+
 2000-06-07  Yuuichi Teranishi  <teranisi@gohome.org>
 
 	* emacs/mhc-wl.el (mhc-wl-summary-mode-setup):
