@@ -1,3 +1,26 @@
+2003-03-06  MIYOSHI Masanori  <miyoshi@boreas.dti.ne.jp>
+
+	* mhc2ol.in (RepeatPattern.Period.get_duration): Return 60 * 24
+	minutes if either @edate or @sdate is nil.  Support `-s' option.
+	(MhcScheduleItem.to_outlook): Assumu NonRepeat if either time_b or
+	time_e is valid.
+	(Exporter.setup_ol_appointments): Get duration with period
+	.get_duration().
+	(Exporter.setup_ol_appointments): Don't set a reminder is any
+	alarms are not set.
+	(Exporter.setup_ol_appointments): Don't save an appointment with
+	`-s' option.
+	(Exporter.setup_ol_appointments): Don't set a reminder to a task.
+	(Exporter.delete_unmanaged_schedules): Don't delete schedules with
+	`-n' option. Thanks to Toshihiko SHIMOKAWA
+	<toshi@is.kyusan-u.ac.jp>.
+	(Exporter.write_sync_info): Don't update sync_info with `-n'
+	option.
+	(Exporter.delete_ol_schedules): Don't delete Outlook appointments
+	with `-n' option.
+	($flag_separation): New varialbes.
+	Initialize Outlook even if `-n' option is specified.
+	
 2003-02-26  MIYOSHI Masanori  <miyoshi@boreas.dti.ne.jp>
 
 	* mhc2ol.in (RepeatPattern): Add instance varialbes for start time

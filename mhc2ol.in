@@ -8,7 +8,7 @@
 ##          
 ##
 ## Created: 2001/09/15
-## Revised: $Date: 2003/02/26 12:05:58 $
+## Revised: $Date: 2003/03/06 13:43:33 $
 ##
 
 $DEBUG = false
@@ -38,7 +38,11 @@ module RepeatPattern
     end
 
     def get_duration()
-      (@edate - @sdate + 1) * 60 * 24 # min
+      if @edate != nil && @sdate != nil
+	(@edate - @sdate + 1) * 60 * 24 # min
+      else
+	60 * 24
+      end
     end
 
     def handle_recurrence(ol_appoint)
@@ -158,7 +162,7 @@ end
 
 def usage
   print '
-usage: mhc2ol [-a | -i | -N] [-n] [-r dir] [-c category] [YYYYMMDD-yyyymmdd]
+usage: mhc2ol [-a | -i | -N] [-n] [-s] [-r dir] [-c category] [YYYYMMDD-yyyymmdd]
 
   mhc2ol -- Add/Copy mhc articles to Outlook.
 
@@ -170,6 +174,7 @@ usage: mhc2ol [-a | -i | -N] [-n] [-r dir] [-c category] [YYYYMMDD-yyyymmdd]
     -N     : Copy only the articles that has been modified since
              the last execution.
     -n     : Do nothing effectives. Useful for checking.
+    -s     : Split appointments and tasks.
     -c     : Copy only the mhc articles of which the category
              matches the specified regexp.
     -r dir : Set repository directory of the mhc.
@@ -197,7 +202,9 @@ class MhcScheduleItem
 
     ## First, treat X-SC-Day: field.
     while day_cp .length > 0
-      if day_cp .length > 1 && day_cp .length == day_cp .max - day_cp .min + 1
+      if ((day_cp .length > 1 \
+	   && day_cp .length == day_cp .max - day_cp .min + 1) \
+	  && (time_b == nil && time_e == nil))
 	## repeat in a series of days -- make up as a daily.
 	dates << RepeatPattern::Daily .new(day_cp .min, day_cp .max,
 					   time_b, time_e, 1)
@@ -415,7 +422,7 @@ class Exporter
       # If any time is not specified, the appointment is a kind of AllDayEvent.
       if !stime && !etime
 	appoint .AllDayEvent = true
-	appoint .Duration = 60 * 24
+	appoint .Duration = period .get_duration()
       end
 
       appoint .Categories = sch .category_as_string()
@@ -426,8 +433,7 @@ class Exporter
 	appoint .ReminderSet = true
 	appoint .ReminderMinutesBeforeStart = sch .alarm() / 60
       else
-	# Set reminder to all entry except AllDayEvent.
-	appoint .ReminderSet = 	! appoint .AllDayEvent
+	appoint .ReminderSet = false
       end
 
       # handle recurrence.
@@ -443,7 +449,7 @@ class Exporter
       appoint .Categories = cats .join(',')
       $= = old_sp
       appoint .Body = MhcKconv::todisp(sch .dump())
-      appoint .Save()
+      appoint .Save() if !$flag_separation
 
       # Copy TODO
       if todo_p
@@ -467,6 +473,7 @@ class Exporter
         task .Sensitivity = appoint .Sensitivity
         task .Subject = appoint .Subject
         task .Body = appoint .Body
+	task .ReminderSet = false
         task .Save()
         print " - And set it to Task\n" if @@flag_verbose
 
@@ -605,28 +612,32 @@ class Exporter
   end
 
   def delete_unmanaged_schedules()
-    for table in @last_sync_infos
-      ol_infos = table[2]
-      for info in ol_infos
-	entry_id = info[0]
-	appoint = get_ol_appointment(entry_id)
-	appoint .delete() if appoint
+    if !@@flag_noharm
+      for table in @last_sync_infos
+	ol_infos = table[2]
+	for info in ol_infos
+	  entry_id = info[0]
+	  appoint = get_ol_appointment(entry_id)
+	  appoint .delete() if appoint
+	end
       end
     end
   end
 
   def write_sync_info()
-    begin
-      fp = open(@@sync_file, 'w')
-      Marshal .dump(@sync_infos, fp)
-    rescue
-    ensure
-      fp .close() if fp
+    if !@@flag_noharm
+      begin
+	fp = open(@@sync_file, 'w')
+	Marshal .dump(@sync_infos, fp)
+      rescue
+      ensure
+	fp .close() if fp
+      end
     end
   end
 
   def delete_ol_schedules()
-    if @@flag_install
+    if @@flag_install && !@@flag_noharm
       print "delete all articles in Outlook."
       if !@@flag_noharm
 	# Appointments
@@ -687,6 +698,7 @@ $flag_from, $flag_to = nil, nil
 $flag_timestamp = nil
 $flag_category_regexp = ""
 $flag_dir = File .expand_path("~/Mail/schedule")
+$flag_separation = false
 
 while ARGV .length > 0
   case ARGV[0]
@@ -708,6 +720,8 @@ while ARGV .length > 0
     $flag_from, $flag_to = MhcDate .new($1), MhcDate .new($2)
   when '-N'
     $flag_timestamp = true
+  when '-s'
+    $flag_separation = true
   else
     usage()
   end
@@ -723,15 +737,13 @@ usage() if (!($flag_append || $flag_install || $flag_timestamp) || ($flag_append
 ## Initialize Outlook OLE Automation object
 ##
 
-if !$flag_noharm
-  begin
-    outlook = WIN32OLE .new('Outlook.Application')
-    WIN32OLE .const_load(outlook, OlConst)
-  rescue
-    STDERR .print("Cannot find Outlook in your PC!\n")
-    STDERR .print("Please install Outlook (*NOT* Outlook Express) before execute this command.\n")
-    exit(1)
-  end
+begin
+  outlook = WIN32OLE .new('Outlook.Application')
+  WIN32OLE .const_load(outlook, OlConst)
+rescue
+  STDERR .print("Cannot find Outlook in your PC!\n")
+  STDERR .print("Please install Outlook (*NOT* Outlook Express) before execute this command.\n")
+  exit(1)
 end
 
 ##
