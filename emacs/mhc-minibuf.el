@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1999/12/10
-;; Revised: $Date: 2000/06/20 06:15:10 $
+;; Revised: $Date: 2000/06/21 01:25:28 $
 
 ;;;
 ;;; Commentay:

@@ -1,3 +1,12 @@
+2000-06-21  Hideyuki SHIRAI  <shirai@rdmg.mgcs.mei.co.jp>
+
+	* emacs/mhc-calendar.el (all :-): Follow reconstruction of mhc-date.el.
+	* emacs/mhc.el (mhc-edit): Change interface to mhc-calender.el
+	(mhc-delete-file): Ditto.
+	(mhc-draft-finish): Ditto.
+	* emacs/mhc-minibuf.el (mhc-date-new-from-string3): Fix typo.
+	* emacs/ddate.el: Remove file.
+
 2000-06-20  Yoshinari Nomura  <nom@quickhack.net>
 
 	* ruby-ext/lib/mhc-gtk.rb:

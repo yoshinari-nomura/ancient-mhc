@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1994/07/04
-;; Revised: $Date: 2000/06/20 06:16:38 $
+;; Revised: $Date: 2000/06/21 01:25:28 $
 
 ;;;
 ;;; Commentay:
@@ -292,7 +292,7 @@ If HIDE-PRIVATE, private schedules are suppressed."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; import, edit, delete, modify
 
-(defun mhc-edit (&optional import-buffer calendar)
+(defun mhc-edit (&optional import-buffer)
   "Edit a new schedule.
 If optional argument IMPORT-BUFFER is specified, import its content.
 Returns t if the importation was succeeded."
@@ -301,8 +301,7 @@ Returns t if the importation was succeeded."
        (list (get-buffer (read-buffer "Import buffer: "
 				      (current-buffer))))))
   (let ((draft-buffer (generate-new-buffer mhc-draft-buffer-name))
-	(current-date 
-	 (if calendar (mhc-calendar-get-ddate) (mhc-current-date)))
+	(current-date (or (mhc-current-date) (mhc-calendar-get-date)))
 	(succeed t)
 	date time subject location category)
     (and (interactive-p)
@@ -441,12 +440,11 @@ Returns t if the importation was succeeded."
 	  (mhc-db-add-exception-rule 
 	   record 
 	   (or (mhc-current-date)
-	       (and (eq major-mode 'mhc-calendar-mode)
-		    mhc-calendar-view-ddate)))
+	       (mhc-calendar-view-date)))
 	(mhc-db-delete-file record))
       (or (and (mhc-summary-buffer-p)
 	       (mhc-rescan-month mhc-default-hide-private-schedules))
-	  (and (eq major-mode 'mhc-calendar-mode) (mhc-calendar-rescan))))))
+	  (and (mhc-calendar-p) (mhc-calendar-rescan))))))
 
 (defun mhc-modify ()
   (interactive)
@@ -557,7 +555,7 @@ C-c ?    mhc-draft-insert-calendar
 	  (mhc-window-pop)
 	  (or (and (mhc-summary-buffer-p)
 		   (mhc-rescan-month mhc-default-hide-private-schedules))
-	      (and (eq major-mode 'mhc-calendar-mode) (mhc-calendar-rescan)))
+	      (and (mhc-calendar-p) (mhc-calendar-rescan)))
 	  (run-hooks 'mhc-draft-finish-hook)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
