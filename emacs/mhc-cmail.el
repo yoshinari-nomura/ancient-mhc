@@ -2,7 +2,7 @@
 
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;; Created: 2000/07/18
-;; Revised: $Date: 2000/08/07 02:13:17 $
+;; Revised: $Date: 2000/08/07 09:26:28 $
 
 ;; (autoload 'mhc-cmail-setup "mhc-cmail")
 ;; (add-hook 'cmail-startup-hook 'mhc-cmail-setup)
@@ -23,6 +23,17 @@
 (if (and (featurep 'mime-edit)
 	 (featurep 'eword-decode))
     (require 'mhc-mime))
+
+;;; Customize variables:
+
+(defcustom mhc-cmail-dummy-file (cond
+				 ((file-readable-p "nul")
+				  "nul")
+				 ((file-readable-p "/dev/null")
+				  "/dev/null"))
+  "*Null file name (Ex. \"/dev/null\")."
+  :group 'mhc
+  :type 'file)
 
 ;; Internal Variables:
 
@@ -97,7 +108,7 @@
 
 (defun mhc-cmail/schedule-foldermsg (schedule)
   (let ((path (mhc-record-name (mhc-schedule-record schedule))))
-    (concat "\r " (or path "/dev/null"))))
+    (concat "\r " (or path mhc-cmail-dummy-file))))
 
 (defun mhc-cmail-insert-summary-contents (inserter)
   (insert mhc-cmail/header-string)
@@ -147,7 +158,7 @@
      (no-err
       nil)
      ((and (boundp 'mhc-mode) mhc-mode)
-      "/dev/null")
+      mhc-cmail-dummy-file)
      (t
       (cmail-error-resource 'get-page-number-from-summary)))))
 

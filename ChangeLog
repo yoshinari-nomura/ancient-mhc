@@ -1,5 +1,11 @@
 2000-08-07  Hideyuki SHIRAI  <shirai@quickhack.net>
 
+	* emacs/mhc-cmail.el (mhc-cmail-dummy-file): New variable.
+	(Thanks to Mr. WATANABE Hirofumi)
+	(mhc-cmail/schedule-foldermsg): Use mhc-cmail-dummy-file instead of
+	'/dev/null'.
+	(cmail-get-page-number-from-summary): Ditto.
+
 	* emacs/mhc.el (mhc-mode-menu-spec): 'Sync' enable safer.
 
 	* emacs/mhc-sync (toplevel): Add Date keyword.
