@@ -5,7 +5,7 @@
 ;;          MIYOSHI Masanori <miyoshi@quickhack.net>
 ;;
 ;; Created: 05/12/2000
-;; Reviesd: $Date: 2001/10/28 01:20:35 $
+;; Reviesd: $Date: 2002/09/05 04:28:23 $
 
 ;;; Configration Variables:
 
@@ -98,7 +98,7 @@ ww-japanese-long => \"土曜日\"
 (defcustom mhc-calendar-height-offset
   (cond
    ((and (featurep 'xemacs) window-system) 4)
-   ((and (not (featurep 'xemacs)) (>= emacs-major-version 21)) 2)
+   ((and (not (featurep 'xemacs)) (>= emacs-major-version 21)) 3)
    (t 1))
   "*Offset of window height."
   :group 'mhc
@@ -150,8 +150,9 @@ ww-japanese-long => \"土曜日\"
 (defvar mhc-calendar/mark-date nil)
 
 ;; requires
-(if (locate-library "hnf-mode")
-    (require 'hnf-mode))
+(eval-and-compile
+  (when (locate-library "hnf-mode")
+    (require 'hnf-mode)))
 
 ;; mhc-calendar functions
 ;; macros
@@ -216,8 +217,7 @@ ww-japanese-long => \"土曜日\"
     (posn-point (event-start event))))
 
 ;; map/menu
-(if mhc-calendar-mode-map
-    ()
+(unless mhc-calendar-mode-map
   (setq mhc-calendar-mode-map (make-sparse-keymap))
   (define-key mhc-calendar-mode-map "."    'mhc-calendar-goto-today)
   (define-key mhc-calendar-mode-map "g"    'mhc-calendar-goto-month)
@@ -256,8 +256,7 @@ ww-japanese-long => \"土曜日\"
   (define-key mhc-calendar-mode-map "Q"    'mhc-calendar-exit)
   (define-key mhc-calendar-mode-map "?"    'describe-mode))
 
-(if mhc-calendar-mode-menu-spec
-    ()
+(unless mhc-calendar-mode-menu-spec
   (setq mhc-calendar-mode-menu-spec
 	'("Mhc-Calendar"
 	  ["Toggle view area" mhc-calendar-goto-home t]
@@ -343,9 +342,8 @@ ww-japanese-long => \"土曜日\"
       (beginning-of-line)
       (mhc-misc-move-to-column col)
       (if (consp months)
-	  (progn
-	    (setq m (car months))
-	    (setq center (- m (cdr months))))
+	  (setq m (car months)
+		center (- m (cdr months)))
 	(setq m (or months 3))
 	(setq center (/ (1+ m) 2)))
       (while (> m 0)
@@ -394,27 +392,26 @@ ww-japanese-long => \"土曜日\"
 	     ((= 6 (mhc-day-day-of-week (car days)))
 	      'mhc-calendar-face-saturday)
 	     (t 'mhc-calendar-face-default)))
-      (if (mhc-date= today (mhc-day-date (car days)))
-	  (setq color (mhc-face-get-today-face color)))
-      (if (mhc-day-busy-p (car days))
-	  (setq color (mhc-face-get-busy-face color)))
+      (when (mhc-date= today (mhc-day-date (car days)))
+	(setq color (mhc-face-get-today-face color)))
+      (when (mhc-day-busy-p (car days))
+	(setq color (mhc-face-get-busy-face color)))
       (setq week (cons (format "%2d" (mhc-day-day-of-month (car days))) week))
-      (if color
-	  (mhc-face-put (car week) color))
-      (if (= 6 (mhc-day-day-of-week (car days)))
-	  (setq month (cons (mapconcat
-			     (function identity)
-			     (cons separator (nreverse week))
-			     " ")
-			    month)
-		week nil))
-      (setq days (cdr days)))
-    (if week
+      (when color (mhc-face-put (car week) color))
+      (when (= 6 (mhc-day-day-of-week (car days)))
 	(setq month (cons (mapconcat
 			   (function identity)
 			   (cons separator (nreverse week))
 			   " ")
-			  month)))
+			  month)
+	      week nil))
+      (setq days (cdr days)))
+    (when week
+      (setq month (cons (mapconcat
+			 (function identity)
+			 (cons separator (nreverse week))
+			 " ")
+			month)))
     (nreverse month)))
 
 ;; function
@@ -475,8 +472,8 @@ The keys that are defined for mhc-calendar-mode are:
   (setq mode-name "mhc-calendar")
   (setq indent-tabs-mode nil)
   (setq truncate-lines t)
-  (if (featurep 'xemacs)
-      (easy-menu-add mhc-calendar-mode-menu))
+  (when (featurep 'xemacs)
+    (easy-menu-add mhc-calendar-mode-menu))
   (unless (memq 'mhc-calendar/duration-show post-command-hook)
     (add-hook 'post-command-hook 'mhc-calendar/duration-show))
   (run-hooks 'mhc-calendar-mode-hook))
@@ -520,13 +517,13 @@ The keys that are defined for mhc-calendar-mode are:
 
 (defun mhc-calendar/view-summary-delete ()
   (goto-char (point-min))
-  (if (re-search-forward "^--" nil t)
-      (let ((buffer-read-only nil))
-	(beginning-of-line)
-	(forward-char -1)
-	(set-text-properties (point) (point-max) nil)
-	(delete-region (point) (point-max))
-	(set-buffer-modified-p nil))))
+  (when (re-search-forward "^--" nil t)
+    (let ((buffer-read-only nil))
+      (beginning-of-line)
+      (forward-char -1)
+      (set-text-properties (point) (point-max) nil)
+      (delete-region (point) (point-max))
+      (set-buffer-modified-p nil))))
 
 (defun mhc-calendar/view-summary-insert ()
   (let ((date mhc-calendar-view-date)
@@ -541,26 +538,25 @@ The keys that are defined for mhc-calendar-mode are:
 
 (defun mhc-calendar/put-property-summary ()
   (condition-case nil
-      (if mhc-calendar-use-mouse-highlight
-	  (let ((buffer-read-only nil))
-	    (goto-char (point-min))
-	    (if (re-search-forward "^--" nil t)
-		(let (beg)
-		  (forward-line)
-		  (while (not (eobp))
-		    (setq beg (point))
-		    (end-of-line)
-		    (put-text-property beg (point) 'mouse-face 'highlight)
-		    (forward-line))))
-	    (set-buffer-modified-p nil)))
+      (when mhc-calendar-use-mouse-highlight
+	(let ((buffer-read-only nil)
+	      beg)
+	  (goto-char (point-min))
+	  (when (re-search-forward "^--" nil t)
+	    (forward-line)
+	    (while (not (eobp))
+	      (setq beg (point))
+	      (end-of-line)
+	      (put-text-property beg (point) 'mouse-face 'highlight)
+	      (forward-line))))
+	(set-buffer-modified-p nil))
     (error nil)))
 
 (defun mhc-calendar/shrink-window ()
   (or (one-window-p t)
       (/= (frame-width) (window-width))
-      (let ((winh
-	     (+ (count-lines (point-min) (point-max))
-		mhc-calendar-height-offset)))
+      (let ((winh (+ (count-lines (point-min) (point-max))
+		     mhc-calendar-height-offset)))
 	(cond
 	 ((< winh mhc-calendar-height)
 	  (setq winh mhc-calendar-height))
@@ -615,8 +611,8 @@ The keys that are defined for mhc-calendar-mode are:
 		      cdate
 		      (mhc-calendar/get-date-colnum (current-column))))
 	  (put-text-property beg end 'mhc-calendar/date-prop (+ yymm dd))
-	  (if mhc-calendar-use-mouse-highlight
-	      (put-text-property beg end 'mouse-face 'highlight)))
+	  (when mhc-calendar-use-mouse-highlight
+	    (put-text-property beg end 'mouse-face 'highlight)))
 	(setq beg (- (point) 2) end (point))
 	(goto-char beg)
 	(setq dd (1- (string-to-number (buffer-substring beg end))))
@@ -624,8 +620,8 @@ The keys that are defined for mhc-calendar-mode are:
 		    cdate
 		    (mhc-calendar/get-date-colnum (current-column))))
 	(put-text-property beg end 'mhc-calendar/date-prop (+ yymm dd))
-	(if mhc-calendar-use-mouse-highlight
-	    (put-text-property beg end 'mouse-face 'highlight)))
+	(when mhc-calendar-use-mouse-highlight
+	  (put-text-property beg end 'mouse-face 'highlight)))
     (error nil)))
 
 (defun mhc-calendar-edit ()
@@ -661,13 +657,16 @@ The keys that are defined for mhc-calendar-mode are:
 
 (defun mhc-calendar-goto-view ()
   (interactive)
-  (if (mhc-calendar/in-summary-p)
-      (mhc-calendar/view-file (mhc-calendar/in-summary-p))
-    (if (mhc-calendar/in-summary-hnf-p)
-	(mhc-calendar/hnf-view)
-      (setq mhc-calendar-view-summary t)
-      (mhc-calendar/goto-date (mhc-calendar-get-date))
-      (goto-char (next-single-property-change (point) 'mhc-calendar/summary-prop)))))
+  (cond
+   ((mhc-calendar/in-summary-p)
+    (mhc-calendar/view-file (mhc-calendar/in-summary-p)))
+   ((mhc-calendar/in-summary-hnf-p)
+    (mhc-calendar/hnf-view))
+   (t
+    (setq mhc-calendar-view-summary t)
+    (mhc-calendar/goto-date (mhc-calendar-get-date))
+    (goto-char (next-single-property-change
+		(point) 'mhc-calendar/summary-prop)))))
 
 (defun mhc-calendar/view-file (file)
   (if (and (stringp file) (file-exists-p file))
@@ -857,25 +856,27 @@ The keys that are defined for mhc-calendar-mode are:
       (display-completion-list
        (all-completions word mhc-calendar/select-alist)))))
 
+(defvar mhc-calendar/select-comp-active nil)
+(defadvice choose-completion-string (around mhc-calendar-select activate)
+  ad-do-it
+  (when mhc-calendar/select-comp-active
+    (select-window (active-minibuffer-window))))
+
 (defun mhc-calendar/select-comp (&optional prompt active)
-  (let ((choose-backup (symbol-function 'choose-completion-string))
-	(minibuffer-setup-hook minibuffer-setup-hook)
+  (let ((minibuffer-setup-hook minibuffer-setup-hook)
 	(ret ""))
     (unless prompt (setq prompt "Select: "))
     (unwind-protect
 	(progn
 	  ;; Select minibuffer forcibly
-	  (defun choose-completion-string (choice &optional buffer base-size)
-	    (funcall choose-backup choice buffer base-size)
-	    (select-window (active-minibuffer-window)))
+	  (setq mhc-calendar/select-comp-active t)
 	  ;; completion buffer setup
-	  (if active
-	      (add-hook 'minibuffer-setup-hook
-			'mhc-calendar/select-comp-setup))
+	  (when active
+	    (add-hook 'minibuffer-setup-hook 'mhc-calendar/select-comp-setup))
 	  (setq ret (read-from-minibuffer
 		     prompt
 		     nil mhc-calendar/select-map nil 'mhc-calendar/select-hist)))
-      (fset 'choose-completion-string choose-backup)
+      (setq mhc-calendar/select-comp-active nil)
       (remove-hook 'minibuffer-setup-hook
 		   'mhc-calendar/select-comp-setup)
       (and (buffer-live-p (get-buffer mhc-calendar/select-buffer))
@@ -1337,17 +1338,55 @@ The keys that are defined for mhc-calendar-mode are:
 	(setq i (1+ i))))
     flst))
 
-(defun mhc-calendar-hnf-edit ()
-  (interactive)
-  (if mhc-calendar-link-hnf
-      (let ((find-file-not-found-hooks nil)
-	    (count (mhc-calendar/in-summary-hnf-p)))
-	(if (functionp hnf-initial-function);; hns-mode require APEL :-)
-	    (add-hook 'find-file-not-found-hooks
-		      '(lambda () (funcall hnf-initial-function))))
-	(find-file-other-window
-	 (mhc-calendar/hnf-get-filename (mhc-calendar-get-date)))
-	(and (integerp count) (mhc-calendar/hnf-search-title count)))))
+(defvar mhc-calendar/hnf-ignore-categories nil)
+
+(defun mhc-calendar-hnf-edit (&optional args)
+  (interactive "P")
+  (if (not mhc-calendar-link-hnf)
+      (message "Nothing to do.")
+    (let ((hnffile (mhc-calendar/hnf-get-filename (mhc-calendar-get-date)))
+	  (mhcfile (mhc-calendar/in-summary-p))
+	  (count (mhc-calendar/in-summary-hnf-p))
+	  cats subj uri lst)
+      (save-excursion
+	(when (and args mhcfile (file-readable-p mhcfile))
+	  (unless mhc-calendar/hnf-ignore-categories
+	    (setq lst mhc-icon-function-alist)
+	    (while lst
+	      (setq mhc-calendar/hnf-ignore-categories
+		    (cons (downcase (car (car lst)))
+			  mhc-calendar/hnf-ignore-categories))
+	      (setq lst (cdr lst))))
+	  (with-temp-buffer
+	    (insert-file-contents mhcfile)
+	    (mhc-decode-header)
+	    (mhc-header-narrowing
+	      (setq cats (mhc-header-get-value "x-sc-category"))
+	      (setq subj (mhc-header-get-value "x-sc-subject"))
+	      (setq lst (mhc-misc-split cats))
+	      (when (member "Link" lst)
+		(setq uri (or (mhc-header-get-value "x-uri")
+			      (mhc-header-get-value "x-url"))))
+	      (setq cats nil)
+	      (while lst
+		(unless (member (downcase (car lst))
+				mhc-calendar/hnf-ignore-categories)
+		  (setq cats (cons (car lst) cats)))
+		(setq lst (cdr lst)))
+	      (setq cats (nreverse cats))))))
+      (find-file-other-window hnffile)
+      (hnf-mode)
+      (and (integerp count) (mhc-calendar/hnf-search-title count))
+      (when subj
+	(goto-char (point-max))
+	(insert "\n")
+	(when cats
+	  (insert (format "CAT %s\n"
+			  (mapconcat 'identity cats " "))))
+	(if uri
+	    (insert (format "LNEW %s %s\n" uri subj))
+	  (insert (format "NEW %s\n" subj)))))))
+;; xxxxx
 
 (defun mhc-calendar/hnf-view ()
   (interactive)
@@ -1393,7 +1432,7 @@ The keys that are defined for mhc-calendar-mode are:
     (if (not (file-readable-p fname))
 	()
       (goto-char (point-max))
-      (with-temp-buffer;; hnf-mode.el require APEL :-)
+      (with-temp-buffer	;; hnf-mode.el require APEL :-)
 	(insert-file-contents fname)
 	(goto-char (point-min))
 	(mhc-face-put sub 'mhc-calendar-hnf-face-subtag)

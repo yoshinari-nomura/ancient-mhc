@@ -142,11 +142,14 @@ FROM, TO は 1970/01/01 からの経過日数を用いて指定"
 		 (lambda (schedule)
 		   (cons (mhc-schedule-priority schedule)
 			 schedule))
-		 (mhc-day-schedules
-		  (mhc-logic-eval-for-date
-		   (mhc-day-let day
-		     (mhc-db/get-sexp-list-for-month year month))
-		   day 'todo)))
+		 (sort (mhc-day-schedules
+			(mhc-logic-eval-for-date
+			 (mhc-day-let day
+			   (mhc-db/get-sexp-list-for-month year month))
+			 day 'todo))
+		       (lambda (x y)
+			 (< (mhc-schedule-todo-deadline x)
+			    (mhc-schedule-todo-deadline y)))))
 		(lambda (a b)
 		  (if (and (null (car a)) (car b))
 		      nil

@@ -1,3 +1,16 @@
+2002-09-05  Hideyuki SHIRAI  <shirai@quickhack.net>
+
+	* emacs/mhc-calendar.el (all): Brush up all code.
+	(mhc-calendar-height-offset): Chage default value for XEmacs.
+	(mhc-calendar/select-comp-active): New internal variable.
+	(mhc-calendar/select-comp): Use advice of
+	`choose-completion-string' insted of takeover the funciton.
+	(mhc-calendar/hnf-ignore-categories): New internal variable.
+	(mhc-calendar-hnf-edit): Rewrite.
+
+	* emacs/mhc-db.el (mhc-db-scan-todo): Sort schedule data with
+	deadline.
+
 2002-06-21  Akira Funahashi <funa@funa.org> / nom@quickhack.net
 
 	* ruby-ext/mhc_pilib.c: USB support.
