@@ -1,3 +1,8 @@
+2003-06-06  Hideyuki SHIRAI  <shirai@quickhack.net>
+
+	* emacs/mhc-mew.el (mhc-mew-draft-translate): When error occur,
+	display message of Mew's one if possible.
+
 2003-05-12  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* emacs/mhc.el (mhc-scan-month): Use format-string. Thanks to

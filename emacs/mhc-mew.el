@@ -340,7 +340,10 @@
 	 (insert bufstr)
 	 (goto-char (point-min))
 	 (ding t)
-	 (error "Draft buffer has some illegal headers. Please fix it."))))))
+	 (error "%s"
+		(or (and (fboundp 'mew-tinfo-get-encode-err)
+			 (mew-tinfo-get-encode-err))
+		    "Draft buffer has some illegal headers. Please fix it.")))))))
 
 (defun mhc-mew/make-message ()
   (mew-charset-sanity-check (point-min) (point-max))
