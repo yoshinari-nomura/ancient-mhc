@@ -1,3 +1,7 @@
+2004-09-16  Hideyuki SHIRAI  <shirai@quickhack.net>
+
+	* emacs/make.rb.in: Fix '--with-mew' option.
+
 2004-09-13  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* emacs/mhc.el (mhc-goto-today): Execute beginning-of-line();
