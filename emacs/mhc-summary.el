@@ -492,6 +492,7 @@ If optional argument FOR-DRAFT is non-nil, Hilight message as draft message."
        (or category-predicate mhc-default-category-predicate-sexp)
        secret)
       (and (eq (mhc-day-day-of-week (car dayinfo-list)) mhc-use-week-separator)
+	   (> (length dayinfo-list) 1)
 	   (mhc-summary/insert-separator))
       (setq dayinfo-list (cdr dayinfo-list)))))
 
