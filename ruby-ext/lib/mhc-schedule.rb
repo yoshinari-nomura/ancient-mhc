@@ -3,7 +3,7 @@
 ## Author:  Yoshinari Nomura <nom@quickhack.net>
 ##
 ## Created: 1999/07/16
-## Revised: $Date: 2000/05/29 14:59:26 $
+## Revised: $Date: 2000/06/21 06:38:47 $
 ##
 
 ################################################################
@@ -185,9 +185,8 @@ class MhcScheduleItem
       else
 	init_by_string(path_or_string)
       end
-    else
-      set_rec_id(create_record_id)
     end
+    set_rec_id(create_record_id) if ! rec_id
     set_modified(false, 'initialize')
   end
 
@@ -769,7 +768,7 @@ class MhcScheduleItem
   ################################################################
   RECORD_ID_INFO = ['AAAA', nil, 0]
 
-  def create_record_id(domain = 'from.mhc-schedule.rbxx')
+  def create_record_id(domain = 'from.mhc-schedule.rb')
     last_id_rand, last_id_time, last_id_counter = RECORD_ID_INFO
 
     id_time = Time .now .strftime("%Y%m%d%H%M%S")
