@@ -1,5 +1,12 @@
 2003-10-10  Yoshinari Nomura  <nom@quickhack.net>
 
+	* emacs/mhc.el (mhc-edit): ask Alarm: if mhc-ask-alarm is non-nil.
+
+	* emacs/mhc-vars.el (mhc-default-alarm, mhc-ask-alarm): New variables.
+
+	* emacs/mhc-minibuf.el (mhc-alarm-hist): New variable.
+	(mhc-input-alarm): New function.
+
 	* emacs/mhc-guess.el (mhc-guess-location-regexp-list): brushup regexp.
 
 	* emacs/mhc.el (mhc-version): New function.
