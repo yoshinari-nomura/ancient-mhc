@@ -1,0 +1,26 @@
+2000-05-27  Yoshinari NOMURA  <nom@quickhack.net>
+
+        * 00changes.jis: obsolete.
+
+	* ChangeLog, NEWS: New file.
+
+2000-05-26  Yoshinari NOMURA  <nom@quickhack.net>
+
+	* emacs/mhc.el: menu fix for xemacs. (thanks to shirai san)
+
+2000-05-26  Yuuichi Teranishi <teranisi@gohome.org>
+
+	* emacs/mhc.el (mhc-scan-month):
+	Set `wl-summary-buffer-number-regexp' and
+	`wl-summary-buffer-msgdb'.
+
+2000-05-25  Yoshinari NOMURA  <nom@quickhack.net>
+
+	* ruby-ext/lib/mhc-schedule.rb: make sure put last \n.
+
+	* mhc-sync: strict check not to access deleted schedule.
+	fix typo.
+
+	* emacs/mhc.el: mhc-version changed to "0.25pre3"
+
+	* Newly restart.
