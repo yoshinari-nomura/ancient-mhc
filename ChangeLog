@@ -1,3 +1,13 @@
+2000-06-19  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+
+	* emacs/mhc-summary.el (mhc-summary-search-date): Renamed
+	`mhc-summary-search-day'.
+	* emacs/mhc.el (mhc-goto-today): Replace `mhc-summary-search-day'
+	with `mhc-summary-search-date'.
+	* emacs/mhc-wl.el (mhc-wl-search-date): Renamed `mhc-wl-search-day'.
+	* emacs/mhc-mew.el (mhc-mew-search-date): Renamed `mhc-mew-search-day'.
+	* emacs/mhc-gnus.el (mhc-gnus-search-date): Renamed `mhc-gnus-search-day'.
+
 2000-06-19  Hideyuki SHIRAI  <shirai@rdmg.mgcs.mei.co.jp>
 
 	* emacs/mhc.el (mhc-goto-today): Use mhc-summary-search-day().

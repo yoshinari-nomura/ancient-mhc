@@ -31,7 +31,7 @@
 ;;         Return buffer visiting import article.  If GET-ORIGINAL,
 ;;         return it without MIME decode.
 ;;
-;;     (mhc-foo-generate-summary-buffer DDATE)
+;;     (mhc-foo-generate-summary-buffer DATE)
 ;;         Generate summary buffer of mailer, and change current
 ;;         buffer to it.  This function will be called at the top of
 ;;         mhc-scan-month.
@@ -39,10 +39,10 @@
 ;;     (mhc-foo-insert-summary-contents SCHEDULE CONTENTS)
 ;;         Insert string CONTENTS to the current buffer as SCHEDULE.
 ;;
-;;     (mhc-foo-summary-search-day YY MM DD)
-;;         Search day in the current buffer.
+;;     (mhc-foo-summary-search-date DATE)
+;;         Search DATE in the current buffer. If not found, return nil.
 ;;
-;;     (mhc-foo-summary-mode-setup DDATE)
+;;     (mhc-foo-summary-mode-setup DATE)
 ;;         Setup buffer as summary of mailer.  This function will be
 ;;         called at the end of mhc-scan-month.
 ;;
@@ -54,7 +54,7 @@
 ;;    (put 'mhc-foo 'get-import-buffer       'mhc-foo-get-import-buffer)
 ;;    (put 'mhc-foo 'generate-summary-buffer 'mhc-foo-generate-summary-buffer)
 ;;    (put 'mhc-foo 'insert-summary-contents 'mhc-foo-insert-summary-contents)
-;;    (put 'mhc-foo 'summary-search-day      'mhc-foo-summary-search-day)
+;;    (put 'mhc-foo 'summary-search-date     'mhc-foo-summary-search-date)
 ;;    (put 'mhc-foo 'summary-mode-setup      'mhc-foo-summary-mode-setup)
 
 
@@ -121,9 +121,9 @@
   "Return buffer to import article."
   (funcall (mhc-summary-get-function 'get-import-buffer mailer) get-original))
 
-(defsubst mhc-summary-generate-buffer (ddate &optional mailer)
+(defsubst mhc-summary-generate-buffer (date &optional mailer)
   "Generate buffer with summary mode of MAILER."
-  (funcall (mhc-summary-get-function 'generate-summary-buffer mailer) ddate))
+  (funcall (mhc-summary-get-function 'generate-summary-buffer mailer) date))
 
 (defsubst mhc-summary-insert-contents (schedule contents icon &optional mailer)
   "Insert CONTENTS for SCHEDULE in summary buffer of MAILER."
@@ -132,13 +132,13 @@
     (funcall (mhc-summary-get-function 'insert-summary-contents mailer)
 	     schedule contents icon)))
 
-(defsubst mhc-summary-search-day (yy mm dd)
+(defsubst mhc-summary-search-date (date)
   "Search day in the current buffer."
-  (funcall (mhc-summary-get-function 'summary-search-day) yy mm dd))
+  (funcall (mhc-summary-get-function 'summary-search-date) date))
 
-(defsubst mhc-summary-mode-setup (ddate &optional mailer)
+(defsubst mhc-summary-mode-setup (date &optional mailer)
   "Setup buffer as summary mode of MAILER."
-  (funcall (mhc-summary-get-function 'summary-mode-setup mailer) ddate))
+  (funcall (mhc-summary-get-function 'summary-mode-setup mailer) date))
 
 (defun mhc-summary-record (&optional mailer)
   "Return record on current line."

@@ -114,9 +114,9 @@
 	(mhc-put-icon icon (+ pos mhc-summary-icon-position)))))
 
 
-(defun mhc-mew-summary-search-day (yy mm dd)
+(defun mhc-mew-summary-search-date (date)
   (re-search-forward
-   (format "^0[ %c]| %02d/%02d" mew-mark-review mm dd) nil t))
+   (mhc-date-format date "^0[ %c]| %02d/%02d" mew-mark-review mm dd) nil t))
 
 
 (defun mhc-mew-summary-mode-setup (date)
@@ -197,7 +197,7 @@
 (put 'mhc-mew 'draft-mode 'mhc-mew-draft-mode)
 (put 'mhc-mew 'generate-summary-buffer 'mhc-mew-generate-summary-buffer)
 (put 'mhc-mew 'insert-summary-contents 'mhc-mew-insert-summary-contents)
-(put 'mhc-mew 'summary-search-day 'mhc-mew-summary-search-day)
+(put 'mhc-mew 'summary-search-date 'mhc-mew-summary-search-date)
 (put 'mhc-mew 'summary-mode-setup 'mhc-mew-summary-mode-setup)
 
 ;;; Copyright Notice:

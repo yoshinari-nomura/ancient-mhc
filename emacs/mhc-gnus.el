@@ -58,10 +58,11 @@
 
 
 (defun mhc-gnus-summary-display-article ()
+  "Display the article on the current."
   (let ((num (get-text-property (point) 'gnus-number)))
     (if num (gnus-summary-display-article num))))
-  
-  
+
+
 (defun mhc-gnus-get-import-buffer (get-original)
   (gnus-summary-select-article)
   (gnus-copy-article-buffer))
@@ -106,9 +107,8 @@
 	(mhc-put-icon icon (+ pos mhc-summary-icon-position)))))
 
 
-(defun mhc-gnus-summary-search-day (yy mm dd)
-  (re-search-forward
-   (format "^\\([0-9]+ | \\)?%02d/%02d" mm dd) nil t))
+(defun mhc-gnus-summary-search-date (date)
+  (re-search-forward (mhc-date-format date "^%02d/%02d" mm dd) nil t))
 
 
 (defun mhc-gnus-summary-mode-setup (date)
@@ -169,7 +169,7 @@
 (put 'mhc-gnus 'get-import-buffer 'mhc-gnus-get-import-buffer)
 (put 'mhc-gnus 'generate-summary-buffer 'mhc-gnus-generate-summary-buffer)
 (put 'mhc-gnus 'insert-summary-contents 'mhc-gnus-insert-summary-contents)
-(put 'mhc-gnus 'summary-search-day 'mhc-gnus-summary-search-day)
+(put 'mhc-gnus 'summary-search-date 'mhc-gnus-summary-search-date)
 (put 'mhc-gnus 'summary-mode-setup 'mhc-gnus-summary-mode-setup)
 
 ;;; Copyright Notice:
