@@ -1,5 +1,7 @@
 2000-06-21  Yoshinari Nomura  <nom@quickhack.net>
 
+	* NEWS, NEWS.jis: Add description of new features.
+
 	* ruby-ext/lib/mhc-schedule.rb (MhcScheduleItem::initializse):
 	  add record-id correctly. (MFC)
 
