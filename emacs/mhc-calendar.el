@@ -1,11 +1,11 @@
 ;;; -*- emacs-lisp -*-
 ;; mhc-calendar.el -- MHC Mini calendar
 ;;
-;; Author:  Hideyuki SHIRAI <shirai@rdmg.mgcs.mei.co.jp>
+;; Author:  Hideyuki SHIRAI <shirai@quickhack.net>
 ;;          MIYOSHI Masanori <miyoshi@ask.ne.jp>
 ;;
 ;; Created: 05/12/2000
-;; Reviesd: $Date: 2000/06/30 01:26:08 $
+;; Reviesd: $Date: 2000/07/05 09:58:22 $
 
 ;; internal variables
 (defvar mhc-calendar/buffer "*mhc-calendar*")

@@ -1,3 +1,12 @@
+2000-07-05  Hideyuki SHIRAI  <shirai@quickhack.net>
+
+	* ChangeLog (toplevel): Change my email-address to "quickhack".
+	* 00changes.jp (toplevel): Ditto.
+	* emacs/mhc-calendar.el (toplevel): Ditto.
+	* emacs/mhc-cvs.el (toplevel): Ditto.
+	* emacs/mhc-mew.el (toplevel): Ditto.
+	* emacs/mhc-sync.el (toplevel): Ditto.
+
 2000-07-04  Yuuichi Teranishi  <teranisi@quickhack.net>
 
 	* emacs/mhc-guess.el (mhc-guess-date-regexp-list): Added workaround
@@ -51,7 +60,7 @@
 
 	* icons/Conflict.xbm, icons/Conflict.xpm: New files.
 
-2000-06-30  Hideyuki SHIRAI  <shirai@rdmg.mgcs.mei.co.jp>
+2000-06-30  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* emacs/mhc.el (mhc-current-date): Get dayinfo property safe. (thanks to Teranishi-san)
 
@@ -81,7 +90,7 @@
 	Set `wl-summary-buffer-next-folder-func' and
 	`wl-summary-buffer-prev-folder-func'.
 
-2000-06-28  Hideyuki SHIRAI  <shirai@rdmg.mgcs.mei.co.jp>
+2000-06-28  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* emacs/mhc-summary.el (mhc-summary-insert-contents): If mailer eq 'direct,
 	disable icon and insert \n.
@@ -221,7 +230,7 @@
 
 	* ruby-ext/extconf.rb: add header check.
 
-2000-06-26  Hideyuki SHIRAI  <shirai@rdmg.mgcs.mei.co.jp>
+2000-06-26  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* emacs/mhc-compat.el (mhc-string-width): Remove function. This
 		  defined by APEL.
@@ -238,7 +247,7 @@
 	(mhc-ps/schedule-to-string): Add code to handle subjects, which
 	contains special characters of PostScript.
 
-2000-06-23  Hideyuki SHIRAI  <shirai@rdmg.mgcs.mei.co.jp>
+2000-06-23  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* emacs/mhc-compat.el (mhc-string-width): New function.
 	(mhc-char-width): Ditto.
@@ -266,7 +275,7 @@
 
 	* 00readme.jis: change file kanji code euc to jis.
 
-2000-06-22  Hideyuki SHIRAI  <shirai@rdmg.mgcs.mei.co.jp>
+2000-06-22  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* emacs/mhc-calendar.el (mhc-calendar): Requested month displays
 		  center position. 
@@ -312,7 +321,7 @@
 	  add record-id correctly.
 	* adb2mhc (to_mhc): ignore cron job '|', support daily schedule.
 
-2000-06-21  Hideyuki SHIRAI  <shirai@rdmg.mgcs.mei.co.jp>
+2000-06-21  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* emacs/mhc-calendar.el (all :-): Follow reconstruction of mhc-date.el.
 	* emacs/mhc.el (mhc-edit): Change interface to mhc-calender.el
@@ -346,14 +355,14 @@
 	(mhc-date-yy--),
 	(mhc-date-p): New functions to support new mhc-guess.
 
-2000-06-20  Hideyuki SHIRAI  <shirai@rdmg.mgcs.mei.co.jp>
+2000-06-20  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* emacs/mhc-date.el (mhc-date-mm+): If check is nil, return
 		  last-day instead of '1'. 
 	(mhc-date-digit-to-ww-japanese-string): New function, return
 		japanese day of week. 
 
-2000-06-19  Hideyuki SHIRAI  <shirai@rdmg.mgcs.mei.co.jp>
+2000-06-19  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* emacs/mhc-mew.el (mhc-mew-summary-display-article): Implemented.
 
@@ -386,7 +395,7 @@
 	* emacs/mhc-gnus.el (mhc-gnus-search-date): Renamed
 		  `mhc-gnus-search-day'. 
 
-2000-06-19  Hideyuki SHIRAI  <shirai@rdmg.mgcs.mei.co.jp>
+2000-06-19  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* emacs/mhc.el (mhc-goto-today): Use mhc-summary-search-day().
 	* emacs/mhc-summary.el (mhc-summary-search-day): New function, for
@@ -542,7 +551,7 @@
 
 	* emacs/MHC-MK: Add comments and copyright notices.
 
-2000-06-15  Hideyuki SHIRAI  <shirai@rdmg.mgcs.mei.co.jp>
+2000-06-15  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* emacs/MHC-MK (make-mhc/lisp-directory): Meadow support.
 	(make-mhc-install-package): Fix icon-dir, has overlapped '/'.
@@ -553,7 +562,7 @@
 	* emacs/mhc-parse.el (mhc-parse/internal-parser): Always skip
 	non-header lines.
 
-2000-06-14  Hideyuki SHIRAI  <shirai@rdmg.mgcs.mei.co.jp>
+2000-06-14  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* emacs/mhc.el (mhc-edit): Enwrap regexp-opt in parenthesis .
 
@@ -600,7 +609,7 @@
 	QUIT-CONFIG to ensure MHC to be called from a group buffer even if
 	there's no schedule.
 
-2000-06-12  Hideyuki SHIRAI  <shirai@rdmg.mgcs.mei.co.jp>
+2000-06-12  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* emacs/mhc.el (toplevel): Require mhc-calendar, mhc-sync.
 	(mhc-delete-file, mhc-modify-file): New functions to call from mhc
@@ -669,7 +678,7 @@
 	(mhc-gnus-insert-summary-contents): Replace eword-encode-string
 	with mhc-gnus-encode-string.
 
-2000-06-05  Hideyuki SHIRAI  <shirai@rdmg.mgcs.mei.co.jp>
+2000-06-05  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* emacs/mhc-calendar.el (mhc-calendar-hnf-summary-insert): 'SUB',
 		  'LSUB' suport. 
@@ -705,7 +714,7 @@
 	(mhc-xmas/setup-icons): Renamed from `mhc-xmas-setup-icons'.
 	All other related functions are changed.
 
-2000-06-02  Hideyuki SHIRAI  <shirai@rdmg.mgcs.mei.co.jp>
+2000-06-02  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* emacs/mhc-calendar.el (mhc-calendar-hnf-summary-insert): hnf's
 		  'CAT' support. 
@@ -715,7 +724,7 @@
 	* emacs/mhc-calendar.el (mhc-calendar-hnf-summary-insert): Avoid
 	summary insertion when no heading is found.
 
-2000-06-01  Hideyuki SHIRAI  <shirai@rdmg.mgcs.mei.co.jp>
+2000-06-01  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* emacs/mhc-calendar.el (mhc-calendar-hnf-face-setup): Do ditto
 		  mhc-face-setup. 
@@ -745,7 +754,7 @@
 	or `mhc-todo-string-deadline-day' on TODO.
 	Use `mhc-schedule-todo-deadline' to get deadline day of TODO.
 
-2000-05-31  Hideyuki SHIRAI  <shirai@rdmg.mgcs.mei.co.jp>
+2000-05-31  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* emacs/mhc.el (mhc-sync): New function.
 	Bind mhc-sync process coding-system. Ignore illegal passwd request.
@@ -842,7 +851,7 @@
 	emacs/mhc-guess.el, emacs/mhc-minibuf.el, emacs/mhc-misc.el,
 	emacs/mhc-schedule.el, emacs/mhc.el: Modified and improved.
 
-2000-05-31  Hideyuki SHIRAI  <shirai@rdmg.mgcs.mei.co.jp>
+2000-05-31  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* emacs/mhc-calendar.el: New file. MINI calender mode(like 'M-x
 		  calendar').

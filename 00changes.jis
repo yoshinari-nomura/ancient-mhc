@@ -3,7 +3,7 @@
 ################################################################
 
 Created: 1999/04/07
-Revised: $Date: 2000/05/26 20:06:50 $
+Revised: $Date: 2000/07/05 09:58:22 $
 
 ・ ChangeLog, NEWS を追加。以降は、00changes.jis は更新しない。
 ・ emacs/mhc.el: menu fix for xemacs. (thanks to shirai san)
@@ -45,7 +45,7 @@ Revised: $Date: 2000/05/26 20:06:50 $
      `-' による範囲の記述を可能に
 
    + mhc-mode の docstring を修正
-     Hideyuki SHIRAI (白井秀行) <shirai@rdmg.mgcs.mei.co.jp>
+     Hideyuki SHIRAI (白井秀行) <shirai@quickhack.net>
 
    + Gnus 環境で (mhc-goto-today) が動作するように修正
      TSUCHIYA Masatoshi <tsuchiya@pine.kuee.kyoto-u.ac.jp>
@@ -55,7 +55,7 @@ Revised: $Date: 2000/05/26 20:06:50 $
 ・ mhc*.el
 
    + mhc-date.el のバグ修正その 2
-     Hideyuki SHIRAI (白井秀行) <shirai@rdmg.mgcs.mei.co.jp>
+     Hideyuki SHIRAI (白井秀行) <shirai@quickhack.net>
 
    + gnus で、スケジュールを抜けるとき発生するエラーを回避
      MIYOSHI Masanori <miyoshi@ask.ne.jp>
@@ -82,7 +82,7 @@ Revised: $Date: 2000/05/26 20:06:50 $
      MIYOSHI Masanori <miyoshi@hrl.hitachi.co.jp>
 
    + mhc-date.el のバグ修正  x 2
-     Hideyuki SHIRAI (白井秀行) <shirai@rdmg.mgcs.mei.co.jp>
+     Hideyuki SHIRAI (白井秀行) <shirai@quickhack.net>
 
 ・ ruby staff:
 
@@ -103,7 +103,7 @@ Revised: $Date: 2000/05/26 20:06:50 $
      (add-hook 'mew-message-hook      'mhc-misc-hdr-decode)
      が .emacs に必要に (mhc.el 中のコメント参照)
 
-     Hideyuki SHIRAI (白井秀行) <shirai@rdmg.mgcs.mei.co.jp>
+     Hideyuki SHIRAI (白井秀行) <shirai@quickhack.net>
      (And thanks to Mr. Shun-ichi Goto <gotoh@taiyo.co.jp>)
 
    + Gnus サポートの強化
@@ -152,7 +152,7 @@ Revised: $Date: 2000/05/26 20:06:50 $
 ・ mhc*.el
 
     + face のユーザ設定が効かないバグを修正
-	(Hideyuki SHIRAI (白井秀行) <shirai@rdmg.mgcs.mei.co.jp>)
+	(Hideyuki SHIRAI (白井秀行) <shirai@quickhack.net>)
 
 * mhc-snap20000229 (2000-02-29)
 
@@ -162,11 +162,11 @@ Revised: $Date: 2000/05/26 20:06:50 $
 	(三好 雅則 MIYOSHI Masanori <miyoshi@ask.ne.jp>)
     + face の設定 mhc-category-face-alist, mhc-symbol-face-alist 書式を変更
     + 19.28 の macro 書式に戻す。
-	(Hideyuki SHIRAI (白井秀行) <shirai@rdmg.mgcs.mei.co.jp>)
+	(Hideyuki SHIRAI (白井秀行) <shirai@quickhack.net>)
     + path の区切を '/' に決め打ちしていたのを修正。
-	(Hideyuki SHIRAI (白井秀行) <shirai@rdmg.mgcs.mei.co.jp>)
+	(Hideyuki SHIRAI (白井秀行) <shirai@quickhack.net>)
     + 変更時 dir を touch し忘れによる chache check 問題の修正
-	(Hideyuki SHIRAI (白井秀行) <shirai@rdmg.mgcs.mei.co.jp>)
+	(Hideyuki SHIRAI (白井秀行) <shirai@quickhack.net>)
     + 3ヶ月表示で、予定のある日に下線を引いてみた (うるさい?)
     + 00usage.jis を現状に合わせて更新
       
@@ -201,7 +201,7 @@ Revised: $Date: 2000/05/26 20:06:50 $
 
 ・ mhc*.el
     + mew 1.95 で、元になるメールを読めない不具合を修正
-	(Hideyuki SHIRAI (白井秀行) <shirai@rdmg.mgcs.mei.co.jp>)
+	(Hideyuki SHIRAI (白井秀行) <shirai@quickhack.net>)
     + emacs 19.28 で 3ヶ月表示の画面が崩れるのを修正
     + xemacs の場合は明示的に (require 'overlay) するように修正
 
@@ -210,7 +210,7 @@ Revised: $Date: 2000/05/26 20:06:50 $
 ・ mhc*.el
     + xemacs で rescan が失敗するのを修正
 	(what-line)
-	(Hideyuki SHIRAI (白井秀行) <shirai@rdmg.mgcs.mei.co.jp>)
+	(Hideyuki SHIRAI (白井秀行) <shirai@quickhack.net>)
     + 新規入力で mhc-location is unbound のエラーが出るのを修正
     + xemacs で 3ヶ月表示の画面が崩れるのを修正
     + DOS のディレクトリタイムスタンプ問題を修正。
@@ -253,7 +253,7 @@ Revised: $Date: 2000/05/26 20:06:50 $
     + 週の区切りを入れるようにした (mhc-use-week-separator)
     + 「今日」 の日付部分を反転させるようにした
     + Mew のカーソル行に現れる underline を抑制するようにした
-       (以上 4つ Hideyuki SHIRAI <shirai@rdmg.mgcs.mei.co.jp>)
+       (以上 4つ Hideyuki SHIRAI <shirai@quickhack.net>)
 
 ・ mhc*.rb
     + gemcal 立ち上げ時のデバッグ表示を削除
@@ -263,7 +263,7 @@ Revised: $Date: 2000/05/26 20:06:50 $
 ・ mhc*.el
 
     + emacs 19.28 に再び対応
-        Hideyuki SHIRAI <shirai@rdmg.mgcs.mei.co.jp>
+        Hideyuki SHIRAI <shirai@quickhack.net>
 
     + 時間入力に `none' を入力しないでいいようにした。
 
@@ -338,10 +338,10 @@ Revised: $Date: 2000/05/26 20:06:50 $
 
     + mew-virtual-mode を呼ぶときは hook を nil にして
       かわりに mhc-mode-hook を追加 
-        Hideyuki SHIRAI <shirai@rdmg.mgcs.mei.co.jp>
+        Hideyuki SHIRAI <shirai@quickhack.net>
 
     + Mew を "Q" したときに、 mhc の folder も消えるように変更 
-        Hideyuki SHIRAI <shirai@rdmg.mgcs.mei.co.jp>
+        Hideyuki SHIRAI <shirai@quickhack.net>
 
     + mode-line の " Schedule" を " mhc" に変更
 
@@ -378,7 +378,7 @@ Revised: $Date: 2000/05/26 20:06:50 $
 ・ サマリバッファで行頭の `0 |' を隠してみた。
 
 ・ samples/DOT.schedule.sample.jp に 2031年までの休日を
-   追加。(Hideyuki SHIRAI <shirai@rdmg.mgcs.mei.co.jp>)
+   追加。(Hideyuki SHIRAI <shirai@quickhack.net>)
 
 * 0.23 (1999-11-19)
 

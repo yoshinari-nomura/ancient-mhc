@@ -127,7 +127,7 @@
 
 ;; This function was orignally written by 
 ;; Shun-ichi Goto <gotoh@taiyo.co.jp> (cf. http://www.imasy.org/~gotoh/)
-;; Arranged by Hideyuki SHIRAI <shirai@rdmg.mgcs.mei.co.jp>.
+;; Arranged by Hideyuki SHIRAI <shirai@quickhack.net>.
 (defun mhc-mew-decode-header ()
   "mew-message-hook function to decode RAW JIS subject in header"
   (condition-case e

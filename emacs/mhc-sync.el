@@ -1,7 +1,7 @@
 ;;; -*- emacs-lisp -*-
 ;; mhc-sync.el -- mhc-sync (ruby script) interface
 ;;
-;; Author:  Hideyuki SHIRAI <shirai@rdmg.mgcs.mei.co.jp>
+;; Author:  Hideyuki SHIRAI <shirai@quickhack.net>
 ;;
 ;; Created: 06/12/2000
 ;; Revised: 06/12/2000
