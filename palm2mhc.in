@@ -6,7 +6,7 @@
 ## Author:  Yoshinari Nomura <nom@quickhack.net>
 ##
 ## Created: 1999/10/08
-## Revised: $Date: 2000/07/14 06:59:50 $
+## Revised: $Date: 2001/02/09 09:37:06 $
 ##
 
 $DEBUG = false
@@ -17,28 +17,28 @@ require 'mhc-date'
 require 'mhc-schedule'
 
 def yes_no(message = '')
-  STDOUT .print message + '(yes/no) ? '
+  STDOUT .print message + '? '
   STDOUT .flush
   ans = STDIN .gets
-  return (ans =~ /^yes$/i)
+  return (ans =~ /^ye?s?$/i)
 end
 
 def usage
-  print '
+  print "
 palm2mhc -- Add palm articles to a mhc repository.
 
   usage: palm2mhc [-a | -u] [-n] [-i] [-d dev] [-r dir]
 
     -a     : Add all articles of a palm to a mhc repository.
-    -u     : Add dirty articles of a palm to a mhc repository.
+    -u     : Add modified articles of a palm to a mhc repository.
     -n     : Do nothing effectives to mhc. Useful for checking.
     -i     : Interactive. Confirm before install to a mhc repository.
     -d dev : Set the device file connected to the palm.
-             default value is /dev/pilot
+             default value is #{$flag_device}
     -r dir : Set repository directory of mhc.
              if not exists, palm2mhc makes the directory.
-             default value is /tmp/mhc-schedule
-'
+             default value is #{$flag_dir}
+"
   exit 1
 end
 
@@ -50,7 +50,7 @@ $flag_interactive = false
 $flag_update  = false
 $flag_append  = false
 $flag_noharm  = false
-$flag_dir     = '/tmp/mhc-schedule'
+$flag_dir     = MhcScheduleDB::DEF_BASEDIR
 $flag_device  = '/dev/pilot'
 
 while ARGV .length > 0
@@ -96,6 +96,7 @@ else
   exit 1
 end
 
+STDERR .print "Connected..\n"
 mdb = MhcScheduleDB .new($flag_dir)
 
 pdb .each_record{|rec|
