@@ -2,7 +2,7 @@
 
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;; Created: 2000/07/18
-;; Revised: $Date: 2000/07/18 04:29:13 $
+;; Revised: $Date: 2000/07/19 03:48:47 $
 
 ;; (autoload 'mhc-cmail-setup "mhc-cmail")
 ;; (add-hook 'cmail-startup-hook 'mhc-cmail-setup)
@@ -97,6 +97,119 @@
   (make-local-variable 'cmail-highlight-mode)
   (setq cmail-highlight-mode nil)
   (delete-other-windows))
+
+;; override cmail functions.
+
+(defun cmail-n-page (nth)
+  "NTH番目のメイルの先頭のポインタの値を返す. ポインタも移動する."
+  (if (not (integerp nth))
+      (progn
+ 	(mhc-insert-file-contents-as-coding-system
+	 *cmail-file-coding-system nth)
+	(goto-char (point-min)))
+    (cmail-rebuild-index)
+    (goto-char (nth nth *cmail-pagelist))))
+
+;; cmail-get-page-number-from-summary now gets an absolute file name
+;; which is in a trail of  line. \r path-name.
+(defun cmail-get-page-number-from-summary (&optional no-err)
+  "サマリからカーソル位置のmailのページ番号を拾う."
+  (cmail-fixcp)
+  (save-excursion
+    (beginning-of-line)
+    (cond
+     ((looking-at mhc-cmail/summary-filename-regex)
+      (buffer-substring (match-beginning 1) (match-end 1)))
+     ((looking-at "^[ +]*\\([0-9]+\\)")
+      (string-to-int
+       (buffer-substring (match-beginning 1) (match-end 1))))
+     (no-err
+      nil)
+     (t
+      (cmail-error-resource 'get-page-number-from-summary)))))
+
+(fset 'cmail-show-contents-orig (symbol-function 'cmail-show-contents))
+
+;; if page-or-path is an integer, it works same as original.
+;; if not, it includes an MH style file into mail-buffer.
+;;
+(defun cmail-show-contents (page-or-path &optional all-headers)
+  "FOLDERのPAGE番目のメイルを表示する."
+  (interactive (list (cmail-get-page-number-from-summary)))
+  (if (integerp page-or-path)
+      (cmail-show-contents-orig page-or-path all-headers)
+    (setq *cmail-current-folder cmail-current-folder)
+    (setq *cmail-current-page page-or-path)
+    (save-excursion
+      (cmail-select-buffer *cmail-summary-buffer))
+    (cmail-select-buffer *cmail-mail-buffer)
+    (setq buffer-read-only nil)
+    (erase-buffer)
+    (mhc-insert-file-contents-as-coding-system
+     *cmail-file-coding-system page-or-path)
+    (goto-char (point-min))
+    (let ((code (detect-coding-region (point-min) (point-max))))
+      (if (listp code) (setq code (car code)))
+      (decode-coding-region (point-min) (point-max) code))
+    (setq *cmail-have-all-headers (or all-headers *cmail-show-all-headers))
+    (or *cmail-have-all-headers (cmail-ignore-headers))
+    (run-hooks 'cmail-show-contents-hook)
+    (cmail-readmail-mode)
+    (cmail-select-buffer *cmail-summary-buffer)))
+
+;; diffs are only 2 lines: use (equal page) instead of (=  page).
+;; page may be an absolute filename of MH style file.
+(defun cmail-read-contents (page)
+  "FOLDERのPAGE番目のメイルを表示・スクロールさせる.
+終りまで読むと次のメイルを表示する."
+  (interactive (list (cmail-get-page-number-from-summary)))
+  (let ((disp (get-buffer-window *cmail-mail-buffer)))
+    (if (equal page 0)
+	(progn
+	  (setq *cmail-current-folder "")
+	  (setq *cmail-current-page 0)
+	  (cmail-error-resource 'read-contents-1)))
+    (cmail-select-buffer *cmail-mail-buffer)
+    (cmail-select-buffer *cmail-summary-buffer)
+    (if (or (null disp)
+	    (not (string= cmail-current-folder *cmail-current-folder))
+	    (not (equal page *cmail-current-page)))
+	  (cmail-show-contents page)
+      (let* ((win (get-buffer-window *cmail-mail-buffer))
+	     (wh (window-height win))
+	     (mbll (save-excursion
+		     (set-buffer *cmail-mail-buffer)
+		     (count-lines (window-start win) (point-max))))
+	     (cp (/ wh 2))
+	   (swin (get-buffer-window *cmail-summary-buffer))
+	   (swh (window-height swin))
+	   (scp (/ swh 2))
+	   (ccp (count-lines (point-min) (point)))
+	   (sll (- swh (count-lines (window-start swin) (point-max)))))
+	(if (or (>= mbll wh)
+		(not (save-window-excursion
+		       (select-window (get-buffer-window *cmail-mail-buffer))
+		       (pos-visible-in-window-p (point-max)))))
+	    (cmail-scroll-up nil win)
+	  (set-buffer *cmail-mail-buffer)
+	  (goto-char (point-max))
+	  (widen)
+	  (if (/= (point) (point-max))
+	      (progn
+		(forward-line 2)
+		(cmail-narrow-to-page))
+	    (cmail-narrow-to-page)
+	    (set-buffer *cmail-summary-buffer)
+	    (let ((p (point)))
+	      (if (and (< sll 2) (>= ccp scp))
+		  (scroll-up 1))
+	      (and (= p (point))
+		   (forward-line 1)))
+	    (if (eobp)
+		(cmail-message-resource 'read-contents-2)
+	      (cmail-show-contents (cmail-get-page-number-from-summary)))))
+	(set-buffer *cmail-summary-buffer)))
+    (cmail-fixcp)))
 
 (provide 'mhc-cmail)
 (put 'mhc-cmail 'summary-filename 'mhc-cmail-summary-filename)
