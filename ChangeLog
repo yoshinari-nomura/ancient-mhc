@@ -4,6 +4,8 @@
 
 2001-02-09  Yoshinari Nomura  <nom@quickhack.net>
 
+	* 00usage.jis: Change documents of palm2mhc.
+
 	* experimental/my-meeting2000 (toplevel):
 		Add IPv6 localhost to the access list.
 
