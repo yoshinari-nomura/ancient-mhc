@@ -1,3 +1,10 @@
+2000-10-16  Yoshinari Nomura  <nom@quickhack.net>
+
+	* emacs/mhc-db.el (mhc-db-add-exception-rule):
+	call mhc-draft-reedit-buffer before
+        modifying a buffer. 
+	Tnx, Mr.Takaaki MORIYAMA <taka@airlab.cs.ritsumei.ac.jp>
+	
 2000-10-10  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* emacs/mhc.el (mhc-mode): Modify doc-string.
