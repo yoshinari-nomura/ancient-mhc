@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@mew.org>
 ;;
 ;; Created: 1994/07/04
-;; Revised: $Date: 2000/06/05 07:20:46 $
+;; Revised: $Date: 2000/06/05 12:41:29 $
 
 ;;;
 ;;; Commentay:
@@ -259,6 +259,17 @@
 (defvar mhc-face-week-color-paint-thick nil)
 (defvar mhc-header-string-mew  "0 | ")
 
+(if (string-match "SEMI" gnus-version)
+    (progn
+      (require 'eword-encode)
+      (defalias 'mhc-eword-encode-string 'eword-encode-string))
+  (defun mhc-eword-encode-string (string)
+    "Alternative function of `eword-encode-string' for pure Gnus."
+    (with-temp-buffer
+      (insert string)
+      (rfc2047-encode-region (point-min) (point-max))
+      (buffer-substring (point-min) (point-max)))))
+
 (defun mhc-sch-scan1 (sch type &optional date conf secret first)
   (let ((subject  (mhc-sch-subject sch))
 	(category (car (mhc-sch-category sch)))
@@ -338,9 +349,8 @@
 	(if num
 	    (progn
 	      (put-text-property 0 (length insert) 'gnus-number num insert)
-	      (require 'eword-encode)
 	      (setq header
-		    (make-full-mail-header 0 (eword-encode-string
+		    (make-full-mail-header 0 (mhc-eword-encode-string
 					      (mhc-sch-subject sch))))
 	      (push (gnus-data-make num 0 0 header 0) gnus-newsgroup-data))
 	  (remove-text-properties 0 (length insert)
