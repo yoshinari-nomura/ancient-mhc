@@ -2,7 +2,7 @@
 
 ;; Author:  TSUCHIYA Masatoshi <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 ;; Created: 2000/06/18
-;; Revised: $Date: 2000/06/19 01:15:31 $
+;; Revised: $Date: 2000/06/19 09:39:18 $
 
 
 ;;; Commentary:
@@ -77,6 +77,16 @@
   :group 'mhc
   :type '(radio (const :tag "Landscape" t)
 		(const :tag "Portrait" nil)))
+
+(defcustom mhc-ps-left-margin 2
+  "*Left margin of the each schedule."
+  :group 'mhc
+  :type 'integer)
+
+(defcustom mhc-ps-string-width 20
+  "*Width of the each schedule."
+  :group 'mhc
+  :type 'integer)
 
 (defcustom mhc-ps-preview-command "gv"
   "*Command to preview PostScript calendar."
@@ -700,20 +710,45 @@ showpage
 
 
 
-(defsubst mhc-ps/schedule-to-string (dayinfo schedule)
+(defun mhc-ps/compose-subject (subject margin)
+  (let (pos)
+    ;; Delete characters to emphasize subject.
+    (and (string-match "^\\*+[ \t\r\f\n]*" subject)
+	 (setq pos (match-end 0))
+	 (string-match "[ \t\r\f\n]*\\*+$" subject)
+	 (setq subject (substring subject pos (match-beginning 0)))))
+  (let (ret)
+    (with-temp-buffer
+      (let ((fill-column mhc-ps-string-width)
+	    (left-margin margin))
+	(insert subject)
+	;; FIXME: fill-region は Emacs のバージョンによって動作がかなり
+	;; 異なっているので、違いを吸収する何らかの処置が必要。
+	(fill-region (point-min) (point-max))
+	(goto-char (point-min))
+	(while (not (eobp))
+	  (setq ret (cons (buffer-substring
+			   (point) (progn (end-of-line) (point)))
+			  ret))
+	  (forward-line 1))))
+    (nreverse ret)))
+
+
+(defun mhc-ps/schedule-to-string (dayinfo schedule)
   (let ((begin (mhc-schedule-time-begin schedule))
-	(end (mhc-schedule-time-end schedule)))
+	(end (mhc-schedule-time-end schedule))
+	(day (mhc-day-day-of-month dayinfo)))
     (if (or begin end)
-	(format "%d ( %s) %d (   %s)"
-		(mhc-day-day-of-month dayinfo)
-		(concat
-		 (if begin (mhc-time-to-string begin) "")
-		 (if end (concat "-" (mhc-time-to-string end)) ""))
-		(mhc-day-day-of-month dayinfo)
-		(mhc-schedule-subject-as-string schedule))
-      (format "%d ( %s)"
-	      (mhc-day-day-of-month dayinfo)
-	      (mhc-schedule-subject-as-string schedule)))))
+	(mapconcat (lambda (str) (format "%d ( %s)" day str))
+		   (cons (concat
+			  (if begin (mhc-time-to-string begin) "")
+			  (if end (concat "-" (mhc-time-to-string end)) ""))
+			 (mhc-ps/compose-subject (mhc-schedule-subject-as-string schedule)
+						 mhc-ps-left-margin))
+		   " ")
+      (mapconcat (lambda (str) (format "%d ( %s)" day str))
+		 (mhc-ps/compose-subject (mhc-schedule-subject-as-string schedule) 0)
+		 " "))))
 
 
 (defun mhc-ps/make-contents (year month &optional category category-is-invert)
@@ -735,8 +770,8 @@ showpage
 			    schedules-buffer))))
 	    (setq schedules (cdr schedules))))
 	(setq dayinfo-list (cdr dayinfo-list))))
-    (setq schedules-buffer (mapconcat 'identity schedules-buffer " ")
-	  holidays-buffer (mapconcat 'identity holidays-buffer " "))
+    (setq schedules-buffer (mapconcat 'identity (nreverse schedules-buffer) " ")
+	  holidays-buffer (mapconcat 'identity (nreverse holidays-buffer) " "))
     (save-excursion
       (set-buffer (mhc-get-buffer-create " *mhc-ps*"))
       (delete-region (point-min) (point-max))

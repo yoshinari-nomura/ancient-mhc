@@ -1,5 +1,13 @@
 2000-06-19  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 
+	* emacs/mhc-ps.el (mhc-ps-left-margin): New variable.
+	(mhc-ps-string-width): New variable.
+	(mhc-ps/compose-subject): New function.
+	(mhc-ps/schedule-to-string): Add handling long subject.
+	(mhc-ps/make-contents): Fix order of schedules.
+
+2000-06-19  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+
 	* emacs/mhc-summary.el (mhc-summary-search-date): Renamed
 	`mhc-summary-search-day'.
 	* emacs/mhc.el (mhc-goto-today): Replace `mhc-summary-search-day'
