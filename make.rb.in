@@ -51,7 +51,7 @@ end
 def install()
   files = SCRIPT_FILES
   while filename = files.shift()
-    File::install(filename, BINDIR, 0644, true)
+    File::install(filename, BINDIR, 0755, true)
   end
   xpmdir = "xpm"
   instdir = File::join(BINDIR, xpmdir)

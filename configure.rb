@@ -52,11 +52,11 @@ begin
     when "--kcode"
       default_kcode = arg
     when "--bindir"
-      bindir = arg
+      bindir = File::expand_path(arg)
     when "--libdir"
-      libdir = arg
+      libdir = File::expand_path(arg)
     when "--with-ruby"
-      rubyexec = arg
+      rubyexec = File::expand_path(arg)
     when "--disable-ext"
       disable_ext = true
     when "--help"
@@ -88,6 +88,7 @@ files = %w(make.rb ruby-ext/make.rb ruby-ext/lib/make.RB)
 while filename = files.shift()
   fin = File::open(filename + ".in")
   fout = File::open(filename, "w")
+  fout.chmod(0755)
   print "configuring: " + filename + "\n"
   while line = fin.gets()
     conversion_table.each { |key, value|
@@ -95,6 +96,8 @@ while filename = files.shift()
     }
     fout.puts(line)
   end
+  fin.close()
+  fout.close()
 end
 
 ### Copyright Notice:

@@ -10,6 +10,7 @@ require 'kconv'
 
 DEFAULT_KCODE = "@@mhc_default_kcode@@"
 LIBDIR = "@@mhc_libdir@@"
+DISABLE_EXT = @@mhc_disable_ext@@
 
 MAKE_FILES = %w(mhc-kconv.rb)
 INSTALL_FILES = %w(mhc-date.rb mhc-gtk.rb mhc-kconv.rb
@@ -38,9 +39,11 @@ def clean()
 end
 
 def install()
-  files = INSTALL_FILES
-  while filename = files.shift()
-    File::install(filename, LIBDIR, 0644, true)
+  if DISABLE_EXT
+    files = INSTALL_FILES
+    while filename = files.shift()
+      File::install(filename, LIBDIR, 0644, true)
+    end
   end
 end
 

@@ -1,3 +1,14 @@
+2000-07-13  MIYOSHI Masanori  <miyoshi@ask.ne.jp>
+
+	* ruby-ext/lib/make.RB.in: Install scripts only when DISABLE_EXT
+	is true.
+
+	* make.rb.in: Chane file mode of scripts to 755.
+
+	* configure.rb: Close files.
+	Change file mode of make.rb to 755.
+	Expand file paths.
+
 2000-07-13  Yoshinari Nomura  <nom@quickhack.net>
 
 	* make.rb.in, configure.rb, 
