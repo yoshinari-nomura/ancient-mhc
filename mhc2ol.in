@@ -8,7 +8,7 @@
 ##          
 ##
 ## Created: 2001/09/15
-## Revised: $Date: 2001/10/28 01:20:35 $
+## Revised: $Date: 2002/09/06 06:15:24 $
 ##
 
 $DEBUG = false
@@ -308,6 +308,8 @@ class Exporter
     @ol_name_space = @outlook .GetNamespace("MAPI")
     folder_type = OlConst::OlFolderCalendar
     @ol_calendar = @ol_name_space .GetDefaultFolder(folder_type)
+    folder_type = OlConst::OlFolderTasks
+    @ol_tasks = @ol_name_space .GetDefaultFolder(folder_type)
   end
 
   def get_ol_appointment(id)
@@ -322,6 +324,19 @@ class Exporter
     ap
   end
   private :get_ol_appointment
+
+  def get_ol_task(id)
+    ap = nil
+    begin
+      tsk = @ol_name_space .GetItemFromID(id, @ol_tasks.StoreID)
+      if tsk.Parent.DefaultItemType != OlConst::OlTaskItem
+	tsk = nil
+      end
+    rescue
+    end
+    tsk
+  end
+  private :get_ol_task
 
   def ol_is_update?(ol_infos)
     is_update = false
@@ -347,6 +362,12 @@ class Exporter
 	print "deleting ", appoint .Subject, "\n" if @@flag_verbose
 	appoint .delete()
       end
+      entry_id = info[2]
+      task = get_ol_task(entry_id) if entry_id
+      if task
+	print "deleting ", task .Subject, "\n" if @@flag_verbose
+	task .delete()
+      end
     end
   end
   private :delete_ol_appointments
@@ -364,6 +385,7 @@ class Exporter
       appoint .Location = MhcKconv::todisp(sch .location()) if sch.location()
 	
       print "Time: ", sch .time_as_string(), "\n" if @@flag_verbose
+      print "Path: ", sch .path(), "\n" if @@flag_verbose
 	
       stime, etime = sch .time()
       etime = stime if !etime
@@ -373,14 +395,16 @@ class Exporter
       print "Date: ", sdate, "-", edate, "\n" if @@flag_verbose
       appoint .Start = sdate
       # If any time is not specified, the appointment is a kind of AllDayEvent.
-      if !stime && !etime
-	appoint .AllDayEvent = true
-	if sdate != edate
+      if !edate.nil?
+	if !stime && !etime
+	  appoint .AllDayEvent = true
+	  if sdate != edate
+	    appoint .End = edate
+	    appoint .Duration = period .get_duration() if sdate && edate
+	  end
+	else
 	  appoint .End = edate
-	  appoint .Duration = period .get_duration() if sdate && edate
 	end
-      else
-	appoint .End = edate
       end
 
       appoint .Categories = sch .category_as_string()
@@ -391,18 +415,101 @@ class Exporter
 	appoint .ReminderSet = true
 	appoint .ReminderMinutesBeforeStart = sch .alarm() / 60
       else
-	appoint .ReminderSet = false
+	# Set reminder to all entry except AllDayEvent.
+	appoint .ReminderSet = 	! appoint .AllDayEvent
       end
 
       # handle recurrence.
       period .handle_recurrence(appoint)
 
+      # contents of appointment
+      old_sp = $=
+      $= = true
+      cats = sch .category_as_string() .split(' ')
+      todo_p = true if cats .delete('todo')
+      done_p = true if cats .delete('done')
+      appoint .Sensitivity = OlConst::OlPrivate if cats .include?('private')
+      appoint .Categories = cats .join(',')
+      $= = old_sp
+      appoint .Body = MhcKconv::todisp(sch .dump())
       appoint .Save()
-      ol_info << [appoint .EntryID, appoint .LastModificationTime]
+
+      # Copy TODO
+      if todo_p
+	task = @outlook .CreateItem(OlConst::OlTaskItem)
+        sdate, edate = sch .duration
+        task .StartDate = Exporter .to_ol_date(sdate) || appoint .Start
+	task .DueDate = Exporter .to_ol_date(edate) || appoint .End
+        if done_p
+	  task .Complete = true
+	  task .DateCompleted = appoint .End
+        end
+	if !sch .priority || sch .priority < 50
+	  task .Importance = OlConst::OlImportanceLow
+	elsif sch .priority < 80
+	  task .Importance = OlConst::OlImportanceNormal
+	else
+	  task .Importance = OlConst::OlImportanceHigh
+	end
+
+        task .Categories = appoint .Categories
+        task .Sensitivity = appoint .Sensitivity
+        task .Subject = appoint .Subject
+        task .Body = appoint .Body
+        task .Save()
+        print " - And set it to Task\n" if @@flag_verbose
+
+	ol_info << [appoint .EntryID, appoint .LastModificationTime, task .EntryID]
+      else
+        ol_info << [appoint .EntryID, appoint .LastModificationTime, nil]
+      end
     end
     ol_info
   end
   private :setup_ol_appointments
+
+  def sync_from_outlook(sch, last_sync_info)
+
+    ## Outlook側での更新内容をmhcに取り込む.  取り込む内容は場所
+    ## (Location), 期限(Day), 時間(Time), 完了フラグ(TODO/DONE), 優先
+    ## 順位(Priority), 期間(Duration) とする.  分類(Category)は変換ルー
+    ## ルが定義できないとまずいハズ.
+    entry_id = last_sync_info[0]
+    appoint = get_ol_appointment(entry_id) if entry_id
+    entry_id = last_sync_info[2]
+    task = get_ol_task(entry_id) if entry_id
+    cats = sch .category_as_string() .split(' ')
+
+    # ol_appointから 場所, 期限, 時間 を取り込む.
+    if appoint
+      sch.set_location(MhcKconv::toeuc(appoint .Location))
+      # 期限/時刻: どうしよう？ appoint .Start / .End
+    end
+
+    # ol_taskから 期間, 完了フラグ, 優先順位 を取り込む
+    if task
+      # 期間: .StartDate, .DueDate
+      # 完了フラグ: Complete, DateCompleted
+      if task .Complete
+	if ! cats .include?('done')
+	  # 今回完了した仕事.  作業期間をBodyに埋め込む
+	  sch .description = sch .duration + sch .description
+	  sch .set_duration( nil , nil)
+	  cats .delete('todo')	# 削除
+	  cats .add('done')	# 追加
+	end
+      end
+      # 優先順位: .Importance
+    end
+
+    # 期間変更は ol_task, ol_appoint の変更をマージする必要あり?  基本
+    # 的に後優先で取り込む.
+    sch .add_sch
+
+    # 更新されたlast_sync_infoを返す
+    last_sync_info
+  end
+  private :sync_from_outlook
 
   def send_to_outlook(periods, sch)
     if sch. path()
@@ -420,17 +527,26 @@ class Exporter
     last_sync_info = @last_sync_infos .assoc(rec_id)
   
     if last_sync_info
+      ## 前回のsync情報がある場合
       @last_sync_infos .delete(last_sync_info)
       mhc_last_modified_time = last_sync_info[1]
       ol_last_sync_infos = last_sync_info[2]
+      ## mhc側が更新されているか？
       mhc_is_modified = (File .mtime(file) != mhc_last_modified_time)
+      ## (mhc未更新のとき)Outlook側が更新されているか？
       is_update = ol_is_update?(ol_last_sync_infos) unless mhc_is_modified
+      ## mhc更新済み または mhc未更新かつOutlook未更新のとき
+      ## → Outlookエントリを削除する(mhcエントリを再度提供する).
       delete_ol_appointments(ol_last_sync_infos) unless is_update
     end
     if is_update
+      ## mhc未更新かつOutlook更新済み.  Outlookエントリは残してある.
       sync_info << ol_last_sync_infos
+      #TODO: Outlookにもとづいてmhcを更新する
+#      sync_info << sync_with_outlook(sch, last_sync_info)
       print "copying to Outlook is skipped!\n" if @@flag_verbose
     else
+      ## 上記以外.  Outlookエントリはもともとないか削除済み.
       sync_info << setup_ol_appointments(periods, sch)
       print "\n"  if @@flag_verbose
     end
@@ -502,7 +618,15 @@ class Exporter
     if @@flag_install
       print "delete all articles in Outlook."
       if !@@flag_noharm
+	# Appointments
 	items = @ol_calendar .items()
+	index = items .Count
+	while index > 0 do
+	  items .Remove(index)
+	  index -= 1
+	end
+	# Tasks
+	items = @ol_tasks .items()
 	index = items .Count
 	while index > 0 do
 	  items .Remove(index)

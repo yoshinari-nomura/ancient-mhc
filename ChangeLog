@@ -1,3 +1,9 @@
+2002-09-06  T.Tanaka <toc.tanaka@toshiba.co.jp>
+
+	* mhc2ol.in: Support `priority' feature.
+
+	* ruby-ext/lib/mhc-schedule.rb: Ditto.
+
 2002-09-05  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* emacs/mhc-calendar.el (all): Brush up all code.

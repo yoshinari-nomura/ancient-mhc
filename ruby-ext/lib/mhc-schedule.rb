@@ -3,7 +3,7 @@
 ## Author:  Yoshinari Nomura <nom@quickhack.net>
 ##
 ## Created: 1999/07/16
-## Revised: $Date: 2002/02/02 10:20:46 $
+## Revised: $Date: 2002/09/06 06:15:24 $
 ##
 
 ################################################################
@@ -126,6 +126,10 @@ require 'mhc-date'
 ##
 ## description -> aString
 ## set_description(aString)
+##
+## priority -> aInteger
+## priority_as_string -> aString
+## set_priority(aInteger)
 ##
 ## pilot_flag()
 ## set_pilot_flag()
@@ -512,6 +516,24 @@ class MhcScheduleItem
 #      return @description
 #    end
 
+  ## priority
+  def priority
+    return @priority
+  end
+
+  def priority_as_string
+    return @priority .to_s
+  end
+
+  def set_priority(pri)
+    begin
+      @priority = pri .to_i
+    rescue
+      @priority = 0
+    ensure
+    end
+  end
+
   ## pilot_flag
   def pilot_flag
   end
@@ -567,6 +589,7 @@ class MhcScheduleItem
       "X-SC-Day: #{day_as_string}\n"           +
       "X-SC-Time: #{time_as_string}\n"         +
       "X-SC-Category: #{category_as_string}\n" +
+      "X-SC-Priority: #{priority_as_string}\n" +
       "X-SC-Cond: #{cond_as_string}\n"         +
       "X-SC-Duration: #{duration_as_string}\n" +
       "X-SC-Alarm: #{alarm_as_string}\n"       +
@@ -967,7 +990,18 @@ class MhcScheduleItem
 
       when 'record-id:'
 	@rec_id = val
-      
+
+      when 'priority:'
+	if val =~ /^(\d+)\s*$/i
+	  begin
+	    @priority = $1 .to_i
+	  rescue
+	    @priority = 0
+	  end
+	else
+	  @priority = 0
+	end
+
       end ## case ##
     }
     return self
