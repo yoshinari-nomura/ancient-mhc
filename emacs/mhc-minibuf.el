@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1999/12/10
-;; Revised: $Date: 2000/06/18 09:59:07 $
+;; Revised: $Date: 2000/06/20 06:15:10 $
 
 ;;;
 ;;; Commentay:
@@ -57,22 +57,25 @@
 ;;    ((score (begin . end) obj) ...)
 ;;
 
+(defun mhc-minibuf/get-nth-candidate  (&optional alist n)
+  (nth (or n mhc-minibuf-candidate-offset)
+       (or alist mhc-minibuf-candidate-alist)))
+
 (defun mhc-minibuf-candidate-nth-score (&optional alist n)
-  (car (nth (or n mhc-minibuf-candidate-offset)
-		      (or alist mhc-minibuf-candidate-alist))))
+  (let ((candidate (mhc-minibuf/get-nth-candidate alist n)))
+    (if candidate (mhc-guess-get-score candidate))))
 
 (defun mhc-minibuf-candidate-nth-begin (&optional alist n)
-  (car (car (cdr (nth (or n mhc-minibuf-candidate-offset)
-		      (or alist mhc-minibuf-candidate-alist))))))
+  (let ((candidate (mhc-minibuf/get-nth-candidate alist n)))
+    (if candidate (mhc-guess-get-begin candidate))))
 
 (defun mhc-minibuf-candidate-nth-end (&optional alist n)
-  (cdr (car (cdr (nth (or n mhc-minibuf-candidate-offset)
-		      (or alist mhc-minibuf-candidate-alist))))))
+  (let ((candidate (mhc-minibuf/get-nth-candidate alist n)))
+    (if candidate (mhc-guess-get-end candidate))))
 
 (defun mhc-minibuf-candidate-nth-obj (&optional alist n)
-  (cdr (cdr (nth (or n mhc-minibuf-candidate-offset)
-		 (or alist mhc-minibuf-candidate-alist)))))
-
+  (let ((candidate (mhc-minibuf/get-nth-candidate alist n)))
+    (if candidate (mhc-guess-get-date-or-time candidate))))
 ;;
 ;; move candidate by score.
 ;;
@@ -186,31 +189,41 @@
 ;; input functions for mhc.
 ;;
 
-(defun mhc-minibuf-date-to-s (obj)
-  (mhc-date-format obj "%04d/%02d/%02d" yy mm dd))
+(defun mhc-minibuf/date-to-string (date)
+  (mhc-date-format date "%04d/%02d/%02d" yy mm dd))
+
+(defun mhc-minibuf/time-to-string (time)
+  (mhc-time-to-string time))
 
 (defun mhc-input-day (&optional prompt default candidate)
   (interactive)
   (let (str-list date ret (error t) str)
     (while error
-      (setq str (mhc-minibuf-read (concat (or prompt "") "(yyyy/mm/dd): ")
-				  (if default
-				      (let ((default-date (mhc-date-new-from-string default t)))
-					(cond
-					 (default-date
-					   (mhc-date-format default-date "%04d/%02d/%02d" yy mm dd))
-					 ((stringp default)
-					  default)
-					 ((listp default)
-					  (mapconcat 
-					   (lambda (date)
-					     (mhc-date-format default-date "%04d/%02d/%02d" yy mm dd))
-					   default
-					   " ")))))
-				  (current-buffer)
-				  candidate
-				  0
-				  'mhc-minibuf-date-to-s)
+      (setq str 
+	    (mhc-minibuf-read 
+	     (concat (or prompt "") "(yyyy/mm/dd): ")
+	     (if candidate
+		 nil
+	       (cond
+		((and (stringp default)
+		      (mhc-date-new-from-string default t))
+		 default)
+		((mhc-date-p default)
+		 (mhc-date-format default
+				  "%04d/%02d/%02d" yy mm dd))
+		((listp default)
+		 (mapconcat 
+		  (lambda (date)
+		    (mhc-date-format date
+				     "%04d/%02d/%02d" yy mm dd))
+		  default
+		  " "))
+		(t
+		 nil)))
+	     (current-buffer)
+	     candidate
+	     0
+	     (function mhc-minibuf/date-to-string))
 	    str-list (mhc-misc-split str)
 	    ret       nil
 	    error    nil)
@@ -256,11 +269,11 @@
 		       nil
 		     (if default
 			 (if (stringp default) default
-			   (mhc-time-to-string default) "")))
+			   (mhc-minibuf/time-to-string default) "")))
 		   (current-buffer)
 		   candidate
 		   0
-		   'mhc-time-to-string))
+		   (function mhc-minibuf/time-to-string)))
 	(cond 
 	 ((and (string-match
 		"^\\([0-9]+:[0-9]+\\)\\(-\\([0-9]+:[0-9]+\\)\\)?$" str)
