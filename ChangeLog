@@ -1,3 +1,7 @@
+2000-07-06  MIYOSHI Masanori  <miyoshi@ask.ne.jp>
+
+	* 00readme.w32.jis: New file for Windows users.
+
 2000-07-04  MIYOSHI Masanori  <miyoshi@hrl.hitachi.co.jp>
 
 	* emacs/00usage.jis: Fix a typo.

@@ -1,0 +1,259 @@
+* はじめに
+
+この文書は Windows 9X/NT/2000 で mhc2palm と palm2mhc を動かす手
+順をまとめたものです。
+
+ここでは、次の2種類の方法を紹介します。
+O バイナリパッケージを利用する方法
+O ソースからコンパイルする方法
+
+前者は、簡単ですので、とにかく mhc2palm と palm2mhc を使ってみた
+い人にお勧めです。一方、後者は、UNIX 系のツールの知識が必要であり、
+やや上級者向けです。
+
+* バイナリパッケージを利用する方法
+
+ここでは、コンパイル済みのバイナリパッケージを利用して、環境を構
+築する方法を説明します。
+
+** ruby のインストール
+
+mhc2palm と palm2mhc は Ruby スクリプトなので、実行するには ruby 
+の実行環境が必要です。
+
+ftp://ftp.netlab.co.jp/pub/lang/ruby/pc/
+から cygwin 版のバイナリパッケージを入手します。2000/07/05現在の
+最新版は、rbcw144.zip(ruby-1.4.4)です。2, 3番目の文字が、cygwin 
+版であることを示しています。
+
+パッケージを展開後、パスを通します。C:\rbcw144 に展開する場合には、
+次のように設定します。以降、このディレクトリに ruby をインストー
+ルしたものとして説明します。
+
+Windows 9X の場合：
+C:\autoexec.bat に次の設定を加えます。
+set PATH=C:\rbcw144;%PATH%
+
+Windows 2000/NT の場合：
+「コントロールパネル」→「システム」→「環境」で、環境変数 Path 
+に C:\rbcw144 を追加します。
+
+** cygwin1.dll のインストール
+
+前述の ruby を実行するには、cygwin1.dll が必要です。下記の場所か
+ら cygwin-1.1.X.tar.gz を入手して、この中に含まれる cygwin1.dll 
+を C:\rbcw144 にコピーします。
+ftp://ftp.u-aizu.ac.jp/pub/gnu/gnu-win32/latest/cygwin/
+ftp://ring.aist.go.jp/archives/pc/gnu-win32/latest/cygwin/
+
+別の入手方法もあります。
+http://sourceware.cygnus.com/cygwin/snapshots/
+で配布される、snapshot を利用する方法です。cygwin1-日付.dll.bz2 
+というファイルを入手して、伸張します。そして、cygwin1.dll とファ
+イル名を変更して、C:\rbcw144 にコピーします。ただし、bz2 形式のファ
+イルを伸張するツールが必要となります。
+
+** mhc_pilib.dll のインストール
+
+ruby から Palm にアクセスするためのライブラリ mhc_pilib.dll を
+http://www.quickhack.net/mhc/arc/distfiles/
+から入手して、C:\rbcw144\lib にコピーします。
+
+** ruby 拡張ライブラリのインストール
+
+MHC の ruby-ext/lib に含まれる ruby スクリプト(拡張子が .rb)を 
+C:\rbcw144\lib にコピーします。
+
+** mhc2palm, palm2mhc のインストール
+
+MHC に含まれる mhc2palm と palm2mhc を(ついでに、adb2mhc, gemcal,
+mhc-sync, today も)を適当なディレクトリにコピーします。ここでは、
+C:\mhc にコピーすることにします。
+
+以上で、mhc2palm と palm2mhc が利用できるようになります。
+
+** mhc2palm, palm2mhc の利用方法
+
+mhc2palm, palm2mhc は、DOS プロンプト、または、コマンドプロンプト
+から実行します。次の点に注意してください。
+
+・-d オプションで指定するデバイスファイルは、com1, com2 のような
+  形式で指定します。
+・ruby スクリプトを直接コマンドラインからは実行できません(注)。そ
+  のため、ruby を明示的に実行して、実行したいスクリプトをコマンドラ
+  インオプションとして指定します。
+・mhc2palm と palm2mhc を実行する場合には、事前に、HotSync マネー
+  ジャを停止しておく必要があります。
+
+注)後述する Cygwin に含まれる、sh.exe や bash.exe を使えば、ruby 
+   スクリプトを直接コマンドラインから実行できます。
+
+Palm のクレイドルがシリアルポートの1番(com1)に接続されている場合
+の、mhc2palm の使用例を次に示します。なお、詳しい利用方法は、
+00usage.jis を参照してください。
+
+$ ruby C:\mhc\mhc2palm -i -d com1
+
+* ソースからコンパイルする方法
+
+ここでは、必要なツール類をソースからコンパイルする方法を説明しま
+す。Unix 系のツールの知識が必要となります。
+
+** Cygwin のインストール
+
+まず、各種ツールをコンパイルするために、Cygwin をインストールしま
+す。これ以降、Cygwin 1.1.X がインストールしてあることを前提として
+説明します。なお、Cygwin 20.1b でも問題なく動きます。ただし、不具
+合対策のため、cygwin1.dll を最近のものに置き換える必要があります。
+
+Cygwin 1.1.X のインストール方法は、早田さんの Web ページ
+http://matsu-www.is.titech.ac.jp/~sohda/cygwin/cygwin11.html
+を参考にしてください。
+
+また、Cygwin の詳細な情報は、藤枝さんの Web ページ
+http://www.jaist.ac.jp/~fujieda/cygwin/
+からも入手できます。
+
+以下、Cygwin の sh.exe または bash.exe をシェルとして利用するもの
+として説明します。
+
+** ruby のインストール
+
+mhc2palm/palm2mhc は Ruby スクリプトなので、実行のためには ruby 
+の実行環境が必要です。ここでは、後述する ruby 拡張ライブラリのイ
+ンストールのために、バイナリ配布を使わずに、ソースからビルドしま
+す。
+
+なお、cygwin 1.1.X では、ruby-1.4.5 以降の版しかコンパイルできま
+せん。
+http://www.ruby-lang.org/ja/download.html
+から ruby-1.4.5 以降の版を入手してください。
+
+アーカイブ展開後のコンパイル手順は下記のとおりです。
+
+$ ./configure --enable-shared
+$ make
+$ make test (=> test succeeded)
+$ make install
+
+** pilot-link のインストール
+
+pilot-link に含まれる libpisock が、Palm と連携するために必要とな
+ります。
+
+pilot-link 0.9.3 は、例えば、下記の場所から入手可能です。
+ftp://ryeham.ee.ryerson.ca/pub/PalmOS/ (最近アクセスできない?)
+ftp://ftp.jp.freebsd.org/pub/FreeBSD/distfiles/
+http://www.quickhack.net/mhc/arc/distfiles/
+
+次に、アーカイブ展開後のコンパイル手順を示します。パッチファイル 
+pilot-link.0.9.3.cygwin1.1.diff は、本メールに末尾に添付していま
+す。パッチをファイルに切り出す場合には、UNIX の改行コード(LF) に
+するように注意してください。そうしないと、パッチがうまくあたりま
+せん。
+
+$ patch -p1 < pilot-link.0.9.3.cygwin1.1.diff
+$ ./configure
+$ make
+$ make test (=> OK)
+$ make install
+
+なお、Cygwin 20.1b を使う場合には、上記のパッチの代わりに、
+pilot-link.0.9.3.cygwin20.1b.diff を使ってください。このパッチは、
+http://www.quickhack.net/mhc/arc/distfiles/
+から入手できます。
+
+** ruby 拡張ライブラリのインストール
+
+ruby から libpisock を呼び出すための拡張ライブラリをインストールしま
+す。このライブラリは、MHC に含まれています。
+
+まず、ruby-ext/extconf.rb の下記の部分を修正します。
+
+修正前：
+$LDFLAGS    = "-L/usr/local/pilot/lib"
+$CFLAGS     = "-I/usr/local/pilot/include"
+
+修正後：
+$LDFLAGS    = "-L/usr/local/lib"
+$CFLAGS     = "-I/usr/local/include"
+
+修正後のインストール手順は下記のとおりです。
+
+$ cd mhcの展開場所/ruby-ext
+$ ruby ./extconf.rb
+$ make
+$ make install
+
+** mhc2palm, palm2mhc のインストール
+
+MHC に含まれる mhc2palm と palm2mhc を (ついでに、adb2mhc, gemcal,
+mhc-sync, today も)パスが通ったところにコピーします。例えば、
+/usr/local/bin にコピーする手順は次の通りです。
+
+$ cp adb2mhc gemcal mhc-sync mhc2palm palm2mhc today /usr/local/bin
+
+以上で、mhc2palm と palm2mhc が利用できるようになります。
+
+** mhc2palm, palm2mhc の利用方法
+
+mhc2palm, palm2mhc は、sh.exe や bash.exe などのシェルから実行し
+ます。次の点に注意してください。
+
+・-d オプションで指定するデバイスファイルは、com1, com2 のような
+  形式で指定します。
+・mhc2palm と palm2mhc を実行する場合には、事前に、HotSync マネー
+  ジャを停止しておく必要があります。
+
+Palm のクレイドルがシリアルポートの1番(com1)に接続されている場合
+の、mhc2palm の使用例を次に示します。なお、詳しい利用方法は、
+00usage.jis を参照してください。
+
+$ mhc2palm -i -d com1
+
+** pilot-link 用の patch
+
+以下は pilot-link にあてる patch
+(pilot-link.0.9.3.cygwin1.1.diff)です。Cygwin 1.1.X 用です。
+
+------ cut here ------ cut here ------ cut here ------ cut here ------
+diff -ur pilot-link.0.9.3.orig/dlpsh.c pilot-link.0.9.3/dlpsh.c
+--- pilot-link.0.9.3.orig/dlpsh.c	Sun May  3 12:11:26 1998
++++ pilot-link.0.9.3/dlpsh.c	Sat Jun 17 09:17:34 2000
+@@ -2,6 +2,7 @@
+ 
+ #include <signal.h>
+ #include <stdio.h>
++#include "getopt.h"
+ #include "pi-source.h"
+ #include "pi-socket.h"
+ #include "pi-padp.h"
+diff -ur pilot-link.0.9.3.orig/pilot-file.c pilot-link.0.9.3/pilot-file.c
+--- pilot-link.0.9.3.orig/pilot-file.c	Sun May  3 12:11:28 1998
++++ pilot-link.0.9.3/pilot-file.c	Sat Jun 17 09:17:50 2000
+@@ -12,6 +12,7 @@
+ #include <unistd.h>
+ #include <time.h>
+ 
++#include "getopt.h"
+ #include "pi-source.h"
+ #include "pi-socket.h"
+ #include "pi-dlp.h"
+diff -ur pilot-link.0.9.3.orig/tests/Makefile.in pilot-link.0.9.3/tests/Makefile.in
+--- pilot-link.0.9.3.orig/tests/Makefile.in	Fri Apr 30 03:02:10 1999
++++ pilot-link.0.9.3/tests/Makefile.in	Sat Jun 17 09:28:18 2000
+@@ -97,7 +97,7 @@
+ 	$(SUBMAKE_COMM_CC)
+ 
+ tests test: $(EXECS)
+-	packers$(EXT)
++	./packers$(EXT)
+ 
+ packers$(EXT): $(PILIB) packers.o
+ 	$(CCLINK) packers.o $(PILIB) -o $@ $(LIBS)
+------ cut here ------ cut here ------ cut here ------ cut here ------
+
+Local variables:
+mode:outline
+fill-column:65
+End:
