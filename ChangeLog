@@ -1,5 +1,7 @@
 2000-07-18  Yoshinari Nomura  <nom@quickhack.net>
 
+	* mhc2palm.in: separate -v and -n.
+
 	* ruby-ext/lib/mhc-schedule.rb (MhcScheduleItem#to_palm):
 	support 1st 3rd Tue.
 
