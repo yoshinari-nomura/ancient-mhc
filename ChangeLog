@@ -1,3 +1,7 @@
+2000-06-26  Yoshinari Nomura  <nom@quickhack.net>
+
+	* 00usage.jis: New file.
+
 2000-06-26  Toshihiko SHIMOKAWA  <toshi@tea.forus.or.jp>
 
 	* mhc-gtk.rb: fix FONTSET2 for non cygwin environments.
@@ -9,25 +13,25 @@
 
 	* palm2mhc: don't ask clear of dirty flag in no-interactive mode.
 
-	* mhc/gemcal (MhcScheduleEdit#conv_description):
+	* gemcal (MhcScheduleEdit#conv_description):
 	New function to divide non X-SC- headers from body. Fix
 		duplication of non X-SC- headers.
 
-	* mhc/ruby-ext/lib/mhc-schedule.rb 
+	* ruby-ext/lib/mhc-schedule.rb 
 	 (MhcScheduleItem#set_non_xsc_header): New function to divide non X-SC-
 	    headers from body.
 	(MhcScheduleItem#dump_without_xsc_header): Ditto.
 	(MhcScheduleItem#to_palm): datebk3 compliant (I hope).
 
-	* mhc/ruby-ext/lib/mhc-palm.rb (PilotApptRecord#to_xsc):
+	* ruby-ext/lib/mhc-palm.rb (PilotApptRecord#to_xsc):
 	datebk3 compliant (I hope).
 
-	* mhc/ruby-ext/lib/mhc-gtk.rb (GtkTimeRangeEdit):
+	* ruby-ext/lib/mhc-gtk.rb (GtkTimeRangeEdit):
 	fix for setting end time.
 
-	* mhc/00todo.jis: updated.
+	* 00todo.jis: updated.
 
-	* mhc/ruby-ext/extconf.rb: add header check.
+	* ruby-ext/extconf.rb: add header check.
 
 2000-06-26  Hideyuki SHIRAI  <shirai@rdmg.mgcs.mei.co.jp>
 
