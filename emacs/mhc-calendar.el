@@ -5,7 +5,7 @@
 ;;          MIYOSHI Masanori <miyoshi@ask.ne.jp>
 ;;
 ;; Created: 05/12/2000
-;; Revised: 06/09/2000
+;; Revised: 06/14/2000
 
 (condition-case nil
     (require 'hnf-mode)
@@ -339,12 +339,14 @@ The keys that are defined for mhc-calendar-mode are:
 	    (put-text-property beg end 'mouse-face 'highlight)))
     (error nil)))
 
-(defun mhc-calendar-edit (&optional import-buff)
-  (interactive "P")
-  (if (or import-buff
-	  (mhc-calendar-in-day-p)
+(defun mhc-calendar-edit ()
+  (interactive)
+  (if (or (mhc-calendar-in-day-p)
 	  (mhc-calendar-in-summary-p))
-      (mhc-edit import-buff 'calendar)
+      (progn
+	(mhc-window-push)
+	(mhc-edit nil 'calendar)
+	(delete-other-windows))
     (message "Nothing to do in this point.")))
 
 (defun mhc-calendar-delete ()
@@ -380,10 +382,11 @@ The keys that are defined for mhc-calendar-mode are:
 
 (defun mhc-calendar-view-file (file)
   (if (and (stringp file) (file-exists-p file))
-      (let ((newname
-	     (mapconcat (lambda (x) (format "%02d" x))
-			mhc-calendar-view-ddate "/")))
+      (let ((newname (mapconcat (lambda (x) (format "%02d" x))
+				mhc-calendar-view-ddate "/")))
+	(mhc-window-push)
 	(view-file-other-window file)
+	(setq view-exit-action 'mhc-calendar-view-exit-action)
 	(set-visited-file-name nil)
 	(rename-buffer newname 'unique)
 	(run-hooks 'mhc-calendar-view-file-hook))
@@ -687,6 +690,10 @@ The keys that are defined for mhc-calendar-mode are:
       (setq bl (cdr bl)))
     (nreverse (cons bfal2 bfal1))))
 
+(defun mhc-calendar-view-exit-action (buff)
+  (kill-buffer buff)
+  (and (get-buffer mhc-calendar-buffer) (mhc-window-pop)))
+
 ;; mhc-minibuffer support
 (defun mhc-minibuf-insert-calendar ()
   (interactive)
@@ -781,7 +788,9 @@ The keys that are defined for mhc-calendar-mode are:
 	(count (mhc-calendar-in-summary-hnf-p)))
     (if (file-readable-p fname)
 	(progn
+	  (mhc-window-push)
 	  (view-file-other-window fname)
+	  (setq view-exit-action 'mhc-calendar-view-exit-action)
 	  (and (integerp count) (mhc-calendar-hnf-search-title count))))))
 
 (defun mhc-calendar-hnf-search-title (count)
@@ -910,13 +919,15 @@ The keys that are defined for mhc-calendar-mode are:
 
 ;;; Pseudo MUA Backend Methods:
 (defun mhc-calendar-insert-summary-contents (schedule contents icon)
-  (put-text-property 0 (length contents)
-		     'mhc-calendar-summary-prop
-		     (or (mhc-record-name
-			  (mhc-schedule-record schedule))
-			 "Dummy")
-		     contents)
-  (insert contents "\n"))
+  (let ((pos (point)))
+    (put-text-property 0 (length contents)
+		       'mhc-calendar-summary-prop
+		       (or (mhc-record-name
+			    (mhc-schedule-record schedule))
+			   "Dummy")
+		       contents)
+  (insert contents "\n")
+  (if icon (mhc-put-icon icon (+ pos mhc-summary-icon-position)))))
 
 
 (provide 'mhc-calendar)

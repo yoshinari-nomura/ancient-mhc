@@ -1,3 +1,12 @@
+2000-06-14  Hideyuki SHIRAI  <shirai@rdmg.mgcs.mei.co.jp>
+
+	* emacs/mhc.el (mhc-edit): Enwrap regexp-opt in parenthesis .
+
+	* emacs/mhc-calendar.el (mhc-calendar-insert-summary-contents): Display icon, again.
+	(mhc-calendar-edit): Push window configuration.
+	(mhc-calendar-view-file, mhc-calendar-hnf-view): Push window configuration and set view-exit-action for window configuration.
+	(mhc-calendar-view-exit-action): New function for view exit action.
+
 2000-06-14  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 
 	* emacs/mhc-calendar.el (mhc-calendar): Added autoload magic.

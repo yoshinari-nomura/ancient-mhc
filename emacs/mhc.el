@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1994/07/04
-;; Revised: $Date: 2000/06/12 11:24:56 $
+;; Revised: $Date: 2000/06/14 11:27:45 $
 
 ;;;
 ;;; Commentay:
@@ -295,7 +295,9 @@ Returns t if the importation was succeeded."
 	(progn
 	  (insert-buffer import-buffer)
 	  (mhc-header-narrowing
-	    (mhc-header-delete-header (concat "^" (mhc-regexp-opt mhc-draft-unuse-hdr-list))
+	    (mhc-header-delete-header (concat "^\\("
+					      (mhc-regexp-opt mhc-draft-unuse-hdr-list)
+					      "\\)")
 				      'regexp))
 	  (switch-to-buffer draft-buffer t)))
     (condition-case ()
@@ -337,7 +339,9 @@ Returns t if the importation was succeeded."
 					      (mhc-schedule-categories-as-string schedule)))
 		    (setq record-id (mhc-record-id original))
 		    (mhc-header-narrowing
-		      (mhc-header-delete-header (concat "^" (mhc-regexp-opt (mhc-header-list)))
+		      (mhc-header-delete-header (concat "^\\("
+							(mhc-regexp-opt (mhc-header-list))
+							"\\)")
 						'regexp)))
 		;; Answer was no.
 		(message "") ; flush minibuffer.
