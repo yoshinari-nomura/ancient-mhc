@@ -36,11 +36,8 @@
 ;;         buffer to it.  This function will be called at the top of
 ;;         mhc-scan-month.
 ;;
-;;     (mhc-foo-insert-summary-contents SCHEDULE CONTENTS)
-;;         Insert string CONTENTS to the current buffer as SCHEDULE.
-;;
-;;     (mhc-foo-summary-search-date DATE)
-;;         Search DATE in the current buffer. If not found, return nil.
+;;     (mhc-foo-insert-summary-contents INSERTER)
+;;         Insert schedule with INSERTER.
 ;;
 ;;     (mhc-foo-summary-mode-setup DATE)
 ;;         Setup buffer as summary of mailer.  This function will be
@@ -54,9 +51,11 @@
 ;;    (put 'mhc-foo 'get-import-buffer       'mhc-foo-get-import-buffer)
 ;;    (put 'mhc-foo 'generate-summary-buffer 'mhc-foo-generate-summary-buffer)
 ;;    (put 'mhc-foo 'insert-summary-contents 'mhc-foo-insert-summary-contents)
-;;    (put 'mhc-foo 'summary-search-date     'mhc-foo-summary-search-date)
 ;;    (put 'mhc-foo 'summary-mode-setup      'mhc-foo-summary-mode-setup)
 
+(require 'mhc-day)
+(require 'mhc-schedule)
+(require 'bytecomp)
 
 ;;; Global Variables:
 
@@ -81,6 +80,64 @@
   :group 'mhc
   :type 'directory)
 
+(defcustom mhc-summary-line-format "%M%/%D %W %b%e %c%i%s %l"
+  "*A format string for summary line of MHC.
+It may include any of the following characters,
+which are replaced by the given information:
+
+%Y The year of the line.
+%M The month of the line.
+%D The day of the line.
+%W The weekday name of the line.
+%b Begin time.
+%e End time.
+%c Warning string for conflict.
+%i The icon for the schedule.
+%s The subject of the schedule.
+%l The location of the schedule.
+
+%/ A slash character if first schedule of the day.
+"
+  :group 'mhc
+  :type 'string)
+
+(defcustom mhc-summary-todo-line-format "     %L %i%s %l%d"
+  "*A format string for summary todo line of MHC.
+It may include any of the following characters,
+which are replaced by the given information:
+
+%i The icon for the schedule.
+%s The subject of the schedule.
+%l The location of the schedule.
+%L The lank of the schedule.
+%d The deadline of the schedule.
+"
+  :group 'mhc
+  :type 'string)
+
+(defcustom mhc-todo-string-remaining-day "(あと %d 日)"
+  "*String format which is displayed in TODO entry.
+'%d' is replaced with remaining day."
+  :group 'mhc
+  :type 'string)
+
+(defcustom mhc-todo-string-deadline-day "(〆切日)"
+  "*String which indicates deadline day in TODO."
+  :group 'mhc
+  :type 'string)
+
+(defcustom mhc-todo-string-heading "TODO(s) at %04d/%02d/%02d"
+  "*String which is displayed as heading of TODO.
+First %d is replaced with year, second one is replaced with month,
+third one is replaced with day of month."
+  :group 'mhc
+  :type 'string)
+
+(defcustom mhc-todo-mergin 1
+  "*Mergin line number between TODO and schedule."
+  :group 'mhc
+  :type 'integer)
+
 ;;; Internal Variable:
 
 (defconst mhc-summary-major-mode-alist
@@ -91,7 +148,69 @@
     (gnus-group-mode   . mhc-gnus)
     (gnus-summary-mode . mhc-gnus)))
 
-(defconst mhc-summary-icon-position 24) ; Insert position of icon.
+;; Internal Variables which are bound while inserting line:
+(defvar mhc-tmp-day-face nil "a face for the day.")
+(defvar mhc-tmp-dayinfo  nil "a dayinfo for the day.")
+(defvar mhc-tmp-schedule nil "a schedule structure.")
+(defvar mhc-tmp-begin    nil "begin time.")
+(defvar mhc-tmp-end      nil "end time.")
+(defvar mhc-tmp-conflict nil "non-nil if conflicted schedule.")
+(defvar mhc-tmp-first    nil "non-nil if first schedule.")
+(defvar mhc-tmp-private  nil "non-nil if private display mode.")
+;; For TODO.
+(defvar mhc-tmp-day      nil "the day.")
+(defvar mhc-tmp-lank     nil "a dayinfo for the day.")
+(defvar mhc-tmp-deadline nil "a schedule structure.")
+
+(defvar mhc-summary-line-format-alist
+  '((?Y (mhc-summary/line-year-string)
+	face mhc-tmp-day-face)
+    (?/ (if mhc-tmp-first "/" " ")
+	face mhc-tmp-day-face)
+    (?M (mhc-summary/line-month-string)
+	face mhc-tmp-day-face)
+    (?D (mhc-summary/line-day-string)
+	face mhc-tmp-day-face)
+    (?W (mhc-summary/line-day-of-week-string)
+	face mhc-tmp-day-face)
+    (?b (if (or (and mhc-tmp-private
+		     (string= (car (mhc-schedule-categories mhc-tmp-schedule))
+			      "private"))
+		(null mhc-tmp-begin))
+	    (make-string 5 ? )
+	  (format "%02d:%02d" (/ mhc-tmp-begin 60) (% mhc-tmp-begin 60)))
+	face (quote mhc-summary-face-time))
+    (?e (if (or (and mhc-tmp-private
+		     (string= (car (mhc-schedule-categories mhc-tmp-schedule))
+			      "private"))
+		(null mhc-tmp-end))
+	    (make-string 6 ? )
+	  (format "-%02d:%02d" (/ mhc-tmp-end 60) (% mhc-tmp-end 60)))
+	face (quote mhc-summary-face-time))
+    (?c (if mhc-tmp-conflict
+	    mhc-summary-string-conflict
+	  "")
+	face (quote mhc-summary-face-conflict))
+    (?i nil icon (mhc-schedule-categories mhc-tmp-schedule))
+    (?s (mhc-summary/line-subject-string)
+	face (mhc-face-category-to-face 
+	      (car (mhc-schedule-categories mhc-tmp-schedule))))
+    (?l (mhc-summary/line-location-string)
+	face (quote mhc-summary-face-location))))
+
+(defvar mhc-summary-todo-line-format-alist
+  '((?  " ")
+    (?i nil icon (mhc-schedule-categories mhc-tmp-schedule))
+    (?s (mhc-summary/line-subject-string)
+	face (mhc-face-category-to-face 
+	      (car (mhc-schedule-categories mhc-tmp-schedule))))
+    (?l (mhc-summary/line-location-string)
+	face (quote mhc-summary-face-location))
+    (?L (format "%5s" (format "[%d]" mhc-tmp-lank))
+	face (cond ((>= mhc-tmp-lank 80) (quote mhc-summary-face-sunday))
+		   ((>= mhc-tmp-lank 50) (quote mhc-summary-face-saturday))))
+    (?d (mhc-summary-todo/line-deadline-string)
+	face (mhc-summary-todo/line-deadline-face))))
 
 ;;; MUA Backend Functions:
 
@@ -125,16 +244,22 @@
   "Generate buffer with summary mode of MAILER."
   (funcall (mhc-summary-get-function 'generate-summary-buffer mailer) date))
 
-(defsubst mhc-summary-insert-contents (schedule contents icon &optional mailer)
-  "Insert CONTENTS for SCHEDULE in summary buffer of MAILER."
+(defsubst mhc-summary-insert-contents (mhc-tmp-schedule
+				       mhc-tmp-private
+				       inserter
+				       &optional mailer)
   (if (eq 'direct mailer)
-      (insert contents "\n") ; don't put icon.
+      (mhc-summary-line-insert)
     (funcall (mhc-summary-get-function 'insert-summary-contents mailer)
-	     schedule contents icon)))
+	     inserter)))
 
 (defsubst mhc-summary-search-date (date)
   "Search day in the current buffer."
-  (funcall (mhc-summary-get-function 'summary-search-date) date))
+  (goto-char (point-min))
+  (while (and (not (eobp))
+	      (not (eq (mhc-day-date
+			(get-text-property (point) 'mhc-dayinfo)) date)))
+    (goto-char (next-single-property-change (point) 'mhc-dayinfo))))
 
 (defsubst mhc-summary-mode-setup (date &optional mailer)
   "Setup buffer as summary mode of MAILER."
@@ -164,155 +289,46 @@
     (insert hr "\n")))
 
 
-(defun mhc-summary/insert-strings (schedule xstrings icon mailer)
-  (let (str)
-    (mhc-summary-insert-contents
-     schedule
-     (mapconcat (lambda (xstr)
-		  (if (consp xstr)
-		      (if (cdr xstr)
-			  (progn
-			    (setq str (concat (car xstr)))
-			    (mhc-face-put str (cdr xstr))
-			    str)
-			(car xstr))
-		    xstr))
-		xstrings
-		"")
-     icon
-     mailer)))
-
-
-;; Returns a cons cell of (XSTRING . ICON).
-(defun mhc-summary/schedule-to-contents (schedule &optional conflict secret)
-  (let ((category (car (mhc-schedule-categories schedule)))
-	space icon use-icon)
-    (if (setq use-icon (mhc-use-icon-p))
-	(and category
-	     (setq icon (mhc-get-icon category))))
-    (cons
-     (delq nil
-	   (if (and secret (mhc-schedule-in-category-p schedule "private"))
-	       ;; In the case when private schedules are hidden.
-	       (list
-		" "
-		(make-string 11 ? )
-		" "
-		(if use-icon
-		    (progn
-		      ;; XX icon must have 2 character width.
-		      (setq space "  ")
-		      (put-text-property 0 2 'invisible
-					 (and category icon t)
-					 space)
-		      (cons space nil)))
-		(if conflict
-		    (cons mhc-summary-string-conflict
-			  'mhc-summary-face-conflict))
-		(cons mhc-summary-string-secret
-		      'mhc-summary-face-secret))
-	     (list
-	      " "
-	      (cons (format "%-11s" (mhc-schedule-time-as-string schedule))
-		    'mhc-summary-face-time)
-	      " "
-	      (if use-icon
-		  (progn
-		    ;; XX icon must have 2 character width.
-		    (setq space "  ")
-		    (put-text-property 0 2 'invisible
-				       (and category icon t)
-				       space)
-		    (cons space nil)))
-	      (if conflict
-		  (cons mhc-summary-string-conflict
-			'mhc-summary-face-conflict))
-	      (cons (mhc-schedule-subject schedule)
-		    (and category (mhc-face-category-to-face category)))
-	      " "
-	      (if (not (zerop (length (mhc-schedule-location schedule))))
-		  (cons (concat "[" (mhc-schedule-location schedule) "]")
-			'mhc-summary-face-location)))))
-     icon)))
-
-
 (defvar mhc-summary/today nil)
 
-(defun mhc-summary/insert-dayinfo-internal
-  (dayinfo schedule mailer &optional require-date-string conflict secret)
-  (let (contents icon)
-    (if schedule
-	(progn
-	  (setq contents (mhc-summary/schedule-to-contents
-			  schedule conflict secret))
-	  (setq icon (cdr contents))
-	  (setq contents (car contents))))
-    (let ((week-color (cond
-		       ((eq (mhc-day-day-of-week dayinfo) 0)
-			'mhc-summary-face-sunday)
-		       ((mhc-day-holiday dayinfo)
-			'mhc-category-face-holiday)
-		       ((eq (mhc-day-day-of-week dayinfo) 6)
-			'mhc-summary-face-saturday)))
-	  date
-	  day-of-week)
-      (if require-date-string
-	  (setq date (cons (format "%02d/%02d"
-				   (mhc-day-month dayinfo)
-				   (mhc-day-day-of-month dayinfo))
-			   (if (mhc-date= mhc-summary/today
-					  (mhc-day-date dayinfo))
-			       'mhc-summary-face-today
-			     week-color))
-		day-of-week (cons (mhc-day-day-of-week-as-string dayinfo)
-				  week-color))
-	(setq date (make-string 5 ? )
-	      day-of-week (make-string 3 ? )))
-      (mhc-summary/insert-strings
-       schedule
-       (cons date
-	     (cons
-	      " "
-	      (cons day-of-week
-		    (if mhc-face-week-color-paint-thick
-			(if contents
-			    (if week-color
-				(mapcar (lambda (xstr)
-					  (if (consp xstr)
-					      (progn (setcdr xstr week-color) xstr)
-					    (cons xstr week-color)))
-					contents)
-			      contents))
-		      contents))))
-       icon
-       mailer))))
-
-
-(defun mhc-summary/insert-dayinfo
-  (dayinfo mailer category category-is-invert secret)
-  (let ((schedules (mhc-day-schedules dayinfo)))
+(defun mhc-summary/insert-dayinfo (mhc-tmp-dayinfo mailer category
+						   category-is-invert secret)
+  (let ((time-max -1)
+	(schedules (mhc-day-schedules mhc-tmp-dayinfo))
+	(mhc-tmp-first t)
+	mhc-tmp-begin mhc-tmp-end
+	mhc-tmp-location mhc-tmp-schedule
+	mhc-tmp-conflict
+	next-begin)
     (if schedules
-	(let ((require-date-string t)
-	      (time-max -1)
-	      time-b1 time-e1 time-b2 conflict)
-	  (while schedules
-	    (if (or (null category)
-		    (if category-is-invert
-			(not (mhc-schedule-in-category-p (car schedules) category))
-		      (mhc-schedule-in-category-p (car schedules) category)))
-		(progn
-		  (setq time-b1 (mhc-schedule-time-begin (car schedules))
-			time-e1 (mhc-schedule-time-end (car schedules))
-			time-b2 (if (car (cdr schedules))
-				    (mhc-schedule-time-begin (car (cdr schedules))))
-			conflict (or (and time-e1 time-b2 (< time-b2 time-e1))
-				     (and time-b1 time-max (< time-b1 time-max))))
-		  (if time-e1 (setq time-max (max time-e1 time-max)))
-		  (mhc-summary/insert-dayinfo-internal dayinfo (car schedules) mailer
-						       require-date-string conflict secret)
-		  (setq require-date-string nil)))
-	    (setq schedules (cdr schedules))))
-      (mhc-summary/insert-dayinfo-internal dayinfo nil mailer t nil secret))))
+	(while schedules
+	  (if (or (null category)
+		  (if category-is-invert
+		      (not (mhc-schedule-in-category-p
+			    (car schedules) category))
+		    (mhc-schedule-in-category-p
+		     (car schedules) category)))
+	      (progn
+		(setq mhc-tmp-begin (mhc-schedule-time-begin (car schedules))
+		      mhc-tmp-end (mhc-schedule-time-end (car schedules))
+		      next-begin (if (car (cdr schedules))
+				     (mhc-schedule-time-begin
+				      (car (cdr schedules))))
+		      mhc-tmp-conflict (or (and mhc-tmp-end next-begin
+						(< next-begin mhc-tmp-end))
+					   (and mhc-tmp-begin time-max 
+						(< mhc-tmp-begin time-max))))
+		(if mhc-tmp-end (setq time-max (max mhc-tmp-end time-max)))
+		(mhc-summary-insert-contents
+		 (car schedules)
+		 secret
+		 'mhc-summary-line-insert
+		 mailer)
+		(setq mhc-tmp-first nil)))
+	  (setq schedules (cdr schedules)))
+      (mhc-summary-insert-contents nil secret
+				   'mhc-summary-line-insert
+				   mailer))))
 
 
 (defun mhc-summary-make-contents
@@ -326,33 +342,11 @@
 	   (mhc-summary/insert-separator))
       (setq dayinfo-list (cdr dayinfo-list)))))
 
-(defcustom mhc-todo-string-remaining-day "(あと %d 日)"
-  "*String format which is displayed in TODO entry.
-'%d' is replaced with remaining day."
-  :group 'mhc
-  :type 'string)
-
-(defcustom mhc-todo-string-deadline-day "(〆切日)"
-  "*String which indicates deadline day in TODO."
-  :group 'mhc
-  :type 'string)
-
-(defcustom mhc-todo-string-heading "TODO(s) at %04d/%02d/%02d"
-  "*String which is displayed as heading of TODO.
-First %d is replaced with year, second one is replaced with month,
-third one is replaced with day of month."
-  :group 'mhc
-  :type 'string)
-
-(defcustom mhc-todo-mergin 1
-  "*Mergin line number between TODO and schedule."
-  :group 'mhc
-  :type 'integer)
 
 (defun mhc-summary-make-todo-list
   (day mailer &optional category category-is-invert secret)
   (let ((schedules (mhc-db-scan-todo day))
-	contents deadline)
+	(mhc-tmp-day day))
     (if schedules
 	(progn
 	  (insert (make-string mhc-todo-mergin ?\n))
@@ -367,29 +361,165 @@ third one is replaced with day of month."
 			(not (mhc-schedule-in-category-p
 			      (car schedules) category))
 		      (mhc-schedule-in-category-p (car schedules) category)))
-		(progn
-		  (setq deadline (mhc-schedule-todo-deadline (car schedules)))
-		  (mhc-summary/insert-strings
-		   (car schedules)
-		   (cons (let ((lank (mhc-schedule-todo-lank (car schedules))))
-			   (cons (format "%9s" (format "[%d]" lank))
-				 (cond
-				  ((>= lank 80) 'mhc-summary-face-sunday)
-				  ((>= lank 50) 'mhc-summary-face-saturday))))
-			 (append
-			  (car (setq contents
-				     (mhc-summary/schedule-to-contents
-				      (car schedules) nil secret)))
-			  (list (if deadline
-				    (if (eq deadline day)
-					(cons mhc-todo-string-deadline-day
-					      'mhc-summary-face-sunday)
-				      (format mhc-todo-string-remaining-day
-					      (- deadline day)))
-				  ""))))
-		   (and contents (cdr contents))
-		   mailer)))
+		(mhc-summary-insert-contents
+		 (car schedules)
+		 secret
+		 'mhc-summary-todo-line-insert
+		 mailer))
 	    (setq schedules (cdr schedules)))))))
+
+
+(defmacro mhc-summary/line-insert (string)
+  (` (and (, string) (insert (, string)))))
+
+
+(defun mhc-summary/line-year-string ()
+  (if mhc-tmp-first
+      (format "%4d" (mhc-day-year mhc-tmp-dayinfo))
+    (make-string 2 ? )))
+
+
+(defun mhc-summary/line-month-string ()
+  (if mhc-tmp-first
+      (format "%02d" (mhc-day-month mhc-tmp-dayinfo))
+    (make-string 2 ? )))
+
+
+(defun mhc-summary/line-day-string ()
+  (if mhc-tmp-first
+      (format "%02d" (mhc-day-day-of-month mhc-tmp-dayinfo))
+    (make-string 2 ? )))
+
+
+(defun mhc-summary/line-day-of-week-string ()
+  (if mhc-tmp-first
+      (format "%s" (mhc-day-day-of-week-as-string mhc-tmp-dayinfo))
+    (make-string 3 ? )))
+
+
+(defun mhc-summary/line-subject-string ()
+  (if (and mhc-tmp-private
+	   (string= (car (mhc-schedule-categories mhc-tmp-schedule))
+		    "private"))
+      mhc-summary-string-secret
+    (or (mhc-schedule-subject mhc-tmp-schedule) "")))
+
+
+(defun mhc-summary/line-location-string ()
+  (let ((location (mhc-schedule-location mhc-tmp-schedule)))
+    (and location
+	 (> (length location) 0)
+	 (concat "[" location "]"))))
+
+
+(defun mhc-summary-todo/line-deadline-string ()
+  (and mhc-tmp-deadline
+       (if (mhc-date= mhc-tmp-deadline mhc-tmp-day)
+	   mhc-todo-string-deadline-day
+	 (format mhc-todo-string-remaining-day 
+		 (mhc-date- mhc-tmp-deadline mhc-tmp-day)))))
+
+
+(defun mhc-summary-todo/line-deadline-face ()
+  (and mhc-tmp-deadline
+       (if (mhc-date= mhc-tmp-deadline mhc-tmp-day)
+	   'mhc-summary-face-sunday
+	 'default)))
+
+
+(defun mhc-summary/line-parse-format (format spec-alist)
+  (let ((f (string-to-list format))
+	inserter entry)
+    (setq inserter (list 'let (list 'pos)))
+    (while f
+      (if (eq (car f) ?%)
+	  (progn
+	    (setq f (cdr f))
+	    (if (eq (car f) ?%)
+		(setq inserter (append inserter (list (list 'insert ?%))))
+	      (setq entry (assq (car f) spec-alist))
+	      (unless entry
+		(error "Unknown format spec %c" (car f)))
+	      (setq inserter
+		    (append inserter
+			    (list (list 'setq 'pos (list 'point)))
+			    (list (list 'mhc-summary/line-insert
+					(nth 1 entry)))
+			    (and
+			     (nth 2 entry)
+			     (list
+			      (append (cond
+				       ((eq (nth 2 entry) 'face)
+					(list 'put-text-property
+					      'pos (list 'point)
+					      (list 'quote 'face)
+					      (nth 3 entry)))
+				       ((eq (nth 2 entry) 'icon)
+					(list 'and (list 'mhc-use-icon-p)
+					      (list 'mhc-put-icon
+						    (nth 3 entry))))))))))))
+	(setq inserter (append inserter (list (list 'insert (car f))))))
+      (setq f (cdr f)))
+    inserter))
+
+;; Internal variable.
+(defvar mhc-summary/line-inserter nil)
+
+(defun mhc-summary-line-inserter-setup ()
+  "Setup MHC summary line inserter."
+  (interactive)
+  (let (byte-compile-warnings)
+    (setq mhc-summary/line-inserter
+	  (byte-compile
+	   (list 'lambda ()
+		 (mhc-summary/line-parse-format
+		  mhc-summary-line-format
+		  mhc-summary-line-format-alist))))
+    (when (get-buffer "*Compile-Log*")
+      (bury-buffer "*Compile-Log*"))
+    (when (get-buffer "*Compile-Log-Show*")
+      (bury-buffer "*Compile-Log-Show*"))))
+
+
+(defun mhc-summary-line-insert ()
+  "Insert summary line."
+  (let ((mhc-tmp-day-face (cond
+			   ((mhc-schedule-in-category-p
+			     mhc-tmp-schedule "holiday")
+			    'mhc-category-face-holiday)
+			   ((eq (mhc-day-day-of-week 
+				 mhc-tmp-dayinfo) 0)
+			    'mhc-summary-face-sunday)
+			   ((eq (mhc-day-day-of-week mhc-tmp-dayinfo) 6)
+			    'mhc-summary-face-saturday)))
+	(pos (point)))
+    (funcall mhc-summary/line-inserter)
+    (put-text-property pos (point) 'mhc-dayinfo mhc-tmp-dayinfo)))
+
+;; Internal variable.
+(defvar mhc-summary-todo/line-inserter nil)
+
+(defun mhc-summary-todo-line-inserter-setup ()
+  "Setup MHC summary line inserter."
+  (interactive)
+  (let (byte-compile-warnings)
+    (setq mhc-summary-todo/line-inserter
+	  (byte-compile
+	   (list 'lambda ()
+		 (mhc-summary/line-parse-format
+		  mhc-summary-todo-line-format
+		  mhc-summary-todo-line-format-alist))))
+    (when (get-buffer "*Compile-Log*")
+      (bury-buffer "*Compile-Log*"))
+    (when (get-buffer "*Compile-Log-Show*")
+      (bury-buffer "*Compile-Log-Show*"))))
+
+
+(defun mhc-summary-todo-line-insert ()
+  "Insert todo line."
+  (let ((mhc-tmp-lank (mhc-schedule-todo-lank mhc-tmp-schedule))
+	(mhc-tmp-deadline (mhc-schedule-todo-deadline mhc-tmp-schedule)))
+    (funcall mhc-summary-todo/line-inserter)))
 
 
 (provide 'mhc-summary)

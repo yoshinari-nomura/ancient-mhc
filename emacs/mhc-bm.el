@@ -3,7 +3,7 @@
 ;; Author:  Yuuichi Teranishi <teranisi@gohome.org>
 ;;
 ;; Created: 2000/05/27
-;; Time-stamp: <2000-06-01 18:25:02 teranisi>
+;; Time-stamp: <00/06/27 09:42:56 teranisi>
 
 (require 'bitmap)
 (require 'mhc-face)
@@ -88,15 +88,15 @@ Example:
   "Returns t if MHC displays icon."
   (and window-system mhc-use-icon))
 
-(defun mhc-get-icon (category)
-  "Get icon glyph for GATEGORY."
-  (cdr (assoc category mhc-bm/category-bmstr-alist)))
-
-(defun mhc-put-icon (icon position)
-  "Put ICON at POSITION of the current buffer."
-  (save-excursion
-    (goto-char position)
-    (insert icon)))
+(defun mhc-put-icon (categories)
+  "Put icons on current buffer.
+Icon is decided by CATEGORIES and `mhc-bm-category-icon-alist'."  
+  (let (icon)
+    (while categories
+      (setq icon (cdr (assoc (car categories)
+			     mhc-bm/category-bmstr-alist)))
+      (and icon (insert icon))
+      (setq categories (cdr categories)))))
 
 (provide 'mhc-bm)
 

@@ -5,7 +5,7 @@
 ;;          MIYOSHI Masanori <miyoshi@ask.ne.jp>
 ;;
 ;; Created: 05/12/2000
-;; Reviesd: $Date: 2000/06/22 09:42:42 $
+;; Reviesd: $Date: 2000/06/27 13:07:02 $
 
 ;; internal variables
 (defvar mhc-calendar/buffer "*mhc-calendar*")
@@ -929,16 +929,9 @@ The keys that are defined for mhc-calendar-mode are:
    (t nil)))
 
 ;;; Pseudo MUA Backend Methods:
-(defun mhc-calendar-insert-summary-contents (schedule contents icon)
-  (let ((pos (point)))
-    (put-text-property 0 (length contents)
-		       'mhc-calendar/summary-prop
-		       (or (mhc-record-name
-			    (mhc-schedule-record schedule))
-			   "Dummy")
-		       contents)
-  (insert contents "\n")
-  (if icon (mhc-put-icon icon (+ pos mhc-summary-icon-position)))))
+(defun mhc-calendar-insert-summary-contents (inserter)
+  (funcall inserter)
+  (insert "\n"))
 
 
 (provide 'mhc-calendar)

@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1994/07/04
-;; Revised: $Date: 2000/06/22 09:42:42 $
+;; Revised: $Date: 2000/06/27 13:07:02 $
 
 ;;;
 ;;; Commentay:
@@ -632,20 +632,8 @@ C-c ?    mhc-draft-insert-calendar
 		 (or buffer (current-buffer)))))
 
 (defun mhc-current-date ()
-  (let ((buf (buffer-name)) yy mm dd)
-    (if (not (string-match mhc-summary-buf-regex buf))
-	nil
-      (setq yy (string-to-number (match-string 1 buf))
-	    mm (string-to-number (match-string 2 buf)))
-      (save-excursion
-	(forward-line 0)
-	(while (if (looking-at mhc-summary-day-regex)
-		   (progn
-		     (setq dd (string-to-number (match-string 2)))
-		     nil) ;; exit loop.
-		 (not (bobp)))
-	  (forward-line -1))
-	(if dd (mhc-date-new yy mm dd) nil)))))
+  (when (string-match mhc-summary-buf-regex (buffer-name))
+    (mhc-day-date (get-text-property (point) 'mhc-dayinfo))))
 
 (defun mhc-current-date-month ()
   (let ((buf (buffer-name)) yy mm dd)
@@ -834,6 +822,8 @@ C-c ?    mhc-draft-insert-calendar
     (mhc-file-setup)
     (and (mhc-use-icon-p) (mhc-icon-setup))
     (and mhc-calendar-link-hnf (mhc-calendar-hnf-face-setup))
+    (mhc-summary-line-inserter-setup)
+    (mhc-summary-todo-line-inserter-setup)
     (autoload 'mhc-ps-preview "mhc-ps" "*Preview PostScript calendar." t)
     (autoload 'mhc-ps-print "mhc-ps" "*Print PostScript calendar." t)
     (setq mhc-setup-p t)

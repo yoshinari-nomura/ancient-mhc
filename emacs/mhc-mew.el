@@ -102,20 +102,12 @@
      (file-name-nondirectory fld-msg))))
 
 
-(defun mhc-mew-insert-summary-contents (schedule contents icon)
-  (let (pos)
-    (insert (if schedule mhc-mew/header-string-review mhc-mew/header-string))
-    (setq pos (point))
-    (insert contents
-	    (mhc-mew/schedule-foldermsg schedule)
-	    "\n")
-    (if icon
-	(mhc-put-icon icon (+ pos mhc-summary-icon-position)))))
-
-
-(defun mhc-mew-summary-search-date (date)
-  (re-search-forward
-   (mhc-date-format date "^0[ %c]| %02d/%02d" mew-mark-review mm dd) nil t))
+(defun mhc-mew-insert-summary-contents (inserter)
+  (insert (if mhc-tmp-schedule 
+	      mhc-mew/header-string-review mhc-mew/header-string))
+  (funcall inserter)
+  (insert (mhc-mew/schedule-foldermsg mhc-tmp-schedule)
+	  "\n"))
 
 
 (defun mhc-mew-summary-mode-setup (date)

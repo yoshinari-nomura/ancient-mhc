@@ -3,7 +3,7 @@
 ;; Author:  Yuuichi Teranishi <teranisi@gohome.org>
 ;;
 ;; Created: 1999/12/02
-;; Time-stamp: <2000-06-01 18:25:24 teranisi>
+;; Time-stamp: <00/06/27 09:42:29 teranisi>
 
 (defcustom mhc-xmas-category-icon-alist nil
   "*Alist to rule the category-to-icon conversion.
@@ -59,13 +59,23 @@ Example:
        (featurep 'xpm)
        mhc-use-icon))
 
-(defun mhc-get-icon (category)
-  "Get icon glyph for GATEGORY."
-  (cdr (assoc category mhc-xmas/category-glyph-alist)))
-
-(defun mhc-put-icon (icon position)
-  "Put ICON at POSITION of the current buffer."
-  (set-extent-end-glyph (make-extent position position) icon))
+(defun mhc-put-icon (categories)
+  "Put an icon on current buffer.
+Icon is decided by CATEGORIES and `mhc-xmas-category-icon-alist'."
+  (let (start space)
+    (setq categories
+	  (delq nil
+		(mapcar (lambda (category)
+			  (cdr (assoc category mhc-xmas/category-glyph-alist)))
+			categories)))
+    (when categories
+      (setq space (make-string (length categories) ? ))
+      (setq start (point))
+      (insert space space) ; Icon is 2 character width.
+      (put-text-property start (point) 'invisible t)
+      (while categories
+	(set-extent-begin-glyph (make-extent (point) (point)) (car categories))
+	(setq categories (cdr categories))))))
 
 (provide 'mhc-xmas)
 

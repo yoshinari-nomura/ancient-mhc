@@ -56,10 +56,10 @@
     (wl-summary-jump-to-current-message)
     (current-buffer)))
 
-
-(defun mhc-wl-insert-summary-contents (schedule contents icon)
+;; mhc-tmp-schedule is already bound.
+(defun mhc-wl-insert-summary-contents (inserter)
   (let (head path pos)
-    (setq path (mhc-record-name (mhc-schedule-record schedule))
+    (setq path (mhc-record-name (mhc-schedule-record mhc-tmp-schedule))
 	  head
 	  (cond
 	   ((or (not path) (equal path mhc-schedule-file))
@@ -73,15 +73,8 @@
 	  head (concat head (if path "*| " " | ")))
     (put-text-property 0 (length head) 'invisible t head)
     (insert head)
-    (setq pos (point))
-    (insert contents "\n")
-    (if icon
-	(mhc-put-icon icon (+ pos mhc-summary-icon-position)))))
-
-
-(defun mhc-wl-summary-search-date (date)
-  (re-search-forward
-   (mhc-date-format date "^[0-9]+ | %02d/%02d" mm dd) nil t))
+    (funcall inserter)
+    (insert "\n")))
 
 
 (defsubst mhc-wl/date-to-folder (date)

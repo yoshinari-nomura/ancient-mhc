@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 2000/02/08
-;; Revised: $Date: 2000/06/12 11:24:56 $
+;; Revised: $Date: 2000/06/27 13:07:02 $
 
 ;;;
 ;;; Commentay:
@@ -71,8 +71,10 @@ refer to mhc-calendar-hnf-face-alist-internal.")
 ;; make faces from string/symbol
 
 (defun mhc-face-category-to-face (category)
-  (or (intern-soft (format "mhc-category-face-%s" (downcase category)))
-      'default))
+  (if category
+      (or (intern-soft (format "mhc-category-face-%s" (downcase category)))
+	  'default)
+    'default))
 
 (defun mhc-face-make-face-from-string (string prop &optional overwrite prefix)
   (let ((symbol-name (concat prefix (if prefix "-") string)))

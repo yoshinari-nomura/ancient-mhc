@@ -89,26 +89,21 @@
     (delete-region (point-min) (point-max))))
 
 
-(defun mhc-gnus-insert-summary-contents (schedule contents icon)
-  (let ((x (mhc-record-name (mhc-schedule-record schedule)))
+(defun mhc-gnus-insert-summary-contents (inserter)
+  (let ((x (mhc-record-name (mhc-schedule-record mhc-tmp-schedule)))
 	(subject (mhc-gnus-encode-string
-		  (mhc-schedule-subject-as-string schedule)))
+		  (mhc-schedule-subject-as-string mhc-tmp-schedule)))
 	(pos (point)))
     (when x
       (push (cons x subject) nnmhc-article-list)
       (setq x (length nnmhc-article-list)))
+    (funcall inserter)
     (if x
 	(let ((header (make-full-mail-header x subject)))
-	  (put-text-property 0 (length contents) 'gnus-number x contents)
+	  (put-text-property pos (point) 'gnus-number x)
 	  (push (gnus-data-make x 0 0 header 0) gnus-newsgroup-data))
-      (remove-text-properties 0 (length contents) '(gnus-number nil) contents))
-    (insert contents "\n")
-    (if icon
-	(mhc-put-icon icon (+ pos mhc-summary-icon-position)))))
-
-
-(defun mhc-gnus-summary-search-date (date)
-  (re-search-forward (mhc-date-format date "^%02d/%02d" mm dd) nil t))
+      (remove-text-properties pos (point) '(gnus-number nil)))
+    (insert "\n")))
 
 
 (defun mhc-gnus-summary-mode-setup (date)
