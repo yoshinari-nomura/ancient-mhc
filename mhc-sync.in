@@ -6,7 +6,7 @@
 ## Author:  Yoshinari Nomura <nom@quickhack.net>
 ##
 ## Created: 2000/04/26
-## Revised: $Date: 2000/07/14 06:59:50 $
+## Revised: $Date: 2000/09/25 02:20:58 $
 ##
 
 ## mhc-sync [-n] [-x exchange_id] [-r local_dir] [user@]remote.host[:dir]
@@ -376,7 +376,7 @@ else
       STDERR .print "I concatinate the remote one to the local one.\n"
       STDERR .print "Also, I preserved  the remote one.\n"
       STDERR .print "Please reedit the local one and do sync again.\n"
-      l_sch .set_description(l_sch .description + $CONFLICT_INFO + r_sch .dump)
+      l_sch .set_description(l_sch .description .to_s + $CONFLICT_INFO + r_sch .dump)
       if !$flag_noharm
 	db .modify_sch(l_sch) 
       else
