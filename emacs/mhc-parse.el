@@ -67,11 +67,15 @@
   schedule)
 
 (defun mhc-parse/subject (record schedule)
-  (mhc-schedule/set-subject schedule (mhc-parse/continuous-lines))
+  (mhc-schedule/set-subject
+   schedule
+   (mhc-eword-decode-string (mhc-parse/continuous-lines)))
   schedule)
 
 (defun mhc-parse/location (record schedule)
-  (mhc-schedule/set-location schedule (mhc-parse/continuous-lines))
+  (mhc-schedule/set-location 
+   schedule 
+   (mhc-eword-decode-string (mhc-parse/continuous-lines)))
   schedule)
 
 (defconst mhc-parse/time-regexp "\\([012][0-9]\\):\\([0-5][0-9]\\)")
@@ -107,9 +111,13 @@
   (let ((category (mhc-parse/continuous-lines)))
     (mhc-schedule/set-categories
      schedule
-     (nconc (delq nil (mapcar (lambda (s)
-				(if (stringp s) (downcase s)))
-			      (mhc-misc-split category "[ \t]+")))
+     (nconc (delq nil
+		  (mapcar
+		   (lambda (str)
+		     (and (stringp str) (downcase str)))
+		   (mhc-misc-split
+		    (mhc-eword-decode-string category)
+		    "[ \t]+")))
 	    (mhc-schedule-categories schedule))))
   (mhc-logic/set-todo (mhc-schedule-condition schedule)
 		      (mhc-schedule-in-category-p schedule "todo"))
