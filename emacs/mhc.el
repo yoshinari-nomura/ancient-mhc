@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1994/07/04
-;; Revised: $Date: 2000/07/21 01:48:50 $
+;; Revised: $Date: 2000/07/21 09:12:05 $
 
 ;;;
 ;;; Commentay:
@@ -276,7 +276,7 @@ If HIDE-PRIVATE, private schedules are suppressed."
 
 (defvar mhc-summary-buffer-current-date-month nil
   "Indicate summary buffer's month. It is also used by mhc-summary-buffer-p")
-(make-variable-buffer-local 'mhc-summary-buffer-current-date)
+(make-variable-buffer-local 'mhc-summary-buffer-current-date-month)
 
 (defun mhc-scan-month (date mailer cat inv-cat secret)
   (let ((from  (mhc-date-mm-first date))

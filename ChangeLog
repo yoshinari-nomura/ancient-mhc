@@ -12,7 +12,9 @@
 	
 	* emacs/mhc.el (mhc-cal-make-rectangle):
 	Use 'mhc-calendar-face-default face instead of 'default.
-
+	(top-level): Typo fix,
+	(make-variable-buffer-local 'mhc-summary-buffer-current-.....).
+	
 	* emacs/mhc-summary.el (mhc-summary-line-insert):
 	Use 'mhc-summary-face-default face instead of 'default.
 	(mhc-summary-todo/line-deadline-face): Ditto.
