@@ -1,3 +1,14 @@
+2000-07-10  Toshihiko SHIMOKAWA  <toshi@tea.forus.or.jp>
+
+	* today : Change help message of --format.
+	Remove code conversion at final display.  Now, every formatter
+	module is responsible to code conversion.
+	
+	* ruby-ext/lib/mhc-kconv.rb : Change to module.
+	Add tohtml, tops for formatter module of 'today'.
+		
+	* gemcal : Change some global variables to local variables.
+
 2000-07-08  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 
 	* emacs/mhc-logic.el (mhc-logic/compile-schedule): Fix
