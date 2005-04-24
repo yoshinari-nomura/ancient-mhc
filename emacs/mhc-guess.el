@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1999/04/13
-;; Revised: $Date: 2005/04/04 09:09:25 $
+;; Revised: $Date: 2005/04/24 05:32:35 $
 ;;
 
 ;;;
@@ -146,6 +146,9 @@ You can specify following symbols as a list.
     throw
 
     ("\\([０-９0-9]+\\)[\n 　]*日"
+     mhc-guess/make-date-from-mmdd nil 1)
+
+    ("\\([０-９0-9]+\\)[ 　]*[(（][月火水木金土日]"
      mhc-guess/make-date-from-mmdd nil 1)
 
     ("[^\(（]\\([月火水木金土日]\\)\n?曜"
