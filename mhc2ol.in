@@ -8,7 +8,7 @@
 ##          
 ##
 ## Created: 2001/09/15
-## Revised: $Date: 2003/10/29 12:48:14 $
+## Revised: $Date: 2005/05/01 22:55:08 $
 ##
 
 $DEBUG = false
@@ -183,7 +183,7 @@ end
 
 def usage
   print '
-usage: mhc2ol [-a | -i | -d | -N] [-n] [-s] [-m] [-r dir] [-c category] [YYYYMMDD-yyyymmdd]
+usage: mhc2ol [-a | -i | -d | -N] [-H] [-n] [-s] [-m] [-r dir] [-c category] [YYYYMMDD-yyyymmdd]
 
   mhc2ol -- Add/Copy mhc articles to Outlook.
 
@@ -197,6 +197,7 @@ usage: mhc2ol [-a | -i | -d | -N] [-n] [-s] [-m] [-r dir] [-c category] [YYYYMMD
              will be lost.
     -N     : Copy only the articles that have been modified since
              the last execution.
+    -H     : Add/Copy mhc articles to Outlook without HEADER part.
     -n     : Do nothing effectives. Useful for checking.
     -s     : Split appointments and tasks.
     -m     : Append an additional category `MHC-sch\'.
@@ -324,12 +325,20 @@ class MhcScheduleItem
       return dates
     end
   end
+
+  def dump_without_header
+    desc = description .to_s
+    desc += "\n" if desc != '' and desc !~ /\n\z/n
+
+    return desc
+  end
 end
 
 class Exporter
   @@sync_file = File .expand_path("~/Mail/schedule/.ol_sync")
   @@flag_verbose = false
   @@flag_install = false
+  @@flag_export_part = 'all' # 'all' || 'body_only'
   @@flag_noharm = false
   @@flag_timestamp = false
   @@mhc_category_name = 'MHC-sch'
@@ -457,7 +466,12 @@ class Exporter
 	cat_string = @@mhc_category_name + "," + cat_string
       end
       appoint .Categories = cat_string
-      appoint .Body = MhcKconv::todisp(sch .dump())
+      case @@flag_export_part
+      when 'all'
+ 	appoint .Body = MhcKconv::todisp(sch .dump())
+      when 'body_only'
+ 	appoint .Body = MhcKconv::todisp(sch .dump_without_header())	
+      end
 
       # a reminder is valid for a future schedule.
       if sch .alarm() != nil then
@@ -480,7 +494,12 @@ class Exporter
 	cat_string = @@mhc_category_name + "," + cat_string
       end
       appoint .Categories = cat_string
-      appoint .Body = MhcKconv::todisp(sch .dump())
+      case @@flag_export_part
+      when 'all'
+ 	appoint .Body = MhcKconv::todisp(sch .dump())
+      when 'body_only'
+ 	appoint .Body = MhcKconv::todisp(sch .dump_without_header())	
+      end
       appoint .Save() if !$flag_separation  || !todo_p
 
       # Copy TODO
@@ -717,6 +736,10 @@ class Exporter
     @@flag_discreet = flag
   end
 
+  def Exporter.set_flag_export_part(flag)
+    @@flag_export_part = flag
+  end
+
   def Exporter.set_flag_noharm(flag)
     @@flag_noharm = flag
   end
@@ -744,6 +767,7 @@ end
 
 $flag_verbose = false
 $flag_noharm, $flag_append, $flag_install = false, false, false
+$flag_export_part = 'all' # 'all' || 'body_only'
 $flag_from, $flag_to = nil, nil
 $flag_timestamp = nil
 $flag_category_regexp = Regexp .new("")
@@ -762,6 +786,8 @@ while ARGV .length > 0
     $flag_install = true
   when '-d'
     $flag_discreet = true
+  when '-H' 
+    $flag_export_part = 'body_only'
   when '-n'
     $flag_noharm  = true
   when '-r'
@@ -819,6 +845,7 @@ mdb = MhcScheduleDB .new($flag_dir)
 Exporter .set_sync_filename($flag_dir + "/.ol_sync")
 Exporter .set_flag_verbose($flag_verbose)
 Exporter .set_flag_install($flag_install)
+Exporter .set_flag_export_part($flag_export_part)
 Exporter .set_flag_discreet($flag_discreet)
 Exporter .set_flag_noharm($flag_noharm)
 Exporter .set_flag_timestamp($flag_timestamp)

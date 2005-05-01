@@ -1,3 +1,14 @@
+2005-05-02  MIYOSHI Masanori  <miyoshi@meadowy.org>
+
+	* mhc2ol.in (usage): Add usage of `-H' option.
+	(MhcScheduleItem#dump_without_header): New method.
+	(Exporter#flag_export_part): New class variable.
+	(Exporter#setup_ol_appointments): Don't dump header parts if
+	flag_export_part is `body'.
+	(Exporter#set_flag_export_part): New function.
+	($flag_export_part): New variable and initialize it.
+	Support new option `-H'.
+
 2005-04-24  KOIE Hidetaka <hide@koie.org> / nom
 
 	* emacs/mhc-guess.el (mhc-guess-date-regexp-list): add regexp.
