@@ -8,6 +8,8 @@
 	(Exporter#set_flag_export_part): New function.
 	($flag_export_part): New variable and initialize it.
 	Support new option `-H'.
+	The preceding modifications are derived with a patch from NOGUCHI
+	Yusuke <nogunogu@mva.biglobe.ne.jp>.
 
 2005-04-24  KOIE Hidetaka <hide@koie.org> / nom
 
