@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1994/07/04
-;; Revised: $Date: 2005/01/14 12:07:54 $
+;; Revised: $Date: 2005/05/15 12:04:55 $
 
 ;;;
 ;;; Commentay:
@@ -762,6 +762,11 @@ the default action of this command is changed to the latter."
   (interactive)
   (mhc-delete-file (mhc-summary-record)))
 
+(defcustom mhc-delete-file-hook nil
+  "Normal hook run after mhc-delete-file."
+  :group 'mhc
+  :type 'hook)
+
 (defun mhc-delete-file (record)
   (interactive)
   (if (not (and record (file-exists-p (mhc-record-name record))))
@@ -782,7 +787,8 @@ the default action of this command is changed to the latter."
 	(mhc-db-delete-file record))
       (or (and (mhc-summary-buffer-p)
 	       (mhc-rescan-month mhc-default-hide-private-schedules))
-	  (and (mhc-calendar-p) (mhc-calendar-rescan))))))
+	  (and (mhc-calendar-p) (mhc-calendar-rescan)))
+      (run-hooks 'mhc-delete-file-hook))))
 
 (defun mhc-modify ()
   "Modify the current schedule."
