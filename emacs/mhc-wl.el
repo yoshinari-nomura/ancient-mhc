@@ -36,7 +36,7 @@
     (defun mhc-wl-summary-filename ()
       "Return FILENAME on current line ."
       (let ((number (wl-summary-message-number)))
-	(if number 
+	(if (and number (not (eq number 100000)))
 	    (elmo-message-file-name wl-summary-buffer-elmo-folder number)
 	  (error "No schedule data"))))
   (defun mhc-wl-summary-filename ()

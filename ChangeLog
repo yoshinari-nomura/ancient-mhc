@@ -1,3 +1,8 @@
+2005-05-14  Yoichi NAKAYAMA  <yoichi@geiin.org>
+
+	* emacs/mhc-wl.el (mhc-wl-summary-filename): Message with number
+	100000 is not associated with file.
+
 2005-05-02  MIYOSHI Masanori  <miyoshi@meadowy.org>
 
 	* mhc2ol.in (usage): Add usage of `-H' option.
