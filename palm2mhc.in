@@ -6,7 +6,7 @@
 ## Author:  Yoshinari Nomura <nom@quickhack.net>
 ##
 ## Created: 1999/10/08
-## Revised: $Date: 2001/02/09 09:37:06 $
+## Revised: $Date: 2005/07/06 11:14:17 $
 ##
 
 $DEBUG = false
@@ -75,7 +75,7 @@ while ARGV .length > 0
   ARGV .shift
 end
 
-if !File .exist?($flag_device)
+if $flag_device != "net:" && !File .exist?($flag_device)
   STDERR .print "Can not open #{$flag_device}.\n"
   exit 1
 end
@@ -132,6 +132,16 @@ if $flag_noharm
   ## do nothing
 else
   if !$flag_interactive or yes_no("Do you clear dirty flag of the palm ")
+    # commit
+    if f .respond_to?("fsync")
+      f .fsync 
+      sleep 1
+      f .fsync
+      sleep 1
+      f .fsync
+      sleep 1
+    end
+    # done.
     pdb .reset_sync_flags  ## remove all dirty flag in palm.
     print "Dirty flag cleared.\n"
   else
