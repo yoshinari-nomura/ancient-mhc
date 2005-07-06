@@ -1,3 +1,9 @@
+2005-07-06 Yoshinari Nomura  <nom@quickhack.net>
+
+	* palm2mhc.in (toplevel): hit fsync x 3 before clearing the pdb
+		  dirty flag.
+	(TNX, Mr. KOIE Hidetaka <hide@koie.org>)
+
 2005-05-15  MIYOSHI Masanori  <miyoshi@meadowy.org>
 
 	* emacs/mhc.el (mhc-delete-file-hook): New hook.
