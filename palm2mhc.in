@@ -6,7 +6,7 @@
 ## Author:  Yoshinari Nomura <nom@quickhack.net>
 ##
 ## Created: 1999/10/08
-## Revised: $Date: 2005/07/06 11:14:17 $
+## Revised: $Date: 2005/09/08 02:56:14 $
 ##
 
 $DEBUG = false
@@ -133,13 +133,9 @@ if $flag_noharm
 else
   if !$flag_interactive or yes_no("Do you clear dirty flag of the palm ")
     # commit
-    if f .respond_to?("fsync")
-      f .fsync 
-      sleep 1
-      f .fsync
-      sleep 1
-      f .fsync
-      sleep 1
+    if ! File .method_defined?("fsync")
+      system("sync")
+      system("sync")
     end
     # done.
     pdb .reset_sync_flags  ## remove all dirty flag in palm.

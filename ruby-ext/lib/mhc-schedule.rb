@@ -3,7 +3,7 @@
 ## Author:  Yoshinari Nomura <nom@quickhack.net>
 ##
 ## Created: 1999/07/16
-## Revised: $Date: 2004/10/25 02:28:57 $
+## Revised: $Date: 2005/09/08 02:56:14 $
 ##
 
 ################################################################
@@ -1089,6 +1089,7 @@ class File
       else
 	f = File .open(obj + '/' + MTIME_FILE, "w")
 	f .print 'x' # FreeBSD requires this.
+	f .fsync if f .respond_to?("fsync")
 	f .close
       end
     end
@@ -1169,7 +1170,10 @@ class MhcScheduleDB
       end
 
       contents = sch .dump
-      (File .open(new_path, "w") << contents) .close
+      f = File .open(new_path, "w")
+      f << contents
+      f .fsync if f .respond_to?("fsync")
+      f .close
       print "#{old_path} -> #{new_path}\n" if $DEBUG
 
       File .utime2(now, now, new_slot)
@@ -1293,7 +1297,7 @@ class MhcScheduleDB
     return true if File .directory?(dir)
     parent = File .dirname(dir)
     if makedir_or_higher(parent)
-      Dir .mkdir(dir)
+      File .open(dir, "r") .fsync .close if File .method_defined?("fsync")
       return true
     end
     return false
@@ -1433,6 +1437,7 @@ class MhcLog
   def add_entry(entry)
     file = File .open(@filename, "a+")
     file .print "#{entry}\n"
+    file .fsync if f .respond_to?("fsync")
     file .close
   end
 
