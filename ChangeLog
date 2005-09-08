@@ -1,3 +1,9 @@
+2005-09-08 Yoshinari Nomura <nom@quickhack.net>
+
+	* palm2mhc.in (toplevel): more fsync hack.
+
+	* ruby-ext/lib/mhc-schedule.rb (File::utime2): more fsync hack.
+
 2005-07-06 Yoshinari Nomura  <nom@quickhack.net>
 
 	* palm2mhc.in (toplevel): hit fsync x 3 before clearing the pdb
