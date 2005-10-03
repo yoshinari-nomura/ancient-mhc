@@ -197,7 +197,7 @@
 	(goto-char (match-end 0)))
     (while (not (eobp))
       (or (mhc-logic/looking-at mhc-logic/not-regexp mhc-logic/day-regexp)
-	  (error "Parse ERROR !!!"))
+	  (error "Parse ERROR !!! (at X-SC-Day:)"))
       (setq d (mhc-date-new (string-to-number (match-string 2))
 			    (string-to-number (match-string 3))
 			    (string-to-number (match-string 4)))
@@ -226,7 +226,7 @@
 			       (string-to-number (match-string 1)))
 		 (mhc-logic/day logicinfo)))
 	  (goto-char (match-end 0)))
-      (error "Parse ERROR !!!"))))
+      (error "Parse ERROR !!!(at X-SC-Date:)"))))
 
 
 (defun mhc-logic-parse-cond (logicinfo)
@@ -262,7 +262,7 @@
 				      mhc-logic/month-alist)))
 		    month)))
        (t ;; 解釈できない要素の場合
-	(error "Parse ERROR !!!")))
+	(error "Parse ERROR !!!(at X-SC-Cond:)")))
       (goto-char (match-end 0)))
     (mapcar (lambda (s)
 	      (set s (if (symbol-value s)
@@ -307,7 +307,7 @@
 					(string-to-number (match-string 2))
 					(string-to-number (match-string 3)))))
 		   (t ; それ以外の場合
-		    (error "Parse ERROR !!!")))
+		    (error "Parse ERROR !!!(at X-SC-Duration:)")))
 		  sexp))
       (goto-char (match-end 0)))
     (if sexp
@@ -326,7 +326,7 @@
 	(goto-char (match-end 0)))
     (if (eobp)
 	(mhc-logic/set-todo logicinfo (string-to-number content))
-      (error "Parse ERROR !!!"))))
+      (error "Parse ERROR !!!(at X-SC-Todo:)"))))
 
 
 (defun mhc-logic-compile-file (record)

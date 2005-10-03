@@ -63,7 +63,7 @@
 				   (if (eq (length content) 0)
 				       nil
 				     (string-to-number content)))
-      (error "Parse ERROR !!!")))
+      (error "Parse ERROR !!!(at X-SC-Priority:)")))
   schedule)
 
 (defun mhc-parse/subject (record schedule)
