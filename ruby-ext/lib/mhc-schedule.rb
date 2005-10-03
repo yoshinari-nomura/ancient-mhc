@@ -3,7 +3,7 @@
 ## Author:  Yoshinari Nomura <nom@quickhack.net>
 ##
 ## Created: 1999/07/16
-## Revised: $Date: 2005/09/08 02:56:14 $
+## Revised: $Date: 2005/10/03 14:23:03 $
 ##
 
 ################################################################
@@ -1297,6 +1297,7 @@ class MhcScheduleDB
     return true if File .directory?(dir)
     parent = File .dirname(dir)
     if makedir_or_higher(parent)
+      Dir .mkdir(dir)
       File .open(dir, "r") .fsync .close if File .method_defined?("fsync")
       return true
     end
@@ -1437,7 +1438,7 @@ class MhcLog
   def add_entry(entry)
     file = File .open(@filename, "a+")
     file .print "#{entry}\n"
-    file .fsync if f .respond_to?("fsync")
+    file .fsync if file .respond_to?("fsync")
     file .close
   end
 
