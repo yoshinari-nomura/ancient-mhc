@@ -1,3 +1,8 @@
+2005-10-03  KOIE Hidetaka <hide@koie.org> / nom
+
+	* ruby-ext/lib/mhc-schedule.rb (MhcLog#add_entry): add fsync.
+	(MhcScheduleDB#makedir_or_higher): ditto.
+
 2005-09-08 Yoshinari Nomura <nom@quickhack.net>
 
 	* palm2mhc.in (toplevel): more fsync hack.
