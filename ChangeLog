@@ -1,3 +1,20 @@
+2005-10-04  NOGUCHI Yusuke <nogunogu@mva.biglobe.ne.jp> / shirai
+
+	* emacs/mhc-parse.el (mhc-parse/strict): New internal variable.
+	(mhc-parse/time-regexp): Modify regexp.
+	(mhc-parse/time): Add detailed error message. Add strict parsing
+	mode.
+	(mhc-parse/alarm-regexp): Modify regexp.
+	(mhc-parse/alarm): Add detailed error message. Add strict parsing
+	mode.
+	(mhc-parse/internal-parser): Add third optional argument
+	`strict'. Bind `mhc-parse/strict' to `strict'.
+	(mhc-parse-buffer): Add third optional argument `strict'. Call
+	mhc-parse/internal-parser() with `strict'.
+
+	* emacs/mhc-draft.el (mhc-draft-finish): Call mhc-parse-buffer()
+	with `strict'.
+
 2005-10-03  NOGUCHI Yusuke <nogunogu@mva.biglobe.ne.jp> / nom
 
 	* emacs/mhc-logic.el, emacs/mhc-parse.el: add detailed error messages.

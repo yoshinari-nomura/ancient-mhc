@@ -18,6 +18,7 @@
 (require 'mhc-record)
 (require 'mhc-header)
 
+(defvar mhc-parse/strict nil)
 
 (defun mhc-parse/continuous-lines ()
   "ヘッダの継続行を処理して、内容のみを取り出す関数"
@@ -78,24 +79,26 @@
    (mhc-eword-decode-string (mhc-parse/continuous-lines)))
   schedule)
 
-(defconst mhc-parse/time-regexp "\\([012][0-9]\\):\\([0-5][0-9]\\)")
+(defconst mhc-parse/time-regexp "\\([012]?[0-9]\\):\\([0-5][0-9]\\)")
 
 (defun mhc-parse/time (record schedule)
-  (let ((time (mhc-parse/continuous-lines)))
-    (let (begin end)
-      (cond
-       ((string-match (concat "^" mhc-parse/time-regexp "-" mhc-parse/time-regexp "$") time)
-	(setq begin (+ (* 60 (string-to-number (match-string 1 time)))
-		       (string-to-number (match-string 2 time)))
-	      end (+ (* 60 (string-to-number (match-string 3 time)))
-		     (string-to-number (match-string 4 time)))))
-       ((string-match (concat "^" mhc-parse/time-regexp "-?$") time)
-	(setq begin (+ (* 60 (string-to-number (match-string 1 time)))
-		       (string-to-number (match-string 2 time)))))
-       ((string-match (concat "^-" mhc-parse/time-regexp "$") time)
-	(setq end (+ (* 60 (string-to-number (match-string 1 time)))
-		     (string-to-number (match-string 2 time))))))
-      (mhc-schedule/set-time schedule begin end)))
+  (let ((time (mhc-parse/continuous-lines))
+	begin end)
+    (cond
+     ((string-match (concat "^" mhc-parse/time-regexp "-" mhc-parse/time-regexp "$") time)
+      (setq begin (+ (* 60 (string-to-number (match-string 1 time)))
+		     (string-to-number (match-string 2 time)))
+	    end (+ (* 60 (string-to-number (match-string 3 time)))
+		   (string-to-number (match-string 4 time)))))
+     ((string-match (concat "^" mhc-parse/time-regexp "-?$") time)
+      (setq begin (+ (* 60 (string-to-number (match-string 1 time)))
+		     (string-to-number (match-string 2 time)))))
+     ((string-match (concat "^-" mhc-parse/time-regexp "$") time)
+      (setq end (+ (* 60 (string-to-number (match-string 1 time)))
+		   (string-to-number (match-string 2 time)))))
+     ((and mhc-parse/strict (not (string= "" time)))
+      (error "Parse ERROR!!!(at X-SC-Time:)")))
+    (mhc-schedule/set-time schedule begin end))
   schedule)
 
 ;; For backward compatibility.
@@ -103,8 +106,15 @@
   (mhc-logic-parse-old-style-date (mhc-schedule-condition schedule))
   (mhc-parse/time record schedule))
 
+(defconst mhc-parse/alarm-regexp "^[0-9]+ \\(minute\\|hour\\|day\\)$")
+
 (defun mhc-parse/alarm (record schedule)
-  (mhc-schedule/set-alarm schedule (mhc-parse/continuous-lines))
+  (let ((alarm (mhc-parse/continuous-lines)))
+    (unless (or (not mhc-parse/strict)
+		(string-match mhc-parse/alarm-regexp alarm)
+		(string= "" alarm))
+      (error "Parse ERROR!!! (at X-SC-Alarm:)"))
+    (mhc-schedule/set-alarm schedule alarm))
   schedule)
 
 (defun mhc-parse/category (record schedule)
@@ -165,9 +175,11 @@
 
 ;; FIXME: top level とそれ以外の場所で許される header が異なるので、
 ;; multi pass parser に組み替えるべきかも知れない。
-(defun mhc-parse/internal-parser (record &optional schedule)
+(defun mhc-parse/internal-parser (record &optional schedule strict)
   "Internal parseser of schedule headers in this narrowed buffer."
-  (let (func (case-fold-search t))
+  (let ((mhc-parse/strict strict)
+	(case-fold-search t)
+	func)
     (while (not (eobp))
       (if (looking-at "\\([^ \t:]+\\):")
 	  (progn
@@ -190,12 +202,12 @@
 	(forward-line 1))))
   schedule)
 
-(defun mhc-parse-buffer (&optional record)
+(defun mhc-parse-buffer (&optional record strict)
   "Parse schedule headers in this buffer."
   (unless record
     (setq record (mhc-record-new (buffer-file-name))))
   (mhc-header-narrowing
-    (let ((schedule (mhc-parse/internal-parser record)))
+    (let ((schedule (mhc-parse/internal-parser record nil strict)))
       (if schedule (mhc-schedule/set-region-end schedule (point)))))
   ;; 得られた構造を整理する
   (let (schedules sexp)

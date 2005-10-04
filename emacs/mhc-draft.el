@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>,
 ;;          Yuuichi Teranishi <teranisi@quickhack.net>
 ;; Created: 2000/07/25
-;; Revised: $Date: 2004/05/04 13:48:31 $
+;; Revised: $Date: 2005/10/04 08:52:44 $
 
 ;;; Commentary:
 
@@ -167,7 +167,8 @@ If optional argument NO-CONFIRM is non-nil, kill without confirmation."
   "Add current draft as a schedule."
   (interactive)
   (let ((record
-	 (mhc-parse-buffer (mhc-record-new mhc-draft-buffer-file-name))))
+	 (mhc-parse-buffer (mhc-record-new mhc-draft-buffer-file-name)
+			   'strict)))
     (mhc-calendar-input-exit)
     (if (mhc-db-add-record-from-buffer record (current-buffer)
 				       (not (interactive-p)))
