@@ -79,7 +79,7 @@
    (mhc-eword-decode-string (mhc-parse/continuous-lines)))
   schedule)
 
-(defconst mhc-parse/time-regexp "\\([012]?[0-9]\\):\\([0-5][0-9]\\)")
+(defconst mhc-parse/time-regexp "\\([012][0-9]\\):\\([0-5][0-9]\\)")
 
 (defun mhc-parse/time (record schedule)
   (let ((time (mhc-parse/continuous-lines))
