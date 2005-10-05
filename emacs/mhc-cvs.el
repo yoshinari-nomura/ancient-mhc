@@ -115,8 +115,9 @@ from 'month before last' to 'this month next year'."
 	      (progn
 		(set-buffer buffer)
 		(delete-region (point-min) (point-max))
-		(let ((default-directory (file-name-as-directory mhc-cvs/default-directory))
-		      (process-environment process-environment))
+		(let ((default-directory (file-name-as-directory
+					  mhc-cvs/default-directory))
+		      (process-environment (copy-sequence process-environment)))
 		  (setenv "CVS_RSH" mhc-cvs-rsh)
 		  (apply #'call-process "cvs" nil t nil
 			 (append mhc-cvs-global-options options))))
@@ -265,7 +266,7 @@ from 'month before last' to 'this month next year'."
   "ファイルを削除する関数"
   (let ((added (mhc-cvs/get-added-flag-file-name filename))
 	(removed (mhc-cvs/get-removed-file-name filename))
-    	(new-path (expand-file-name
+	(new-path (expand-file-name
 		   "trash"
 		   (mhc-summary-folder-to-path mhc-base-folder))))
     (or (file-directory-p new-path)
@@ -283,13 +284,17 @@ from 'month before last' to 'this month next year'."
       (if (file-exists-p removed) (delete-file removed))
       (if (file-exists-p filename)
 	  (rename-file filename (mhc-misc-get-new-path new-path)))
-      (and (= 0 (mhc-cvs/backend (list "remove" (mhc-cvs/shrink-file-name filename))))
+      (and (= 0 (mhc-cvs/backend (list "remove"
+				       (mhc-cvs/shrink-file-name filename))))
 	   (mhc-cvs/modify filename)))))
 
 (defun mhc-cvs/modify (filename &optional offline)
   "ファイルを変更する関数"
-  (or offline (= 0 (mhc-cvs/backend
-		    (list "commit" "-m" "" (mhc-cvs/shrink-file-name filename))))))
+  (or offline
+      (prog1 (= 0 (mhc-cvs/backend
+		   (list "commit" "-m" ""
+			 (mhc-cvs/shrink-file-name filename))))
+	(set-file-modes filename (logior ?\200 (file-modes filename))))))
 
 
 ;;; CVS Backend Function

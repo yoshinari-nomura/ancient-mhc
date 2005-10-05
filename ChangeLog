@@ -1,3 +1,10 @@
+2005-10-05  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* emacs/mhc-cvs.el (mhc-cvs/modify): Make a committed file
+	writable after committed.
+	(mhc-cvs/backend): Copy `process-environment' before calling
+	`setenv'.
+
 2005-10-04  NOGUCHI Yusuke <nogunogu@mva.biglobe.ne.jp> / shirai
 
 	* emacs/mhc-parse.el (mhc-parse/strict): New internal variable.
