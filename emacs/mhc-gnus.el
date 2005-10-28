@@ -56,11 +56,19 @@
   (require 'mhc)
   (setq mhc-mailer-package 'gnus)
   (mhc-gnus/setup-methods)
+  (mhc-file-toggle-offline nil (not gnus-plugged) nil)
   (mhc-setup)
   (add-hook 'gnus-group-mode-hook 'mhc-mode)
   (add-hook 'gnus-summary-mode-hook 'mhc-mode)
-  (add-hook 'gnus-exit-gnus-hook 'mhc-exit))
+  (add-hook 'gnus-exit-gnus-hook 'mhc-exit)
+  (add-hook 'gnus-agent-plugged-hook 'mhc-gnus/plugged)
+  (add-hook 'gnus-agent-unplugged-hook 'mhc-gnus/unplugged))
 
+(defun mhc-gnus/plugged ()
+  (mhc-file-toggle-offline nil nil))
+
+(defun mhc-gnus/unplugged ()
+  (mhc-file-toggle-offline nil t))
 
 ;;; Backend methods:
 

@@ -148,17 +148,21 @@
 	  (car mhc-file-line-status-strings)
 	(cdr mhc-file-line-status-strings))))
 
-(defun mhc-file-toggle-offline (&optional full)
+(defun mhc-file-toggle-offline (&optional full set-to no-sync)
   "*Toggle line status of file manipulation backend."
-  (interactive "P")
-  (setq mhc-file/offline (not mhc-file/offline))
-  (if (assq 'mhc-mode minor-mode-alist)
-      (setcdr (assq 'mhc-mode minor-mode-alist) (list (mhc-file-line-status))))
-  (if mhc-file/offline
-      (message "mhc-file is offline.")
-    (if (y-or-n-p "Sync schedule files right now ? ")
-	(mhc-file-sync full))
-    (message "mhc-file is online.")))
+  (interactive (list current-prefix-arg (not mhc-file/offline)))
+  (let ((previous mhc-file/offline))
+    (setq mhc-file/offline set-to)
+    (if (assq 'mhc-mode minor-mode-alist)
+	(setcdr (assq 'mhc-mode minor-mode-alist)
+		(list (mhc-file-line-status))))
+    (if mhc-file/offline
+	(message "mhc-file is offline.")
+      (if (and (not no-sync)
+	       previous
+	       (y-or-n-p "Sync schedule files right now ? "))
+	  (mhc-file-sync full))
+      (message "mhc-file is online."))))
 
 
 (defun mhc-file-sync (&optional full)

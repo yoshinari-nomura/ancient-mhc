@@ -1,3 +1,13 @@
+2005-10-28  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* emacs/mhc-file.el (mhc-file-toggle-offline): Accept additional
+	optional arguments.
+
+	* emacs/mhc-gnus.el (mhc-gnus-setup): Toggle a network status
+	based on `gnus-plugged', and add following functions to
+	appropriate hooks.
+	(mhc-gnus/plugged, mhc-gnus/unplugged): New functions.
+
 2005-10-05  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
 	* emacs/mhc-cvs.el (mhc-cvs/modify): Make a committed file
