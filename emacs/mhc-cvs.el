@@ -294,7 +294,9 @@ from 'month before last' to 'this month next year'."
       (prog1 (= 0 (mhc-cvs/backend
 		   (list "commit" "-m" ""
 			 (mhc-cvs/shrink-file-name filename))))
-	(set-file-modes filename (logior ?\200 (file-modes filename))))))
+	(let ((modes (file-modes filename)))
+	  (when modes
+	    (set-file-modes filename (logior ?\200 modes)))))))
 
 
 ;;; CVS Backend Function
