@@ -1,4 +1,4 @@
-#!@@MHC_RUBY_PATH@@ -Ke
+#!/usr/local/bin/ruby16 -Ke
 # -*- ruby -*-
 
 ## today
@@ -6,7 +6,7 @@
 ## Author:  Yoshinari Nomura <nom@quickhack.net>
 ##
 ## Created: 1999/11/11
-## Revised: $Date: 2004/01/12 10:24:37 $
+## Revised: $Date: 2005/11/27 14:18:15 $
 ##
 ## today was originally written in perl.
 ## This  is a ruby version of it. Original authors were
@@ -50,7 +50,7 @@ def usage(do_exit = true)
   STDERR .print "usage: today [options]
   Show your today's schedules.
   --help               show this message.
-  --format=FORMAT      change output format to one of: ps, html
+  --format=FORMAT      change output format to one of: ps, html, howm
   --category=CATEGORY  pick only in CATEGORY. 
                        '!' and space separated multiple values are allowed.
   --date=strig[+n]     set a period of date.
@@ -167,6 +167,36 @@ formatter_html = Proc .new{|date, items|
   MhcKconv::tohtml(buffer)
 }
 
+formatter_howm = Proc .new{|date, items|
+  ret = ''
+
+  items .each{|sch|
+    sw = "@"
+    ret += "["
+    ret += format("%04d-%02d-%02d", date .y, date .m, date .d)
+    if (sch .time_b)
+      ret += " " + sch .time_b .to_s
+    else
+      ret += "      "
+    end
+    ret += "]"
+    sw=" "
+    case sch .category_as_string .downcase
+    when /done/
+      sw="."
+    when /todo/
+      sw="+"
+    else
+      sw="@"
+    end
+    ret += sw + " " + sch .subject + "\n"
+    if sch .description
+      ret += sch .description .gsub(/^/, " ")
+    end
+  }
+  MhcKconv::todisp(ret)
+}
+
 ################################################################
 ## hook
 
@@ -227,6 +257,8 @@ while option = ARGV .shift
       hook_proc = hook_ps
       date_from = date_from .m_first_day
       date_to   = date_from .m_last_day
+    when 'howm'
+      formatter = formatter_howm
     else
       formatter = formatter_normal
     end
@@ -256,8 +288,11 @@ if mail_address
   header   += "Subject: Today's schedule (#{date_from .to_s})\n"
   header   += "\n"
   header   += "#{user_name}'s schedule: \n\n"
-  contents  = 
+  contents = 
     get_schedule(db, date_from, date_to, category, formatter, hook_proc)
+  if formatter == formatter_howm
+    contents = format("= mhc %s--%s\n", date_from .to_s, date_to .to_s) + contents
+  end
 
   if contents && contents != ''
     message = MhcKconv::tomail(header + contents)
@@ -266,6 +301,7 @@ if mail_address
     }
   end
 else
+  print format("= mhc %s--%s\n", date_from .to_s, date_to .to_s) if formatter == formatter_howm
   print get_schedule(db, date_from, date_to, category, formatter, hook_proc)
 end
 
