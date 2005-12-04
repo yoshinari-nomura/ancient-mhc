@@ -1,3 +1,8 @@
+2005-12-04  KOIE Hidetaka <hide@koie.org> / nom
+
+	* emacs/mhc.el (toplevel): add mhc-goto-date.
+	* today.in (toplevel): add hown mode.
+
 2005-11-27  KOIE Hidetaka <hide@koie.org> / nom
 
 	* today.in (toplevel): support hown.
