@@ -1,4 +1,4 @@
-#!/usr/local/bin/ruby16 -Ke
+#!@@MHC_RUBY_PATH@@ -Ke
 # -*- ruby -*-
 
 ## today
@@ -6,7 +6,7 @@
 ## Author:  Yoshinari Nomura <nom@quickhack.net>
 ##
 ## Created: 1999/11/11
-## Revised: $Date: 2005/11/27 14:18:15 $
+## Revised: $Date: 2005/12/04 15:48:20 $
 ##
 ## today was originally written in perl.
 ## This  is a ruby version of it. Original authors were
