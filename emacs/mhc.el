@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1994/07/04
-;; Revised: $Date: 2005/05/15 12:04:55 $
+;; Revised: $Date: 2005/12/04 15:48:59 $
 
 ;;;
 ;;; Commentay:
@@ -80,6 +80,7 @@
 	["Next month"   mhc-goto-next-month t]
 	["Prev month"   mhc-goto-prev-month t]
 	["Goto month"   mhc-goto-month t]
+	["Goto date"    mhc-goto-date t]
 	["Import"       mhc-import t]
 	["Set category" mhc-set-default-category t]
 	"----"
@@ -122,6 +123,7 @@
   (setq mhc-mode-map (make-sparse-keymap))
   (setq mhc-prefix-map (make-sparse-keymap))
   (define-key mhc-prefix-map "g" 'mhc-goto-month)
+  (define-key mhc-prefix-map "j" 'mhc-goto-date)
   (define-key mhc-prefix-map "." 'mhc-goto-this-month)
   (define-key mhc-prefix-map "n" 'mhc-goto-next-month)
   (define-key mhc-prefix-map "p" 'mhc-goto-prev-month)
@@ -164,6 +166,7 @@
 \\[mhc-goto-next-month]	Review the schedule of next month
 \\[mhc-goto-prev-month]	Review the schedule of previous month
 \\[mhc-goto-month]	Jump to your prefer month
+\\[mhc-goto-date]	Jump to your prefer date
 \\[mhc-rescan-month]	Rescan the buffer of the month
 \\[mhc-goto-today]	Move cursor to today (Only available reviewing this month)
 \\[mhc-import]	Register the reviewing mail to schdule
@@ -176,7 +179,7 @@
 \\[mhc-calendar-toggle-insert-rectangle]	Toggle 3 months calendar
 \\[mhc-reset]	Reset MHC
 
-   '\\[universal-argument]' prefix is available on using '\\[mhc-rescan-month]', '\\[mhc-goto-this-month]', '\\[mhc-goto-month]'
+   '\\[universal-argument]' prefix is available on using '\\[mhc-rescan-month]', '\\[mhc-goto-this-month]', '\\[mhc-goto-month]', '\\[mhc-goto-date]'
   , it works to assign the category (see below).
 
    The prefix arg '\\[mhc-goto-next-month]', '\\[mhc-goto-prev-month]' is also available and you can indicate
@@ -186,7 +189,7 @@
 
    X-SC-Category:
    Space-seperated Keywords. You can set default category to scan.
-   You can also indicate keywords by typing C-cs C-c. C-cg with C-u.
+   You can also indicate keywords by typing '\\[mhc-rescan-month]', '\\[mhc-goto-this-month]', '\\[mhc-goto-month]', '\\[mhc-goto-date]' with C-u.
 "
   (interactive "P")
   (make-local-variable 'mhc-mode)
@@ -370,6 +373,37 @@ If HIDE-PRIVATE, priavate schedules are suppressed."
 		  (mhc-summary-mailer-type)
 		  mhc-default-category-predicate-sexp
 		  hide-private))
+
+(defvar mhc-goto-date-func 'mhc-goto-date-calendar)
+                                        ; or mhc-goto-date-summary
+(defun mhc-goto-date (&optional hide-private)
+  "*Show schedules of specified date.
+If HIDE-PRIVATE, private schedules are suppressed."
+  (interactive
+   (list
+    (if mhc-default-hide-private-schedules
+	(not current-prefix-arg)
+      current-prefix-arg)))
+  (let* ((owin (get-buffer-window (current-buffer)))
+         (buf (mhc-summary-get-import-buffer))
+         (win (if buf (get-buffer-window buf) nil))
+         date)
+    (save-excursion
+      (when win (select-window win))
+      (setq date (car (mhc-input-day "Date: " (mhc-date-now) (mhc-guess-date))))
+      (select-window owin))
+    (funcall mhc-goto-date-func date hide-private)))
+(defun mhc-goto-date-calendar (date hide-private)
+  (mhc-calendar-goto-month date))
+(defun mhc-goto-date-summary (date hide-private)
+  ;; XXX mhc-calendar-scanのパクリです
+  (mhc-goto-month date hide-private)
+  (goto-char (point-min))
+  (if (mhc-summary-search-date date)
+      (progn
+        (beginning-of-line)
+        (if (not (pos-visible-in-window-p (point)))
+            (recenter)))))
 
 (defun mhc-goto-this-month (&optional hide-private)
   "*Show schedules of this month.
