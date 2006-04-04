@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1994/07/04
-;; Revised: $Date: 2005/12/04 15:48:59 $
+;; Revised: $Date: 2006/04/04 07:35:24 $
 
 ;;;
 ;;; Commentay:
@@ -766,8 +766,8 @@ Returns t if the importation was succeeded."
 		  "\nX-SC-Duration: "
 		  "\nX-SC-Alarm: " (or alarm "")
 		  "\nX-SC-Record-Id: " (mhc-record-create-id) "\n")
-	  (mhc-draft-mode)
 	  (goto-char (point-min))
+	  (mhc-draft-mode)
 	  succeed))))
 
 (defcustom mhc-default-import-original-article nil
@@ -884,8 +884,8 @@ the default action of this command is changed to the latter."
 	  (mhc-draft-reedit-file file)
 	  (set-buffer-modified-p nil)
 	  (switch-to-buffer-other-window buffer)
-	  (mhc-draft-mode)
 	  (goto-char (point-min))
+	  (mhc-draft-mode)
 	  (set (make-local-variable 'mhc-draft-buffer-file-name) file)))
     (message "Specified file(%s) does not exist." file)))
 
