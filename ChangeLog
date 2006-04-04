@@ -1,3 +1,9 @@
+2006-04-04  Yoshinari Nomura <nom@quickhack.net>
+
+	* emacs/mhc.el (mhc-modify-file): allow (mhc-draft-mode-hook) to
+	                                  (goto-char).
+	               (mhc-edit): ditto.
+
 2005-12-04  KOIE Hidetaka <hide@koie.org> / nom
 
 	* emacs/mhc.el (toplevel): add mhc-goto-date.
