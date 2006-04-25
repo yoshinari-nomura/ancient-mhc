@@ -138,6 +138,11 @@
   :group 'mhc
   :type 'boolean)
 
+(defcustom mhc-insert-overdue-todo nil
+  "*Display overdue TODO on TODAY."
+  :group 'mhc
+  :type 'boolean)
+
 (defcustom mhc-summary-line-format
   (if (eq mhc-summary-language 'japanese)
       "%M%·î%D%Æü%(%ÍË%) %b%e %c%i%s %p%l"
@@ -176,6 +181,27 @@ which are replaced by the given information:
 It may include any of the following format specifications
 which are replaced by the given information:
 
+%i The icon for the schedule.
+%c The checkbox of the TODO.
+%s The subject of the schedule.
+%l The location of the schedule.
+%p The priority of the schedule.
+%d The deadline of the schedule.
+\(`mhc-todo-string-remaining-day' or `mhc-todo-string-deadline-day' is used\)
+"
+  :group 'mhc
+  :type 'string)
+
+(defcustom mhc-overdue-todo-line-format
+  (concat (if (eq mhc-summary-language 'japanese)
+	      "             "
+	    "          ")
+	  "%T  %p %c%i%s %l%d")
+  "*A format string for summary overdue todo line of MHC.
+It may include any of the following format specifications
+which are replaced by the given information:
+
+%T The indicator for TODO.
 %i The icon for the schedule.
 %c The checkbox of the TODO.
 %s The subject of the schedule.
@@ -296,6 +322,8 @@ which are replaced by the given information:
 
 (defvar mhc-todo/line-inserter nil)
 
+(defvar mhc-overdue-todo/line-inserter nil)
+
 (defvar mhc-memo/line-inserter nil)
 
 (defvar mhc-summary-line-format-alist
@@ -367,7 +395,8 @@ PROP-VALUE is the property value correspond to PROP-TYPE.
 ")
 
 (defvar mhc-todo-line-format-alist
-  '((?i (not mhc-tmp-private) 'icon
+  '((?T "TODO" 'face 'mhc-category-face-todo)
+    (?i (not mhc-tmp-private) 'icon
 	(delete "todo"
 		(delete "done"
 			(copy-sequence
@@ -636,13 +665,37 @@ If optional argument FOR-DRAFT is non-nil, Hilight message as draft message."
 
 (defun mhc-summary-make-contents
   (from to mailer &optional category-predicate secret)
-  (let ((dayinfo-list (mhc-db-scan from to)))
+  (let ((dayinfo-list (mhc-db-scan from to))
+	todo-list overdue deadline mhc-tmp-day)
     (setq mhc-summary/today (mhc-date-now))
     (while dayinfo-list
       (mhc-summary/insert-dayinfo
        (car dayinfo-list) mailer
        (or category-predicate mhc-default-category-predicate-sexp)
        secret)
+      (when (and mhc-insert-overdue-todo
+		 (mhc-date= (mhc-day-date (car dayinfo-list)) mhc-summary/today))
+	(setq todo-list (mhc-db-scan-todo mhc-summary/today))
+	(while todo-list
+	  (setq deadline (mhc-schedule-todo-deadline (car todo-list)))
+	  (when (and deadline
+		     (if mhc-summary-display-todo
+			 (> (mhc-date- mhc-summary/today deadline) 0)
+		       (>= (mhc-date- mhc-summary/today deadline) 0))
+		     (not (mhc-schedule-in-category-p (car todo-list) "done")))
+	    (setq overdue (cons (car todo-list) overdue)))
+	  (setq todo-list (cdr todo-list)))
+	(setq mhc-tmp-day mhc-summary/today)
+	(setq overdue (nreverse overdue))
+	(while overdue
+	  (mhc-summary-insert-contents
+	   (car overdue)
+	   (and secret
+		(mhc-schedule-in-category-p (car overdue)
+					    mhc-category-as-private))
+	   'mhc-overdue-todo-line-insert
+	   mailer)
+	  (setq overdue (cdr overdue))))
       (and mhc-use-week-separator
 	   (eq (mhc-day-day-of-week (car dayinfo-list))
 	       (mhc-end-day-of-week))
@@ -848,10 +901,14 @@ If optional argument FOR-DRAFT is non-nil, Hilight message as draft message."
    mhc-todo-line-format
    mhc-todo-line-format-alist)
   (mhc-line-inserter-setup
+   mhc-overdue-todo/line-inserter
+   mhc-overdue-todo-line-format
+   mhc-todo-line-format-alist)
+  (mhc-line-inserter-setup
    mhc-memo/line-inserter
    mhc-memo-line-format
    mhc-memo-line-format-alist))
-  
+
 
 (defun mhc-summary-line-insert ()
   "Insert summary line."
@@ -877,6 +934,12 @@ If optional argument FOR-DRAFT is non-nil, Hilight message as draft message."
   (let ((mhc-tmp-deadline (mhc-schedule-todo-deadline mhc-tmp-schedule))
 	(mhc-tmp-priority (mhc-schedule-priority mhc-tmp-schedule)))
     (funcall mhc-todo/line-inserter)))
+
+(defun mhc-overdue-todo-line-insert ()
+  "Insert overdue todo line."
+  (let ((mhc-tmp-deadline (mhc-schedule-todo-deadline mhc-tmp-schedule))
+	(mhc-tmp-priority (mhc-schedule-priority mhc-tmp-schedule)))
+    (funcall mhc-overdue-todo/line-inserter)))
 
 (defun mhc-memo-line-insert ()
   "Insert memo line."

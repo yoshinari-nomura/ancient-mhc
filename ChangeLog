@@ -1,3 +1,14 @@
+2006-04-25  Hideyuki SHIRAI  <shirai@quickhack.net>
+
+	* emacs/mhc-summary.el (mhc-insert-overdue-todo): New user option.
+	(mhc-overdue-todo-line-format): Ditto.
+	(mhc-todo-line-format-alist): Add `?T' element.
+	(mhc-summary-make-contents): Display overue todos on TODAY if
+	`mhc-insert-overdue-todo' is non-nil.
+	(mhc-summary-line-inserter-setup): Setup
+	`mhc-overdue-todo/line-inserter'.
+	(mhc-overdue-todo-line-insert): New function.
+
 2006-04-04  Yoshinari Nomura <nom@quickhack.net>
 
 	* emacs/mhc.el (mhc-modify-file): allow (mhc-draft-mode-hook) to
