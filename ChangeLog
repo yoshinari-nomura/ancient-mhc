@@ -1,3 +1,8 @@
+2006-06-15  Hideyuki SHIRAI  <shirai@quickhack.net>
+
+	* emacs/mhc-vars.el (mhc-default-coding-system): Change default
+	value to `iso-2022-7bit-ss2-unix'.
+
 2006-04-25  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* emacs/mhc-summary.el (mhc-insert-overdue-todo): New user option.
