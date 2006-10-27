@@ -1,3 +1,7 @@
+2006-10-27  author  <author@oasis>
+
+	* mhc2ol.in: -A option added.
+
 2006-06-15  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* emacs/mhc-vars.el (mhc-default-coding-system): Change default
