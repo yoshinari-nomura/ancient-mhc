@@ -8,7 +8,7 @@
 ##          
 ##
 ## Created: 2001/09/15
-## Revised: $Date: 2005/05/01 22:55:08 $
+## Revised: $Date: 2006/10/27 00:53:10 $
 ##
 
 $DEBUG = false
@@ -63,6 +63,22 @@ module RepeatPattern
 
     def get_time()
       [@stime, @etime]
+    end
+
+    def get_sdatetime
+      if @stime .nil?
+	Time .local(@sdate. y, @sdate. m, @sdate .d, 0, 0)
+      else
+	Time .local(@sdate. y, @sdate. m, @sdate .d, @stime .hh, @stime .mm)
+      end
+    end
+
+    def get_edatetime
+      if @stime .nil?
+	Time .local(@edate. y, @edate. m, @edate .d, 0, 0)
+      else
+	Time .local(@edate. y, @edate. m, @edate .d, @etime .hh, @etime .mm)
+      end
     end
 
     def handle_recurrence(ol_appoint)
@@ -183,7 +199,7 @@ end
 
 def usage
   print '
-usage: mhc2ol [-a | -i | -d | -N] [-H] [-n] [-s] [-m] [-r dir] [-c category] [YYYYMMDD-yyyymmdd]
+usage: mhc2ol [-a | -i | -d | -N] [-A] [-H] [-n] [-s] [-m] [-r dir] [-c category] [YYYYMMDD-yyyymmdd]
 
   mhc2ol -- Add/Copy mhc articles to Outlook.
 
@@ -205,6 +221,7 @@ usage: mhc2ol [-a | -i | -d | -N] [-H] [-n] [-s] [-m] [-r dir] [-c category] [YY
              ~/Mail/schedule
     -c     : Copy only the mhc articles of which the category
              matches the specified regexp.
+    -A     : Disable reminder if the mhc article already has been passed.
 
     YYYYMMDD-yyyymmdd : set a start and end date of scanning mhc.
                         if omitted, scan from 3 months ago to
@@ -341,6 +358,7 @@ class Exporter
   @@flag_export_part = 'all' # 'all' || 'body_only'
   @@flag_noharm = false
   @@flag_timestamp = false
+  @@flag_disable_passed_sch = false
   @@mhc_category_name = 'MHC-sch'
   @@additional_category = false
 
@@ -475,8 +493,12 @@ class Exporter
 
       # a reminder is valid for a future schedule.
       if sch .alarm() != nil then
-	appoint .ReminderSet = true
-	appoint .ReminderMinutesBeforeStart = sch .alarm() / 60
+	if period .get_sdatetime >= Time .now && $flag_disable_passed_sch
+	  appoint .ReminderSet = true
+	  appoint .ReminderMinutesBeforeStart = sch .alarm() / 60
+	else
+	  appoint .ReminderSet = false
+	end
       else
 	appoint .ReminderSet = false
       end
@@ -752,6 +774,10 @@ class Exporter
     @@flag_additional_category = flag
   end
 
+  def Exporter.set_flag_disable_passed_sch(flag)
+    @@set_flag_disable_passed_sch = flag
+  end
+
   def Exporter.to_ol_date(date)
     format("%4d/%02d/%02d", date .y(), date .m(), date .d()) if date
   end
@@ -775,6 +801,7 @@ $flag_dir = File .expand_path("~/Mail/schedule")
 $flag_separation = false
 $flag_discreet = false
 $flag_additional_category = false
+$flag_disable_passed_sch = false
 
 while ARGV .length > 0
   case ARGV[0]
@@ -804,6 +831,8 @@ while ARGV .length > 0
     $flag_separation = true
   when '-m'
     $flag_additional_category = true
+  when '-A'
+    $flag_disable_passed_sch = true
   else
     usage()
   end
@@ -850,6 +879,7 @@ Exporter .set_flag_discreet($flag_discreet)
 Exporter .set_flag_noharm($flag_noharm)
 Exporter .set_flag_timestamp($flag_timestamp)
 Exporter .set_flag_additional_category($flag_additional_category)
+Exporter .set_flag_disable_passed_sch($flag_disable_passed_sch)
 exporter = Exporter .new(mdb, outlook)
 exporter .set_category_regexp($flag_category_regexp)
 exporter .delete_ol_schedules()
