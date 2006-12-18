@@ -4,7 +4,7 @@
 ## Author:  MIYOSHI Masanori <miyoshi@quickhack.net>
 ##          Yoshinari Nomura <nom@quickhack.net>
 ## Created: 2000/7/12
-## Revised: $Date: 2003/10/13 07:26:29 $
+## Revised: $Date: 2006/12/18 06:50:14 $
 
 $LOAD_PATH .unshift('.')
 require 'mhc-make'
@@ -114,6 +114,7 @@ conf .replace_keywords(infile_list)
 
 print "In ruby-ext/\n"
 Dir .chdir('ruby-ext')
-make_system('ruby extconf.rb')
+#make_system('ruby extconf.rb')
+make_system("#{conf['@@MHC_RUBY_PATH@@']} extconf.rb")
 
 exit 0
