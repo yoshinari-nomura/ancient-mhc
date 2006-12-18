@@ -5,12 +5,12 @@
 ## Author:  Yoshinari Nomura <nom@quickhack.net>
 ##
 ## Created: 1999/07/16
-## Revised: $Date: 2005/03/22 16:18:45 $
+## Revised: $Date: 2006/12/18 06:39:34 $
 ##
 
 #$DEBUG = true
 
-require 'gtk'
+require 'gtk2'
 
 require 'mhc-kconv'
 require 'mhc-date'
@@ -26,6 +26,7 @@ module MhcKconv
   end
 end
 
+Gtk.init
 # xxx: from ruby-gtk 0.23, Gtk::CAN_* changed to Gtk::Widget::CAN_*
 #
 CAN_DEFAULT = Gtk::Widget::CAN_DEFAULT || Gtk::CAN_DEFAULT
@@ -39,14 +40,14 @@ CAN_FOCUS   = Gtk::Widget::CAN_FOCUS   || Gtk::CAN_FOCUS
 XPM_PATH = '@@MHC_XPM_PATH@@'
 
 TIPS = Gtk::Tooltips .new
-TIPS .set_delay(500)
+# TIPS .set_delay(500)
 
 if RUBY_PLATFORM =~ /cygwin/
   ## for windows
   FONTSET = "-unknown-ms ui gothic-normal-r-normal-*-*-100-*-*-p-*-windows-shiftjis"
   FONTSET2 = "-unknown-ms ui gothic-bold-r-normal-*-*-100-*-*-p-*-windows-shiftjis"
   FONT  = Gdk::Font .font_load(FONTSET)
-  FONT2 = Gdk::Font .font_load(FONTSET2)
+  # FONT2 = Gdk::Font .font_load(FONTSET2)
   Gtk::RC::parse_string <<EOS
 style "default"
 {
@@ -57,8 +58,9 @@ EOS
 else
   FONTSET = "-*-fixed-medium-r-normal--14-*,-*-fixed-medium-r-normal--14-*"
   FONTSET2 = "-*-fixed-bold-r-normal--14-*,-*-fixed-*-r-normal--14-*"
-  FONT  = Gdk::Font .fontset_load(FONTSET)
-  FONT2 = Gdk::Font .fontset_load(FONTSET2)
+  FONT  = Pango::FontDescription.new("serif normal 10")
+  FONT2 = Pango::FontDescription.new("sans normal 10")
+  FONT2.set_weight(Pango::FontDescription::WEIGHT_BOLD)
   Gtk::RC::parse_string <<EOS
 style "default"
 {
@@ -68,10 +70,10 @@ widget_class "*" style "default"
 EOS
 end
 
-STYLE_SATURDAY = Gtk::Style .new .set_font(FONT)
-STYLE_HOLIDAY  = Gtk::Style .new .set_font(FONT)
-STYLE_TODAY    = Gtk::Style .new .set_font(FONT)
-STYLE_WEEKDAY  = Gtk::Style .new .set_font(FONT)
+STYLE_SATURDAY = Gtk::Style .new .set_font_desc(FONT)
+STYLE_HOLIDAY  = Gtk::Style .new .set_font_desc(FONT)
+STYLE_TODAY    = Gtk::Style .new .set_font_desc(FONT)
+STYLE_WEEKDAY  = Gtk::Style .new .set_font_desc(FONT)
 
 [Gtk::STATE_ACTIVE, Gtk::STATE_INSENSITIVE, Gtk::STATE_NORMAL,
   Gtk::STATE_PRELIGHT, Gtk::STATE_SELECTED] .each {|s|
@@ -428,45 +430,52 @@ class GtkDayBook < Gtk::VBox
 
   def initialize(date = MhcDate .new, buttons = nil, need_clist = true)
     super(false, 0)
-    border_width(0)
+    set_border_width(0)
 
     @date      = date
     @tip       = ''
 
     @hbx = GtkButtonBar .new(buttons) if buttons
-    @btn = Gtk::Button .new('') .border_width(0) .set_usize(0, 18) \
+    @btn = Gtk::Button .new('') .set_border_width(0) \
            .unset_flags(CAN_FOCUS) .set_relief(Gtk::RELIEF_NONE)
 
     if need_clist
-      @lst = Gtk::CList .new(['Time', 'Desc']) .column_titles_hide \
-           .set_selection_mode(Gtk::SELECTION_SINGLE) \
-           .set_column_auto_resize(0, true) .unset_flags(CAN_FOCUS) \
-           .set_usize(1, 1)
-
-      @lst .signal_connect_after('select_row'){|w,r,s,t|
-	w .unselect_row(r, s)
-      }
+      @lst = Gtk::ListStore.new(String, String)
+      @lsv = Gtk::TreeView.new(@lst).set_headers_visible(false) \
+		.set_rules_hint(true)
+      @lsv.append_column(Gtk::TreeViewColumn.new("Time",
+                                                 Gtk::CellRendererText.new,
+                                                 :text => 0) \
+                         .set_max_width(42))
+      @lsv.append_column(Gtk::TreeViewColumn.new("Desc",
+                                                 Gtk::CellRendererText.new,
+                                                 :text => 1) \
+                         .set_max_width(56))
     end
     pack_start(@btn, false, false, 0)
-    pack_start(@lst, true,  true,  0) if need_clist
+    pack_start(@lsv, true,  true,  0) if need_clist
     pack_start(@hbx, false, true,  0) if buttons
     set_date(@date)
   end
 
   def append(item, time = '')
-    @lst .append([time, MhcKconv::todisp(item)])
+    if @lst
+      iter = @lst.append
+      iter[0] = time
+      iter[1] = MhcKconv::todisp(item)
+    end
     return self
   end
 
   def set_tip(tip)
-    @tip = tip ? MhcKconv::todisp(tip .to_s) : nil
+    @tip = tip ? MhcKconv::todisp(tip .to_s).tr("\007", " ") : nil
     TIPS .set_tip(@btn, @tip, nil)
     return self
   end
 
   def append_tip(tip)
-    @tip = (@tip .to_s) + tip
-    set_tip(@tip)
+    @tip = (@tip .to_s) + tip.tr("\007", " ")
+    set_tip(MhcKconv::todisp(@tip))
     return self
   end
 
@@ -494,7 +503,7 @@ class GtkDayBook < Gtk::VBox
 	@btn .set_relief(Gtk::RELIEF_NORMAL)
 	return self
       when 'busy'
-	c = @btn .child .style .dup .set_font(FONT2)
+	c = @btn .child .style .dup .set_font_desc(FONT2)
       else
 	c = STYLE_HASH[c]
       end
@@ -513,7 +522,11 @@ class GtkDayBook < Gtk::VBox
     when 'day-btn-clicked'
       @btn .signal_connect('clicked', p)
     when 'day-lst-clicked'
-      @lst .signal_connect('select_row'){|w,r,s,t| p .call(self, r)} if @lst
+      if @lst
+        @lsv .signal_connect('row-activated'){|w,path,t| 
+          p .call(self, path.indices[0].to_i)
+        }
+      end
     when /-btn-clicked$/
       @hbx .signal_connect(sig, &p)
     else
@@ -587,7 +600,8 @@ class GtkCalendar < Gtk::VBox
     for i in 0 .. 41
       if on?(i)
 	dd = pos_to_date(i)
-	@dList[i] .set_date(dd, true) .set_tip("#{dd .d}Æü\n") .show
+	@dList[i] .set_date(dd, true) \
+        	.set_tip(MhcKconv::todisp("#{dd .d}Æü\n")) .show
       else
 	@dList[i] .hide
       end
@@ -651,38 +665,23 @@ end
 
 ################################################################
 ## confirm
-class GtkConfirm < Gtk::Window
+class GtkConfirm < Gtk::Dialog
   def initialize(msg, btns = 1, &p)
-    #super(Gtk::WINDOW_POPUP)
-    super(Gtk::WINDOW_DIALOG)
-
-    vbx = Gtk::VBox .new(false, 0)
-    hbx = Gtk::HBox .new(true , 0)
-
-    y = Gtk::Button .new('OK')
-    y .flags |= CAN_DEFAULT
-    if btns == 1
-      y .grab_default
-    end
-    y .signal_connect('clicked'){p .call(true) if p; destroy}
-    hbx .pack_start(y, true, true, 0)
-    
+    b = [[Gtk::Stock::OK, Gtk::Dialog::RESPONSE_ACCEPT]]
     if btns > 1
-      n = Gtk::Button .new('Cancel')
-      n .flags |= CAN_DEFAULT
-      n .grab_default
-      n .signal_connect('clicked'){p .call(false) if p ; destroy}
-      hbx .pack_start(n, true, true, 0)
+      b << [Gtk::Stock::CANCEL, Gtk::Dialog::RESPONSE_REJECT]
     end
-    
-    vbx .pack_start(Gtk::Label .new(msg))
-    vbx .pack_start(hbx, false, false, 0)
-
-
-    width_size = msg .length * 10
-    width_size = 640 if width_size > 640
-    add(vbx) .set_modal(true) .set_usize(width_size,100)
-    set_position(Gtk::WIN_POS_CENTER) .show_all
+    super(msg, nil, Gtk::Dialog::MODAL, *b)
+    self.vbox.pack_start(Gtk::Label.new(msg)).show_all
+    run do |response|
+      case response
+      when Gtk::Dialog::RESPONSE_ACCEPT
+        p.call(true) if p
+      when Gtk::Dialog::RESPONSE_REJECT
+        p.call(false) if p
+      end
+    end
+    destroy
   end
 end
 
@@ -691,10 +690,10 @@ end
 
 class GtkToplevel < Gtk::Window
   def initialize
-    super(Gtk::WINDOW_TOPLEVEL)
+    super(Gtk::Window::TOPLEVEL)
     signal_connect('destroy'){
       print "GtkToplevel destroyed\n" if $DEBUG
-      exit  if active_other_windows == 0
+      Gtk.main_quit  if active_other_windows == 0
     }
   end
 
@@ -723,31 +722,27 @@ class GtkToplevel < Gtk::Window
 
   def hide
     print "GtkToplevel hide\n" if $DEBUG
-    exit  if active_other_windows == 0
+    Gtk.main_quit  if active_other_windows == 0
     push_position
     super
   end
 
   def hide_all
     print "GtkToplevel hide_all\n" if $DEBUG
-    exit  if active_other_windows == 0
+    Gtk.main_quit  if active_other_windows == 0
     push_position
     super
   end
 
   def push_position
-    begin
-      @pos = self .window .get_root_origin
-    rescue
-      print "You must use ruby/gtk 0.21 or later\n"
-    end
+    @pos = self .position
     print "push_position #{@pos .inspect}\n" if $DEBUG
   end
 
   def pop_position
     if @pos
       print "pop_position #{@pos[0]}, #{@pos[1]}\n" if @pos && $DEBUG
-      self .set_uposition(@pos[0], @pos[1]) 
+      self .move(@pos[0], @pos[1]) 
     end
   end
 
@@ -759,7 +754,7 @@ class GtkToplevel < Gtk::Window
 
     y = Gtk::Button .new('OK')
     y .flags |= CAN_DEFAULT
-    y .signal_connect('clicked'){exit}
+    y .signal_connect('clicked'){Gtk.main_quit}
     hbx .pack_start(y, true, true, 0)
 
     n = Gtk::Button .new('Cancel')
@@ -796,7 +791,7 @@ class GtkFileViewer < Gtk::VBox
     hbx  = Gtk::HBox .new(false, 0)
 
     ## @txt = Gtk::Text .new(nil, vad)
-    @txt = Gtk::Text .new(nil, nil)                            ##
+    @txt = Gtk::TextView .new(nil)                            ##
 
     @txt .set_editable(@text_editable)
 
@@ -806,9 +801,9 @@ class GtkFileViewer < Gtk::VBox
     @vsc .set_policy(Gtk::POLICY_NEVER, Gtk::POLICY_AUTOMATIC) ##
     @vsc .add(@txt)                                            ##
 
-    @height = (@txt .get_style .font .string_width '0') * 2 ## xxxx
+    @height = 14 ## (@txt .get_style .font .string_width '0') * 2 ## xxxx
     # @txt .signal_connect('key_press_event'){|w, ev| less_key(w, ev .string)}
-    @txt .signal_connect('changed'){|w| @modified = true}
+    @txt .buffer .signal_connect('changed'){|w| @modified = true}
 
     ## hbx .pack_start(@txt, true, true,   0)
     ## hbx .pack_start(@vsc,  false, false, 0)
@@ -861,7 +856,7 @@ class GtkFileViewer < Gtk::VBox
 
   def replace_text(text)
     @txt .set_editable(true)  .freeze
-    @txt .delete_text(0, @txt .get_length)
+    @txt .buffer .set_text("")
 #     hdr, value = text .split("\n\n", 2)
 #      hdr .to_s .each_line{|line|
 #        case line
@@ -878,8 +873,8 @@ class GtkFileViewer < Gtk::VBox
 #     @txt .insert(nil, RED,   WHITE, hdr .to_s)
 #     @txt .insert(nil, BLACK, nil, "\n\n" + value .to_s)
 
-    @txt .insert_text(MhcKconv::todisp(text), 0)
-    @txt .set_editable(@text_editable) .thaw
+    @txt .buffer .insert(@txt.buffer.start_iter, MhcKconv::todisp(text))
+    @txt .set_editable(@text_editable) #.thaw
   end
 
   def set_modified(bool, msg)
@@ -891,7 +886,7 @@ class GtkFileViewer < Gtk::VBox
   end
 
   def dump
-    return @txt .get_chars(0, @txt .get_length)
+    return @txt .buffer.text
   end
 end
 
@@ -913,7 +908,7 @@ class GtkNumericCombo < Gtk::Combo
   end
 
   def adjust_number
-      s = self .entry .get_text
+      s = self .entry .text
       i = s .to_i
       if (s !~ /^\d*$/) || (i != 0 &&  (i < @min || i > @max))
  	set_number(i)
@@ -928,7 +923,7 @@ class GtkNumericCombo < Gtk::Combo
       min += @step1
     end
     self .set_popdown_strings(a)
-    self .set_usize(7 * @len + 30, 0)
+    # self .set_usize(7 * @len + 30, 0)
     self .entry .set_max_length(@len)
   end
 
@@ -951,7 +946,7 @@ class GtkNumericCombo < Gtk::Combo
   end
 
   def dump
-    return self .entry .get_text .to_i
+    return self .entry .text .to_i
   end
 end
 
@@ -964,7 +959,7 @@ class GtkNumericSpin < Gtk::SpinButton
     len = to .to_s .length
     super(adj)
     self .set_wrap(true)
-    self .set_usize(7 * len + 30, 0)
+    # self .set_usize(7 * len + 30, 0)
     self .set_max_length(len)
     #self .set_update_policy(Gtk::SpinButton::UPDATE_ALWAYS)
     #self .set_update_policy(Gtk::SpinButton::UPDATE_IF_VALID)
@@ -1007,7 +1002,10 @@ class GtkEntry < Gtk::HBox
   end
 
   def get_text
-    return @ent .get_text
+    text
+  end
+  def text
+    return @ent .text
   end
 
   def set_text(str)
@@ -1038,7 +1036,7 @@ class GtkToggleTable < Gtk::Table
 	lbl = label[xs * y + x]
 	if lbl
 	  b = Gtk::ToggleButton .new(lbl .to_s)
-	  b .unset_flags(CAN_FOCUS) .border_width(0)
+	  b .unset_flags(CAN_FOCUS) .set_border_width(0)
 	  @symbols << b
 	  b .signal_connect('toggled'){|w|
 	    p .call(w)
@@ -1070,7 +1068,7 @@ end
 ## Toolbar like widget.
 
 class GtkButtonBar < Gtk::HBox
-  TOP = Gtk::Window .new(Gtk::WINDOW_TOPLEVEL)
+  TOP = Gtk::Window .new(Gtk::Window::TOPLEVEL)
   TOP .realize
 
   def initialize(btn)
@@ -1086,11 +1084,10 @@ class GtkButtonBar < Gtk::HBox
       w = TOP .window
       s = TOP .style .bg(Gtk::STATE_NORMAL)
       pix, map = Gdk::Pixmap .create_from_xpm(w, s, path)
-      xpm = Gtk::Pixmap .new(pix, map)
-
-      b = Gtk::Button .new() .unset_flags(CAN_FOCUS) .border_width(0)
+      xpm = Gtk::Image .new(pix, map)
+      b = Gtk::Button .new() .unset_flags(CAN_FOCUS) .set_border_width(0)
       b .add(xpm)
-      TIPS .set_tip(b, tip, nil)
+      TIPS .set_tip(b, MhcKconv::todisp(tip), nil)
       self .pack_start(b, false, false, 0)
       @btn[name] = b
     }
