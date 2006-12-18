@@ -1,3 +1,15 @@
+2006-12-18  Yoshinari Nomura <nom@quickhack.net>
+
+	* configure.rb:
+	patch from Tatsuya Kinoshita to enable the --with-ruby setting.
+
+2006-12-18  Yoshinari Nomura <nom@quickhack.net>
+
+	* gemcal.in, ruby-ext/lib/mhc-gtk.rb.in, ruby-ext/lib/mhc-kconv.rb:
+	patch from Fumitoshi UKAI to support gtk2.
+	segfault fix from Kazuhiro Nishiyama.
+	(Thanks to Tatsuya Kinoshita for putting things together.)
+
 2006-12-07  IRIE Tetsuya <irie@t.email.ne.jp>
 
 	* emacs/mhc-gnus.el (mhc-gnus/encode-string): Bind
