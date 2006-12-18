@@ -5,7 +5,7 @@
 ## Author:  Yoshinari Nomura <nom@quickhack.net>
 ##
 ## Created: 1999/07/16
-## Revised: $Date: 2006/12/18 06:39:34 $
+## Revised: $Date: 2006/12/18 09:31:54 $
 ##
 
 #$DEBUG = true
@@ -160,7 +160,7 @@ class GtkAlarmEntry < Gtk::HBox
     if @btn .active?
       return nil
     else
-      return (@num .get_value_as_int) * UNIT_INSEC[@unit]
+      return (@num .value_as_int) * UNIT_INSEC[@unit]
     end
   end
 
@@ -468,13 +468,14 @@ class GtkDayBook < Gtk::VBox
   end
 
   def set_tip(tip)
-    @tip = tip ? MhcKconv::todisp(tip .to_s).tr("\007", " ") : nil
+    # @tip = tip ? MhcKconv::todisp(tip .to_s).tr("\007", " ") : nil
+    @tip = tip ? MhcKconv::todisp(tip .to_s) : nil
     TIPS .set_tip(@btn, @tip, nil)
     return self
   end
 
   def append_tip(tip)
-    @tip = (@tip .to_s) + tip.tr("\007", " ")
+    @tip = (@tip .to_s) + tip # + tip.tr("\007", " ")
     set_tip(MhcKconv::todisp(@tip))
     return self
   end
@@ -601,7 +602,7 @@ class GtkCalendar < Gtk::VBox
       if on?(i)
 	dd = pos_to_date(i)
 	@dList[i] .set_date(dd, true) \
-        	.set_tip(MhcKconv::todisp("#{dd .d}Æü\n")) .show
+        	.set_tip(MhcKconv::todisp("#{dd .d}Æü")) .show
       else
 	@dList[i] .hide
       end
@@ -766,7 +767,7 @@ class GtkToplevel < Gtk::Window
     vbx .pack_start(Gtk::Label .new('Exit GtkCalendar?'))
     vbx .pack_start(hbx, false, false, 0)
 
-    top .add(vbx) .set_modal(true) .set_usize(250,100)
+    top .add(vbx) .set_modal(true).set_size_request(250,100)#set_usize(250,100)
     top .set_position(Gtk::WIN_POS_CENTER) .show_all
   end
 end
@@ -855,7 +856,7 @@ class GtkFileViewer < Gtk::VBox
 #   end
 
   def replace_text(text)
-    @txt .set_editable(true)  .freeze
+    @txt .set_editable(true) # .freeze
     @txt .buffer .set_text("")
 #     hdr, value = text .split("\n\n", 2)
 #      hdr .to_s .each_line{|line|
@@ -924,6 +925,7 @@ class GtkNumericCombo < Gtk::Combo
     end
     self .set_popdown_strings(a)
     # self .set_usize(7 * @len + 30, 0)
+    self .set_width_request(7 * @len + 30)
     self .entry .set_max_length(@len)
   end
 
@@ -981,11 +983,11 @@ class GtkNumericSpin < Gtk::SpinButton
   end
 
   def get_value
-    return get_value_as_int .to_s
+    return value_as_int .to_s
   end
 
   def dump
-    get_value_as_int
+    value_as_int
   end
 end
 

@@ -6,7 +6,7 @@
 ## Author:  Yoshinari Nomura <nom@quickhack.net>
 ##
 ## Created: 1999/09/01
-## Revised: $Date: 2006/12/18 06:39:34 $
+## Revised: $Date: 2006/12/18 09:31:54 $
 ##
 
 # $DEBUG = 1
@@ -35,6 +35,14 @@ class VDateListInput < Gtk::HBox
     hbx = Gtk::HBox .new(false, 0) .set_border_width(10)
 
     @lst = Gtk::ListStore.new(String)
+    @lsv = Gtk::TreeView.new(@lst).set_headers_visible(false) \
+		.set_rules_hint(true)
+    @lsv.append_column(Gtk::TreeViewColumn.new("Date",
+                                               Gtk::CellRendererText.new,
+                                               :text => 0) \
+                       .set_max_width(56))
+    @lsv.set_width_request(150)
+
     # @lst = Gtk::CList .new(['Click to Remove'])
     # @lst .set_selection_mode(Gtk::SELECTION_SINGLE)
     # @lst .signal_connect('click_column'){|w, c|
@@ -53,7 +61,7 @@ class VDateListInput < Gtk::HBox
     #}
     swin = Gtk::ScrolledWindow .new(nil, nil)
     swin .set_policy(Gtk::POLICY_NEVER, Gtk::POLICY_ALWAYS)
-    swin .add(@lst)
+    swin .add(@lsv)
 
     @cal = GtkCalendar .new(MhcDate .new, [['prev',  'prev month'],
 			                ['next',  'next month'],
@@ -61,6 +69,7 @@ class VDateListInput < Gtk::HBox
 			    true, true, false)
 
     hbx .pack_start(swin, false, false, 0)
+    # hbx .pack_start(@lsv, true,  true,  0)
     hbx .pack_start(@cal, false, false, 0)
     frm .add(hbx)
 
@@ -85,14 +94,14 @@ class VDateListInput < Gtk::HBox
     update
   end
 
-  def delete_lst(ymd_str)
-    for i in 0 .. @lst .rows - 1
-      s = @lst .get_text(i, 0) .gsub('[ -]', '')
-      if s == ymd_str
-	@lst .remove_row(i)
-      end
-    end
-  end
+#   def delete_lst(ymd_str)
+#     for i in 0 .. @lst .rows - 1
+#       s = @lst .get_text(i, 0) .gsub('[ -]', '')
+#       if s == ymd_str
+# 	@lst .remove_row(i)
+#       end
+#     end
+#   end
 
   def set_date(date)
     @cal .set_date(date)
@@ -104,7 +113,7 @@ class VDateListInput < Gtk::HBox
   end
 
   def update
-    @lst .freeze
+    #@lst .freeze
     @lst .clear
     @sch .day .each{|day|
       iter = @lst.append
@@ -243,6 +252,7 @@ class MhcScheduleEdit < GtkToplevel
   def initialize(db, sch)
     super()
     # set_usize(640, 480)
+    # set_size_request(640, 480)
     set_title('Mhc::ScheduleEdit')
     vbx = Gtk::VBox .new
 
@@ -431,6 +441,7 @@ class MhcDayBook
       add(@vbx)
       set_title('Mhc::DayBook')
       # set_usize(217, 145)
+      set_size_request(233, 177)
       set_uposition(x, y) if x && y
     end
     def append(*arg)           ; @vbx .append(*arg)           ; end
@@ -534,6 +545,7 @@ class MhcCalendar
       set_title(date .ym_js)
       add(@vbx)
       # set_usize(217, 0)
+      set_size_request(233, 177)
       set_uposition(x, y) if x && y
     end
     def date                     ; @vbx .date                       ; end
@@ -621,8 +633,8 @@ class MhcCalendar
       first = true
       item .each{|x|
 	@vml .d(dd) .append(x .subject, x .time_b .to_s)
-	s = (x .time_b .to_s + " " + x .subject) .gsub("\s", "\x07")
-	@vml .d(dd) .append_tip(MhcKconv::todisp(s) + " ")
+	s = (x .time_b .to_s + " " + x .subject) # .gsub("\s", "\x07")
+        @vml .d(dd) .append_tip("\n" + MhcKconv::todisp(s))
 	@path[dd] << x .path
 
 	if x .in_category?('Holiday')
