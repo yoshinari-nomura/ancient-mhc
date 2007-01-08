@@ -1,3 +1,12 @@
+2007-01-09  KOIE Hidetaka <hide@koie.org> / nom
+
+	* samples/DOT.schedule.sample.jp: Add Showa Day.
+
+2006-12-18  Yoshinari Nomura <nom@quickhack.net>
+
+	* gemcal.in, ruby-ext/lib/mhc-gtk.rb.in:
+	MhcScheduleEdit supports gtk2.
+
 2006-12-18  Yoshinari Nomura <nom@quickhack.net>
 
 	* configure.rb:
