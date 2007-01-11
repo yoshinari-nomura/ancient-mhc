@@ -2,7 +2,7 @@
 ## Sample of ~/.schedule -- Japanese Holidays.
 ##
 ## Created: 1999/09/01
-## Revised: $Date: 2007/01/08 16:33:29 $
+## Revised: $Date: 2007/01/11 01:25:33 $
 ##
 
 X-SC-Subject: 元日
@@ -40,6 +40,12 @@ X-SC-Cond: 3 May
 X-SC-Subject: 国民の休日
 X-SC-Category: Holiday
 X-SC-Cond: 4 May
+X-SC-Duration: -20060504
+
+X-SC-Subject: みどりの日
+X-SC-Category: Holiday
+X-SC-Cond: 4 May
+X-SC-Duration: 20070504-
 
 X-SC-Subject: こどもの日
 X-SC-Category: Holiday
