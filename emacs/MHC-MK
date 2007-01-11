@@ -3,7 +3,7 @@
 ;; Author:  TSUCHIYA Masatoshi <tsuchiya@namazu.org>,
 ;;          Yuuichi Teranishi <teranisi@quickhack.net>
 ;; Created: 2000/06/13
-;; Revised: $Date: 2004/05/06 16:35:13 $
+;; Revised: $Date: 2007/01/11 01:25:06 $
 
 ;;; Commentary:
 
@@ -172,10 +172,10 @@
 			      (setq load-path (cons dir load-path)))))
 		    (make-mhc/split-string (substring str (match-end 0)) ":")))
 	   (t (error "Illegal option"))))
-	(let ((gnus-path-file (expand-file-name "~/.lpath.el")))
-	  (and make-mhc/with-gnus
-	       (file-exists-p gnus-path-file)
-	       (load-file (expand-file-name gnus-path-file))))
+;	(let ((gnus-path-file (expand-file-name "~/.lpath.el")))
+;	  (and make-mhc/with-gnus
+;	       (file-exists-p gnus-path-file)
+;	       (load-file (expand-file-name gnus-path-file))))
 	(setq load-path (cons make-mhc/source-directory load-path))
 	(or make-mhc/debug
 	    (setq make-mhc/debug
