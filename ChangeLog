@@ -1,3 +1,10 @@
+2007-01-11  Yoshinari Nomura <nom@quickhack.net>
+
+	* samples/DOT.schedule.sample.jp: Midori-no-hi moved.
+          from OHARA Shigeki <os@iij.ad.jp>
+	* emacs/MHC-MK: not to load ~/.lpath.el
+          from Tatsuya Kinoshita <tats@vega.ocn.ne.jp>
+
 2007-01-09  KOIE Hidetaka <hide@koie.org> / nom
 
 	* samples/DOT.schedule.sample.jp: Add Showa Day.
