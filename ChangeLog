@@ -1,3 +1,8 @@
+2007-02-19  Tatsuya Kinoshita <tats@vega.ocn.ne.jp> / nom
+
+	* ruby-ext/lib/mhc-gtk.rb.in, ruby-ext/lib/mhc-kconv.rb:
+	Improvement of charset selection.
+
 2007-01-11  Yoshinari Nomura <nom@quickhack.net>
 
 	* samples/DOT.schedule.sample.jp: Midori-no-hi moved.
