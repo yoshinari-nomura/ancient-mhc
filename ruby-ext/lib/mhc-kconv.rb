@@ -9,7 +9,14 @@
 require 'kconv'
 
 module MhcKconv
-  DISP_CODE = Kconv::UTF8
+  env = ENV['LC_ALL'] || ENV['LC_CTYPE'] || ENV['LANG']
+  if env =~ /euc/i
+    DISP_CODE = Kconv::EUC
+  elsif env =~ /sjis|shift_jis/i
+    DISP_CODE = Kconv::SJIS
+  else
+    DISP_CODE = Kconv::UTF8
+  end
 
   def todisp(string)
     Kconv::kconv(string, DISP_CODE, Kconv::AUTO)

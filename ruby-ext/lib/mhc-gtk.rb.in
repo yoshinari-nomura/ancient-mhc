@@ -5,7 +5,7 @@
 ## Author:  Yoshinari Nomura <nom@quickhack.net>
 ##
 ## Created: 1999/07/16
-## Revised: $Date: 2006/12/18 09:31:54 $
+## Revised: $Date: 2007/02/19 03:01:16 $
 ##
 
 #$DEBUG = true
@@ -17,13 +17,10 @@ require 'mhc-date'
 require 'mhc-signal'
 
 module MhcKconv
-  if RUBY_PLATFORM =~ /mswin32|cygwin|mingw/
-    require 'uconv'
-    def todisp(string)
-      Uconv::euctou8(Kconv::toeuc(string))
-    end
-    module_function :todisp
+  def todisp(string)
+    Kconv::kconv(string, Kconv::UTF8, Kconv::AUTO)
   end
+  module_function :todisp
 end
 
 Gtk.init
