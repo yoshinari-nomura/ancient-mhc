@@ -1,3 +1,8 @@
+2007-05-21  KOIE Hidetaka <hide@koie.org> / shirai
+
+	* emacs/mhc.el (mhc-edit): Set today's date to default date if
+	necessary.
+
 2007-03-26  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* samples/DOT.schedule.sample.jp: Change from Furikae-Kyujitsu to

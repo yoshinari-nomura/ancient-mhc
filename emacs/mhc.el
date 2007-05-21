@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1994/07/04
-;; Revised: $Date: 2006/04/04 07:35:24 $
+;; Revised: $Date: 2007/05/21 05:58:20 $
 
 ;;;
 ;;; Commentay:
@@ -604,7 +604,7 @@ Returns t if the importation was succeeded."
        (list (get-buffer (read-buffer "Import buffer: "
 				      (current-buffer))))))
   (let ((draft-buffer (generate-new-buffer mhc-draft-buffer-name))
-	(current-date (or (mhc-current-date) (mhc-calendar-get-date)))
+	(current-date (or (mhc-current-date) (mhc-calendar-get-date) (mhc-date-now)))
 	(succeed t)
 	msgp date time subject location category priority alarm)
     (and (interactive-p)
