@@ -54,7 +54,7 @@
 
 ;;; Customize Variables:
 (defcustom mhc-cvs-rsh
-  (and (getenv "CVS_RSH") "ssh")
+  (or (getenv "CVS_RSH") "ssh")
   "*The name of the remote shell command to use when starting a CVS server."
   :group 'mhc
   :type '(choice

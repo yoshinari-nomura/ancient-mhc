@@ -1,3 +1,8 @@
+2007-09-30  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* emacs/mhc-cvs.el (mhc-cvs-rsh): Use the value of the environment
+	variable CVS_RSH.
+
 2007-05-21  KOIE Hidetaka <hide@koie.org> / shirai
 
 	* emacs/mhc.el (mhc-edit): Set today's date to default date if
