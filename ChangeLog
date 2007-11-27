@@ -1,3 +1,8 @@
+2007-11-27  KOIE Hidetaka <hide@koie.org> / shirai
+
+	* samples/DOT.schedule.sample.jp (X-SC-Day): Delete on Kyujitsu on
+	`2008-07-21'.
+
 2007-09-30  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
 	* emacs/mhc-cvs.el (mhc-cvs-rsh): Use the value of the environment
