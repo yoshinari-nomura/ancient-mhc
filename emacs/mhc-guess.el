@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1999/04/13
-;; Revised: $Date: 2005/04/24 05:32:35 $
+;; Revised: $Date: 2007/12/05 04:59:35 $
 ;;
 
 ;;;
@@ -580,11 +580,11 @@ You can specify following symbols as a list.
     (save-excursion
       (goto-char ptr)
       (if sameline
-	  (setq pmax (min pmax (save-excursion (end-of-line)       (point)))
-		pmin (max pmin (save-excursion (beginning-of-line) (point)))))
+          (setq pmax (min pmax (save-excursion (end-of-line)       (point)))
+                pmin (max pmin (save-excursion (beginning-of-line) (point)))))
       (if (< 0 rel-boundary)
-	  (search-forward-regexp regexp pmax t)
-	(search-backward-regexp regexp pmin t)))))
+          (and (< (point) pmax) (search-forward-regexp regexp pmax t))
+        (and (< pmin (point)) (search-backward-regexp regexp pmin t))))))
 
 ;;
 ;; string-to-int with code conversion.
