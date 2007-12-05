@@ -1,3 +1,8 @@
+2007-12-05  KOIE Hidetaka <hide@koie.org> / nom
+
+	* emacs/mhc-guess.el:
+	(mhc-guess/search-in-boundary): strict boundary check.
+
 2007-11-27  KOIE Hidetaka <hide@koie.org> / shirai
 
 	* samples/DOT.schedule.sample.jp (X-SC-Day): Delete on Kyujitsu on
