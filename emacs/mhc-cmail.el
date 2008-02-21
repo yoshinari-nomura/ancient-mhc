@@ -2,7 +2,7 @@
 
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;; Created: 2000/07/18
-;; Revised: $Date: 2001/02/09 11:48:20 $
+;; Revised: $Date: 2008/02/21 03:29:51 $
 
 ;; (autoload 'mhc-cmail-setup "mhc-cmail")
 ;; (add-hook 'cmail-startup-hook 'mhc-cmail-setup)
@@ -283,6 +283,11 @@
 				   "$") nil t)
 	(delete-region (match-beginning 0) (match-end 0)))))
 
+(defun mhc-cmail-goto-message (&optional view)
+  "Go to a view position on summary buffer."
+  (when view
+    (cmail-show-contents (cmail-get-page-number-from-summary))))
+
 (provide 'mhc-cmail)
 (put 'mhc-cmail 'summary-filename 'mhc-cmail-summary-filename)
 (put 'mhc-cmail 'summary-display-article 'mhc-cmail-summary-display-article)
@@ -291,6 +296,7 @@
 (put 'mhc-cmail 'insert-summary-contents 'mhc-cmail-insert-summary-contents)
 (put 'mhc-cmail 'summary-search-date 'mhc-cmail-summary-search-date)
 (put 'mhc-cmail 'summary-mode-setup 'mhc-cmail-summary-mode-setup)
+(put 'mhc-cmail 'goto-message 'mhc-cmail-goto-message)
 (if (featurep 'mhc-mime)
     (progn
       (put 'mhc-cmail 'get-import-buffer   'mhc-mime-get-import-buffer)

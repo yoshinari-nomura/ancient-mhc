@@ -283,6 +283,10 @@ function."
     (when (search-forward (concat "\n" mail-header-separator "\n") nil t)
       (replace-match "\n\n"))))
 
+(defun mhc-gnus-goto-message (&optional view)
+  "Go to a view position on summary buffer."
+  (when view
+    (gnus-summary-next-page)))
 
 ;;; MIME APIs (mhc-mime.el):
 (defun mhc-gnus-mime-get-raw-buffer ()
@@ -334,6 +338,7 @@ Note: This function is used only when using T-gnus."
 (put 'mhc-gnus 'insert-summary-contents 'mhc-gnus-insert-summary-contents)
 (put 'mhc-gnus 'summary-mode-setup 'mhc-gnus-summary-mode-setup)
 (put 'mhc-gnus 'highlight-message 'mhc-gnus-highlight-message)
+(put 'mhc-gnus 'goto-message 'mhc-gnus-goto-message)
 
 (defun mhc-gnus/setup-methods ()
   (if (and (boundp 'gnus-version)

@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1994/07/04
-;; Revised: $Date: 2007/05/21 05:58:20 $
+;; Revised: $Date: 2008/02/21 03:29:51 $
 
 ;;;
 ;;; Commentay:
@@ -141,7 +141,14 @@
   (define-key mhc-prefix-map "T" 'mhc-file-toggle-offline)
   (define-key mhc-prefix-map "S" 'mhc-file-sync)
   (define-key mhc-prefix-map "R" 'mhc-reset)
-  (define-key mhc-mode-map mhc-prefix-key mhc-prefix-map))
+  (define-key mhc-mode-map mhc-prefix-key mhc-prefix-map)
+  (cond
+   ((featurep 'xemacs)
+    (define-key mhc-mode-map [(button1)] 'mhc-calendar-mouse-goto-date)
+    (define-key mhc-mode-map [(button2)] 'mhc-calendar-mouse-goto-date-view))
+   (t
+    (define-key mhc-mode-map [mouse-1] 'mhc-calendar-mouse-goto-date)
+    (define-key mhc-mode-map [mouse-2] 'mhc-calendar-mouse-goto-date-view))))
 
 (defvar mhc-mode nil "Non-nil when in mhc-mode.")
 

@@ -3,7 +3,7 @@
 ;; Author:  Yuuichi Teranishi <teranisi@gohome.org>
 ;;
 ;; Created: 2000/11/21
-;; Revised: $Date: 2002/11/11 05:27:15 $
+;; Revised: $Date: 2008/02/21 03:29:51 $
 
 (defcustom mhc-e21-icon-alist 
   '(("Conflict"   . "Conflict.xpm")
@@ -125,7 +125,8 @@ Icon is decided by `mhc-e21-icon-alist'."
 	(when (setq func (cdr (assoc (downcase (car icons))
 				     mhc-e21/icon-function-alist)))
 	  (setq props (nconc props 
-			     (list 
+			     (list
+			      'mouse-face 'highlight
 			      'mhc-e21-icon-function func
 			      'local-map mhc-e21-icon-keymap))))
 	(add-text-properties pos (point) props))

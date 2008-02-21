@@ -1,3 +1,33 @@
+2008-02-21  Hideyuki SHIRAI  <shirai@quickhack.net>
+
+	* emacs/mhc.el (mhc-mode-map): Add mouse-1 and mouse-2 keybind for
+	mhc-calendar.
+
+	* emacs/mhc-wl.el (mhc-wl-goto-message): New function.
+
+	* emacs/mhc-mew.el (mhc-mew-draft-translate): Fix
+	case-fold-search. Fix boundary check.
+	(mhc-mew-goto-message): New function.
+
+	* emacs/mhc-gnus.el (mhc-gnus-goto-message): New function.
+
+	* emacs/mhc-e21.el (mhc-put-icon): Put mouse-face property.
+
+	* emacs/mhc-cmail.el (mhc-cmail-goto-message): New function.
+
+	* emacs/mhc-calendar.el (mhc-calendar-use-help-echo): New user
+	option.
+	(mhc-calendar-mode-map): Add define for mouse-1.
+	(mhc-calendar/make-rectangle): Add text-properties, mouse-face and
+	help-echo.
+	(mhc-calendar-mouse-goto-date-view): New command.
+	(mhc-calendar-mouse-goto-date): Ditto.
+	(mhc-calendar/create-buffer): Don't call
+	mhc-calendar/put-property-date().
+	(mhc-calendar/put-property-date): Remove function.
+	(mhc-calendar/date-format): New variable.
+	(mhc-calendar/get-contents): New function.
+
 2007-12-05  KOIE Hidetaka <hide@koie.org> / nom
 
 	* emacs/mhc-guess.el:

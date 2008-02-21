@@ -290,6 +290,7 @@
 
 (defun mhc-mew-draft-translate ()
   (let ((bufstr (buffer-substring (point-min) (point-max)))
+	(case-fold-search t)
 	ct cte boundary beg end)
     (condition-case nil
 	(progn
@@ -305,6 +306,7 @@
 			 (string-match "boundary=\\(.+\\)" ct)))
 	    (setq boundary (regexp-quote (mhc-mew/match-string 1 ct)))
 	    (let ((case-fold-search nil))
+	      (goto-char (point-min))
 	      (unless (and boundary
 			   (re-search-forward (concat "^--" boundary "$") nil t)
 			   (re-search-forward (concat "^--" boundary "--$") nil t))
@@ -430,6 +432,15 @@
   (mew-header-goto-end)
   (mew-header-arrange (point-min) (point)))
 
+(defun mhc-mew-goto-message (&optional view)
+  "Go to a view position on summary buffer."
+  (when (fboundp 'mew-summary-goto-message)
+    (mew-summary-goto-message))
+  (when view
+    (condition-case nil
+	(mew-summary-display 'force)
+      (error
+       (mew-summary-display)))))
 
 (provide 'mhc-mew)
 (put 'mhc-mew 'summary-filename 'mhc-mew-summary-filename)
@@ -447,6 +458,7 @@
 (put 'mhc-mew 'draft-translate 'mhc-mew-draft-translate)
 (put 'mhc-mew 'eword-decode-string 'mhc-mew-eword-decode-string)
 (put 'mhc-mew 'decode-header 'mhc-mew-decode-rfc822-header)
+(put 'mhc-mew 'goto-message 'mhc-mew-goto-message)
 
 ;;; Copyright Notice:
 

@@ -5,7 +5,7 @@
 ;;          MIYOSHI Masanori <miyoshi@quickhack.net>
 ;;
 ;; Created: 05/12/2000
-;; Reviesd: $Date: 2004/05/04 13:48:31 $
+;; Reviesd: $Date: 2008/02/21 03:29:51 $
 
 ;;; Configration Variables:
 
@@ -42,9 +42,9 @@
   :type '(list string string string string string string string))
 
 (defcustom mhc-calendar-header-function
-    (if (eq mhc-calendar-language 'japanese)
-	'mhc-calendar-make-header-ja
-      'mhc-calendar-make-header)
+  (if (eq mhc-calendar-language 'japanese)
+      'mhc-calendar-make-header-ja
+    'mhc-calendar-make-header)
   "*Function of \"make calendar header\" for 3-month calendar.
 Assigned function must have one option \"date\"
 and must return string like \"   December 2000\"."
@@ -135,6 +135,11 @@ ww-japanese-long => \"土曜日\"
   :group 'mhc
   :type 'boolean)
 
+(defcustom mhc-calendar-use-help-echo t
+  "*Display schedule within help-echo."
+  :group 'mhc
+  :type 'boolean)
+
 (defcustom mhc-calendar-use-duration-show (if window-system 'mixed 'modeline)
   "*Show 'duration' mode."
   :group 'mhc
@@ -169,16 +174,16 @@ ww-japanese-long => \"土曜日\"
 (defmacro mhc-calendar-p ()
   `(eq major-mode 'mhc-calendar-mode))
 
-(defmacro mhc-calendar/in-date-p ()		;; return 'date from 01/01/1970'
+(defmacro mhc-calendar/in-date-p () ;; return 'date from 01/01/1970'
   `(get-text-property (point) 'mhc-calendar/date-prop))
 
-(defmacro mhc-calendar/in-summary-p ()		;; return 'schedule filename'
+(defmacro mhc-calendar/in-summary-p () ;; return 'schedule filename'
   `(or (get-text-property (point) 'mhc-calendar/summary-prop)
        (save-excursion
 	 (beginning-of-line)
 	 (get-text-property (point) 'mhc-calendar/summary-prop))))
 
-(defmacro mhc-calendar/in-summary-hnf-p ()	;; return 'title count'
+(defmacro mhc-calendar/in-summary-hnf-p () ;; return 'title count'
   `(or (get-text-property (point) 'mhc-calendar/summary-hnf-prop)
        (save-excursion
 	 (beginning-of-line)
@@ -224,6 +229,7 @@ ww-japanese-long => \"土曜日\"
   (defvar hnf-diary-year-directory-flag)
   (defvar view-exit-action)
   (defvar mhc-calendar-mode-menu))
+
 (eval-and-compile
   (autoload 'easy-menu-add "easymenu")
   (autoload 'hnf-mode "hnf-mode"))
@@ -280,9 +286,11 @@ ww-japanese-long => \"土曜日\"
   (cond
    ((featurep 'xemacs)
     (define-key mhc-calendar-mode-map "\C- " 'mhc-calendar-set-mark-command)
+    (define-key mhc-calendar-mode-map [(button1)] 'mhc-calendar-day-at-mouse)
     (define-key mhc-calendar-mode-map [(button2)] 'mhc-calendar-day-at-mouse))
    (t
     (define-key mhc-calendar-mode-map [?\C- ] 'mhc-calendar-set-mark-command)
+    (define-key mhc-calendar-mode-map [mouse-1] 'mhc-calendar-day-at-mouse)
     (define-key mhc-calendar-mode-map [mouse-2] 'mhc-calendar-day-at-mouse)))
   (define-key mhc-calendar-mode-map "\C-x\C-x" 'mhc-calendar-exchange-point-and-mark)
   (define-key mhc-calendar-mode-map "q"    'mhc-calendar-quit)
@@ -446,7 +454,8 @@ ww-japanese-long => \"土曜日\"
 	 (days (mhc-db-scan-month (mhc-date-yy (or date today)) mm t))
 	 (separator (if separator separator mhc-calendar/separator-str))
 	 (start (mhc-day-day-of-week (car days)))
-	 (i 0) week color cw)
+	 (i 0)
+	 week color cw day cdate map)
     (when (mhc-calendar/cw-week)
       (setq cw (mhc-date-cw (mhc-day-date (car days))))
       (setq week (cons (mhc-calendar/cw-string cw) week)))
@@ -458,9 +467,10 @@ ww-japanese-long => \"土曜日\"
       (setq week (cons "  " week))
       (setq i (1+ i)))
     (while days
+      (setq cdate (mhc-day-date (car days)))
       (when (and (null week) (mhc-calendar/cw-week))
 	(if (or (eq mm 1) (eq mm 12))
-	    (setq cw (mhc-date-cw (mhc-day-date (car days))))
+	    (setq cw (mhc-date-cw cdate))
 	  (setq cw (1+ cw)))
 	(setq week (cons (mhc-calendar/cw-string cw) week)))
       (setq color
@@ -472,12 +482,20 @@ ww-japanese-long => \"土曜日\"
 	     ((= 6 (mhc-day-day-of-week (car days)))
 	      'mhc-calendar-face-saturday)
 	     (t 'mhc-calendar-face-default)))
-      (when (mhc-date= today (mhc-day-date (car days)))
+      (when (mhc-date= today cdate)
 	(setq color (mhc-face-get-today-face color)))
       (when (mhc-day-busy-p (car days))
 	(setq color (mhc-face-get-busy-face color)))
-      (setq week (cons (format "%2d" (mhc-day-day-of-month (car days))) week))
-      (when color (mhc-face-put (car week) color))
+      (setq day (format "%2d" (mhc-day-day-of-month (car days))))
+      (when color (mhc-face-put day color))
+      (add-text-properties 0 (length day)
+			   `(mhc-calendar/date-prop ,cdate
+						    mouse-face ,(if mhc-calendar-use-mouse-highlight
+								    'highlight nil)
+						    help-echo ,(if mhc-calendar-use-help-echo
+								   (mhc-calendar/get-contents cdate) nil))
+			   day)
+      (setq week (cons day week))
       (when (= (mhc-end-day-of-week) (mhc-day-day-of-week (car days)))
 	(setq month (cons (mapconcat
 			   (function identity)
@@ -493,6 +511,39 @@ ww-japanese-long => \"土曜日\"
 			 " ")
 			month)))
     (nreverse month)))
+
+(defun mhc-calendar-mouse-goto-date-view (event)
+  (interactive "e")
+  (mhc-calendar-mouse-goto-date event 'view))
+
+(defun mhc-calendar-mouse-goto-date (event &optional view)
+  (interactive "e")
+  (let (cdate dayinfo pos cpos func)
+    (save-excursion
+      (set-buffer (mhc-calendar/event-buffer event))
+      (goto-char (mhc-calendar/event-point event))
+      (setq cdate (get-text-property (point) 'mhc-calendar/date-prop)))
+    (cond
+     (cdate
+      (unless (= (mhc-current-date-month)
+		 (mhc-date-let cdate (mhc-date-new yy mm 1)))
+	(mhc-goto-month cdate mhc-default-hide-private-schedules))
+      (setq pos (point))
+      (goto-char (point-min))
+      (setq cpos (point))
+      (catch 'detect
+	(while (setq cpos (next-single-property-change cpos 'mhc-dayinfo))
+	  (when (and (setq dayinfo (get-text-property cpos 'mhc-dayinfo))
+		     (= cdate (mhc-day-date dayinfo)))
+	    (setq pos cpos)
+	    (throw 'detect t))))
+      (goto-char pos)
+      (funcall (mhc-get-function 'goto-message) view))
+     (t
+      (setq func (or (lookup-key (current-local-map) (this-command-keys))
+		     (lookup-key (current-global-map) (this-command-keys))))
+      (when func
+	(call-interactively func event))))))
 
 ;; function
 (defun mhc-calendar-mode ()
@@ -676,37 +727,48 @@ The keys that are defined for mhc-calendar-mode are:
       (delete-region (match-end 0) (match-beginning 0))
       (insert (make-string (- (match-end 0) (match-beginning 0)) ?\ )))
     (setq mhc-calendar-date date)
-    (mhc-calendar/put-property-date)
+    ;; (mhc-calendar/put-property-date)
     (and mhc-calendar-link-hnf (mhc-calendar/hnf-mark-diary-entries))
     (run-hooks 'mhc-calendar-create-buffer-hook)
     (set-buffer-modified-p nil)
     (message "mhc-calendar create...done")))
 
-(defun mhc-calendar/put-property-date ()
-  (condition-case nil
-      (let ((cdate (mhc-date-let mhc-calendar-date (mhc-date-new yy mm 1)))
-	    beg end yymm dd)
-	(goto-char (point-min))
-	(while (re-search-forward " \\([ 123][0-9]\\)[ \n]" nil 'end)
-	  (setq beg (match-beginning 1) end (match-end 1))
-	  (setq dd (1- (string-to-number (buffer-substring beg end))))
-	  (goto-char end)
-	  (setq yymm (mhc-date-mm+
-		      cdate
-		      (mhc-calendar/get-date-colnum (current-column))))
-	  (put-text-property beg end 'mhc-calendar/date-prop (+ yymm dd))
-	  (when mhc-calendar-use-mouse-highlight
-	    (put-text-property beg end 'mouse-face 'highlight)))
-	(setq beg (- (point) 2) end (point))
-	(goto-char beg)
-	(setq dd (1- (string-to-number (buffer-substring beg end))))
-	(setq yymm (mhc-date-mm+
-		    cdate
-		    (mhc-calendar/get-date-colnum (current-column))))
-	(put-text-property beg end 'mhc-calendar/date-prop (+ yymm dd))
-	(when mhc-calendar-use-mouse-highlight
-	  (put-text-property beg end 'mouse-face 'highlight)))
-    (error nil)))
+(defvar mhc-calendar/date-format nil)
+
+(defun mhc-calendar/get-contents (date)
+  (unless mhc-calendar/date-format
+    (setq mhc-calendar/date-format
+	  (if (eq mhc-calendar-language 'japanese)
+	      "%04d年%2d月%2d日(%s)\n"
+	    "%04d-%02d-%02d (%s)\n")))
+  (with-temp-buffer
+    (let* ((dayinfo (car (mhc-db-scan date date)))
+	   (schedules (mhc-day-schedules dayinfo))
+	   schedule begin end subject location)
+      (mhc-date-let (mhc-day-date dayinfo)
+	(insert (format mhc-calendar/date-format
+			yy mm dd
+			(aref mhc-calendar-day-strings ww))))
+      (when schedules (insert "\n"))
+      (while (setq schedule (car schedules))
+	(setq schedules (cdr schedules))
+	(setq begin (mhc-schedule-time-begin schedule))
+	(setq end (mhc-schedule-time-end schedule))
+	(setq subject (or (mhc-schedule-subject schedule) ""))
+	(setq location (or (mhc-schedule-location schedule) ""))
+	(when (> (length location) 0)
+	  (setq location (concat " [" location "]")))
+	(when (or begin end subject location)
+	  (insert (format "%s%s%s%s%s\n"
+			  (if begin
+			      (format "%02d:%02d" (/ begin 60) (% begin 60))
+			    "")
+			  (if end
+			      (format "-%02d:%02d" (/ end 60) (% end 60))
+			    "")
+			  (if (or begin end) " " "")
+			  subject location))))
+      (buffer-substring-no-properties (point-min) (point-max)))))
 
 (defun mhc-calendar-edit ()
   (interactive)
@@ -835,7 +897,7 @@ The keys that are defined for mhc-calendar-mode are:
 (defun mhc-calendar/get-day-region (&optional type)
   (let (cat datebeg dateend datetmp datelst rlst)
     (if (not (mhc-date-p mhc-calendar/mark-date))
-        (error "No mark set in this buffer")
+	(error "No mark set in this buffer")
       (setq dateend (mhc-calendar-get-date))
       (setq datebeg mhc-calendar/mark-date)
       ;; swap
@@ -894,17 +956,17 @@ The keys that are defined for mhc-calendar-mode are:
 (defun mhc-calendar-count-days-region ()
   (interactive)
   (let ((mark mhc-calendar/mark-date)
-        (date (mhc-calendar-get-date)))
+	(date (mhc-calendar-get-date)))
     (if (null mark)
 	(error "No mark set in this buffer")
       (setq date (mhc-date++ (mhc-date- (max mark date) (min mark date))))
       (kill-new (int-to-string date))
       (if (< date 7)
-          (message "%d days in region." date)
-        (if (= (% date 7) 0)
-            (message "%d days (%d weeks) in region." date (/ date 7))
-          (message "%d days (%d weeks + %d days) in region."
-                   date (/ date 7) (% date 7)))))))
+	  (message "%d days in region." date)
+	(if (= (% date 7) 0)
+	    (message "%d days (%d weeks) in region." date (/ date 7))
+	  (message "%d days (%d weeks + %d days) in region."
+		   date (/ date 7) (% date 7)))))))
 
 ;; selector
 (defvar mhc-calendar/select-alist nil)
@@ -1048,13 +1110,13 @@ The keys that are defined for mhc-calendar-mode are:
 	(setq datelst (cdr datelst))))
     (setq retlst (nreverse retlst))
     (if (not dateend)
-	retlst;; return
+	retlst ;; return
       ;; duration
       (setq datelst lst-org)
       (mhc-date-let dateend
 	(while datelst
 	  (setq con (cdr (car datelst)))
-	  (if (listp con);; multiple connectoer
+	  (if (listp con) ;; multiple connectoer
 	      (while con
 		(setq formlst (car (car datelst)))
 		(setq ret (car con))
@@ -1262,9 +1324,9 @@ The keys that are defined for mhc-calendar-mode are:
 (defun mhc-calendar-exchange-point-and-mark ()
   (interactive)
   (let ((mark mhc-calendar/mark-date)
-        (date (mhc-calendar-get-date)))
+	(date (mhc-calendar-get-date)))
     (if (null mark)
-        (error "No mark set in this buffer")
+	(error "No mark set in this buffer")
       (setq mhc-calendar/mark-date date)
       (mhc-calendar/goto-date mark)
       (mhc-calendar/duration-show))))
@@ -1521,7 +1583,7 @@ The keys that are defined for mhc-calendar-mode are:
     (if (not (file-readable-p fname))
 	()
       (goto-char (point-max))
-      (with-temp-buffer	;; hnf-mode.el require APEL :-)
+      (with-temp-buffer ;; hnf-mode.el require APEL :-)
 	(insert-file-contents fname)
 	(goto-char (point-min))
 	(mhc-face-put sub 'mhc-calendar-hnf-face-subtag)

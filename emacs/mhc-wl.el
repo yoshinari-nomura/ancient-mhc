@@ -229,6 +229,10 @@
     (widen)
     (delete-region (point-min) (point-max))))
 
+(defun mhc-wl-goto-message (&optional view)
+  "Go to a view position on summary buffer."
+  (when view
+    (wl-summary-redisplay)))
 
 (provide 'mhc-wl)
 (put 'mhc-wl 'summary-filename 'mhc-wl-summary-filename)
@@ -246,6 +250,7 @@
 (put 'mhc-wl 'draft-translate 'mhc-mime-draft-translate)
 (put 'mhc-wl 'eword-decode-string 'mhc-mime-eword-decode-string)
 (put 'mhc-wl 'decode-header 'mhc-mime-decode-header)
+(put 'mhc-wl 'goto-message 'mhc-wl-goto-message)
 
 ;;; Copyright Notice:
 
