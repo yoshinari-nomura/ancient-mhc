@@ -3,7 +3,7 @@
 ;; Author:  Yuuichi Teranishi <teranisi@gohome.org>
 ;;
 ;; Created: 2000/11/21
-;; Revised: $Date: 2008/02/21 03:29:51 $
+;; Revised: $Date: 2008/03/06 09:40:12 $
 
 (defcustom mhc-e21-icon-alist 
   '(("Conflict"   . "Conflict.xpm")
@@ -57,10 +57,10 @@ icon line."
   (interactive "e")
   (save-excursion
     (mouse-set-point event)
-    (if (get-text-property (point) 'mhc-e21-icon-function)
-	(call-interactively
-	 (get-text-property (point) 'mhc-e21-icon-function)))))
-    
+    (when (get-text-property (point) 'mhc-e21-icon-function)
+      (call-interactively
+       (get-text-property (point) 'mhc-e21-icon-function))
+      t)))
 
 ;; internal variable.
 (defvar mhc-e21/icon-glyph-alist nil)

@@ -5,7 +5,7 @@
 ;;          MIYOSHI Masanori <miyoshi@quickhack.net>
 ;;
 ;; Created: 05/12/2000
-;; Reviesd: $Date: 2008/02/21 03:29:51 $
+;; Reviesd: $Date: 2008/03/06 09:40:12 $
 
 ;;; Configration Variables:
 
@@ -516,6 +516,13 @@ ww-japanese-long => \"土曜日\"
   (interactive "e")
   (mhc-calendar-mouse-goto-date event 'view))
 
+(eval-and-compile
+  (if (featurep 'xemacs)
+      (defun mhc-calendar-mouse-icon-function (event)
+	(mhc-xmas-icon-call-function event))
+    (defun mhc-calendar-mouse-icon-function (event)
+      (mhc-e21-icon-call-function event))))
+
 (defun mhc-calendar-mouse-goto-date (event &optional view)
   (interactive "e")
   (let (cdate dayinfo pos cpos func)
@@ -540,10 +547,11 @@ ww-japanese-long => \"土曜日\"
       (goto-char pos)
       (funcall (mhc-get-function 'goto-message) view))
      (t
-      (setq func (or (lookup-key (current-local-map) (this-command-keys))
-		     (lookup-key (current-global-map) (this-command-keys))))
-      (when func
-	(call-interactively func event))))))
+      (unless (mhc-calendar-mouse-icon-function event)
+	(setq func (or (lookup-key (current-local-map) (this-command-keys))
+		       (lookup-key (current-global-map) (this-command-keys))))
+	(when func
+	  (call-interactively func event)))))))
 
 ;; function
 (defun mhc-calendar-mode ()

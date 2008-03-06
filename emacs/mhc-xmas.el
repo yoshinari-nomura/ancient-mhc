@@ -3,7 +3,7 @@
 ;; Author:  Yuuichi Teranishi <teranisi@gohome.org>
 ;;
 ;; Created: 1999/12/02
-;; Revised: $Date: 2002/11/11 05:27:15 $
+;; Revised: $Date: 2008/03/06 09:40:12 $
 
 (defcustom mhc-xmas-icon-alist 
   '(("Conflict"   . "Conflict.xpm")
@@ -57,11 +57,12 @@ icon line."
   (interactive "e")
   (save-excursion
     (goto-char (extent-start-position (event-glyph-extent event)))
-    (if (extent-property (event-glyph-extent event)
-			 'mhc-xmas-icon-function)
-	(call-interactively
-	 (extent-property (event-glyph-extent event)
-			  'mhc-xmas-icon-function)))))
+    (when (extent-property (event-glyph-extent event)
+			   'mhc-xmas-icon-function)
+      (call-interactively
+       (extent-property (event-glyph-extent event)
+			'mhc-xmas-icon-function))
+      t)))
 
 ;; internal variable.
 (defvar mhc-xmas/icon-glyph-alist nil)

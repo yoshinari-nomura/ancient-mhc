@@ -1,3 +1,16 @@
+2008-03-06  Hideyuki SHIRAI  <shirai@quickhack.net>
+
+	* emacs/mhc-calendar.el (mhc-calendar-mouse-icon-function): New
+	function.
+	(mhc-calendar-mouse-goto-date): Call
+	mhc-calendar-mouse-icon-function and check return value.
+
+	* emacs/mhc-xmas.el (mhc-xmas-icon-call-function): Return if call
+	mhc-xmas-icon-function.
+
+	* emacs/mhc-e21.el (mhc-e21-icon-call-function): Return t if call
+	mhc-e21-icon-function.
+
 2008-02-21  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* emacs/mhc.el (mhc-mode-map): Add mouse-1 and mouse-2 keybind for
