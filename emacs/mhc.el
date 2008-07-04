@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1994/07/04
-;; Revised: $Date: 2008/02/21 03:29:51 $
+;; Revised: $Date: 2008/07/04 06:01:20 $
 
 ;;;
 ;;; Commentay:
@@ -141,6 +141,7 @@
   (define-key mhc-prefix-map "T" 'mhc-file-toggle-offline)
   (define-key mhc-prefix-map "S" 'mhc-file-sync)
   (define-key mhc-prefix-map "R" 'mhc-reset)
+  (define-key mhc-prefix-map "@" 'mhc-todo-toggle-done)
   (define-key mhc-mode-map mhc-prefix-key mhc-prefix-map)
   (cond
    ((featurep 'xemacs)
@@ -849,6 +850,14 @@ the default action of this command is changed to the latter."
   (interactive)
   (mhc-modify-file (mhc-summary-filename))
   (mhc-draft-set-as-not-done)
+  (mhc-draft-finish)
+  (message ""))
+
+(defun mhc-todo-toggle-done ()
+  "Toggle between done and not for todo"
+  (interactive)
+  (mhc-modify-file (mhc-summary-filename))
+  (mhc-draft-toggle-done)
   (mhc-draft-finish)
   (message ""))
 

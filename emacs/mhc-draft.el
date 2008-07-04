@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>,
 ;;          Yuuichi Teranishi <teranisi@quickhack.net>
 ;; Created: 2000/07/25
-;; Revised: $Date: 2005/10/04 08:52:44 $
+;; Revised: $Date: 2008/07/04 06:01:20 $
 
 ;;; Commentary:
 
@@ -137,6 +137,14 @@ If optional argument NO-CONFIRM is non-nil, kill without confirmation."
   (interactive)
   (if (mhc-draft-in-category-p "todo")
       (mhc-draft-delete-category "done")))
+
+(defun mhc-draft-toggle-done ()
+  "Set current draft as DONE if not; remove done if there."
+  (interactive)
+  (if  (mhc-draft-in-category-p "todo")
+      (if (mhc-draft-in-category-p "done")
+	  (mhc-draft-delete-category "done")
+	(mhc-draft-append-category "Done"))))
 
 (defun mhc-draft-append-category (category)
   "Append CATEGORY if it is not contained yet."
