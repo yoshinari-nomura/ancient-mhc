@@ -1,3 +1,13 @@
+2008-09-29 Kazuhiro Ito, KOIE Hidetaka / nom
+
+	* mhc_pilib.c:
+	Conforming to pilot-link 0.12 or later, not compatible with 0.11.
+
+2008-07-04  David Bremner / Yoshinari Nomura <nom@quickhack.net>
+
+        * emacs/mhc-draft.el, emacs/mhc.el:
+        (mhc-draft-toggle-done), (mhc-todo-toggle-done): new functions.
+
 2008-03-06  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* emacs/mhc-calendar.el (mhc-calendar-mouse-icon-function): New
