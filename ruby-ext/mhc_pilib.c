@@ -3,7 +3,7 @@
 ** Author:  Yoshinari Nomura <nom@quickhack.net>
 **
 ** Created: 1999/09/01
-** Revised: $Date: 2004/11/15 00:40:01 $
+** Revised: $Date: 2008/09/29 00:36:48 $
 **
 */
 
@@ -24,20 +24,6 @@
 #include "pi-address.h"
 #include "pi-appinfo.h"
 
-/* Try to determine if version of pilot-link > 0.9.x */
-#ifdef USB_PILOT_LINK
-# undef USB_PILOT_LINK
-#endif
-
-#if PILOT_LINK_VERSION > 0
-# define USB_PILOT_LINK
-#else
-# if PILOT_LINK_MAJOR > 9
-#  define USB_PILOT_LINK
-# endif
-#endif
-
-
 VALUE mPiLib;
 
 /*************************************************************/
@@ -47,90 +33,13 @@ VALUE mPiLib;
 /* open socket, return descriptor or nil */
 static VALUE rpi_sock_open(VALUE obj, VALUE dev)
 {
-  int sd;
-  int i, ret;
-  int dev_usb;
-  struct pi_sockaddr addr;
-  char link[256], dev_str[256], dev_dir[256], *Pc;
+  int sd, ret;
 
-  Check_Type(dev, T_STRING);
+  sd = pi_socket(0, PI_SOCK_STREAM, 0);
+  if (sd == -1)return Qnil;
 
-  if (RSTRING(dev)->len > sizeof(addr.pi_device) - 1)
-    return Qnil;
-
-  strcpy(addr.pi_device, STR2CSTR(dev));
-
-  /* pilot-link > 0.9.5 needed for many USB devices */
-#ifdef USB_PILOT_LINK
-  /* Newer pilot-link */
-  addr.pi_family = PI_AF_PILOT;
-  if (!(sd = pi_socket(PI_AF_PILOT, PI_SOCK_STREAM, PI_PF_DLP)))
-    return Qnil;
-#else
-  /* 0.9.5 or older */
-  addr.pi_family = PI_AF_SLP;
-  if (!(sd = pi_socket(PI_AF_SLP, PI_SOCK_STREAM, PI_PF_PADP)))
-    return Qnil;
-#endif
-
-  /* This is for USB, whose device doesn't exist until the cradle is pressed
-   * We will give them 5 seconds */
-  dev_str[0]='\0';
-  link[0]='\0';
-  strncpy(dev_str, STR2CSTR(dev), 255);
-  strncpy(dev_dir, STR2CSTR(dev), 255);
-  dev_str[255]='0';
-  dev_dir[255]='0';
-  dev_usb=0;
-  for (Pc=&dev_dir[strlen(dev_dir)-1]; Pc>dev_dir; Pc--) {
-	if (*Pc=='/') *Pc='\0';
-	else break;
-  }
-  Pc = strrchr(dev_dir, '/');
-  if(Pc) {
-    *Pc = '\0';
-  }
-  for (i=10; i>0; i--) {
-   	  ret = readlink(dev_str, link, 256);
-	  if (ret>0) {
-		  link[ret]='\0';
-      } else {
-     if (strstr(dev_str, "usb") || strstr(dev_str, "USB")) {
-        dev_usb=1;
-     }
-     break;
-      }
-      if (link[0]=='/') {
-     strcpy(dev_str, link);
-     strcpy(dev_dir, link);
-     for (Pc=&dev_dir[strlen(dev_dir)-1]; Pc>dev_dir; Pc--) {
-        if (*Pc=='/') *Pc='\0';
-        else break;
-     }
-     Pc = strrchr(dev_dir, '/');
-     if (Pc) {
-        *Pc = '\0';
-     }
-      } else {
-     snprintf(dev_str, 255, "%s/%s", dev_dir, link);
-     dev_str[255]='\0';
-      }
-      if (strstr(link, "usb") || strstr(link, "USB")) {
-     dev_usb=1;
-     break;
-      }
-   }
-
-  if (dev_usb) {
-	  for (i=7; i>0; i--) {
-		  ret = pi_bind(sd, (struct sockaddr*)&addr, sizeof(addr));
-		  if (ret!=-1) break;
-		  sleep(1);
-	  }
-  } else {
-	  ret = pi_bind(sd, (struct sockaddr*)&addr, sizeof(addr));
-  }
-  if (ret == -1) return Qnil;
+  ret = pi_bind(sd, StringValuePtr(dev));
+  if (ret < 0) return Qnil;
 
   return INT2FIX(sd);
 }
@@ -241,7 +150,7 @@ static VALUE rdlp_OpenDB(VALUE obj, VALUE sd, VALUE name)
   Check_Type(name, T_STRING);
 
   /* xxx: cardno is always zero for now. */
-  if (dlp_OpenDB(FIX2INT(sd), 0, 0x80|0x40, STR2CSTR(name), &db) < 0)
+  if (dlp_OpenDB(FIX2INT(sd), 0, 0x80|0x40, StringValuePtr(name), &db) < 0)
     return Qnil;
 
   return INT2FIX(db);
@@ -260,15 +169,22 @@ static VALUE rdlp_CloseDB(VALUE obj, VALUE sd, VALUE db)
 
 static VALUE rdlp_ReadAppBlock(VALUE obj, VALUE sd, VALUE db)
 {
-  int len;
-  unsigned char buffer[0xffff];
+  int result;
+  pi_buffer_t *buffer;
+  VALUE ret;
 
-  len = dlp_ReadAppBlock(FIX2INT(sd), FIX2INT(db), 0, buffer, 0xffff);
+  buffer = pi_buffer_new(0xffff);
+  if (!buffer) return Qnil;
 
-  if (len <= 0)
-    return Qnil;
+  result = dlp_ReadAppBlock(FIX2INT(sd), FIX2INT(db), 0, 0xffff, buffer);
+
+  if (result <= 0)
+    ret = Qnil;
   else
-    return str_new(buffer, len);
+    ret = str_new(buffer->data, buffer->used);
+
+  pi_buffer_free (buffer);
+  return ret;
 }
 
 /****************************************************************/
@@ -287,13 +203,19 @@ static VALUE rdlp_ReadRecordByIndex(VALUE obj, VALUE sd, VALUE db, VALUE i)
   VALUE ary;
   int attr, category, len;
   recordid_t id;
-  unsigned char buffer[0xffff];
+  pi_buffer_t *buffer;
+
+  buffer = pi_buffer_new(0xffff);
+  if (!buffer) return Qnil;
 
   ary = ary_new();
   len = dlp_ReadRecordByIndex(FIX2INT(sd), FIX2INT(db), FIX2INT(i), 
-			      buffer, &id, 0, &attr, &category);
+			      buffer, &id, &attr, &category);
 
-  if (len <= 0) return Qnil;
+  if (len <= 0) {
+    pi_buffer_free (buffer);
+    return Qnil;
+  }
 
   dprintf(("id:%d atr:%d cat:%d bp:%d len:%d\n",id,attr,category,buffer,len));
   dprintf(("readrecordbyindex 0\n"));
@@ -303,9 +225,10 @@ static VALUE rdlp_ReadRecordByIndex(VALUE obj, VALUE sd, VALUE db, VALUE i)
   dprintf(("readrecordbyindex 2\n"));
   ar_set1(ary, "i", category);
   dprintf(("readrecordbyindex 3\n"));
-  ary_push(ary, str_new(buffer, len));
+  ary_push(ary, str_new(buffer->data, len));
   dprintf(("readrecordbyindex 4\n"));
 
+  pi_buffer_free (buffer);
   return ary;
 }
 
@@ -314,21 +237,28 @@ static VALUE rdlp_ReadRecordById(VALUE obj, VALUE sd, VALUE db, VALUE vid)
   VALUE ary;
   int attr, category, len;
   int index;
-  unsigned char buffer[0xffff];
+  pi_buffer_t *buffer;
   recordid_t id = FIX2INT(vid);
+
+  buffer = pi_buffer_new(0xffff);
+  if (!buffer) return Qnil;
 
   ary = ary_new();
   len = dlp_ReadRecordById(FIX2INT(sd), FIX2INT(db), id, 
-			   buffer, &index, 0, &attr, &category);
+			   buffer, &index, &attr, &category);
 
-  if (len <= 0) return Qnil;
+  if (len <= 0) {
+    pi_buffer_free (buffer);
+    return Qnil;
+  }
 
   dprintf(("id:%d atr:%d cat:%d bp:%d len:%d\n",id,attr,category,buffer,len));
   ar_set1(ary, "i", id);
   ar_set1(ary, "i", attr);
   ar_set1(ary, "i", category);
-  ary_push(ary, str_new(buffer, len));
+  ary_push(ary, str_new(buffer->data, len));
 
+  pi_buffer_free (buffer);
   return ary;
 }
 
@@ -340,26 +270,30 @@ static VALUE rdlp_WriteRecord(VALUE obj, VALUE sd, VALUE db, VALUE ary)
 {
   recordid_t id, new_id;
   int        attr, category, ret, len;
-  char       buf[0xffff];
   char       *ptr;
   struct Appointment app;
   int i;
   VALUE      a = ary_new();
+  pi_buffer_t *buffer;
 
-  for (i = 0; i < 0xffff; i++)
-    buf[i] = '\0';
-     
   ary_copy(a, ary);
   ar_get1(a, "i", id);
   ar_get1(a, "i", attr);
   ar_get1(a, "i", category);
   ar_get1(a, "s", ptr);
   len = STRING_LENGTH;
-  bcopy(ptr, buf, len);
 
-  dprintf(("buf: %s\n", buf));
+  buffer = pi_buffer_new(len);
+  if (!buffer) return Qnil;
 
-  unpack_Appointment(&app, buf, len);
+  if(!pi_buffer_append(buffer, ptr, len)) {
+    pi_buffer_free(buffer);
+    return Qnil;
+  }
+
+  dprintf(("buf: %s\n", buffer->data));
+
+  unpack_Appointment(&app, buffer, datebook_v1);
   dprintf(("event: %d\n", app.event));
   dprintf(("beg_year %d\n", app.begin.tm_year));
   dprintf(("Subject: %s\n", app.description));
@@ -367,12 +301,14 @@ static VALUE rdlp_WriteRecord(VALUE obj, VALUE sd, VALUE db, VALUE ary)
 	   id, attr, category, len));
 
   ret = dlp_WriteRecord(FIX2INT(sd), FIX2INT(db), attr,
-			id, category, buf, len, &new_id);
-
+			id, category, buffer->data, len, &new_id);
+  pi_buffer_free(buffer);
+  
   if (ret < 0){
     dprintf(("%s\n", dlp_strerror(ret)));
     return Qnil;
   }
+
   dprintf(("new_id::::::: %d\n", new_id));
   return INT2FIX(new_id);
 }
@@ -425,10 +361,14 @@ static VALUE rdlp_ResetSyncFlags(VALUE obj, VALUE sd, VALUE db)
 static VALUE rpack_Appointment(VALUE x, VALUE ary1)
 {
   struct Appointment app;
-  char buf[0xffff];
   int len, i = 0;
   VALUE ary = ary_new();
+  VALUE ret;
   ary_copy(ary, ary1);
+  pi_buffer_t * buffer;
+
+  buffer = pi_buffer_new(0xffff);
+  if (!buffer) return Qnil;
 
   ar_get1(ary, "b", app.event);
   ar_get1(ary, "t", app.begin);
@@ -449,19 +389,32 @@ static VALUE rpack_Appointment(VALUE x, VALUE ary1)
   ar_get1(ary, "s", app.description);
   ar_get1(ary, "s", app.note);
 
-  len = pack_Appointment(&app, buf, sizeof(buf));
+  len = pack_Appointment(&app, buffer, datebook_v1);
   dprintf(("pack_Appointment: length: %d\n", len));
   free(app.exception);
-  return str_new(buf, len);
+
+  ret = str_new(buffer->data, buffer->used);
+  pi_buffer_free(buffer);
+
+  return ret;
 }
 
 static VALUE runpack_Appointment(VALUE x, VALUE raw_str)
 {
   struct Appointment app;
   VALUE ary = ary_new();
+  pi_buffer_t *buffer;
+
+  buffer = pi_buffer_new(0xffff);
+  if (!buffer) return Qnil;
 
   Check_Type(raw_str, T_STRING);
-  unpack_Appointment(&app, RSTRING(raw_str)->ptr, RSTRING(raw_str)->len);
+
+  if (!pi_buffer_append(buffer, RSTRING(raw_str)->ptr, RSTRING(raw_str)->len)) {
+    pi_buffer_free(buffer);
+    return Qnil;
+  }
+  unpack_Appointment(&app, buffer, datebook_v1);
 
   ar_set1(ary, "b", app.event);
   dprintf(("runpack_Appointment: 0\n"));
@@ -488,6 +441,7 @@ static VALUE runpack_Appointment(VALUE x, VALUE raw_str)
   dprintf(("Subject: %s\n", app.description));
 
   free_Appointment(&app);
+  pi_buffer_free (buffer);
   return ary;
 }
 
@@ -498,8 +452,11 @@ static VALUE runpack_Appointment(VALUE x, VALUE raw_str)
 static VALUE rpack_Address(VALUE x, VALUE ary1)
 {
   struct Address add;
-  unsigned char buf[0xffff];
-  int len;
+  VALUE ret;
+  pi_buffer_t *buffer;
+
+  buffer = pi_buffer_new(0xffff);
+  if (!buffer) return Qnil;
 
   VALUE ary = ary_new();
   ary_copy(ary, ary1);
@@ -508,23 +465,37 @@ static VALUE rpack_Address(VALUE x, VALUE ary1)
   ar_get1(ary, "i", add.showPhone);
   ar_get2(ary, "s", add.entry, 19);
 
-  len = pack_Address(&add, buf, sizeof(buf));
-  return str_new(buf, len);
+  if (pack_Address(&add, buffer, address_v1) < 0) 
+    ret = Qnil;
+  else
+    ret = str_new(buffer->data, buffer->used);
+
+  pi_buffer_free (buffer);
+  return ret;
 }
 
 static VALUE runpack_Address(VALUE x, VALUE raw_str)
 {
   struct Address add;
   VALUE ary = ary_new();
+  pi_buffer_t *buffer;
+
+  buffer = pi_buffer_new(0xffff);
+  if (!buffer) return Qnil;
 
   Check_Type(raw_str, T_STRING);
-  unpack_Address(&add, RSTRING(raw_str)->ptr, RSTRING(raw_str)->len);
+  if (!pi_buffer_append(buffer, RSTRING(raw_str)->ptr, RSTRING(raw_str)->len)) {
+    pi_buffer_free(buffer);
+    return Qnil;
+  }
+  unpack_Address(&add, buffer, address_v1);
 
   ar_set2(ary, "i", add.phoneLabel, 5);
   ar_set1(ary, "i", add.showPhone);
   ar_set2(ary, "s", add.entry, 19);
 
   free_Address(&add);
+  pi_buffer_free(buffer);
   return ary;
 }
 
@@ -604,9 +575,8 @@ static VALUE rpi_file_get_app_info(VALUE obj)
 
   Data_Get_Struct(obj, struct pi_file, pf);
 
-  if (pi_file_get_app_info(pf, (void*)&ptr, &len) < 0){
-    Fail("pi_file_get_app_info");
-  }
+  pi_file_get_app_info(pf, (void *) &ptr, &len);
+
   return str_new(ptr, len);
 }
 
@@ -614,7 +584,7 @@ static VALUE rpi_file_read_record(VALUE obj, VALUE i)
 {
   struct pi_file *pf;
   int len, attr, category;
-  pi_uid_t id;
+  recordid_t id;
   void *ptr;
   VALUE ary = ary_new();
 
