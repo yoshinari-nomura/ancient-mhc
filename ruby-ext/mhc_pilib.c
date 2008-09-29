@@ -3,7 +3,7 @@
 ** Author:  Yoshinari Nomura <nom@quickhack.net>
 **
 ** Created: 1999/09/01
-** Revised: $Date: 2008/09/29 00:36:48 $
+** Revised: $Date: 2008/09/29 00:39:11 $
 **
 */
 
@@ -570,7 +570,7 @@ static VALUE rpi_file_open(int argc, VALUE *argv, VALUE klass)
 static VALUE rpi_file_get_app_info(VALUE obj)
 {
   struct pi_file *pf;
-  int len;
+  size_t len;
   char *ptr;
 
   Data_Get_Struct(obj, struct pi_file, pf);
@@ -583,7 +583,8 @@ static VALUE rpi_file_get_app_info(VALUE obj)
 static VALUE rpi_file_read_record(VALUE obj, VALUE i)
 {
   struct pi_file *pf;
-  int len, attr, category;
+  size_t len;
+  int attr, category;
   recordid_t id;
   void *ptr;
   VALUE ary = ary_new();
