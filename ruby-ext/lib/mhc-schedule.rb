@@ -3,7 +3,7 @@
 ## Author:  Yoshinari Nomura <nom@quickhack.net>
 ##
 ## Created: 1999/07/16
-## Revised: $Date: 2005/10/03 14:23:03 $
+## Revised: $Date: 2008/10/08 03:22:37 $
 ##
 
 ################################################################
@@ -1298,7 +1298,7 @@ class MhcScheduleDB
     parent = File .dirname(dir)
     if makedir_or_higher(parent)
       Dir .mkdir(dir)
-      File .open(dir, "r") .fsync .close if File .method_defined?("fsync")
+      File .open(dir, "r") {|f| f .sync} if File .method_defined?("fsync")
       return true
     end
     return false

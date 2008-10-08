@@ -3,7 +3,7 @@
 ## Author:  Yoshinari Nomura <nom@quickhack.net>
 ##
 ## Created: 1999/09/01
-## Revised: $Date: 2004/06/22 10:09:15 $
+## Revised: $Date: 2008/10/08 03:22:37 $
 ##
 
 require 'mhc-date'
@@ -668,7 +668,7 @@ class PilotApptRecord < PilotRecord
       part1_is_header = false
     end
 
-    part1 .split("\n") .each{|line|
+    part1 .to_s .split("\n") .each{|line|
       if !(string =~ /^[ \t]+/ or string =~ /^[A-Za-z0-9_-]+:/)
 	part1_is_header = false
       end
