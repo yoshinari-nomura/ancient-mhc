@@ -1,3 +1,7 @@
+2009-01-07  KOIE Hidetaka / nom
+
+	* mhc-palm.rb: fix typo of variable name.
+
 2008-10-08 Kazuhiro Ito / nom
 
 	* ruby-ext/lib/mhc-palm.rb, ruby-ext/lib/mhc-schedule.rb:
