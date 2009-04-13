@@ -133,15 +133,28 @@
 	  (concat "^"
 		  (regexp-quote (file-name-as-directory mhc-mail-path)))
 	  path))
-	(progn
-	  (setq fld-msg
-		(concat "+" (substring path (match-end 0))))
-	  (concat
-	   "\r "
-	   (if mhc-mew-new-virtual-type "<> <> \006 ")
-	   (directory-file-name (file-name-directory fld-msg))
-	   " "
-	   (file-name-nondirectory fld-msg)))
+	(if (fboundp 'mew-summary-parent-id)
+	    (progn
+	      (setq fld-msg (concat "+" (substring path (match-end 0))))
+	      (setq fld (directory-file-name (file-name-directory fld-msg)))
+	      (setq msg (file-name-nondirectory fld-msg))
+	      (with-temp-buffer
+		(mew-insert-message fld msg mew-cs-text-for-read mew-header-reasonable-size)
+		(setq msgid (or (mew-idstr-get-first-id
+				 (mew-header-get-value "X-SC-Record-Id:"))
+				" "))
+		(setq ref (or (mew-idstr-get-first-id
+			       (mew-header-get-value mew-message-id:))
+			      " ")))
+	      (concat "\r " (directory-file-name (file-name-directory fld-msg))
+		      " " (file-name-nondirectory fld-msg)
+		      " " msgid " " ref "  "))
+	  (setq fld-msg (concat "+" (substring path (match-end 0))))
+	  (concat "\r "
+		  (if mhc-mew-new-virtual-type "<> <> \006 ")
+		  (directory-file-name (file-name-directory fld-msg))
+		  " "
+		  (file-name-nondirectory fld-msg)))
       "")))
 
 

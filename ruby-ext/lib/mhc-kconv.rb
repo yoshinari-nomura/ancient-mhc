@@ -14,6 +14,8 @@ module MhcKconv
     DISP_CODE = Kconv::EUC
   elsif env =~ /sjis|shift_jis/i
     DISP_CODE = Kconv::SJIS
+  elsif env =~ /^ja$/i
+    DISP_CODE = Kconv::EUC
   else
     DISP_CODE = Kconv::UTF8
   end

@@ -1,3 +1,11 @@
+2009-04-13  Hideyuki SHIRAI  <shirai@quickhack.net>
+
+	* emacs/mhc-mew.el (mhc-mew/schedule-foldermsg): Put Message-ID:
+	instead of Parent-ID: for `mew-summary-parent'
+
+	* ruby-ext/lib/mhc-kconv.rb (MhcKconv): If environment is `ja',
+	set kanjicode to EUC.
+
 2009-01-07  KOIE Hidetaka / nom
 
 	* mhc-palm.rb: fix typo of variable name.
