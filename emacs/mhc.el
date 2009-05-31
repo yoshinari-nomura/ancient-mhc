@@ -3,7 +3,7 @@
 ;; Author:  Yoshinari Nomura <nom@quickhack.net>
 ;;
 ;; Created: 1994/07/04
-;; Revised: $Date: 2008/07/04 06:01:20 $
+;; Revised: $Date: 2009/05/31 12:54:50 $
 
 ;;;
 ;;; Commentay:
@@ -55,6 +55,7 @@
 			       ;; Meadow2 or NTEmacs21.3(and the later
 			       ;; version) supports the image feature.
 			       (or (featurep 'meadow)
+				   (>= emacs-major-version 22)
 				   (>= emacs-minor-version 3))
 			     t)))
   (require 'mhc-e21))

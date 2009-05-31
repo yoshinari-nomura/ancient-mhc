@@ -1,3 +1,8 @@
+2009-05-31  Hideyuki SHIRAI  <shirai@quickhack.net>
+
+	* emacs/mhc.el (toplevel): require 'mhc-e21 if NTEmacs 22 and the
+	later. Thanks to Mr. Kazuhiro Ito.
+
 2009-04-13  Hideyuki SHIRAI  <shirai@quickhack.net>
 
 	* emacs/mhc-mew.el (mhc-mew/schedule-foldermsg): Put Message-ID:
